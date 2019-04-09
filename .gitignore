@@ -10,3 +10,4 @@ sys/mvnw
 sys/mvnw.cmd
 util/target/
 util/util.iml
+/var/
