@@ -1,6 +1,8 @@
 package com.ldz.biz.model;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 import javax.persistence.*;
 
 @Table(name = "user")
@@ -25,7 +27,7 @@ public class User implements Serializable {
     private String userName;
 
     /**
-     * 来源。区分Android注册用户和机器人用户
+     * 来源。区分Android注册用户和机器人用户   0 人 1 机
      */
     private String source;
 
@@ -42,7 +44,7 @@ public class User implements Serializable {
     private String lastImei;
 
     /**
-     * 用户状态。正常、锁定
+     * 用户状态。正常、锁定   0 正常  1 锁定
      */
     private String zt;
 
@@ -99,7 +101,20 @@ public class User implements Serializable {
      */
     private String bz3;
 
+    /**
+     * 充值和消费记录
+     */
+    private List<Map<String,String>> record;
+
     private static final long serialVersionUID = 1L;
+
+    public List<Map<String, String>> getRecord() {
+        return record;
+    }
+
+    public void setRecord(List<Map<String, String>> record) {
+        this.record = record;
+    }
 
     /**
      * @return id

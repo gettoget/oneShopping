@@ -3,6 +3,7 @@ package com.ldz.util.bean;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.github.pagehelper.PageInfo;
+import com.ldz.util.commonUtil.MessageUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -43,9 +44,13 @@ public class ApiResponse<T> implements Serializable {
 	 *
 	 */
 	private int code = SUCCESS;
-	//返回消息内容
-	private String message = "请求成功！";
-	//返回结果对象
+	/**
+	 * 返回消息内容
+	 */
+	private String message = MessageUtils.get("message.success") + "!";
+	/**
+	 * 返回结果对象
+	 */
 	@JsonInclude(value=Include.NON_EMPTY)
 	private T result;
 	//如果是分页查询，则返回分页对象
@@ -76,22 +81,22 @@ public class ApiResponse<T> implements Serializable {
 	}
 	public static <T> ApiResponse<T> success(T result){
 		ApiResponse<T> res = new ApiResponse<>();
-		res.setMessage("操作成功");
+		res.setMessage(MessageUtils.get("message.success")+"!");
 		res.setResult(result);
 		return res;
 	}
 	public static ApiResponse<String> saveSuccess(){
-		return success("数据保存成功！");
+		return success(MessageUtils.get("message.saveSuccess") + "!");
 	}
 	public static ApiResponse<String> deleteSuccess(){
-		return success("数据删除成功！");
+		return success(MessageUtils.get("message.delSuccess") + "!");
 	}
 	public static ApiResponse<String> updateSuccess(){
-		return success("数据修改成功！");
+		return success(MessageUtils.get("message.updateSuccess") + "!");
 	}
 
 	public static ApiResponse<String> success(){
-		return success("操作成功");
+		return success(MessageUtils.get("message.success") + "!");
 	}
 	public static ApiResponse<String> fail(String msg){
 		ApiResponse<String> res = new ApiResponse<>();
@@ -102,7 +107,7 @@ public class ApiResponse<T> implements Serializable {
 	public static ApiResponse<String> authFailed(){
 		ApiResponse<String> res = new ApiResponse<>();
 		res.setCode(AUTH_FAILED);
-		res.setMessage("授权认证失败");
+		res.setMessage(MessageUtils.get("message.authFailed"));
 		return res;
 	}
 	public static ApiResponse<String> notFound(String msg){

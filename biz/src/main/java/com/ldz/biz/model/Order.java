@@ -3,7 +3,7 @@ package com.ldz.biz.model;
 import java.io.Serializable;
 import javax.persistence.*;
 
-@Table(name = "order")
+@Table(name = "order_form")
 public class Order implements Serializable {
     /**
      * 订单编号

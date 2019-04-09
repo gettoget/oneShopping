@@ -75,6 +75,7 @@ public abstract class BaseServiceImpl<T, PK extends Serializable> implements Bas
         return list;
     }
 
+    @Override
     public ApiResponse<List<T>> pager(Page<T> pager) {
         ApiResponse<List<T>> result = new ApiResponse<>();
         LimitedCondition condition = getQueryCondition();
@@ -102,6 +103,7 @@ public abstract class BaseServiceImpl<T, PK extends Serializable> implements Bas
      * @param condition
      * @return
      */
+    @Override
     public boolean fillCondition(LimitedCondition condition) {
         return fillPagerCondition(condition);
     }
@@ -124,6 +126,11 @@ public abstract class BaseServiceImpl<T, PK extends Serializable> implements Bas
     public String getRequestParamterAsString(String key) {
         HttpServletRequest request = getRequset();
         return request.getParameter(key);
+    }
+
+    public Object getAttribute(String key){
+        HttpServletRequest requset = getRequset();
+        return  requset.getAttribute(key);
     }
 
     public HttpServletRequest getRequset() {
@@ -152,6 +159,7 @@ public abstract class BaseServiceImpl<T, PK extends Serializable> implements Bas
      *
      * @return
      */
+    @Override
     public LimitedCondition getQueryCondition() {
         LimitedCondition condition = new LimitedCondition(getEntityCls());
         //从请求中获取到所有参数名称，对参数名称进行解析，将符合搜索条件的参数取出来，参与到查询条件中
@@ -315,6 +323,7 @@ public abstract class BaseServiceImpl<T, PK extends Serializable> implements Bas
     }
 
 
+    @Override
     public List<List<String>> getSheetData(ExcelParams params) {
         LimitedCondition example = getQueryCondition();
         fillCondition(example);
@@ -328,6 +337,7 @@ public abstract class BaseServiceImpl<T, PK extends Serializable> implements Bas
      *
      * @return
      */
+    @Override
     public List<List<String>> getSheetData(List<T> list, ExcelParams params) {
         List<List<String>> data = new ArrayList<>(list.size());
         if (list.size() == 0) return data;

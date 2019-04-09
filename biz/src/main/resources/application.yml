@@ -1,6 +1,10 @@
 server:
   port: 8088
 spring:
+  messages:
+    basename: i18n/messages
+    cache-second: 3600
+    encoding: utf-8
   redis:
     database: 10
     host: 127.0.0.1
@@ -13,7 +17,7 @@ spring:
         max-active: 2000
         max-wait: 1000ms
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/yyg?useUnicode=true&characterEncoding=UTF-8
+    url: jdbc:mysql://127.0.0.1:3306/yyg?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
     username: root
     password: 123456
     type: com.alibaba.druid.pool.DruidDataSource
@@ -32,7 +36,7 @@ spring:
     filters: stat,wall,log4j
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
     cachePrepStmts: true
-#mybatisÅäÖÃÐÅÏ¢
+#mybatisï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
 mybatis:
   configLocation: classpath:mybatis/MapperConfig.xml
 
