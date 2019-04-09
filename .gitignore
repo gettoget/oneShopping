@@ -1,0 +1,12 @@
+# Created by .ignore support plugin (hsz.mobi)
+.gitignore
+.idea/
+biz/.mvn/
+biz/mvnw
+biz/mvnw.cmd
+parent.iml
+sys/.mvn/
+sys/mvnw
+sys/mvnw.cmd
+util/target/
+util/util.iml
