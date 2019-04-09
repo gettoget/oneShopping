@@ -1,3 +1,13 @@
+<style lang="less">
+  .pageTitSty{
+    .tit{
+      display: inline-block;
+      vertical-align: text-top;
+      font-size:24px;
+      margin-left: 10px;
+    }
+  }
+</style>
 <template>
   <div class="box_row colCenter pageTitSty">
     <div style="background-color: #19be6b;width: 3px;height: 30px">
@@ -24,7 +34,3 @@
     }
   }
 </script>
-
-<style scoped>
-
-</style>

@@ -105,15 +105,15 @@ export default [
       //   },
       //   component: () => import('@/vShop/system/system-daily')
       // },
-      // {
-      //   path: 'dictionaries',
-      //   name: 'dictionaries',
-      //   meta: {
-      //     icon: '_bear',
-      //     title: '字典管理'
-      //   },
-      //   component: () => import('@/vShop/system/dictionaries')
-      // },
+      {
+        path: 'dictionaries',
+        name: 'dictionaries',
+        meta: {
+          icon: '_bear',
+          title: '字典管理'
+        },
+        component: () => import('@/vShop/system/dictionaries')
+      },
       // {
       //   path: 'system-ShortMessage',
       //   name: 'system-ShortMessage',
