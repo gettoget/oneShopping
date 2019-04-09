@@ -1,5 +1,5 @@
 <style lang="less">
-  @import '../../../assets/css/wdPageSty';
+  /*@import '../../../assets/css/wdPageSty';*/
 </style>
 <!--用户管理-->
 <template>
