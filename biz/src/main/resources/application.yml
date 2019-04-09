@@ -1,0 +1,43 @@
+server:
+  port: 8088
+spring:
+  redis:
+    database: 10
+    host: 127.0.0.1
+    port: 6379
+    timeout: 3000ms
+    jedis:
+      pool:
+        max-idle: 500
+        min-idle: 50
+        max-active: 2000
+        max-wait: 1000ms
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/yyg?useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: 123456
+    type: com.alibaba.druid.pool.DruidDataSource
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 'x'
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    maxPoolPreparedStatementPerConnectionSize: 20
+    filters: stat,wall,log4j
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+    cachePrepStmts: true
+#mybatis≈‰÷√–≈œ¢
+mybatis:
+  configLocation: classpath:mybatis/MapperConfig.xml
+
+logging:
+  config: classpath:log4j2.xml
+
+mapper:
+  identity: MYSQL
