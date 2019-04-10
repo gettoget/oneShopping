@@ -1,6 +1,7 @@
 package com.ldz.biz.model;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.*;
 
 @Table(name = "order_form")
@@ -12,7 +13,7 @@ public class Order implements Serializable {
     private String id;
 
     /**
-     * 订单类型( 直接购买/ 参与抽奖)
+     * 订单类型( 直接购买/ 参与抽奖)  1 直接购买  2 参与抽奖
      */
     @Column(name = "order_type")
     private String orderType;
@@ -56,7 +57,7 @@ public class Order implements Serializable {
     private String imei;
 
     /**
-     * 订单状态。待开奖、已中奖、未中奖
+     * 订单状态。待开奖、已中奖、未中奖  待支付   0 待开奖 1 已中奖 2 未中奖 3 待支付 4 已支付 5 取消支付
      */
     private String ddzt;
 
@@ -80,7 +81,22 @@ public class Order implements Serializable {
      */
     private String bz3;
 
+    /**
+     * 抽奖订单详情
+     */
+    private List<OrderList> orderLists;
+
+
+
     private static final long serialVersionUID = 1L;
+
+    public List<OrderList> getOrderLists() {
+        return orderLists;
+    }
+
+    public void setOrderLists(List<OrderList> orderLists) {
+        this.orderLists = orderLists;
+    }
 
     /**
      * 获取订单编号

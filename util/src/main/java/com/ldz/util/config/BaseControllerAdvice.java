@@ -3,6 +3,7 @@ package com.ldz.util.config;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ldz.util.bean.ApiResponse;
+import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.AuthFailedException;
 import com.ldz.util.exception.RuntimeCheckException;
 import org.slf4j.Logger;
@@ -69,7 +70,7 @@ public class BaseControllerAdvice {
 
 		ApiResponse api = new ApiResponse();
 		api.setCode(ApiResponse.FAILED);
-		api.setMessage("数据处理异常！");
+		api.setMessage(MessageUtils.get("exception"));
 		return api;
     }
 }

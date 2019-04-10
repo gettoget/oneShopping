@@ -39,13 +39,13 @@ public class ProInfo implements Serializable {
     private String proStore;
 
     /**
-     * 商品状态。上架、下架、已开奖
+     * 商品状态。上架、下架、已开奖  1 上架  2 下架 3 已开奖
      */
     @Column(name = "pro_zt")
     private String proZt;
 
     /**
-     * 商品类型，可多个。推荐、上新、热门
+     * 商品类型，可多个。推荐、上新、热门  1 推荐 2 上新 3热门
      */
     @Column(name = "pro_lx")
     private String proLx;

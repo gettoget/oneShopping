@@ -21,7 +21,7 @@ public class Popularimgs implements Serializable {
     private String imgUrl;
 
     /**
-     * 轮播图类型。商品推荐、活动页面
+     * 轮播图类型。商品推荐、活动页面  1 商品推荐  2 活动页面
      */
     @Column(name = "img_lx")
     private String imgLx;
@@ -37,7 +37,7 @@ public class Popularimgs implements Serializable {
     private String cjsj;
 
     /**
-     * 状态。有效、无效
+     * 状态。有效、无效 0 有效  1 无效
      */
     private String zt;
 

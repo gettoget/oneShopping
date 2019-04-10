@@ -6,6 +6,7 @@ import com.ldz.util.bean.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -75,10 +76,28 @@ public class UserCtrl  {
         return service.findPwd(phone, code,newPwd,newPwd1,type);
     }
 
+    /**
+     * 消费记录
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
     @PostMapping("/myWallet")
-    public ApiResponse<String> getMyWallet(){
-        return service.getMyWallet();
+    public ApiResponse<String> getMyWallet(@RequestParam(defaultValue = "1") Integer pageNum,@RequestParam(defaultValue = "8") int pageSize){
+        return service.getMyWallet(pageNum,pageSize);
     }
+
+    /**
+     * 短信验证码下发接口
+     * @param phone 用户手机号
+     * @param type 类型  1 注册  2 找回没密码
+     * @return
+     */
+    @PostMapping("/sendMsg")
+    public ApiResponse<String> sendMsg(String phone, String type){
+        return service.sendMsg(phone, type);
+    }
+
 
 
 

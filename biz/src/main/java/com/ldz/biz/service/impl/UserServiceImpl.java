@@ -3,16 +3,16 @@ package com.ldz.biz.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.ldz.biz.mapper.UserMapper;
+import com.ldz.biz.model.PaymentBean;
 import com.ldz.biz.model.User;
 import com.ldz.biz.service.UserService;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.SimpleCondition;
-import com.ldz.util.commonUtil.DateUtils;
-import com.ldz.util.commonUtil.EncryptUtil;
-import com.ldz.util.commonUtil.JwtUtil;
-import com.ldz.util.commonUtil.MessageUtils;
+import com.ldz.util.commonUtil.*;
 import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.redis.RedisTemplateUtil;
 import org.apache.commons.collections4.CollectionUtils;
@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
+import javax.management.relation.RoleUnresolved;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -56,7 +57,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 		RuntimeCheck.ifBlank(regCode, MessageUtils.get("user.regCodeBlank"));
 		RuntimeCheck.ifTrue(StringUtils.equals(regCode,code), MessageUtils.get("user.regCodeError"));
 
-		String imei = getRequestParamterAsString("imei");
+		String imei = (String) getAttribute("imei");
 		RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
 
 		// 保存用户
@@ -84,7 +85,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 		condition.eq(User.InnerColumn.phone , phone);
 		List<User> users = findByCondition(condition);
 		RuntimeCheck.ifTrue(CollectionUtils.isEmpty(users), MessageUtils.get("user.notregister"));
-		String imei = getRequestParamterAsString("imei");
+		String imei = (String) getAttribute("imei");
 		RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
 		User user = users.get(0);
 		String userPwd = EncryptUtil.encryptUserPwd(password);
@@ -156,20 +157,41 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 			update(u);
 			return ApiResponse.success(MessageUtils.get("user.editPwdSuc"));
 		}else {
-			return ApiResponse.fail(MessageUtils.get("error"));
+			return ApiResponse.fail(MessageUtils.get("user.typeError"));
 		}
 	}
 
 	@Override
-	public ApiResponse<String> getMyWallet() {
+	public ApiResponse<String> getMyWallet(int pageNum, int pageSize) {
 		String userId = (String) getAttribute("userId");
 		User user = findById(userId);
 		RuntimeCheck.ifNull(user, MessageUtils.get("user.null"));
-
-
-
-		return null;
+		PageInfo<PaymentBean> info = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> {
+			baseMapper.getMyPayRecord(userId);
+		});
+		ApiResponse<String> res = new ApiResponse<>();
+		res.setPage(info);
+		return res;
 	}
+
+    @Override
+    public ApiResponse<String> sendMsg(String phone, String type) {
+		RuntimeCheck.ifBlank(phone, MessageUtils.get("user.codePhoneBlank"));
+		//todo 短信发送过程暂时忽略
+		String code = SendSmsUtil.sendMSG(phone,type);
+		if(StringUtils.equals(type, "1")){
+			// 用户注册验证码
+
+			redis.boundValueOps(phone + "_register_code").set(code, 5 , TimeUnit.MINUTES);
+		}else if(StringUtils.equals(type , "2")){
+			// 用户找回密码 验证码
+
+			redis.boundValueOps(phone + "_find_pwd").set(code, 5 , TimeUnit.MINUTES);
+		}else{
+			return ApiResponse.fail(MessageUtils.get("user.typeError"));
+		}
+		return ApiResponse.success(MessageUtils.get("user.sendMsgSuc"));
+    }
 
 
 }

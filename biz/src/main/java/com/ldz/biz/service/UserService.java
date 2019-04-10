@@ -53,6 +53,19 @@ public interface UserService extends BaseService<User, String> {
      */
     ApiResponse<String> findPwd(String phone, String code, String newPwd, String newPwd1, String type);
 
-    ApiResponse<String> getMyWallet();
+    /**
+     * 消费记录分页接口
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    ApiResponse<String> getMyWallet(int pageNum, int pageSize);
 
+    /**
+     * 发送短信接口
+     * @param phone
+     * @param type
+     * @return
+     */
+    ApiResponse<String> sendMsg(String phone, String type);
 }
