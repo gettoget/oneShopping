@@ -67,7 +67,7 @@ export default [
           icon: 'md-trending-up',
           title: '用户管理'
         },
-        // component: () => import('@/vShop/system/system-user')
+        component: () => import('@/vShop/system/system-user')
       },
       {
         path: 'system-role',
@@ -76,7 +76,7 @@ export default [
           icon: '_bear',
           title: '角色管理'
         },
-        // component: () => import('@/vShop/system/system-root')
+        component: () => import('@/vShop/system/system-root')
       },
       {
         path: 'system-function',
@@ -96,33 +96,33 @@ export default [
       //   },
       //   component: () => import('@/vShop/system/system-Jurisdiction')
       // },
-      // {
-      //   path: 'system-daily',
-      //   name: 'system-daily',
-      //   meta: {
-      //     icon: '_bear',
-      //     title: '日志管理'
-      //   },
-      //   component: () => import('@/vShop/system/system-daily')
-      // },
-      // {
-      //   path: 'dictionaries',
-      //   name: 'dictionaries',
-      //   meta: {
-      //     icon: '_bear',
-      //     title: '字典管理'
-      //   },
-      //   component: () => import('@/vShop/system/dictionaries')
-      // },
-      // {
-      //   path: 'system-ShortMessage',
-      //   name: 'system-ShortMessage',
-      //   meta: {
-      //     icon: '_bear',
-      //     title: '短信管理'
-      //   },
-      //   component: () => import('@/vShop/system/system-ShortMessage')
-      // }
+      {
+        path: 'system-daily',
+        name: 'system-daily',
+        meta: {
+          icon: '_bear',
+          title: '日志管理'
+        },
+        component: () => import('@/vShop/system/system-daily')
+      },
+      {
+        path: 'dictionaries',
+        name: 'dictionaries',
+        meta: {
+          icon: '_bear',
+          title: '字典管理'
+        },
+        component: () => import('@/vShop/system/dictionaries')
+      },
+      {
+        path: 'system-ShortMessage',
+        name: 'system-ShortMessage',
+        meta: {
+          icon: '_bear',
+          title: '短信管理'
+        },
+        component: () => import('@/vShop/system/system-ShortMessage')
+      }
     ]
   },
 

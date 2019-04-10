@@ -16,6 +16,7 @@
 
 <script>
 import LoginForm from '_c/login-form'
+import Cookies from 'js-cookie';
 import { mapActions } from 'vuex'
 export default {
   components: {
@@ -43,27 +44,13 @@ export default {
       //   })
       // })
     },
-    initDict(dictList) {
-      for (let r of dictList){
-        if ('ZDCLK1017' === r.lmdm){
-          this.initSchoolPY(r);
-          break;
-        }
-      }
-      sessionStorage.setItem('dictMap', dictList)
-    },
-    initSchoolPY(dict){
-      for (let r of dict.zdxmList){
-        r.by1 = this.util.parsePY(r.zdmc);
-      }
-    },
     login(form){
       var v = this
       v.$http.post(this.apis.LOGIN.QUERY, form).then((res) => {
         if (res.code === 200) {
         //   localStorage.setItem('user',this.form.username)
         //   Cookies.set('usermess', this.form.username);
-        //   Cookies.set('accessToken', res.result.accessToken);
+          Cookies.set('accessToken', res.result.accessToken);
         //
         //   sessionStorage.setItem("userInfo", JSON.stringify(res.result.userInfo));
         //   localStorage.setItem('menuList', JSON.stringify(res.result.menuTree))
@@ -81,6 +68,20 @@ export default {
         }
         // this.getUrl()
       })
+    },
+    initDict(dictList) {
+      for (let r of dictList){
+        if ('ZDCLK1017' === r.lmdm){
+          this.initSchoolPY(r);
+          break;
+        }
+      }
+      sessionStorage.setItem('dictMap', dictList)
+    },
+    initSchoolPY(dict){
+      for (let r of dict.zdxmList){
+        r.by1 = this.util.parsePY(r.zdmc);
+      }
     },
   }
 }

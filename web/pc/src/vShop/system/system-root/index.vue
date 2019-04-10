@@ -8,7 +8,7 @@
 
     <div class="box_row colCenter rowRight pageFindSty" style="border: none">
       <div>
-        <Icon type="md-person" size="34"/>
+        <!--<Icon type="md-person" size="34"/>-->
         <Input v-model="param.jsmcLike"
                placeholder="请输入角色"
                style="width: 200px"
@@ -54,8 +54,6 @@
 
 <script>
   import mixins from '@/mixins'
-
-
   import addrole from './comp/addmess.vue'
   // import modifyRolePermission from './comp/modifyRolePermission.vue'
 

@@ -16,7 +16,6 @@
 					</FormItem>
 				</Form>
 			</div>
-			</Form>
 			<div slot='footer'>
 				<Button type="default" @click="colse"style="color: #949494">取消</Button>
 				<Button type="primary" @click="colse">确定</Button>

@@ -112,7 +112,7 @@
 
 <script>
 
-  import menuChoose from '../../../components/menuChoose'
+  import menuChoose from '../../components/menuChoose'
   import selectRole from '../../system-root/selectTable'
 
   export default {

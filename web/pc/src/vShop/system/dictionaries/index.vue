@@ -11,13 +11,12 @@
     <pager-tit title="字典管理"></pager-tit>
     <div class="box_row colCenter rowRight pageFindSty">
       <div>
-        <Icon type="md-person" size="34"/>
         <Input v-model="param.lmmcLike" placeholder="请输入字典名称..."
                style="width: 200px"
                @on-keyup.enter="findMessList()"
                @on-change="findMessList"></Input>
       </div>
-      <Button type="primary" @click="findMessList()">
+      <Button type="primary" @click="findMessList()" style="margin: 0 8px">
         <Icon type="md-search"></Icon>
         <!--查询-->
       </Button>
@@ -94,8 +93,6 @@
 </template>
 
 <script>
-  import mixins from '@/mixins'
-
 
   import addmess from './comp/addmess.vue'
   import addmessList from './comp/addmessList.vue'
@@ -103,7 +100,6 @@
 
   export default {
     name: 'char',
-    mixins: [mixins],
     components: {
       addmessList,
       addmess,
