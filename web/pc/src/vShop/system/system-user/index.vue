@@ -1,5 +1,5 @@
 <style lang="less">
-  /*@import '../../../assets/css/wdPageSty';*/
+  @import '../../../assets/css/wdPageSty';
 </style>
 <!--用户管理-->
 <template>
@@ -7,7 +7,7 @@
     <pager-tit title="用户管理"></pager-tit>
     <div class="box_row colCenter rowRight pageFindSty" style="border: none">
       <div>
-        <Icon type="md-person" size="34"/>
+        <!--<Icon type="md-person" size="34"/>-->
         <Input v-model="param.xmLike"
                placeholder="请输入用户姓名" style="width: 200px"
                @on-keyup.enter="findMessList()"
@@ -15,7 +15,7 @@
       </div>
 
       <div>
-        <Icon type="ios-call" size="34"/>
+        <!--<Icon type="ios-call" size="34"/>-->
         <Input v-model="param.sjhLike"
                placeholder="请输入手机号码" style="width: 200px"
                @on-keyup.enter="findMessList()"
