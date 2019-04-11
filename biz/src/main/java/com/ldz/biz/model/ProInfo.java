@@ -119,7 +119,49 @@ public class ProInfo implements Serializable {
      */
     private String bz3;
 
+    /**
+     * 用户姓名
+     */
+    @Transient
+    private String userName;
+    /**
+     * 当前用户参与次数
+     */
+    @Transient
+    private int cycs;
+
+    /**
+     * 上期中奖记录
+     */
+    @Transient
+    private WinRecord winRecord;
+
+
     private static final long serialVersionUID = 1L;
+
+    public WinRecord getWinRecord() {
+        return winRecord;
+    }
+
+    public void setWinRecord(WinRecord winRecord) {
+        this.winRecord = winRecord;
+    }
+
+    public int getCycs() {
+        return cycs;
+    }
+
+    public void setCycs(int cycs) {
+        this.cycs = cycs;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
     /**
      * @return id

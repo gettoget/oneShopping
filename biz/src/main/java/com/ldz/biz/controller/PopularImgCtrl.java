@@ -22,6 +22,11 @@ public class PopularImgCtrl extends BaseController<Popularimgs,String> {
         return service;
     }
 
+    /**
+     * 保存推荐轮播图
+     * @param entity
+     * @return
+     */
     @RequestMapping(value="/save", method={RequestMethod.POST})
     @Override
     public ApiResponse<String> save(Popularimgs entity){

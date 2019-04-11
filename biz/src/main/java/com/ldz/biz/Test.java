@@ -4,15 +4,12 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Test {
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         DateTimeFormatter hHmmssSSS = DateTimeFormat.forPattern("yyyyMMddHHmmssSSS");
 
         // 创建51 个中奖号码  根据 中奖规则 计算中奖率
@@ -21,8 +18,9 @@ public class Test {
         System.out.println(now);
         List<String> list = new ArrayList<>();
         Random random = new Random();
+        int i1 = random.nextInt(5788);
         // 生成 51 个号码
-        for(int i = 0 ; i < 201 ; i++){
+        for(int i = 0 ; i < i1 ; i++){
             // 根据时间生成
             int nextInt = random.nextInt(86400000-28800000);
             DateTime plusMillis = now.plusMillis(nextInt);
@@ -40,8 +38,12 @@ public class Test {
         for(int i = 0; i < 201; i++){
 
             total += Long.parseLong(collect.get(i));
-            long l = (total - (total / (i + 1)) * (i + 1)) ;
-            list1.add(l);
+            long aa = 0;
+            for(int j = i ; j>=0 ; j-- ){
+                aa += Long.parseLong(collect.get(j));
+                long l = (aa + i1) / (i1) + 10000001;
+                list1.add(l);
+            }
             if(i == 49){
                 zjhm = total % 201 + 10000001;
             }
@@ -57,6 +59,13 @@ public class Test {
 
 
 
+    }*/
+
+    public static void main(String[] args) {
+        String uuid = UUID.randomUUID().toString().replace("-","").substring(15,25).toUpperCase();
+        System.out.println(uuid);
+
     }
+
 
 }

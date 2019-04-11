@@ -144,37 +144,48 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 	}
 
 	@Override
-	public ApiResponse<String> payOrder(String id) {
+	public ApiResponse<String> payOrder(String id, String payPwd) {
 		RuntimeCheck.ifBlank(id, MessageUtils.get("order.idBlank"));
 		String userId = (String) getAttribute("userId");
 		User user = userService.findById(userId);
+		RuntimeCheck.ifBlank(user.getPayPwd(), MessageUtils.get("user.paypwdnull"));
+		RuntimeCheck.ifBlank(payPwd, MessageUtils.get("user.paypwdblank"));
 		Order order = findById(id);
 		RuntimeCheck.ifFalse(order.getDdzt().equals("3"), MessageUtils.get("order.ztError"));
+		Exchange exchange = new Exchange();
+		int dzf = Integer.parseInt(order.getZfje());
+		exchange.setXfjb(dzf+"");
 		if (StringUtils.equals(order.getOrderType(), "1")) {
-			// 直接购买订单
+			// todo 直接购买可能是直接调用支付接口
+			// 直接购买订单 订单状态改为已支付
 			order.setDdzt("4");
+
 		}else{
 			// 抽奖 支付后直接进入待开奖状态
 			order.setDdzt("0");
+			int balance = Integer.parseInt(user.getBalance());
+			int ye = balance - dzf;
+			if(ye < 0){
+				return ApiResponse.fail(MessageUtils.get("order.balanceNotEnough"));
+			}
+			exchange.setXfqjbs(balance+"");
+			exchange.setXfsj(DateUtils.getNowTime());
+			exchange.setXfhjbs(ye+"");
+			user.setBalance(ye + "");
 		}
-		int dzf = Integer.parseInt(order.getZfje());
-		int balance = Integer.parseInt(user.getBalance());
-		int ye = balance - dzf;
-		if(ye < 0){
-			return ApiResponse.fail(MessageUtils.get("order.balanceNotEnough"));
-		}
-		user.setBalance(ye + "");
+
+
+
 		// 已支付 生成消费记录
-		Exchange exchange = new Exchange();
+
 		exchange.setId(genId());
 		exchange.setProid(order.getProId());
 		exchange.setPromc(order.getProName());
 		exchange.setUserid(userId);
 		exchange.setXfddh(order.getId());
-		exchange.setXfhjbs(ye+"");
-		exchange.setXfjb(dzf+"");
-		exchange.setXfqjbs(balance+"");
-		exchange.setXfsj(DateUtils.getNowTime());
+
+
+
 		exchangeService.save(exchange);
 		userService.update(user);
 		update(order);

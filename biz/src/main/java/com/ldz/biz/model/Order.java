@@ -84,11 +84,21 @@ public class Order implements Serializable {
     /**
      * 抽奖订单详情
      */
+    @Transient
     private List<OrderList> orderLists;
 
-
+    @Transient
+    private String userName;
 
     private static final long serialVersionUID = 1L;
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
     public List<OrderList> getOrderLists() {
         return orderLists;

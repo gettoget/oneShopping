@@ -69,7 +69,6 @@ public class AccessInterceptor extends HandlerInterceptorAdapter {
 			userId = request.getParameter("userId");
 		}
 
-		request.setAttribute("userId",userId);
 
 		String imei = request.getHeader("imei");
 		if(StringUtils.isBlank(imei)){

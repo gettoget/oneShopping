@@ -6,6 +6,7 @@ import com.ldz.sys.base.BaseController;
 import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,13 +22,25 @@ public class OrderCtrl extends BaseController<Order,String> {
         return service;
     }
 
+    /**
+     * 新增一条订单接口
+     * @param entity
+     * @return
+     */
     @Override
+    @PostMapping("/save")
     public ApiResponse<String> save(Order entity){
         return service.saveEntity(entity);
     }
 
-    public ApiResponse<String> payOrder(String id){
-        return  service.payOrder(id);
+    /**
+     * 支付订单接口
+     * @param id 订单id
+     * @return
+     */
+    @PostMapping("/payOrder")
+    public ApiResponse<String> payOrder(String id, String payPwd){
+        return  service.payOrder(id,payPwd);
     }
 
 
