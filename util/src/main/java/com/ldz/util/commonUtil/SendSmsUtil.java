@@ -31,19 +31,20 @@ public class SendSmsUtil {
     static final String accessKeySecret = "nrs5RISRKjTDH2QnMg0O7zwhh9JcUR";
 
 
-    public static Boolean sendSms(Map<String,String> requestMap){
-        Boolean ret=false;
+    public static Boolean sendSms(Map<String, String> requestMap) {
+        Boolean ret = false;
         try {
-            SendSmsResponse response= sendSmsMap(requestMap);
-            if(response.getCode() != null && response.getCode().equals("OK")) {
-                ret=true;
+            SendSmsResponse response = sendSmsMap(requestMap);
+            if (response.getCode() != null && response.getCode().equals("OK")) {
+                ret = true;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return ret;
     }
-    public static SendSmsResponse sendSmsMap(Map<String,String> requestMap) throws ClientException {
+
+    public static SendSmsResponse sendSmsMap(Map<String, String> requestMap) throws ClientException {
 
         //可自助调整超时时间
         System.setProperty("sun.net.client.defaultConnectTimeout", "10000");
@@ -79,6 +80,7 @@ public class SendSmsUtil {
 
         return sendSmsResponse;
     }
+
     public static QuerySendDetailsResponse querySendDetails(String bizId) throws ClientException {
 
         //可自助调整超时时间
@@ -112,10 +114,10 @@ public class SendSmsUtil {
 
     public static void main(String[] args) throws ClientException, InterruptedException {
 
-        Map<String,String> map=new HashMap<>();
-        map.put("phoneNumbers","18672922385");//电话号码
-        map.put("templateCode","SMS_147260049");//短信模板
-        map.put("templateParam","{\"code\":\"123456\"}");//短信报文
+        Map<String, String> map = new HashMap<>();
+        map.put("phoneNumbers", "18672922385");//电话号码
+        map.put("templateCode", "SMS_147260049");//短信模板
+        map.put("templateParam", "{\"code\":\"123456\"}");//短信报文
 //        map.put("","");
 //        map.put("","");
         //发短信
@@ -129,15 +131,14 @@ public class SendSmsUtil {
         Thread.sleep(3000L);
 
         //查明细
-        if(response.getCode() != null && response.getCode().equals("OK")) {
+        if (response.getCode() != null && response.getCode().equals("OK")) {
             QuerySendDetailsResponse querySendDetailsResponse = querySendDetails(response.getBizId());
             System.out.println("短信明细查询接口返回数据----------------");
             System.out.println("Code=" + querySendDetailsResponse.getCode());
             System.out.println("Message=" + querySendDetailsResponse.getMessage());
             int i = 0;
-            for(QuerySendDetailsResponse.SmsSendDetailDTO smsSendDetailDTO : querySendDetailsResponse.getSmsSendDetailDTOs())
-            {
-                System.out.println("SmsSendDetailDTO["+i+"]:");
+            for (QuerySendDetailsResponse.SmsSendDetailDTO smsSendDetailDTO : querySendDetailsResponse.getSmsSendDetailDTOs()) {
+                System.out.println("SmsSendDetailDTO[" + i + "]:");
                 System.out.println("Content=" + smsSendDetailDTO.getContent());
                 System.out.println("ErrCode=" + smsSendDetailDTO.getErrCode());
                 System.out.println("OutId=" + smsSendDetailDTO.getOutId());
@@ -151,4 +152,11 @@ public class SendSmsUtil {
             System.out.println("RequestId=" + querySendDetailsResponse.getRequestId());
         }
 
-    }}
+    }
+
+    public static String sendMSG(String phone, String type){
+        return "123456";
+    }
+
+
+}

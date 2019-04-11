@@ -57,7 +57,7 @@
 
 <script>
 
-  import menuChoose from '../../../components/menuChoose'
+  import menuChoose from '../../components/menuChoose'
 
   export default {
     name: '',

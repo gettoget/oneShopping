@@ -1,5 +1,7 @@
 package com.ldz.biz.intercepter;
 
+import com.ldz.biz.model.User;
+import com.ldz.biz.service.UserService;
 import com.ldz.sys.constant.Dict;
 import com.ldz.sys.mapper.SysYhJsMapper;
 import com.ldz.sys.model.SysGn;
@@ -11,6 +13,7 @@ import com.ldz.util.spring.SpringContextUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -65,7 +68,15 @@ public class AccessInterceptor extends HandlerInterceptorAdapter {
 		if(userId == null ){
 			userId = request.getParameter("userId");
 		}
-		request.setAttribute("userId",userId);
+
+
+		String imei = request.getHeader("imei");
+		if(StringUtils.isBlank(imei)){
+			imei = request.getParameter("imei");
+		}
+
+		request.setAttribute("imei",imei);
+
 		return super.preHandle(request, response, handler);
 	}
 

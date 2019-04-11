@@ -39,7 +39,7 @@ public class ProBaseinfo implements Serializable {
     private String proSign;
 
     /**
-     * 抢购类型
+     * 抢购类型  1 人  2机
      */
     @Column(name = "r_type")
     private String rType;

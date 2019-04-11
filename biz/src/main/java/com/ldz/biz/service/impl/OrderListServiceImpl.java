@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
+import java.util.List;
+
 @Service
 public class OrderListServiceImpl extends BaseServiceImpl<OrderList, String> implements OrderListService {
 
@@ -18,4 +20,9 @@ public class OrderListServiceImpl extends BaseServiceImpl<OrderList, String> imp
 	protected Mapper<OrderList> getBaseMapper() {
 		return baseMapper;
 	}
+
+    @Override
+    public void saveList(List<OrderList> list) {
+		baseMapper.insertList(list);
+    }
 }

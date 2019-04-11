@@ -104,7 +104,9 @@ public class OperateLogAop {
      * @throws IllegalAccessException
      */
     private Object getPK(Object obj) throws IllegalAccessException {
-        if (obj == null)return null;
+        if (obj == null){
+            return null;
+        }
         Field[] fields = obj.getClass().getDeclaredFields();
         for (Field field : fields) {
             if (field.isAnnotationPresent(Id.class)){
@@ -127,7 +129,9 @@ public class OperateLogAop {
                 return serviceMap.get(className);
             }
             Method method = joinPoint.getTarget().getClass().getDeclaredMethod("getBaseService");
-            if (method == null)return null;
+            if (method == null){
+                return null;
+            }
             method.setAccessible(true);
             BaseService baseService = (BaseService) method.invoke(joinPoint.getTarget());
             serviceMap.put(className,baseService);
@@ -138,7 +142,9 @@ public class OperateLogAop {
         return null;
     }
     private Object getById(BaseService baseService,Object pk) throws IllegalAccessException {
-        if (baseService == null || pk == null)return null;
+        if (baseService == null || pk == null){
+            return null;
+        }
         return baseService.findById((Serializable) pk);
     }
 }

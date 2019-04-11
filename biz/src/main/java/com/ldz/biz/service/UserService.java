@@ -4,6 +4,8 @@ import com.ldz.biz.model.User;
 import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
 
+import java.util.List;
+
 /**
  * @author slu
  */
@@ -15,7 +17,7 @@ public interface UserService extends BaseService<User, String> {
      * @param code
      * @return
      */
-    ApiResponse<String> register(String username, String password, String code);
+    ApiResponse<String> register(String username, String password, String password1, String code);
 
     /**
      * 用户登录
@@ -48,11 +50,42 @@ public interface UserService extends BaseService<User, String> {
      * @param code
      * @param newPwd
      * @param newPwd1
+     * @return
+     */
+    ApiResponse<String> findPwd(String phone, String code, String newPwd, String newPwd1);
+
+    /**
+     * 消费记录分页接口
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    ApiResponse<String> getMyWallet(int pageNum, int pageSize);
+
+    /**
+     * 发送短信接口
+     * @param phone
      * @param type
      * @return
      */
-    ApiResponse<String> findPwd(String phone, String code, String newPwd, String newPwd1, String type);
+    ApiResponse<String> sendMsg(String phone, String type);
 
-    ApiResponse<String> getMyWallet();
+    /**
+     * 我的号码
+     * @param id
+     * @return
+     */
+    ApiResponse<List<String>> myNum(String id);
 
+    /**
+     * 设置支付密码
+     * @param pwd
+     * @param pwd1
+     * @return
+     */
+    ApiResponse<String> savePayPwd(String pwd, String pwd1);
+
+    ApiResponse<String> findPayPwd(String newPwd, String newPwd1, String code);
+
+    ApiResponse<String> genRefferCode();
 }

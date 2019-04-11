@@ -15,7 +15,7 @@ public class Recharge implements Serializable {
     private String userId;
 
     /**
-     * 充值状态。待确认、充值成功、充值失败、充值取消
+     * 充值状态。待确认、充值成功、充值失败、充值取消  1 待确认 2 成功 3 失败  4 取消
      */
     private String czzt;
 
@@ -35,7 +35,7 @@ public class Recharge implements Serializable {
     private String cjsj;
 
     /**
-     * 充值渠道。支付通道或活动奖励
+     * 充值渠道。支付通道或活动奖励  1 支付 2 活动
      */
     private String czqd;
 

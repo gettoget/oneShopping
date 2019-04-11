@@ -21,6 +21,12 @@ public class User implements Serializable {
     private String pwd;
 
     /**
+     * 支付密码
+     */
+    @Column(name = "pay_pwd")
+    private String payPwd;
+
+    /**
      * 用户名
      */
     @Column(name = "user_name")
@@ -164,6 +170,14 @@ public class User implements Serializable {
      */
     public void setPwd(String pwd) {
         this.pwd = pwd;
+    }
+
+    public String getPayPwd() {
+        return payPwd;
+    }
+
+    public void setPayPwd(String payPwd) {
+        this.payPwd = payPwd;
     }
 
     /**

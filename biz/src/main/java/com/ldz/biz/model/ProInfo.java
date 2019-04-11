@@ -39,13 +39,13 @@ public class ProInfo implements Serializable {
     private String proStore;
 
     /**
-     * 商品状态。上架、下架、已开奖
+     * 商品状态。上架、下架、已开奖  1 上架  2 下架 3 已开奖
      */
     @Column(name = "pro_zt")
     private String proZt;
 
     /**
-     * 商品类型，可多个。推荐、上新、热门
+     * 商品类型，可多个。推荐、上新、热门  1 推荐 2 上新 3热门
      */
     @Column(name = "pro_lx")
     private String proLx;
@@ -119,7 +119,49 @@ public class ProInfo implements Serializable {
      */
     private String bz3;
 
+    /**
+     * 用户姓名
+     */
+    @Transient
+    private String userName;
+    /**
+     * 当前用户参与次数
+     */
+    @Transient
+    private int cycs;
+
+    /**
+     * 上期中奖记录
+     */
+    @Transient
+    private WinRecord winRecord;
+
+
     private static final long serialVersionUID = 1L;
+
+    public WinRecord getWinRecord() {
+        return winRecord;
+    }
+
+    public void setWinRecord(WinRecord winRecord) {
+        this.winRecord = winRecord;
+    }
+
+    public int getCycs() {
+        return cycs;
+    }
+
+    public void setCycs(int cycs) {
+        this.cycs = cycs;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
     /**
      * @return id

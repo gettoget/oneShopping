@@ -6,7 +6,10 @@ import com.ldz.util.bean.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/app/user")
@@ -23,8 +26,8 @@ public class UserCtrl  {
      * @return
      */
     @PostMapping("/register")
-    public ApiResponse<String> register(String phone, String password, String code){
-        return service.register(phone, password, code);
+    public ApiResponse<String> register(String phone, String password, String password1, String code){
+        return service.register(phone, password,password1, code);
     }
 
     /**
@@ -67,18 +70,79 @@ public class UserCtrl  {
      * @param code 验证码
      * @param newPwd 新密码
      * @param newPwd1 确认密码
-     * @param type 1 验证短信验证码 2 修改密码
      * @return
      */
     @PostMapping("/findPwd")
-    public ApiResponse<String> findPwd(String phone, String code, String newPwd, String newPwd1, String type){
-        return service.findPwd(phone, code,newPwd,newPwd1,type);
+    public ApiResponse<String> findPwd(String phone, String code, String newPwd, String newPwd1){
+        return service.findPwd(phone, code,newPwd,newPwd1);
     }
 
+    /**
+     * 消费记录
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
     @PostMapping("/myWallet")
-    public ApiResponse<String> getMyWallet(){
-        return service.getMyWallet();
+    public ApiResponse<String> getMyWallet(@RequestParam(defaultValue = "1") Integer pageNum,@RequestParam(defaultValue = "8") int pageSize){
+        return service.getMyWallet(pageNum,pageSize);
     }
+
+    /**
+     * 短信验证码下发接口
+     * @param phone 用户手机号
+     * @param type 类型  1 注册  2 找回登录密码 3 忘记支付密码
+     * @return
+     */
+    @PostMapping("/sendMsg")
+    public ApiResponse<String> sendMsg(String phone, String type){
+        return service.sendMsg(phone, type);
+    }
+
+    /**
+     * 我的号码
+     * @param id
+     * @return
+     */
+    @PostMapping("/myNum")
+    public ApiResponse<List<String>> myNum(String id){
+        return service.myNum(id);
+    }
+
+    /**
+     * 支付密码设置
+     *
+     */
+    @PostMapping("/savePayPwd")
+    public ApiResponse<String> savePayPwd(String pwd, String pwd1){
+        return service.savePayPwd(pwd,pwd1);
+    }
+
+
+    /**
+     * 忘记支付密码找回
+     */
+    @PostMapping("/findPayPwd")
+    public ApiResponse<String> findPayPwd(String newPwd,String newPwd1, String code){
+        return service.findPayPwd(newPwd, newPwd1, code);
+    }
+
+    /**
+     * 生成邀请码
+     */
+    @PostMapping("/genRefferCode")
+    public ApiResponse<String> genRefferCode(){
+        return service.genRefferCode();
+    }
+
+
+
+
+
+
+//    public ApiResponse<String> findPayPwd(String phone)
+
+
 
 
 

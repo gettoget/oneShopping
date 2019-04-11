@@ -40,7 +40,7 @@
 </template>
 
 <script>
-  import searchItems from '../../components/searchItems'
+  import searchItems from '../components/searchItems'
 
   export default {
     name: 'roleSelectTable',

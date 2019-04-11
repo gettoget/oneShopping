@@ -53,10 +53,14 @@ public class ApiResponse<T> implements Serializable {
 	 */
 	@JsonInclude(value=Include.NON_EMPTY)
 	private T result;
-	//如果是分页查询，则返回分页对象
+	/**
+	 * 如果是分页查询，则返回分页对象
+	 */
 	@JsonInclude(value=Include.NON_EMPTY)
 	private PageInfo<T> page;
-	//有新的APP版本时，该字段有值
+	/**
+	 * 有新的APP版本时，该字段有值
+	 */
 	@JsonInclude(value=Include.NON_EMPTY)
 	private Object newVer;
 
@@ -124,15 +128,15 @@ public class ApiResponse<T> implements Serializable {
 	}
 
 	public static ApiResponse<String> fail(){
-		return fail("操作失败");
+		return fail(MessageUtils.get("defeat"));
 	}
 	public static ApiResponse<String> error(){
-		return fail("未知错误");
+		return fail(MessageUtils.get("error"));
 	}
 	public static ApiResponse<String> forbidden(){
 		ApiResponse<String> res = new ApiResponse<>();
 		res.setCode(FORBIDDEN);
-		res.setMessage("无权限访问");
+		res.setMessage(MessageUtils.get("forbidden"));
 		return res;
 	}
 	public boolean isSuccess(){
