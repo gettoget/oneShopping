@@ -27,10 +27,7 @@ import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
 import javax.management.relation.RoleUnresolved;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -280,26 +277,23 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     public ApiResponse<String> genRefferCode() {
         String userId = (String) getAttribute("userId");
         User user = findById(userId);
+        if(StringUtils.isBlank(user.getRefCode())){
+            long id = Long.parseLong(user.getId());
+            long l = id / (32 * 32 * 32 * 32);
+            String refferCode = Long.toHexString(l).toUpperCase();
+            user.setRefCode(refferCode);
+            update(user);
+        }
 
-
-
-
-        return null;
+        return ApiResponse.success(user.getRefCode());
     }
 
+    @Override
+    public ApiResponse<User> getUserInfo() {
+        String userId = getAttributeAsString("userId");
+        User user = findById(userId);
+        return ApiResponse.success(user);
+    }
 
-
-
-
-
-
-
-
-	/*@Override
-	public ApiResponse<String> sendPayPwdMsg() {
-		String userId = (String) getAttribute("userId");
-		return null;
-	}
-*/
 
 }

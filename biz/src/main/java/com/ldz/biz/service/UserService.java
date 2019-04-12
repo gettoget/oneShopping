@@ -85,7 +85,24 @@ public interface UserService extends BaseService<User, String> {
      */
     ApiResponse<String> savePayPwd(String pwd, String pwd1);
 
+    /**
+     * 重设支付密码
+     * @param newPwd
+     * @param newPwd1
+     * @param code
+     * @return
+     */
     ApiResponse<String> findPayPwd(String newPwd, String newPwd1, String code);
 
+    /**
+     * 获取推荐码
+     * @return
+     */
     ApiResponse<String> genRefferCode();
+
+    /**
+     * 获取当前登录用户信息
+     * @return
+     */
+    ApiResponse<User> getUserInfo();
 }

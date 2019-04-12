@@ -133,6 +133,11 @@ public abstract class BaseServiceImpl<T, PK extends Serializable> implements Bas
         return  requset.getAttribute(key);
     }
 
+    public String getAttributeAsString(String key){
+        HttpServletRequest requset = getRequset();
+        return  (String) requset.getAttribute(key);
+    }
+
     public HttpServletRequest getRequset() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         return request;

@@ -5,6 +5,8 @@ import javax.persistence.*;
 
 @Table(name = "pro_info")
 public class ProInfo implements Serializable {
+
+
     @Id
     private String id;
 
@@ -89,6 +91,19 @@ public class ProInfo implements Serializable {
     private String urls;
 
     /**
+     * 商品封面图
+     */
+    @Column(name = "cover_url'")
+    private String coverUrl;
+
+    /**
+     * 商品推荐图
+     */
+    @Column(name = "ref_url")
+    private String refUrl;
+
+
+    /**
      * 参与的真实用户数
      */
     private String cyyhs;
@@ -145,6 +160,22 @@ public class ProInfo implements Serializable {
 
     public void setWinRecord(WinRecord winRecord) {
         this.winRecord = winRecord;
+    }
+
+    public String getCoverUrl() {
+        return coverUrl;
+    }
+
+    public void setCoverUrl(String coverUrl) {
+        this.coverUrl = coverUrl;
+    }
+
+    public String getRefUrl() {
+        return refUrl;
+    }
+
+    public void setRefUrl(String refUrl) {
+        this.refUrl = refUrl;
     }
 
     public int getCycs() {
@@ -536,6 +567,25 @@ public class ProInfo implements Serializable {
     public void setBz3(String bz3) {
         this.bz3 = bz3;
     }
+
+
+    public ProInfo() {
+    }
+
+    public ProInfo(ProBaseinfo baseinfo) {
+        this.proBaseid = baseinfo.getId();
+        this.proName = baseinfo.getProName();
+        this.proPrice = baseinfo.getProPrice();
+        this.proSign = baseinfo.getProSign();
+        this.proType = baseinfo.getProType();
+        this.rePrice = baseinfo.getProPrice();
+        this.rType = baseinfo.getrType();
+        this.urls = baseinfo.getUrls();
+        this.coverUrl = baseinfo.getCoverUrl();
+        this.refUrl = baseinfo.getRefUrl();
+
+    }
+
 
     public enum InnerColumn {
         id("id"),

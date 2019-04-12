@@ -135,15 +135,14 @@ public class UserCtrl  {
         return service.genRefferCode();
     }
 
-
-
-
-
-
-//    public ApiResponse<String> findPayPwd(String phone)
-
-
-
+    /**
+     * 获取登录用户信息
+     * @return
+     */
+    @PostMapping("/getUserInfo")
+    public ApiResponse<User> getUserInfo(){
+        return service.getUserInfo();
+    }
 
 
 }

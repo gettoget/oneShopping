@@ -34,6 +34,7 @@ public class ProBaseinfoServiceImpl extends BaseServiceImpl<ProBaseinfo, String>
 		RuntimeCheck.ifBlank(entity.getProPrice(), MessageUtils.get("pro.priceBlank"));
 		RuntimeCheck.ifBlank(entity.getProStore(), MessageUtils.get("pro.storeBlank"));
 		RuntimeCheck.ifBlank(entity.getrType(), MessageUtils.get("pro.rTypeBlank"));
+		RuntimeCheck.ifBlank(entity.getCoverUrl(), MessageUtils.get("pro.coverBlank"));
 
 		entity.setId(genId());
 		entity.setCjsj(DateUtils.getNowTime());

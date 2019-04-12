@@ -54,25 +54,19 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 	@Override
 	public ApiResponse<String> saveOne(String id) {
 		ProBaseinfo baseinfo = proBaseinfoService.findById(id);
+		RuntimeCheck.ifNull(baseinfo, MessageUtils.get("pro.isNull"));
 		int storeNum = Integer.parseInt(baseinfo.getProStore());
 		if(storeNum <= 0 ){
 			return ApiResponse.fail(MessageUtils.get("pro.storeIsNull"));
 		}
-		ProInfo  proInfo = new ProInfo();
+
+		ProInfo  proInfo = new ProInfo(baseinfo);
 		proInfo.setId(genId());
 		proInfo.setCjsj(DateUtils.getNowTime());
 		proInfo.setCyyhs("0");
 		proInfo.setGxsj(proInfo.getCjsj());
-		proInfo.setProBaseid(id);
-		proInfo.setProName(baseinfo.getProName());
-		proInfo.setProPrice(baseinfo.getProPrice());
-		proInfo.setProSign(baseinfo.getProSign());
 		proInfo.setProStore("1");
-		proInfo.setProType(baseinfo.getProType());
 		proInfo.setProZt("1");
-		proInfo.setRePrice(baseinfo.getProPrice());
-		proInfo.setrType(baseinfo.getrType());
-		proInfo.setUrls(baseinfo.getUrls());
 		save(proInfo);
 
 		baseinfo.setProStore(storeNum -1 + "");

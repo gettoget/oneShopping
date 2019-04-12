@@ -55,6 +55,19 @@ public class ProBaseinfo implements Serializable {
     private String urls;
 
     /**
+     * 商品封面图
+     */
+    @Column(name = "cover_url'")
+    private String coverUrl;
+
+    /**
+     * 商品推荐图
+     */
+    @Column(name = "ref_url")
+    private String refUrl;
+
+
+    /**
      * 备注一
      */
     private String bz1;
@@ -70,6 +83,22 @@ public class ProBaseinfo implements Serializable {
     private String bz3;
 
     private static final long serialVersionUID = 1L;
+
+    public String getCoverUrl() {
+        return coverUrl;
+    }
+
+    public void setCoverUrl(String coverUrl) {
+        this.coverUrl = coverUrl;
+    }
+
+    public String getRefUrl() {
+        return refUrl;
+    }
+
+    public void setRefUrl(String refUrl) {
+        this.refUrl = refUrl;
+    }
 
     /**
      * @return id
