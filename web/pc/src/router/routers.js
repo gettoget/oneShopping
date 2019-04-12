@@ -50,7 +50,6 @@ export default [
       }
     ]
   },
-
   {
     path: '/system',
     name: 'system',
@@ -122,6 +121,35 @@ export default [
           title: '短信管理'
         },
         component: () => import('@/vShop/system/system-ShortMessage')
+      }
+    ]
+  },
+  {
+    path: '/stock',
+    name: 'stock',
+    meta: {
+      icon: 'logo-buffer',
+      title: '商品管理'
+    },
+    component: Main,
+    children:[
+      {
+        path:'/newstock',
+        name:'newstock',
+        meta: {
+          icon: 'md-trending-up',
+          title: '商品上架'
+        },
+        component: () => import('@/vShop/commodity/NewStock')
+      },
+      {
+        path:'/manage',
+        name:'manage',
+        meta: {
+          icon: 'md-trending-up',
+          title: '上架管理'
+        },
+        component: () => import('@/vShop/commodity/Manage')
       }
     ]
   },
@@ -463,7 +491,6 @@ export default [
       },
     ]
   },
-
   {
     path: '/message',
     name: 'message',
@@ -484,7 +511,6 @@ export default [
       }
     ]
   },
-
   {
     path: '/401',
     name: 'error_401',
