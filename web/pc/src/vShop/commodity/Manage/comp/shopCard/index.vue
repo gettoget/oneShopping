@@ -1,5 +1,7 @@
 <template>
-    
+    <div>
+      rrr
+    </div>
 </template>
 
 <script>
