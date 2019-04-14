@@ -35,6 +35,9 @@
             <div>2019-04-21</div>
             <div>19：00</div>
           </div>
+          <div class="shoptxt box_row_1auto">
+            已开奖{{mess | messTyp}}
+          </div>
 
 
         </div>
@@ -46,6 +49,23 @@
   import shopImg from '@/assets/images/login-bg.jpg'
   export default {
     name: "index",
+    props:{
+      mess:{
+        type:Number,
+        default:{
+
+        }
+      }
+    },
+    filters:{
+      messTyp:function (val) {
+        if (val>1){
+          return '红色'
+        } else {
+          return '绿色'
+        }
+      }
+    },
     data(){
       return {
         shopImg

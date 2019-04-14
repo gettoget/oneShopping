@@ -1,9 +1,11 @@
 <template>
       <div class="shopManager box_col" >
-        <div class="barShow" >
+        <div style="padding:0 0 10px 0;font-size: 1.2rem; border-bottom:solid 1px #ccc;color: #666;" >
+          <Icon type="md-cube" color="#666" size="30"/>
+
           商品管理
         </div>
-        <div class="box_row" style="padding: 0 16px">
+        <div class="box_row barShow" style="padding: 11px 16px;border-bottom:solid 1px #ccc;">
           <div class="titleBarShow" style="width: 100px;padding: 0px 5px;" >
             商品图片
           </div>
@@ -25,10 +27,13 @@
           <div class="titleBarShow box_row_1auto" >
             结束时间
           </div>
+          <div class="titleBarShow box_row_1auto" >
+            商品状态
+          </div>
 
         </div>
-        <div class="box_col_autoY" style="background-color: #eeeeee">
-          <shop-card v-for="(it,index) in 3"></shop-card>
+        <div class="box_col_autoY" >
+          <shop-card v-for="(it,index) in 3" :mess="index"></shop-card>
         </div>
 
 
@@ -50,10 +55,14 @@
 
 <style lang="less">
   .shopManager{
-    background-color: #eeeeee;
+    /*background-color:#eeeeee;*/
+    font-size: 0.18rem;
+
     .barShow{
-      background-color: #dcdcdc;
-      height: 20px;
+      background-color: #f8f8f9;
+
+      color: #2d8cf0;
+      font-weight: 900;
     }
     .titleBarShow{
       padding: 0 10px;
