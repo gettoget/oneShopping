@@ -119,6 +119,9 @@ public class ProInfo implements Serializable {
     @Column(name = "user_id")
     private String userId;
 
+    @Column(name = "sort")
+    private Integer sort;
+
     /**
      * 备注一
      */
@@ -151,6 +154,14 @@ public class ProInfo implements Serializable {
     @Transient
     private WinRecord winRecord;
 
+
+    public Integer getSort() {
+        return sort;
+    }
+
+    public void setSort(Integer sort) {
+        this.sort = sort;
+    }
 
     private static final long serialVersionUID = 1L;
 
@@ -608,7 +619,8 @@ public class ProInfo implements Serializable {
         userId("user_id"),
         bz1("bz1"),
         bz2("bz2"),
-        bz3("bz3");
+        bz3("bz3"),
+        sort("sort");
 
         private final String column;
 

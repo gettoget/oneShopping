@@ -4,7 +4,7 @@ spring:
   messages:
     basename: i18n/messages
     cache-second: 3600
-    encoding: utf-8
+    encoding: UTF-8
   redis:
     database: 10
     host: 127.0.0.1

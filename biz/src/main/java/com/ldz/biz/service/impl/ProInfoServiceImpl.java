@@ -134,4 +134,10 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 		res.setPage(pageInfo);
 		return res;
 	}
+
+    @Override
+    public String getBaseId(String id) {
+		String baseId = baseMapper.getBaseId(id);
+		return baseId;
+    }
 }

@@ -18,7 +18,6 @@ import com.ldz.biz.service.RefferRecordService;
 import com.ldz.biz.mapper.RefferRecordMapper;
 import com.ldz.biz.model.RefferRecord;
 
-import java.beans.Transient;
 import java.util.List;
 
 @Service

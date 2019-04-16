@@ -19,14 +19,10 @@ import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.redis.RedisTemplateUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.jcajce.provider.symmetric.RC5;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
-import javax.management.relation.RoleUnresolved;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -198,7 +194,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
             SimpleCondition condition = new SimpleCondition(User.class);
             condition.eq(User.InnerColumn.phone, phone);
             List<User> users = findByCondition(condition);
-            RuntimeCheck.ifTrue(CollectionUtils.isEmpty(users), MessageUtils.get("user.registered"));
+            RuntimeCheck.ifTrue(CollectionUtils.isNotEmpty(users), MessageUtils.get("user.registered"));
             //todo 短信发送过程暂时忽略
             String code = SendSmsUtil.sendMSG(phone, type);
             redis.boundValueOps(phone + "_register_code").set(code, 5, TimeUnit.MINUTES);
