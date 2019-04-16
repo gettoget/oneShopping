@@ -216,7 +216,9 @@ public class GnServiceImpl extends BaseServiceImpl<SysGn, String> implements GnS
     @Override
     public List<Menu> getMenuTree(SysYh user) {
         List<SysGn> functions = getUserFunctions(user);
-        if (functions == null || functions.size() == 0)return new ArrayList<>();
+        if (functions == null || functions.size() == 0){
+            return new ArrayList<>();
+        }
         Set<String> functionCodes = functions.stream().map(SysGn::getGndm).collect(Collectors.toSet());
         findParent(functions,functionCodes);
         functions.sort(Comparator.comparing(SysGn::getPx));

@@ -1,6 +1,7 @@
 package com.ldz.biz.model;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.*;
 
 @Table(name = "pro_baseinfo")
@@ -57,7 +58,7 @@ public class ProBaseinfo implements Serializable {
     /**
      * 商品封面图
      */
-    @Column(name = "cover_url'")
+    @Column(name = "cover_url")
     private String coverUrl;
 
     /**
@@ -81,6 +82,36 @@ public class ProBaseinfo implements Serializable {
      * 备注三
      */
     private String bz3;
+    @Transient
+    private List<String> imgUrls;
+    @Transient
+    private List<String> coverUrls;
+    @Transient
+    private List<String> refUrls;
+
+    public List<String> getImgUrls() {
+        return imgUrls;
+    }
+
+    public void setImgUrls(List<String> imgUrls) {
+        this.imgUrls = imgUrls;
+    }
+
+    public List<String> getCoverUrls() {
+        return coverUrls;
+    }
+
+    public void setCoverUrls(List<String> coverUrls) {
+        this.coverUrls = coverUrls;
+    }
+
+    public List<String> getRefUrls() {
+        return refUrls;
+    }
+
+    public void setRefUrls(List<String> refUrls) {
+        this.refUrls = refUrls;
+    }
 
     private static final long serialVersionUID = 1L;
 

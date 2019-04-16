@@ -47,9 +47,14 @@ public class Order implements Serializable {
     private String zfje;
 
     /**
-     * 支付时间
+     * 创建时间
      */
     private String cjsj;
+
+    /**
+     * 确认支付时间
+     */
+    private String zfsj;
 
     /**
      * IMEI
@@ -98,6 +103,14 @@ public class Order implements Serializable {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getZfsj() {
+        return zfsj;
+    }
+
+    public void setZfsj(String zfsj) {
+        this.zfsj = zfsj;
     }
 
     public List<OrderList> getOrderLists() {
@@ -367,6 +380,7 @@ public class Order implements Serializable {
         proName("pro_name"),
         userId("user_id"),
         gmfs("gmfs"),
+        zfsj("zfsj"),
         zfje("zfje"),
         cjsj("cjsj"),
         imei("imei"),

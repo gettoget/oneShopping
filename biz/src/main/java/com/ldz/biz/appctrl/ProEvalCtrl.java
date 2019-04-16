@@ -1,4 +1,4 @@
-package com.ldz.biz.controller;
+package com.ldz.biz.appctrl;
 
 import com.ldz.biz.model.ProEval;
 import com.ldz.biz.service.ProEvalService;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/proeval")
+@RequestMapping("/app/proeval")
 public class ProEvalCtrl extends BaseController<ProEval, String> {
 
     @Autowired

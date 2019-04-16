@@ -1,4 +1,4 @@
-package com.ldz.biz.controller;
+package com.ldz.biz.appctrl;
 
 import com.ldz.biz.model.User;
 import com.ldz.biz.service.UserService;
@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/app/user")
@@ -37,7 +38,7 @@ public class UserCtrl  {
      * @return
      */
     @PostMapping("/login")
-    public ApiResponse<String> login(String phone, String password){
+    public ApiResponse<Map<String, Object>> login(String phone, String password){
         return  service.login(phone, password);
     }
 
@@ -60,7 +61,7 @@ public class UserCtrl  {
      * @return
      */
     @PostMapping("/editUserInfo")
-    public ApiResponse<String> editUserInfo(User user){
+    public ApiResponse<User> editUserInfo(User user){
         return service.editUserInfo(user);
     }
 

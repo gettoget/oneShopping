@@ -105,14 +105,7 @@ public class SysYh implements Serializable {
 
     @Column(name = "JGDMS")
     private String jgdms;
-    @Column(name = "login_type")
-    private String loginType; // 1-验证码 2-PKI登录
-    //UKey设备ID
-    @Column(length = 64)
-    private String ukey;
-    //UKey主密钥，保存在增强密钥一中
-    @Column(length = 64)
-    private String ukeyPwd;
+
 
     private static final long serialVersionUID = 1L;
 

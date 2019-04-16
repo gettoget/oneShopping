@@ -1,6 +1,8 @@
 package com.ldz.biz.service.impl;
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
+import com.ldz.biz.mapper.LuckNumMapper;
 import com.ldz.biz.mapper.OrderMapper;
 import com.ldz.biz.model.*;
 import com.ldz.biz.service.*;
@@ -11,17 +13,16 @@ import com.ldz.util.bean.SimpleCondition;
 import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
+import com.ldz.util.redis.RedisTemplateUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.connection.SortParameters;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,7 +45,21 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 
 	@Autowired
 	private ProEvalService proEvalService;
-	
+
+	@Autowired
+	private ProInfoService proInfoService;
+
+	@Autowired
+	private LuckNumMapper luckNumMapper;
+
+	@Autowired
+	private WinRecordService recordService;
+
+	@Autowired
+	private RedisTemplateUtil redis;
+
+	private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+
 	@Override
 	protected Mapper<Order> getBaseMapper() {
 		return baseMapper;
@@ -89,13 +104,30 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 
 	@Override
 	public ApiResponse<String> saveEntity(Order entity) {
+		String imei = (String) getAttribute("imei");
+		String userId = (String) getAttribute("userId");
+		RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
+		Object o = redis.boundValueOps(imei + "saveOrder").get();
+		if(o != null){
+			return ApiResponse.fail(MessageUtils.get("FrequentOperation"));
+		}else{
+			redis.boundValueOps(imei + "saveOrder").set(1,10,TimeUnit.SECONDS);
+		}
 		RuntimeCheck.ifBlank(entity.getOrderType(), MessageUtils.get("order.typeBlank"));
-		RuntimeCheck.ifFalse(Arrays.asList("1", "2").contains(entity.getOrderType()), MessageUtils.get("order.typeError"));
+		RuntimeCheck.ifFalse(entity.getOrderType().equals("1") ||entity.getOrderType().equals("2"), MessageUtils.get("order.typeError"));
 		RuntimeCheck.ifBlank(entity.getProId(), MessageUtils.get("order.proBlank"));
 		RuntimeCheck.ifBlank(entity.getZfje(), MessageUtils.get("order.jeBlank"));
-		String userId = (String) getAttribute("userId");
-		String imei = (String) getAttribute("imei");
-		ProBaseinfo baseinfo = proBaseinfoService.findById(entity.getProId());
+
+
+		ProBaseinfo baseinfo;
+		if (entity.getOrderType().equals("1")) {
+			baseinfo = proBaseinfoService.findById(entity.getProId());
+
+		}else{
+			String baseId = proInfoService.getBaseId(entity.getProId());
+			baseinfo = proBaseinfoService.findById(baseId);
+		}
+
 		RuntimeCheck.ifNull(baseinfo, MessageUtils.get("pro.isNull"));
 		Order order = new Order();
 		order.setId(genId());
@@ -117,25 +149,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 
 			order.setZfje(entity.getGmfs());
 			order.setGmfs(entity.getGmfs());
-			// 抽奖号码生成  根据购买份数生成
-			List<OrderList> orderLists = new ArrayList<>();
-			for(int i = 0 ; i < Integer.parseInt(entity.getGmfs()); i++){
-				OrderList o = new OrderList();
-				o.setId(genId());
-				o.setCjsj(order.getCjsj());
-				// todo 中奖号码生成方法
-				o.setNum("1" + i);
-				o.setOrderId(order.getId());
-				o.setProId(order.getProId());
-				o.setProName(order.getProName());
-				o.setUserid(userId);
-				User user = userService.findById(userId);
-				o.setUserName(user.getUserName());
-				o.setYhlx(user.getSource());
-				orderLists.add(o);
-			}
+
 			save(order);
-			orderListService.saveList(orderLists);
 			return ApiResponse.success(MessageUtils.get("order.saveSuc"));
 		}else{
 			return ApiResponse.fail(MessageUtils.get("order.typeError"));
@@ -174,7 +189,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 			user.setBalance(ye + "");
 		}
 
-
+		order.setZfsj(DateUtils.getNowTime());
 
 		// 已支付 生成消费记录
 
@@ -184,11 +199,121 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 		exchange.setUserid(userId);
 		exchange.setXfddh(order.getId());
 
-
-
 		exchangeService.save(exchange);
 		userService.update(user);
 		update(order);
+		if(StringUtils.equals(order.getOrderType(), "2")){
+
+			// 订单支付完成 分配号码
+			// 先查询当前号码分配到多少位
+			ProInfo proInfo = proInfoService.findById(order.getProId());
+			Integer sort = proInfo.getSort();
+			 // 根据购买份数 分配号码
+			int anInt = Integer.parseInt(order.getGmfs());
+			int nu = sort + anInt;
+			List<String> luckNum = luckNumMapper.getLuckNum(sort, nu,proInfo.getProBaseid());
+			List<OrderList> orderLists = new ArrayList<>();
+			for (String s : luckNum) {
+				OrderList orderList = new OrderList(order,s,user);
+				orderLists.add(orderList);
+			}
+			if(CollectionUtils.isNotEmpty(orderLists)){
+				orderListService.saveList(orderLists);
+				proInfo.setSort(nu);
+				proInfo.setGxsj(DateUtils.getNowTime());
+				proInfoService.update(proInfo);
+			}
+			// 查看商品剩余名额是否 为 0
+			String rePrice = proInfo.getRePrice();
+			if(StringUtils.equals(rePrice, "0")){
+				// 建立延时任务 , 准备分配中奖号码
+
+				executorService.schedule(() -> fenpei(proInfo.getId()),5, TimeUnit.MINUTES);
+
+			}
+
+
+		}
 		return ApiResponse.success(MessageUtils.get("order.paySuc"));
 	}
+
+    @Override
+    public ApiResponse<String> getPageInfo(Page<Order> page) {
+		LimitedCondition condition = getQueryCondition();
+		PageInfo<Order> pageInfo = findPage(page, condition);
+		ApiResponse<String> res = new ApiResponse<>();
+		res.setPage(pageInfo);
+		return res;
+    }
+
+	@Override
+	public ApiResponse<String> orderCancel(String id) {
+		Order order = findById(id);
+		RuntimeCheck.ifFalse(order.getDdzt().equals("3"), MessageUtils.get("order.ztError"));
+		order.setDdzt("5");
+		update(order);
+		return ApiResponse.success();
+	}
+
+
+	/**
+	 * 中奖号码分配
+	 * @param id 上架商品id
+	 */
+	private void fenpei(String id){
+		ProInfo info = proInfoService.findById(id);
+		// 首先获取 最后五十个商品的购买时间
+		List<String> lastFifty = baseMapper.getLastFifty();
+		// 所有时间 按 HHmmssSSS 相加
+		Long hHmmssSSS = lastFifty.stream().map(s -> Long.parseLong(DateTime.parse(s).toString("HHmmssSSS"))).reduce(Long::sum).get();
+		// 时间总数除以需求总数 取余
+		long zjhm = (hHmmssSSS % Long.parseLong(info.getProPrice())) + 10000001;
+
+		info.setZjhm(zjhm + "");
+		info.setProZt("3");
+		info.setKjsj(DateUtils.getNowTime());
+		info.setGxsj(DateUtils.getNowTime());
+
+		// 查询中奖人 id
+		SimpleCondition condition = new SimpleCondition(OrderList.class);
+		condition.eq(OrderList.InnerColumn.num, zjhm+"");
+		condition.eq(OrderList.InnerColumn.proId, info.getId());
+		List<OrderList> lists = orderListService.findByCondition(condition);
+		if(CollectionUtils.isNotEmpty(lists)){
+			OrderList list = lists.get(0);
+			info.setUserId(list.getUserid());
+			info.setUserName(list.getUserName());
+			// 将此单的状态改为已中奖
+			Order order = findById(list.getOrderId());
+			order.setDdzt("1");
+			order.setZjhm(zjhm + "");
+			update(order);
+			// 将所有没有中奖的订单重置为未中奖
+			baseMapper.updateDdztToLost(info.getId());
+			// 用户中奖次数加 1
+			User user = userService.findById(list.getUserid());
+			user.setZjcs(Integer.parseInt(user.getZjcs()) + 1 + "");
+			userService.update(user);
+			// 中奖记录生成
+			WinRecord record = new WinRecord();
+			record.setId(genId());
+			record.setCjsj(DateUtils.getNowTime());
+			record.setNum(zjhm + "");
+			record.setProId(info.getId());
+			record.setUserId(user.getId());
+			record.setUserName(user.getUserName());
+			SimpleCondition simpleCondition = new SimpleCondition(Order.class);
+			simpleCondition.eq(Order.InnerColumn.proId, info.getId());
+			simpleCondition.eq(Order.InnerColumn.userId, user.getId());
+			List<Order> orders = findByCondition(simpleCondition);
+			int sum = orders.stream().map(order1 -> Integer.parseInt(order1.getGmfs())).mapToInt(value -> value).sum();
+			record.setZjfs(sum+"");
+			record.setZjlx(user.getScore());
+			recordService.save(record);
+		}
+
+	}
+
+
+
 }

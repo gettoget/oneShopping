@@ -1,4 +1,4 @@
-package com.ldz.biz.controller;
+package com.ldz.biz.appctrl;
 
 import com.ldz.biz.model.Recharge;
 import com.ldz.biz.service.RechargeService;

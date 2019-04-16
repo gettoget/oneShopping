@@ -13,12 +13,14 @@ import com.ldz.util.exception.RuntimeCheck;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import tk.mybatis.mapper.common.Mapper;
 
 import com.ldz.biz.mapper.ProInfoMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,6 +45,9 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
 	@Autowired
 	private OrderService orderService;
+
+	@Value("${filePath}")
+	private  String filePath;
 
 
 	@Override
@@ -97,6 +102,10 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 			List<OrderList> orderLists = orderListService.findByCondition(condition);
 			int size = orderLists.size();
 			proInfo.setCycs(size);
+			if(CollectionUtils.isNotEmpty(orderLists)){
+				List<String> nums = orderLists.stream().map(OrderList::getNum).collect(Collectors.toList());
+				proInfo.setNums(nums);
+			}
 			// 获取上一期中奖的 商品id
 			ProInfo info = baseMapper.getLatestPerson(proInfo.getProBaseid());
 			SimpleCondition simpleCondition = new SimpleCondition(WinRecord.class);
@@ -106,6 +115,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 				proInfo.setWinRecord(winRecordList.get(0));
 			}
 		}
+		setImgUrl(proInfo);
 		return ApiResponse.success(proInfo);
 	}
 
@@ -134,4 +144,50 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 		res.setPage(pageInfo);
 		return res;
 	}
+
+    @Override
+    public String getBaseId(String id) {
+		String baseId = baseMapper.getBaseId(id);
+		return baseId;
+    }
+
+
+
+	@Override
+	public void afterPager(PageInfo<ProInfo> result){
+		List<ProInfo> list = result.getList();
+		if(CollectionUtils.isEmpty(list)){
+			return;
+		}
+		for (ProInfo proBaseinfo : list) {
+			setImgUrl(proBaseinfo);
+		}
+	}
+
+	@Override
+	public void afterQuery(List<ProInfo> result) {
+
+		for (ProInfo proBaseinfo : result) {
+			setImgUrl(proBaseinfo);
+		}
+	}
+
+	private void setImgUrl(ProInfo info){
+		List<String> imgUrls = new ArrayList<>();
+		for (String s : info.getUrls().split(",")) {
+			imgUrls.add(filePath + s);
+		}
+		info.setImgUrls(imgUrls);
+		List<String> coverUrls = new ArrayList<>();
+		for (String s : info.getCoverUrl().split(",")) {
+			coverUrls.add(filePath + s);
+		}
+		info.setCoverUrls(coverUrls);
+		List<String> refUrls = new ArrayList<>();
+		for (String s : info.getRefUrl().split(",")) {
+			refUrls.add(filePath + s);
+		}
+		info.setRefUrls(refUrls);
+	}
+
 }

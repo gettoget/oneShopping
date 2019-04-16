@@ -31,4 +31,7 @@ public interface ProInfoService extends BaseService<ProInfo, String> {
 
 
     ApiResponse<String> getUserInfo(String id, int pageNum, int pageSize);
+
+    String getBaseId(String id);
+
 }

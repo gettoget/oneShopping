@@ -1,6 +1,9 @@
 package com.ldz.biz.model;
 
+import com.ldz.util.commonUtil.DateUtils;
+
 import java.io.Serializable;
+import javax.jws.soap.SOAPBinding;
 import javax.persistence.*;
 
 @Table(name = "order_list")
@@ -36,6 +39,7 @@ public class OrderList implements Serializable {
      */
     @Column(name = "user_name")
     private String userName;
+
 
     /**
      * 用户类型。注册用户、机器人
@@ -279,6 +283,23 @@ public class OrderList implements Serializable {
      */
     public void setBz3(String bz3) {
         this.bz3 = bz3;
+    }
+
+
+    public OrderList() {
+    }
+
+    public OrderList(Order order, String num, User user){
+        this.orderId = order.getId();
+        this.proId = order.getProId();
+        this.proName = order.getProName();
+        this.userid = order.getUserId();
+        this.num = num;
+        this.userName = user.getUserName();
+        this.yhlx = user.getScore();
+        this.cjsj = DateUtils.getNowTime();
+
+
     }
 
     public enum InnerColumn {

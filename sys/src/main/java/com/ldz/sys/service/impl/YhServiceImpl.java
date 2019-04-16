@@ -280,7 +280,7 @@ public class YhServiceImpl extends BaseServiceImpl<SysYh, String> implements YhS
 		}
 	}
 
-	@Override
+	/*@Override
 	public ApiResponse<String> bindUKey(SysYh updateUser) {
 		ApiResponse<String> result = new ApiResponse<>();
 		if (StringUtils.isEmpty(updateUser.getUkey())){
@@ -304,9 +304,9 @@ public class YhServiceImpl extends BaseServiceImpl<SysYh, String> implements YhS
 			return ApiResponse.fail("用户已经颁发过UKey，不能重复颁发！");
 		}
 		return result;
-	}
+	}*/
 
-	@Override
+	/*@Override
 	public ApiResponse<String> unBindUKey(SysYh user) {
 		if (StringUtils.isEmpty(user.getUkey())){
 			return ApiResponse.fail("请先插入UKey！");
@@ -334,7 +334,7 @@ public class YhServiceImpl extends BaseServiceImpl<SysYh, String> implements YhS
 		exist.setLoginType(user.getLoginType());
 		baseMapper.updateByPrimaryKeySelective(exist);
 		return ApiResponse.success();
-	}
+	}*/
 
     @Override
     public ApiResponse<String> initUserRole() {

@@ -1,7 +1,7 @@
-package com.ldz.biz.controller;
+package com.ldz.biz.appctrl;
 
-import com.ldz.biz.model.Store;
-import com.ldz.biz.service.StoreService;
+import com.ldz.biz.model.Exchange;
+import com.ldz.biz.service.ExchangeService;
 import com.ldz.sys.base.BaseController;
 import com.ldz.sys.base.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/store")
-public class StoreCtrl extends BaseController<Store,String> {
+@RequestMapping("/app/exchange")
+public class ExchangeCtrl extends BaseController<Exchange, String> {
 
     @Autowired
-    private StoreService service;
+    private ExchangeService service;
 
     @Override
-    protected BaseService<Store, String> getBaseService() {
+    protected BaseService<Exchange, String> getBaseService() {
         return service;
     }
 }

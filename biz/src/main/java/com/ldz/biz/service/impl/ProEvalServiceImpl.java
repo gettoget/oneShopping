@@ -15,8 +15,6 @@ import com.ldz.biz.service.ProEvalService;
 import com.ldz.biz.mapper.ProEvalMapper;
 import com.ldz.biz.model.ProEval;
 
-import java.lang.reflect.Member;
-
 @Service
 public class ProEvalServiceImpl extends BaseServiceImpl<ProEval, String> implements ProEvalService {
 

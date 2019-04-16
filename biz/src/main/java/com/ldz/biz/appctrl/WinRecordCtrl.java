@@ -1,4 +1,4 @@
-package com.ldz.biz.controller;
+package com.ldz.biz.appctrl;
 
 import com.ldz.biz.model.WinRecord;
 import com.ldz.biz.service.WinRecordService;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/winrecord")
+@RequestMapping("/app/winrecord")
 public class WinRecordCtrl extends BaseController<WinRecord,String> {
 
     @Autowired

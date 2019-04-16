@@ -5,6 +5,7 @@ import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author slu
@@ -25,7 +26,7 @@ public interface UserService extends BaseService<User, String> {
      * @param password
      * @return
      */
-    ApiResponse<String> login(String phone, String password);
+    ApiResponse<Map<String, Object>> login(String phone, String password);
 
     /**
      * 用户修改密码
@@ -42,7 +43,7 @@ public interface UserService extends BaseService<User, String> {
      * @param user
      * @return
      */
-    ApiResponse<String> editUserInfo(User user);
+    ApiResponse<User> editUserInfo(User user);
 
     /**
      * 重设密码

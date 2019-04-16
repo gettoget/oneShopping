@@ -45,11 +45,11 @@ public interface YhService extends BaseService<SysYh, String> {
 	 */
 	SysYh queryByPhone(String phone);
 
-    ApiResponse<String> bindUKey(SysYh user);
+   /* ApiResponse<String> bindUKey(SysYh user);
 
     ApiResponse<String> unBindUKey(SysYh user);
 
-	ApiResponse<String> updateLoginType(SysYh user);
+	ApiResponse<String> updateLoginType(SysYh user);*/
 
     ApiResponse<String> initUserRole();
 }
