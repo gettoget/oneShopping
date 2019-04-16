@@ -1,6 +1,7 @@
 package com.ldz.biz.model;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.*;
 
 @Table(name = "pro_info")
@@ -93,7 +94,7 @@ public class ProInfo implements Serializable {
     /**
      * 商品封面图
      */
-    @Column(name = "cover_url'")
+    @Column(name = "cover_url")
     private String coverUrl;
 
     /**
@@ -154,6 +155,47 @@ public class ProInfo implements Serializable {
     @Transient
     private WinRecord winRecord;
 
+    @Transient
+    List<String> nums;
+
+    @Transient
+    private List<String> imgUrls;
+    @Transient
+    private List<String> coverUrls;
+    @Transient
+    private List<String> refUrls;
+
+    public List<String> getNums() {
+        return nums;
+    }
+
+    public void setNums(List<String> nums) {
+        this.nums = nums;
+    }
+
+    public List<String> getImgUrls() {
+        return imgUrls;
+    }
+
+    public void setImgUrls(List<String> imgUrls) {
+        this.imgUrls = imgUrls;
+    }
+
+    public List<String> getCoverUrls() {
+        return coverUrls;
+    }
+
+    public void setCoverUrls(List<String> coverUrls) {
+        this.coverUrls = coverUrls;
+    }
+
+    public List<String> getRefUrls() {
+        return refUrls;
+    }
+
+    public void setRefUrls(List<String> refUrls) {
+        this.refUrls = refUrls;
+    }
 
     public Integer getSort() {
         return sort;

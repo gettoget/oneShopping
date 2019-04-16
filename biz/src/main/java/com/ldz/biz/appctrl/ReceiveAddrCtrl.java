@@ -1,4 +1,4 @@
-package com.ldz.biz.controller;
+package com.ldz.biz.appctrl;
 
 import com.ldz.biz.model.ReceiveAddr;
 import com.ldz.biz.service.ReceiveAddrService;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/receiveaddr")
+@RequestMapping("/app/receiveaddr")
 public class ReceiveAddrCtrl extends BaseController<ReceiveAddr, String> {
 
     @Autowired

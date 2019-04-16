@@ -68,7 +68,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 
         String regCode = (String) redis.boundValueOps(phone + "_register_code").get();
         RuntimeCheck.ifBlank(regCode, MessageUtils.get("user.regCodeBlank"));
-        RuntimeCheck.ifTrue(StringUtils.equals(regCode, code), MessageUtils.get("user.regCodeError"));
+        RuntimeCheck.ifFalse(StringUtils.equals(regCode, code), MessageUtils.get("user.regCodeError"));
 
         String imei = (String) getAttribute("imei");
         RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
@@ -91,7 +91,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     }
 
     @Override
-    public ApiResponse<String> login(String phone, String password) {
+    public ApiResponse<Map<String, Object>> login(String phone, String password) {
         RuntimeCheck.ifBlank(phone, MessageUtils.get("user.phoneblank"));
         RuntimeCheck.ifBlank(password, MessageUtils.get("user.pwdblank"));
         SimpleCondition condition = new SimpleCondition(User.class);
@@ -108,12 +108,15 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         String token = JwtUtil.createToken(user.getId(), System.currentTimeMillis() + "");
         redis.boundValueOps(user.getId()).set(token, 1, TimeUnit.DAYS);
         redis.boundValueOps(user.getId() + "_userInfo").set(JSON.toJSON(user), 1, TimeUnit.DAYS);
-        ApiResponse<String> res = new ApiResponse<>();
-        res.setResult(token);
+        ApiResponse<Map<String,Object>> res = new ApiResponse<>();
         res.setMessage(MessageUtils.get("user.loginSuccess"));
         user.setLastImei(imei);
         user.setLastTime(DateUtils.getNowTime());
         update(user);
+        Map<String,Object> tokenMap = new HashMap<>();
+        tokenMap.put("token", token);
+        tokenMap.put("userInfo",user);
+        res.setResult(tokenMap);
         return res;
     }
 
@@ -138,12 +141,15 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     }
 
     @Override
-    public ApiResponse<String> editUserInfo(User user) {
+    public ApiResponse<User> editUserInfo(User user) {
+        ApiResponse<User> res = new ApiResponse<>();
         User u = findById(user.getId());
         BeanUtil.copyProperties(user, u, CopyOptions.create().setIgnoreNullValue(true).setIgnoreError(true).setIgnoreProperties("id", "phone", "pwd", "source", "lastTime", "lastImei", "regImei", "balance", "cjsj", "refCode", "score", "zjcs"));
         update(u);
         redis.boundValueOps(u.getId() + "_userInfo").set(JSON.toJSON(user), 1, TimeUnit.DAYS);
-        return ApiResponse.success(MessageUtils.get("user.editInfoSuc"));
+        res.setMessage(MessageUtils.get("user.editInfoSuc"));
+        res.setResult(u);
+        return res;
     }
 
     @Override

@@ -33,7 +33,7 @@ public class YhController extends BaseController<SysYh, String> {
 		return userService.initUserRole();
 	}
 
-	@RequestMapping("/bindUKey")
+	/*@RequestMapping("/bindUKey")
 	@ResponseBody
 	public ApiResponse<String> bindUKey(SysYh user) {
 		return this.userService.bindUKey(user);
@@ -47,7 +47,7 @@ public class YhController extends BaseController<SysYh, String> {
 	@ResponseBody
 	public ApiResponse<String> updateLoginType(SysYh user) {
 		return this.userService.updateLoginType(user);
-	}
+	}*/
 
 	@Override
 	public ApiResponse<String> save(SysYh entity) {

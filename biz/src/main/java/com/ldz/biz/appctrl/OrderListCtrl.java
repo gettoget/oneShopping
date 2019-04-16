@@ -1,41 +1,29 @@
-package com.ldz.biz.controller;
+package com.ldz.biz.appctrl;
 
-import com.ldz.biz.model.RefferRecord;
-import com.ldz.biz.service.RefferRecordService;
+import com.ldz.biz.model.OrderList;
+import com.ldz.biz.service.OrderListService;
 import com.ldz.sys.base.BaseController;
 import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.PastOrPresent;
-
 @RestController
-@RequestMapping("/api/refferrecord")
-public class RefferRecordCtrl extends BaseController<RefferRecord, String> {
+@RequestMapping("/app/orderlist")
+public class OrderListCtrl extends BaseController<OrderList,String> {
 
     @Autowired
-    private RefferRecordService service;
+    private OrderListService service;
 
     @Override
-    protected BaseService<RefferRecord, String> getBaseService() {
+    protected BaseService<OrderList, String> getBaseService() {
         return service;
     }
 
     @Override
     @PostMapping("/save")
-    public ApiResponse<String> save(RefferRecord entity){
-        return ApiResponse.success();
-    }
-
-    /**
-     * 根据用户输入邀请码生成邀请记录
-     * @param refCode
-     * @return
-     */
-    @PostMapping("/saveRecord")
-    public ApiResponse<String> saveRecord(String refCode){
-        return service.saveRecord(refCode);
+    public ApiResponse<String> save(OrderList entity){
+        return null;
     }
 
     /**
@@ -46,8 +34,8 @@ public class RefferRecordCtrl extends BaseController<RefferRecord, String> {
      */
     @Override
     @RequestMapping(value="/update", method={RequestMethod.POST})
-    public ApiResponse<String> update(RefferRecord entity){
-        return ApiResponse.success();
+    public ApiResponse<String> update(OrderList entity){
+        return null;
     }
 
     /**
@@ -59,9 +47,19 @@ public class RefferRecordCtrl extends BaseController<RefferRecord, String> {
     @Override
     @RequestMapping(value="/remove/{pkid}", method={RequestMethod.POST})
     public ApiResponse<String> remove(@PathVariable("pkid")String id){
-        return ApiResponse.success();
+        return  null;
     }
 
+    /**
+     * 批量删除操作
+     * @param ids
+     * @return
+     */
+    @Override
+    @RequestMapping(value="/removeIds", method={RequestMethod.POST})
+    public ApiResponse<String> remove(String[] ids){
+        return null;
+    }
 
 
 }

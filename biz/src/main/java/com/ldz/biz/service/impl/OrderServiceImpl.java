@@ -1,5 +1,6 @@
 package com.ldz.biz.service.impl;
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import com.ldz.biz.mapper.LuckNumMapper;
 import com.ldz.biz.mapper.OrderMapper;
@@ -12,6 +13,7 @@ import com.ldz.util.bean.SimpleCondition;
 import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
+import com.ldz.util.redis.RedisTemplateUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
@@ -52,6 +54,9 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 
 	@Autowired
 	private WinRecordService recordService;
+
+	@Autowired
+	private RedisTemplateUtil redis;
 
 	private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
@@ -99,12 +104,21 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 
 	@Override
 	public ApiResponse<String> saveEntity(Order entity) {
+		String imei = (String) getAttribute("imei");
+		String userId = (String) getAttribute("userId");
+		RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
+		Object o = redis.boundValueOps(imei + "saveOrder").get();
+		if(o != null){
+			return ApiResponse.fail(MessageUtils.get("FrequentOperation"));
+		}else{
+			redis.boundValueOps(imei + "saveOrder").set(1,10,TimeUnit.SECONDS);
+		}
 		RuntimeCheck.ifBlank(entity.getOrderType(), MessageUtils.get("order.typeBlank"));
-		RuntimeCheck.ifFalse(Arrays.asList("1", "2").contains(entity.getOrderType()), MessageUtils.get("order.typeError"));
+		RuntimeCheck.ifFalse(entity.getOrderType().equals("1") ||entity.getOrderType().equals("2"), MessageUtils.get("order.typeError"));
 		RuntimeCheck.ifBlank(entity.getProId(), MessageUtils.get("order.proBlank"));
 		RuntimeCheck.ifBlank(entity.getZfje(), MessageUtils.get("order.jeBlank"));
-		String userId = (String) getAttribute("userId");
-		String imei = (String) getAttribute("imei");
+
+
 		ProBaseinfo baseinfo;
 		if (entity.getOrderType().equals("1")) {
 			baseinfo = proBaseinfoService.findById(entity.getProId());
@@ -221,6 +235,24 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 
 		}
 		return ApiResponse.success(MessageUtils.get("order.paySuc"));
+	}
+
+    @Override
+    public ApiResponse<String> getPageInfo(Page<Order> page) {
+		LimitedCondition condition = getQueryCondition();
+		PageInfo<Order> pageInfo = findPage(page, condition);
+		ApiResponse<String> res = new ApiResponse<>();
+		res.setPage(pageInfo);
+		return res;
+    }
+
+	@Override
+	public ApiResponse<String> orderCancel(String id) {
+		Order order = findById(id);
+		RuntimeCheck.ifFalse(order.getDdzt().equals("3"), MessageUtils.get("order.ztError"));
+		order.setDdzt("5");
+		update(order);
+		return ApiResponse.success();
 	}
 
 

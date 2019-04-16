@@ -1,7 +1,7 @@
-package com.ldz.biz.controller;
+package com.ldz.biz.appctrl;
 
-import com.ldz.biz.model.ProBaseinfo;
-import com.ldz.biz.service.ProBaseinfoService;
+import com.ldz.biz.model.Popularimgs;
+import com.ldz.biz.service.PopularimgsService;
 import com.ldz.sys.base.BaseController;
 import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
@@ -11,25 +11,26 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/probaseinfo")
-public class ProBaseInfoCtrl extends BaseController<ProBaseinfo, String> {
+@RequestMapping("/app/popularimgs")
+public class PopularImgCtrl extends BaseController<Popularimgs,String> {
 
     @Autowired
-    private ProBaseinfoService service;
+    private PopularimgsService service;
 
     @Override
-    protected BaseService<ProBaseinfo, String> getBaseService() {
+    protected BaseService<Popularimgs, String> getBaseService() {
         return service;
     }
 
     /**
-     * 新增商品基本信息
+     * 保存推荐轮播图
      * @param entity
      * @return
      */
-    @Override
     @RequestMapping(value="/save", method={RequestMethod.POST})
-    public ApiResponse<String> save(ProBaseinfo entity){
-        return service.saveEntity(entity);
+    @Override
+    public ApiResponse<String> save(Popularimgs entity){
+        return null;
     }
+
 }

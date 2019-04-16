@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/app/popularimgs")
-public class PopularImgCtrl extends BaseController<Popularimgs,String> {
+@RequestMapping("/api/popularimgs")
+public class PopularImgContrl extends BaseController<Popularimgs,String> {
 
     @Autowired
     private PopularimgsService service;
