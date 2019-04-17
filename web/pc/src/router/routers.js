@@ -153,7 +153,62 @@ export default [
       }
     ]
   },
-
+  {
+    path: '/order',
+    name: 'order',
+    meta: {
+      icon: 'logo-buffer',
+      title: '订单管理'
+    },
+    component: Main,
+    children:[
+      {
+        path:'/audit-order',
+        name:'audit-order',
+        meta: {
+          icon: 'md-trending-up',
+          title: '订单审核'
+        },
+        component: () => import('@/vShop/order/audit-order')
+      },
+      {
+        path:'/direct-order',
+        name:'direct-order',
+        meta: {
+          icon: 'md-trending-up',
+          title: '直购订单'
+        },
+        component: () => import('@/vShop/order/direct-order')
+      },
+      {
+        path:'/draw-order',
+        name:'draw-order',
+        meta: {
+          icon: 'md-trending-up',
+          title: '中奖订单'
+        },
+        component: () => import('@/vShop/order/draw-order')
+      },
+      {
+        path:'/draw-order-robot',
+        name:'draw-order-robot',
+        meta: {
+          icon: 'md-trending-up',
+          title: 'Robot中奖订单'
+        },
+        component: () => import('@/vShop/order/draw-order-robot')
+      },
+      {
+        path:'/shipment-order',
+        name:'shipment-order',
+        meta: {
+          icon: 'md-trending-up',
+          title: '订单发货'
+        },
+        component: () => import('@/vShop/order/shipment-order')
+      }
+    ]
+  },
 
   {
     path: '/iview',
