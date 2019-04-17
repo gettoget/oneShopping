@@ -42,26 +42,8 @@ public class ProInfoContrl extends BaseController<ProInfo, String> {
         return service.getLatestPerson(baseid);
     }
 
-    /**
-     * 查询当前商品的信息 顺便带上你参与的量
-     * @param id 抢购商品的id
-     */
-    @PostMapping("/getProInfo")
-    public ApiResponse<ProInfo> getProInfo(String id){
-        return service.getProInfo(id);
-    }
 
-    /**
-     * 获取当前商品参与用户
-     * @param id
-     * @param pageNum
-     * @param pageSize
-     * @return
-     */
-    @PostMapping("/getUserInfo")
-    public ApiResponse<String> getUserInfo(String id, @RequestParam(defaultValue = "1") int pageNum,@RequestParam(defaultValue = "8") int pageSize){
-        return service.getUserInfo(id,pageNum,pageSize);
-    }
+
 
 
 

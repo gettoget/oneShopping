@@ -2,7 +2,6 @@ package com.ldz.biz.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
-import com.ldz.biz.mapper.LuckNumMapper;
 import com.ldz.biz.mapper.OrderMapper;
 import com.ldz.biz.model.*;
 import com.ldz.biz.service.*;
@@ -18,6 +17,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.SortParameters;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
@@ -49,8 +49,6 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 	@Autowired
 	private ProInfoService proInfoService;
 
-	@Autowired
-	private LuckNumMapper luckNumMapper;
 
 	@Autowired
 	private WinRecordService recordService;
@@ -104,7 +102,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 
 	@Override
 	public ApiResponse<String> saveEntity(Order entity) {
-		String imei = (String) getAttribute("imei");
+			String imei = (String) getAttribute("imei");
 		String userId = (String) getAttribute("userId");
 		RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
 		Object o = redis.boundValueOps(imei + "saveOrder").get();
@@ -117,14 +115,21 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 		RuntimeCheck.ifFalse(entity.getOrderType().equals("1") ||entity.getOrderType().equals("2"), MessageUtils.get("order.typeError"));
 		RuntimeCheck.ifBlank(entity.getProId(), MessageUtils.get("order.proBlank"));
 		RuntimeCheck.ifBlank(entity.getZfje(), MessageUtils.get("order.jeBlank"));
+		RuntimeCheck.ifBlank(entity.getGmfs(), MessageUtils.get("order.gmfsBlank"));
 
 
 		ProBaseinfo baseinfo;
+		ProInfo proInfo = null;
+		int gmfs = Integer.parseInt(entity.getGmfs());
 		if (entity.getOrderType().equals("1")) {
 			baseinfo = proBaseinfoService.findById(entity.getProId());
-
+			int store = Integer.parseInt(baseinfo.getProStore());
+			RuntimeCheck.ifTrue(gmfs > store, MessageUtils.get("pro.stroeNotEnough"));
 		}else{
-			String baseId = proInfoService.getBaseId(entity.getProId());
+			proInfo = proInfoService.findById(entity.getProId());
+			int reprice = Integer.parseInt(proInfo.getRePrice());
+			RuntimeCheck.ifTrue(gmfs > reprice, MessageUtils.get("pro.stroeNotEnough"));
+			String baseId = proInfo.getProBaseid();
 			baseinfo = proBaseinfoService.findById(baseId);
 		}
 
@@ -138,24 +143,26 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 		order.setProId(entity.getProId());
 		order.setProName(baseinfo.getProName());
 		order.setUserId(userId);
+		order.setGmfs(entity.getGmfs());
 		if(StringUtils.equals(entity.getOrderType(), "1")){
 			// 直接购买
-			order.setZfje(baseinfo.getProPrice());
+			order.setZfje(Integer.parseInt(baseinfo.getProPrice()) * Integer.parseInt(order.getGmfs()) + "");
 			save(order);
-			return ApiResponse.success(MessageUtils.get("order.saveSuc"));
+			// 直接购买  baseInfo 库存 -1
+			baseMapper.minusStore(baseinfo.getId(),Integer.parseInt(order.getGmfs()));
+
 		}else if(StringUtils.equals(entity.getOrderType(), "2")){
 			// 参与抽奖
-			RuntimeCheck.ifBlank(entity.getGmfs(), MessageUtils.get("order.gmfsBlank"));
-
 			order.setZfje(entity.getGmfs());
-			order.setGmfs(entity.getGmfs());
-
 			save(order);
-			return ApiResponse.success(MessageUtils.get("order.saveSuc"));
+			// 参与抽奖 剩余名额需要减去购买份数
+			baseMapper.minusRePrice(Integer.parseInt(order.getGmfs()),order.getProId());
 		}else{
 			return ApiResponse.fail(MessageUtils.get("order.typeError"));
 		}
-
+		// 存储订单支付 30 分钟过期 , 若未支付则  取消支付
+		redis.boundValueOps(order.getId() + "_dzf").set(1,30,TimeUnit.MINUTES);
+		return ApiResponse.success(MessageUtils.get("order.saveSuc"));
 	}
 
 	@Override
@@ -205,13 +212,15 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 		if(StringUtils.equals(order.getOrderType(), "2")){
 
 			// 订单支付完成 分配号码
-			// 先查询当前号码分配到多少位
-			ProInfo proInfo = proInfoService.findById(order.getProId());
-			Integer sort = proInfo.getSort();
 			 // 根据购买份数 分配号码
 			int anInt = Integer.parseInt(order.getGmfs());
-			int nu = sort + anInt;
-			List<String> luckNum = luckNumMapper.getLuckNum(sort, nu,proInfo.getProBaseid());
+			List<String> luckNum = new ArrayList<>();
+			// 获取当前商品 剩余的中奖号码
+			for (int i = 0; i < anInt; i++) {
+				String num = (String) redis.boundListOps(order.getProId() + "_nums").rightPop();
+				luckNum.add(num);
+			}
+
 			List<OrderList> orderLists = new ArrayList<>();
 			for (String s : luckNum) {
 				OrderList orderList = new OrderList(order,s,user);
@@ -219,17 +228,14 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 			}
 			if(CollectionUtils.isNotEmpty(orderLists)){
 				orderListService.saveList(orderLists);
-				proInfo.setSort(nu);
-				proInfo.setGxsj(DateUtils.getNowTime());
-				proInfoService.update(proInfo);
 			}
-			// 查看商品剩余名额是否 为 0
+			// 查看商品剩余名额是否 为 0   且所有订单都已支付
+			ProInfo proInfo = proInfoService.findById(order.getProId());
+			List<Order> orders = findEq(Order.InnerColumn.ddzt, "3");
 			String rePrice = proInfo.getRePrice();
-			if(StringUtils.equals(rePrice, "0")){
+			if(StringUtils.equals(rePrice, "0") && CollectionUtils.isEmpty(orders)){
 				// 建立延时任务 , 准备分配中奖号码
-
 				executorService.schedule(() -> fenpei(proInfo.getId()),5, TimeUnit.MINUTES);
-
 			}
 
 
@@ -252,6 +258,14 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 		RuntimeCheck.ifFalse(order.getDdzt().equals("3"), MessageUtils.get("order.ztError"));
 		order.setDdzt("5");
 		update(order);
+		// 查看订单状态为直接购买还是参与抽奖
+		// 直接购买订单 将库存返回
+		if(StringUtils.equals(order.getOrderType(), "1")){
+			baseMapper.plusStore(order.getProId(),Integer.parseInt(order.getGmfs()));
+		}else{
+			// 抽奖订单将 剩余名额返回
+			baseMapper.plusRePrice(order.getProId(), Integer.parseInt(order.getGmfs()));
+		}
 		return ApiResponse.success();
 	}
 

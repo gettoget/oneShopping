@@ -55,10 +55,4 @@ public class ProInfoCtrl extends BaseController<ProInfo, String> {
         return service.getUserInfo(id,pageNum,pageSize);
     }
 
-
-
-
-
-
-
 }

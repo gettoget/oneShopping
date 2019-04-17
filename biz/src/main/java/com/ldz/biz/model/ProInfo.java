@@ -120,8 +120,7 @@ public class ProInfo implements Serializable {
     @Column(name = "user_id")
     private String userId;
 
-    @Column(name = "sort")
-    private Integer sort;
+
 
     /**
      * 备注一
@@ -195,14 +194,6 @@ public class ProInfo implements Serializable {
 
     public void setRefUrls(List<String> refUrls) {
         this.refUrls = refUrls;
-    }
-
-    public Integer getSort() {
-        return sort;
-    }
-
-    public void setSort(Integer sort) {
-        this.sort = sort;
     }
 
     private static final long serialVersionUID = 1L;
@@ -661,8 +652,7 @@ public class ProInfo implements Serializable {
         userId("user_id"),
         bz1("bz1"),
         bz2("bz2"),
-        bz3("bz3"),
-        sort("sort");
+        bz3("bz3");
 
         private final String column;
 

@@ -6,6 +6,7 @@ import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.EncryptUtil;
 import com.ldz.util.commonUtil.IdWorker;
 import com.ldz.util.commonUtil.SnowflakeIdWorker;
+import com.ldz.util.redis.RedisTemplateUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +33,8 @@ public class BizApplicationTests {
     private UserService userService;
     @Autowired
     private JdbcTemplate template;
-
+    @Autowired
+    private RedisTemplateUtil redis;
 
 
     @Autowired
@@ -43,7 +45,8 @@ public class BizApplicationTests {
 
     @Test
     public void test() throws IOException {
-
+        String s = (String) redis.boundListOps("568132664020697088_nums").rightPop();
+        System.out.println("nums -> " + s);
     }
 
 }

@@ -27,4 +27,8 @@ public class ProBaseInfoCtrl extends BaseController<ProBaseinfo, String> {
     public ApiResponse<String> save(ProBaseinfo entity){
         return null;
     }
+
+
+
+
 }

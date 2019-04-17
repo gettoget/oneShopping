@@ -10,6 +10,7 @@ import com.ldz.util.bean.SimpleCondition;
 import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
+import com.ldz.util.redis.RedisTemplateUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,7 @@ import tk.mybatis.mapper.common.Mapper;
 
 import com.ldz.biz.mapper.ProInfoMapper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,6 +49,11 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 	private  String filePath;
 
 
+
+	@Autowired
+	private RedisTemplateUtil redis;
+
+
 	@Override
 	protected Mapper<ProInfo> getBaseMapper() {
 		return baseMapper;
@@ -73,6 +77,16 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 		proInfo.setProStore("1");
 		proInfo.setProZt("1");
 		save(proInfo);
+		// 生成当前商品的中奖号码
+		List<String> nums = new ArrayList<>();
+		for (int i = 0; i < Integer.parseInt(proInfo.getProPrice()); i++) {
+			nums.add(10000001 + i + "");
+		}
+		Collections.shuffle(nums);
+		for (String num : nums) {
+			redis.boundListOps(proInfo.getId() + "_nums").leftPush(num);
+
+		}
 
 		baseinfo.setProStore(storeNum -1 + "");
 		proBaseinfoService.update(baseinfo);
@@ -152,7 +166,6 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
     }
 
 
-
 	@Override
 	public void afterPager(PageInfo<ProInfo> result){
 		List<ProInfo> list = result.getList();
@@ -188,6 +201,23 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 			refUrls.add(filePath + s);
 		}
 		info.setRefUrls(refUrls);
+	}
+
+	public static void main(String[] args) {
+
+
+
+
+		List<String> nums = new ArrayList<>();
+		for (int i = 0; i < 7699; i++) {
+			nums.add(10000001 + i + "");
+		}
+		System.out.println(nums);
+		Collections.shuffle(nums);
+		System.out.println(nums);
+		Collections.shuffle(nums);
+		System.out.println(nums);
+
 	}
 
 }
