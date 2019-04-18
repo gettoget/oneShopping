@@ -153,7 +153,7 @@ public class DateUtils {
 //		}
 	}
 	public static String getNowTime() {
-		return getToday("yyyy-MM-dd HH:mm:ss");
+		return getToday("yyyy-MM-dd HH:mm:ss.SSS");
 	}
 	public static boolean checkTxnTime(String startTime, String endTime) {
 		String nowDate = getDateStr(new Date(), "HH:mm:ss");

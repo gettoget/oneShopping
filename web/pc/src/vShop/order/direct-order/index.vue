@@ -1,14 +1,35 @@
 <template>
   <div>
     <pager-tit title="直购订单"></pager-tit>
-    <Row style="position: relative;">
-      <Table
-        size='large' stripe
-        :height="AF.getPageHeight()-320"
-        :row-class-name="rowClassName"
-        :columns="tableTiT"
-        :data="tableData"></Table>
-    </Row>
+    <div class="box_row colCenter rowRight pageFindSty" style="border: none">
+      <div>
+        <!--<Icon type="md-person" size="34"/>-->
+        <Input
+               placeholder="请输入订单编号" style="width: 200px">
+              </Input>
+      </div>
+
+      <div>
+        <!--<Icon type="ios-call" size="34"/>-->
+        <Input
+               placeholder="请输入手机号码" style="width: 200px"
+              ></Input>
+      </div>
+      <Button type="primary">
+        <Icon type="md-search"></Icon>
+        <!--查询-->
+      </Button>
+    </div>
+    <div>
+      <Row style="position: relative; padding: 5px">
+        <Table
+          size='large' stripe
+          :height="AF.getPageHeight()-320"
+          :columns="tableTiT"
+          :data="tableData"></Table>
+      </Row>
+    </div>
+
   </div>
 </template>
 
@@ -26,7 +47,8 @@
           {
             title: '订单编号',
             align: 'center',
-            key: 'bh'
+            key: 'bh',
+            width:180
           },
           {
             title: '下单时间',

@@ -76,7 +76,7 @@
     <div class="photoTitle">详情图</div>
     <Row>
       <Col span="4" v-for="it in 7">
-        <StockPhoto></StockPhoto>
+        <!--<StockPhoto></StockPhoto>-->
 
       </Col>
     </Row>
@@ -85,11 +85,11 @@
 </template>
 
 <script>
-  import StockPhoto from "./StockPhoto"
+  // import StockPhoto from "./StockPhoto"
   export default {
     name: "index",
     components: {
-      StockPhoto
+      // StockPhoto
     },
     data () {
       return {

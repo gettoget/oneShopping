@@ -262,7 +262,7 @@ public class User implements Serializable {
     }
 
     /**
-     * 设置用户状态。正常、锁定
+     * 设置用户状态。正常、锁定   0  正常  1 锁定
      *
      * @param zt 用户状态。正常、锁定
      */
