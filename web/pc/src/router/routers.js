@@ -154,6 +154,35 @@ export default [
     ]
   },
   {
+    path: '/user',
+    name: 'user',
+    meta: {
+      icon: 'logo-buffer',
+      title: '用户管理'
+    },
+    component: Main,
+    children:[
+      {
+        path:'/usermanagement',
+        name:'usermanagement',
+        meta: {
+          icon: 'md-trending-up',
+          title: '用户信息'
+        },
+        component: () => import('@/vShop/user/usermanagement')
+      },
+      {
+        path:'/usermess',
+        name:'usermess',
+        meta: {
+          icon: 'md-trending-up',
+          title: '用户分析'
+        },
+        component: () => import('@/vShop/user/usermess')
+      }
+    ]
+  },
+  {
     path: '/order',
     name: 'order',
     meta: {
