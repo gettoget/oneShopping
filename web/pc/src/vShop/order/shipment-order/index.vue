@@ -1,11 +1,29 @@
 <template>
   <div>
-    <pager-tit title="订单审核"></pager-tit>
-    <Row style="position: relative;">
+    <pager-tit title="订单发货"></pager-tit>
+    <div class="box_row colCenter rowRight pageFindSty" style="border: none">
+      <div>
+        <!--<Icon type="md-person" size="34"/>-->
+        <Input
+          placeholder="请输入订单编号" style="width: 200px">
+        </Input>
+      </div>
+
+      <div>
+        <!--<Icon type="ios-call" size="34"/>-->
+        <Input
+          placeholder="请输入手机号码" style="width: 200px"
+        ></Input>
+      </div>
+      <Button type="primary">
+        <Icon type="md-search"></Icon>
+        <!--查询-->
+      </Button>
+    </div>
+    <Row style="position: relative;padding-top: 5px">
       <Table
         size='large' stripe
         :height="AF.getPageHeight()-320"
-        :row-class-name="rowClassName"
         :columns="tableTiT"
         :data="tableData"></Table>
     </Row>
@@ -54,6 +72,11 @@
             align: 'center',
             key: 'bz'
           },
+          {
+            title: '审核人',
+            align: 'center',
+            key: 'shr'
+          },
         ],
         tableData: [
           {
@@ -62,7 +85,8 @@
             sjh:'0908-1678-18766',
             dz:'sjhfjsfkjdakd',
             zt:'已审核',
-            bz:'赠品111'
+            bz:'赠品111',
+            shr:'losslll'
           }
         ],
       }

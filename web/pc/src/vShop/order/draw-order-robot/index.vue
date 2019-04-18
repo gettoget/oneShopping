@@ -1,11 +1,29 @@
 <template>
   <div>
     <pager-tit title="Robot中奖订单"></pager-tit>
-    <Row style="position: relative;">
+    <div class="box_row colCenter rowRight pageFindSty" style="border: none">
+      <div>
+        <!--<Icon type="md-person" size="34"/>-->
+        <Input
+          placeholder="请输入订单编号" style="width: 200px">
+        </Input>
+      </div>
+
+      <div>
+        <!--<Icon type="ios-call" size="34"/>-->
+        <Input
+          placeholder="请输入手机号码" style="width: 200px"
+        ></Input>
+      </div>
+      <Button type="primary">
+        <Icon type="md-search"></Icon>
+        <!--查询-->
+      </Button>
+    </div>
+    <Row style="position: relative;padding-top: 5px">
       <Table
         size='large' stripe
         :height="AF.getPageHeight()-320"
-        :row-class-name="rowClassName"
         :columns="tableTiT"
         :data="tableData"></Table>
     </Row>
@@ -26,6 +44,7 @@
           {
             title: '订单编号',
             align: 'center',
+            width:120,
             key: 'bh'
           },
           {
