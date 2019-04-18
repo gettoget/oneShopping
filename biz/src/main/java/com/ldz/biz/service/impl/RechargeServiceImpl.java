@@ -7,6 +7,7 @@ import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
+import com.ldz.util.redis.RedisTemplateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,8 @@ import com.ldz.biz.service.RechargeService;
 import com.ldz.biz.mapper.RechargeMapper;
 import com.ldz.biz.model.Recharge;
 
+import java.util.concurrent.TimeUnit;
+
 @Service
 public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> implements RechargeService {
 
@@ -24,7 +27,8 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 	private RechargeMapper baseMapper;
 	@Autowired
 	private UserService userService;
-
+	@Autowired
+	private RedisTemplateUtil redis;
 
 	@Override
 	protected Mapper<Recharge> getBaseMapper() {
@@ -40,6 +44,14 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 		User user = userService.findById(userId);
 		RuntimeCheck.ifNull(user, MessageUtils.get("user.null"));
 
+		String imei = (String) getAttribute("imei");
+
+		Object o = redis.boundValueOps(imei + "recharge").get();
+		if (o != null) {
+			return ApiResponse.fail(MessageUtils.get("FrequentOperation"));
+		} else {
+			redis.boundValueOps(imei + "recharge").set(1, 10, TimeUnit.SECONDS);
+		}
 
 
 		// todo 充值接口调用
@@ -56,7 +68,7 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 		recharge.setCzzt("1");
 		recharge.setCzqjbs(user.getBalance());
 		recharge.setCzqd("1");
-		String imei = (String) getAttribute("imei");
+
 		RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
 		user.setBalance(Integer.parseInt(user.getBalance()) + amount + "");
 		recharge.setCzhjbs(user.getBalance());

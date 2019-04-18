@@ -101,6 +101,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         String imei = (String) getAttribute("imei");
         RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
         User user = users.get(0);
+        RuntimeCheck.ifFalse(user.getZt().equals("0"), MessageUtils.get("user.isLocked"));
         String userPwd = EncryptUtil.encryptUserPwd(password);
         RuntimeCheck.ifFalse(StringUtils.equals(user.getPwd(), userPwd), MessageUtils.get("user.pwderror"));
 
@@ -254,6 +255,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         RuntimeCheck.ifFalse(StringUtils.equals(pwd, pwd1), MessageUtils.get("user.pwdnotsame"));
         String userId = (String) getAttribute("userId");
         User user = findById(userId);
+       RuntimeCheck.ifTrue( StringUtils.isNotBlank(user.getPayPwd()), MessageUtils.get("user.paypwdIsNotNull"));
         String userPwd = EncryptUtil.encryptUserPwd(pwd);
         user.setPayPwd(userPwd);
         update(user);

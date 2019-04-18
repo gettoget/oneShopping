@@ -1,5 +1,6 @@
 package com.ldz.biz.listener;
 
+import com.ldz.biz.model.Order;
 import com.ldz.biz.service.OrderService;
 import com.ldz.util.redis.RedisTemplateUtil;
 import lombok.val;
@@ -27,8 +28,11 @@ public class ExpiredListener implements MessageListener {
         if(StringUtils.contains(topic, "expired")){
             if(StringUtils.contains(value,"_dzf")){
                 String[] split = value.split("_");
-                // 订单取消支付
-                orderService.orderCancel(split[0]);
+                Order order = orderService.findById(split[0]);
+                if(StringUtils.equals("3",order.getDdzt())){
+                    // 订单取消支付
+                    orderService.orderCancel(split[0]);
+                }
             }
         }
 

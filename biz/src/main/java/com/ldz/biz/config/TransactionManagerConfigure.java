@@ -36,7 +36,7 @@ public class TransactionManagerConfigure {
         transactionAttributes.setProperty("remove*", "PROPAGATION_REQUIRED,-Exception");
         transactionAttributes.setProperty("update*", "PROPAGATION_REQUIRED,-Exception");
         transactionAttributes.setProperty("batch*", "PROPAGATION_REQUIRED,-Exception");
-
+        transactionAttributes.setProperty("pay*", "PROPAGATION_REQUIRED,-Exception");
         // 其他事物配置
         transactionAttributes.setProperty("confirm*","PROPAGATION_REQUIRED,-Exception");
         transactionAttributes.setProperty("revoke*","PROPAGATION_REQUIRED,-Exception");
