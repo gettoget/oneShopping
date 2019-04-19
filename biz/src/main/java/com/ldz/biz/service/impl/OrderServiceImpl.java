@@ -18,6 +18,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.SortParameters;
 import org.springframework.data.redis.core.BoundListOperations;
@@ -108,12 +109,12 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         String imei = (String) getAttribute("imei");
         String userId = (String) getAttribute("userId");
         RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
-        Object o = redis.boundValueOps(imei + "saveOrder").get();
+       /* Object o = redis.boundValueOps(imei + "saveOrder").get();
         if (o != null) {
             return ApiResponse.fail(MessageUtils.get("FrequentOperation"));
         } else {
             redis.boundValueOps(imei + "saveOrder").set(1, 10, TimeUnit.SECONDS);
-        }
+        }*/
         RuntimeCheck.ifBlank(entity.getOrderType(), MessageUtils.get("order.typeBlank"));
         RuntimeCheck.ifFalse(entity.getOrderType().equals("1") || entity.getOrderType().equals("2"), MessageUtils.get("order.typeError"));
         RuntimeCheck.ifBlank(entity.getProId(), MessageUtils.get("order.proBlank"));
@@ -165,34 +166,39 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         }
         // 存储订单支付 30 分钟过期 , 若未支付则  取消支付
         redis.boundValueOps(order.getId() + "_dzf").set(1, 30, TimeUnit.MINUTES);
-        // 剩余名额少于 50 单时
-        if (proInfo.getrType().equals("2") && (Integer.parseInt(proInfo.getRePrice()) -Integer.parseInt(order.getGmfs()))  <= 50 && (Integer.parseInt(proInfo.getRePrice()) -Integer.parseInt(order.getGmfs())) > 0) {
-            // 创建机器人订单
-            int rePrice = Integer.parseInt(proInfo.getRePrice());
-            List<User> users = baseMapper.ranUsers(1);
-            User user = users.get(0);
-            Order ord = new Order();
-            ord.setId(genId());
-            ord.setUserName(user.getUserName());
-            ord.setUserId(user.getId());
-            ord.setProName(proInfo.getProName());
-            ord.setOrderType("2");
-            ord.setProId(proInfo.getId());
-            ord.setDdzt("0");
-            ord.setGmfs(rePrice + "");
-            ord.setZfje("0");
-            save(ord);
-            proInfo.setRePrice("0");
-            proInfo.setGxsj(DateUtils.getNowTime());
-            proInfoService.update(proInfo);
-            // 将剩余的号码分配给机器人订单
-            BoundListOperations<Object, Object> boundListOps = redis.boundListOps(proInfo.getId() + "_nums");
-            String index = (String) boundListOps.index(0);
-            List<OrderList> orderLists = new ArrayList<>();
-            if (StringUtils.isNotEmpty(index)) {
-                Long length = boundListOps.size();
-                for (int i = 0; i < length; i++) {
-                    String num = (String) boundListOps.rightPop();
+
+        //
+
+        // 当剩余名额处于半数时
+        if ("2".equals(proInfo.getrType()) && Integer.parseInt(proInfo.getProPrice()) / Integer.parseInt(proInfo.getRePrice()) > 1 && Integer.parseInt(proInfo.getProPrice()) >=2) {
+
+            // 查询是否有 机器人下单
+            SimpleCondition condition = new SimpleCondition(OrderList.class);
+            condition.eq(OrderList.InnerColumn.yhlx, "1");
+            condition.eq(OrderList.InnerColumn.proId, proInfo.getId());
+            List<OrderList> lists = orderListService.findByCondition(condition);
+            if (CollectionUtils.isEmpty(lists)) {
+                // 随机生成2个用户创建订单 , 到时 一个 负责中奖 一个负责控制号码
+                List<User> users = baseMapper.ranUsers(2);
+                for (User user : users) {
+                    Order ord = new Order();
+                    ord.setId(genId());
+                    ord.setUserName(user.getUserName());
+                    ord.setUserId(user.getId());
+                    ord.setProName(proInfo.getProName());
+                    ord.setOrderType("2");
+                    ord.setProId(proInfo.getId());
+                    ord.setDdzt("0");
+                    ord.setGmfs("1");
+                    ord.setZfje("1");
+                    ord.setZfsj(DateUtils.getNowTime());
+                    ord.setImei(user.getRegImei());
+                    ord.setCjsj(DateUtils.getNowTime());
+                    save(ord);
+                    baseMapper.minusRePrice(1, proInfo.getId());
+                    baseMapper.updateCyyhs(proInfo.getId());
+                    // 分配号码
+                    String num = (String) redis.boundListOps(proInfo.getId() + "_nums").rightPop();
                     OrderList orderList = new OrderList();
                     orderList.setYhlx("1");
                     orderList.setUserName(user.getUserName());
@@ -203,14 +209,11 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                     orderList.setNum(num);
                     orderList.setId(genId());
                     orderList.setCjsj(DateUtils.getNowTime());
-                    orderLists.add(orderList);
+                    orderListService.save(orderList);
                 }
-                orderListService.saveList(orderLists);
             }
 
         }
-
-
         return ApiResponse.success(MessageUtils.get("order.saveSuc"));
     }
 
@@ -259,6 +262,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         exchangeService.save(exchange);
         userService.update(user);
         update(order);
+        ProInfo proInfo = proInfoService.findById(order.getProId());
+        baseMapper.updateCyyhs(proInfo.getId());
         if (StringUtils.equals(order.getOrderType(), "2")) {
 
             // 订单支付完成 分配号码
@@ -270,26 +275,41 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 String num = (String) redis.boundListOps(order.getProId() + "_nums").rightPop();
                 luckNum.add(num);
             }
+            try {
 
-            List<OrderList> orderLists = new ArrayList<>();
-            for (String s : luckNum) {
-                OrderList orderList = new OrderList(order, s, user);
-                orderList.setId(genId());
-                orderLists.add(orderList);
-            }
-            if (CollectionUtils.isNotEmpty(orderLists)) {
-                orderListService.saveList(orderLists);
-            }
-            // 查看商品剩余名额是否 为 0   且所有订单都已支付
-            ProInfo proInfo = proInfoService.findById(order.getProId());
-            String rePrice = proInfo.getRePrice();
 
-            if (StringUtils.equals(rePrice, "0")) {
-                List<Order> orders = findEq(Order.InnerColumn.ddzt, "3");
-                if (CollectionUtils.isEmpty(orders)) {
-                    // 建立延时任务 , 准备分配中奖号码
-                    executorService.schedule(() -> fenpei(proInfo.getId(),id), 5, TimeUnit.MINUTES);
+                List<OrderList> orderLists = new ArrayList<>();
+                for (String s : luckNum) {
+                    OrderList orderList = new OrderList(order, s, user);
+                    orderList.setId(genId());
+                    orderLists.add(orderList);
                 }
+                if (CollectionUtils.isNotEmpty(orderLists)) {
+                    orderListService.saveList(orderLists);
+                }
+                // 查看商品剩余名额是否 为 0   且所有订单都已支付
+
+                int rePrice = Integer.parseInt(proInfo.getRePrice());
+
+                if (rePrice <= 0) {
+                    SimpleCondition condition = new SimpleCondition(Order.class);
+                    condition.eq(Order.InnerColumn.ddzt, "3");
+                    condition.eq(Order.InnerColumn.proId, proInfo.getId());
+                    List<Order> orders = findEq(Order.InnerColumn.ddzt, "3");
+                    if (CollectionUtils.isEmpty(orders)) {
+                        // 号码分配完 清理redis key
+                        redis.delete(order.getProId() + "_nums");
+
+                        // 建立延时任务 , 准备分配中奖号码
+                        executorService.schedule(() -> fenpei(proInfo.getId()), 5, TimeUnit.MINUTES);
+                    }
+                }
+            } catch (Exception e) {
+                // 如果分配号码时报错 , 此时 订单支付未完成 , 号码应该重新填充回redis
+                for (String s : luckNum) {
+                    redis.boundListOps(order.getProId() + "_nums").leftPush(s);
+                }
+
             }
 
 
@@ -331,37 +351,50 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
      *
      * @param id 上架商品id
      */
-    private void fenpei(String id, String oId) {
+    private void fenpei(String id) {
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS");
         ProInfo info = proInfoService.findById(id);
-        Order byId = findById(id);
-        List<String> lastFifty ;
-        if(StringUtils.equals(info.getrType(), "2")){
-            lastFifty = baseMapper.getLastFifty(info.getId(), 49);
+        List<String> lastFifty;
+        long zjhm = 0;
+        if (StringUtils.equals(info.getrType(), "2")) {
             // 从机器人的号码中随机取一个
             SimpleCondition condition = new SimpleCondition(OrderList.class);
             condition.eq(OrderList.InnerColumn.yhlx, "1");
             condition.eq(OrderList.InnerColumn.proId, info.getId());
             List<OrderList> lists = orderListService.findByCondition(condition);
-            String num = lists.get(0).getNum();
-            String orderId = lists.get(0).getOrderId();
-            Order order = findById(orderId);
-            lastFifty.add(lastFifty.get(0));
 
-            Long hHmmssSSS = lastFifty.stream().map(s -> Long.parseLong(DateTime.parse(s).toString("HHmmssSSS"))).reduce(Long::sum).get();
-            long zjhm = (hHmmssSSS % Long.parseLong(info.getProPrice())) + 10000001;
-            int anInt = Integer.parseInt(num);
-            int l = (int) (zjhm - anInt);
-            String s = DateTime.parse(byId.getZfsj()).plusMillis(l).toString("yyyy-MM-dd HH:mm:ss.SSS");
-            order.setZfsj(s);
-            update(order);
+            if (lists.size() == 2) {
+                lastFifty = baseMapper.getLastFifty(info.getId(), 49);
+                String num = lists.get(0).getNum();
+                String orderId = lists.get(1).getOrderId();
+                Order order = findById(orderId);
+                lastFifty.add(lastFifty.get(lastFifty.size() - 1));
+                long total = 0;
+                for (String s : lastFifty) {
+                    DateTime time = DateTime.parse(s, formatter);
+                    String hHmmssSSS = time.toString("HHmmssSSS");
+                    long aLong = Long.parseLong(hHmmssSSS);
+                    total += aLong;
+                }
+                Long hHmmssSSS = lastFifty.stream().map(s -> Long.parseLong(DateTime.parse(s, formatter).toString("HHmmssSSS"))).reduce(Long::sum).get();
+                zjhm = (hHmmssSSS % Long.parseLong(info.getProPrice())) + 10000001;
+                int anInt = Integer.parseInt(num);
+                int l = (int) (anInt - zjhm);
+
+                String s = DateTime.parse(lastFifty.get(lastFifty.size() - 1), formatter).plusMillis(l).toString("yyyy-MM-dd HH:mm:ss.SSS");
+                order.setZfsj(s);
+                order.setCjsj(s);
+                update(order);
+            }
         }
         lastFifty = baseMapper.getLastFifty(info.getId(), 50);
-
-
         // 所有时间 按 HHmmssSSS 相加
-        Long hHmmssSSS = lastFifty.stream().map(s -> Long.parseLong(DateTime.parse(s).toString("HHmmssSSS"))).reduce(Long::sum).get();
+        Long hHmmssSSS = lastFifty.stream().map(s -> Long.parseLong(DateTime.parse(s, formatter).toString("HHmmssSSS"))).reduce(Long::sum).get();
+        zjhm = (hHmmssSSS % Long.parseLong(info.getProPrice())) + 10000001;
+
+
         // 时间总数除以需求总数 取余
-        long zjhm = (hHmmssSSS % Long.parseLong(info.getProPrice())) + 10000001;
+
 
         info.setZjhm(zjhm + "");
         info.setProZt("3");
