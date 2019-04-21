@@ -49,7 +49,8 @@ Vue.component('pagerTit',pagerTit)
 
 
 Vue.use(iView, {
-  i18n: (key, value) => i18n.t(key, value)
+  i18n: (key, value) => i18n.t(key, value),
+  size:"large"
 })
 Vue.use(TreeTable)
 Vue.use(VOrgTree)

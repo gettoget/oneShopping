@@ -1,21 +1,56 @@
+<style lang="less">
+  @import "./index.less";
+</style>
 <template>
-  <div>
+  <div class="box_col NewStockSty">
     <div>
-      商品上架
+      <h1>商品上架</h1>
     </div>
-    <Row>
-      <Col span="10">
-        <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80">
-          <FormItem label="商品名称" prop="name">
-            <Input v-model="formValidate.name" placeholder="输入商品名称"></Input>
-          </FormItem>
-          <Row>
-            <Col span="10">
-              <FormItem label="商品售价" prop="price">
-                <Input v-model="formValidate.price" placeholder="输入商品售价"></Input>
-              </FormItem>
-            </Col>
-            <Col span="10" offset="4">
+    <div class="box_col_autoY" style="margin-top: 22px">
+      <Row :gutter="16">
+        <Col span="4" class-name="coverImgBoxSty">
+          <h2>封面图</h2>
+          <up-file-img @handleSuccess="(url)=>{handleSuccess(url,'coverImg')}">
+            <img v-if="formData.coverImg" :src="formData.coverImg" alt="">
+            <Button v-else type="dashed">
+              <Icon type="md-cloud-upload" size="120"/>
+            </Button>
+          </up-file-img>
+        </Col>
+        <Col span="4" class-name="tuijianImgBoxSty">
+          <h2>推荐图</h2>
+          <up-file-img @handleSuccess="(url)=>{handleSuccess(url,'tuijianImg')}">
+            <img v-if="formData.tuijianImg" :src="formData.tuijianImg" alt="">
+            <Button v-else type="dashed">
+              <Icon type="md-cloud-upload" size="120"/>
+            </Button>
+          </up-file-img>
+        </Col>
+      </Row>
+      <div style="margin-top: 24px">
+        <h2>内容图</h2>
+      </div>
+      <Row :gutter="16" class-name="contentImgSty">
+        <Col span="4" class-name="contentItemSty" v-for="(it,index) in formData.content" :key="index">
+          <img :src="it" alt="">
+          <div class="ingMask">
+            <Icon type="ios-trash" size="60" color="#fff" @click.native="removeItem(index)"/>
+          </div>
+        </Col>
+        <Col span="4" v-if="formData.content.length<6">
+          <up-file-img @handleSuccess="contentImg">
+            <Button type="dashed">
+              <Icon type="md-cloud-upload" size="120"/>
+            </Button>
+          </up-file-img>
+        </Col>
+      </Row>
+
+      <!-------------------------------->
+      <div class="formDataSty">
+        <Form ref="formValidate" :model="formValidate" :rules="ruleValidate">
+          <Row :gutter="16">
+            <Col span="6">
               <FormItem label="商品类型" prop="classify">
                 <Select v-model="formValidate.classify" placeholder="选择商品分类">
                   <Option value="computer">电脑</Option>
@@ -26,117 +61,119 @@
                   <Option value="other">其他</Option>
                 </Select>
               </FormItem>
-
             </Col>
-          </Row>
-          <Row>
-            <Col span="10">
-              <FormItem label="上架时间" prop="uploaddate">
-                <DatePicker type="datetime" placeholder="选择上架日期" v-model="formValidate.uploaddate"></DatePicker>
+            <Col span="6">
+              <FormItem label="商品名称" prop="name">
+                <Input v-model="formValidate.name" placeholder="输入商品名称"></Input>
               </FormItem>
             </Col>
-            <Col span="10" offset="4">
-              <FormItem label="下架时间" prop="downloaddate">
-                <DatePicker type="datetime" placeholder="选择下架时间" v-model="formValidate.uptime"></DatePicker>
+            <Col span="6">
+              <FormItem label="商品参数" prop="price">
+                <Input v-model="formValidate.price" placeholder="输入商品参数"></Input>
+              </FormItem>
+            </Col>
+            <Col span="6">
+              <FormItem label="商品详情" prop="desc">
+                <Input v-model="formValidate.desc" type="textarea" :autosize="{minRows: 1,maxRows: 5}"
+                       placeholder="输入商品详情."></Input>
               </FormItem>
             </Col>
           </Row>
-          <Row>
-            <Col span="10">
+          <Row :gutter="16">
+            <Col span="6">
               <FormItem label="销售份额" prop="amount">
                 <Input v-model="formValidate.amount" placeholder="输入商品售价"></Input>
               </FormItem>
             </Col>
-            <Col span="10" offset="4">
-              <FormItem label="中奖人数" prop="peopleNum">
-                <Input v-model="formValidate.peopleNum" placeholder="设置中奖人数"></Input>
+            <Col span="6">
+              <FormItem label="销售份额" prop="amount">
+                <Input v-model="formValidate.amount" placeholder="输入商品售价"></Input>
               </FormItem>
             </Col>
           </Row>
-          <FormItem label="商品详情" prop="desc">
-            <Input v-model="formValidate.desc" type="textarea" :autosize="{minRows: 1,maxRows: 5}"
-                   placeholder="输入商品详情."></Input>
-          </FormItem>
+
+
+
           <FormItem>
             <Button type="primary" @click="handleSubmit('formValidate')">提交</Button>
             <Button @click="handleReset('formValidate')" style="margin-left: 8px">重置</Button>
           </FormItem>
         </Form>
-      </Col>
-      <Col span="6" offset="1">
-        <div class="photoTitle">封面图</div>
-        <StockPhoto></StockPhoto>
-      </Col>
-      <Col span="6">
-        <div class="photoTitle">推荐图</div>
-        <StockPhoto></StockPhoto>
-      </Col>
-
-    </Row>
-    <div class="photoTitle">详情图</div>
-    <Row>
-      <Col span="4" v-for="it in 7">
-        <!--<StockPhoto></StockPhoto>-->
-
-      </Col>
-    </Row>
-
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
   // import StockPhoto from "./StockPhoto"
+  import upFileImg from '_p/upLoadComp/index.vue'
+
   export default {
     name: "index",
     components: {
       // StockPhoto
+      upFileImg
     },
-    data () {
+    data() {
       return {
         formValidate: {
-          name: '',
-          price: '',
-          classify: '',
+          name: '',//商品名称
+          price: '',//商品参数
+          classify: '',//商品类型
           amount: '',
           peopleNum: '',
           uploaddate: '',
           downloaddate: '',
-          desc: ''
+          desc: '',//商品详情
         },
         ruleValidate: {
           name: [
-            { required: true, message: '商品名称不能为空', trigger: 'blur' }
+            {required: true, message: '商品名称不能为空', trigger: 'blur'}
           ],
           price: [
-            { required: true, message: '售价不能为空', trigger: 'blur' },
-            { type: 'number', message: '售价需为数字', trigger: 'blur' }
+            {required: true, message: '售价不能为空', trigger: 'blur'},
+            {type: 'number', message: '售价需为数字', trigger: 'blur'}
           ],
           classify: [
-            { required: true, message: '选择商品分类', trigger: 'change' }
+            {required: true, message: '选择商品分类', trigger: 'change'}
           ],
           amount: [
-            { required: true, message: '销售份额不能为空', trigger: 'blur' },
-            { type: 'number', message: '销售份额需为数字', trigger: 'blur' }
+            {required: true, message: '销售份额不能为空', trigger: 'blur'},
+            {type: 'number', message: '销售份额需为数字', trigger: 'blur'}
           ],
           peopleNum: [
-            { required: true, message: '中奖人数不能为空', trigger: 'blur' },
-            { type: 'number', message: '中奖人数需为数字', trigger: 'blur' }
+            {required: true, message: '中奖人数不能为空', trigger: 'blur'},
+            {type: 'number', message: '中奖人数需为数字', trigger: 'blur'}
           ],
           uploaddate: [
-            { required: true, type: 'datetime', message: '选择上架时间', trigger: 'change' }
+            {required: true, type: 'datetime', message: '选择上架时间', trigger: 'change'}
           ],
           downloaddate: [
-            { required: true, type: 'datetime', message: '选择下架时间', trigger: 'change' }
+            {required: true, type: 'datetime', message: '选择下架时间', trigger: 'change'}
           ],
           desc: [
-            { required: true, type: 'string',message: '请填写商品详情', trigger: 'blur' }
+            {required: true, type: 'string', message: '请填写商品详情', trigger: 'blur'}
           ]
+        },
+        formData: {
+          coverImg: "",//封面图片
+          tuijianImg: "",//推荐图
+          content: []
         }
       }
 
     },
     methods: {
-      handleSubmit (name) {
+      handleSuccess(url, key) {
+        this.formData[key] = url
+      },
+      contentImg(url) {
+        this.formData.content.push(url)
+      },
+      removeItem(index) {
+        this.formData.content.splice(index, 1)
+      },
+      handleSubmit(name) {
         this.$refs[name].validate((valid) => {
           if (valid) {
             this.$Message.success('Success!');
@@ -145,17 +182,9 @@
           }
         })
       },
-      handleReset (name) {
+      handleReset(name) {
         this.$refs[name].resetFields();
       }
     }
   }
 </script>
-
-<style lang="less">
-  .photoTitle{
-    font-size: 1rem;
-    text-align: center;
-    padding: 10px 0;
-  }
-</style>
