@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/app/proinfo")
+@RequestMapping("/app/guest/proinfo")
 public class ProInfoCtrl extends BaseController<ProInfo, String> {
 
     @Autowired

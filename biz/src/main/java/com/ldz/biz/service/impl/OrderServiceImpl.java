@@ -299,7 +299,11 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                     if (CollectionUtils.isEmpty(orders)) {
                         // 号码分配完 清理redis key
                         redis.delete(order.getProId() + "_nums");
-
+                        // 更新商品状态为 待开奖
+                        proInfo.setGxsj(DateUtils.getNowTime());
+                        proInfo.setProZt("3");
+                        proInfo.setKjsj(DateTime.now().plusMinutes(1).toString("yyyy-MM-dd HH:mm:ss.SSS"));
+                        proInfoService.update(proInfo);
                         // 建立延时任务 , 准备分配中奖号码
                         executorService.schedule(() -> fenpei(proInfo.getId()), 5, TimeUnit.MINUTES);
                     }
@@ -395,10 +399,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 
         // 时间总数除以需求总数 取余
 
-
         info.setZjhm(zjhm + "");
-        info.setProZt("3");
-        info.setKjsj(DateUtils.getNowTime());
+        info.setProZt("4");
         info.setGxsj(DateUtils.getNowTime());
 
         // 查询中奖人 id
@@ -410,6 +412,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             OrderList list = lists.get(0);
             info.setUserId(list.getUserid());
             info.setUserName(list.getUserName());
+            proInfoService.update(info);
             // 将此单的状态改为已中奖
             Order order = findById(list.getOrderId());
             order.setDdzt("1");
@@ -437,6 +440,11 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             record.setZjfs(sum + "");
             record.setZjlx(user.getScore());
             recordService.save(record);
+            // 商品已中奖  自动上架 下个商品  如果还有库存的话
+            ProBaseinfo baseinfo = proBaseinfoService.findById(info.getProBaseid());
+            if (Integer.parseInt(baseinfo.getProStore()) > 0) {
+                redis.convertAndSend("grounding",baseinfo.getId());
+            }
         }
 
     }

@@ -1,6 +1,7 @@
 package com.ldz.biz.service;
 
 import com.ldz.biz.model.User;
+import com.ldz.biz.model.UserModel;
 import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
 
@@ -43,7 +44,7 @@ public interface UserService extends BaseService<User, String> {
      * @param user
      * @return
      */
-    ApiResponse<User> editUserInfo(User user);
+    ApiResponse<UserModel> editUserInfo(User user);
 
     /**
      * 重设密码
@@ -105,5 +106,5 @@ public interface UserService extends BaseService<User, String> {
      * 获取当前登录用户信息
      * @return
      */
-    ApiResponse<User> getUserInfo();
+    ApiResponse<UserModel> getUserInfo();
 }

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/app/exchange")
+@RequestMapping("/app/user/exchange")
 public class ExchangeCtrl extends BaseController<Exchange, String> {
 
     @Autowired

@@ -23,7 +23,8 @@ public class ExtendInterceptor extends BaseWebConfigure {
 						,"/getUserLoginType"
 						,"/upload");
 		registry.addInterceptor(new AppInterceptor(redisDao))
-				.addPathPatterns("/app/**");
+				.addPathPatterns("/app/user/**")
+				.excludePathPatterns("/app/user/login","/app/user/register","/app/user/sendMsg","/app/user/findPwd","/app/guest/**");
 		super.addInterceptors(registry);
 	}
 	

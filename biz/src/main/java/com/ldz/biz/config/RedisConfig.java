@@ -2,7 +2,9 @@ package com.ldz.biz.config;
 
 
 import com.ldz.biz.listener.ExpiredListener;
+import com.ldz.biz.listener.GroundingListener;
 import com.ldz.biz.service.OrderService;
+import com.ldz.biz.service.ProInfoService;
 import com.ldz.util.redis.RedisTemplateUtil;
 import com.ldz.util.spring.SpringContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,9 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import redis.clients.jedis.JedisPoolConfig;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * redis配置
@@ -91,8 +96,14 @@ public class RedisConfig {
 		OrderService orderService = SpringContextUtil.getBean(OrderService.class);
 		ExpiredListener expiredListener = new ExpiredListener(redisTemplateUtil,orderService);
 
+		List<PatternTopic> topicList = new ArrayList<>();
+		topicList.add(new PatternTopic("grounding"));
+		ProInfoService proInfoService = SpringContextUtil.getBean(ProInfoService.class);
+		GroundingListener groundingListener = new GroundingListener(redisTemplateUtil, proInfoService);
+
 
 		container.addMessageListener(expiredListener,topic);
+		container.addMessageListener(groundingListener, topicList);
 		//这个container 可以添加多个 messageListener
 		return container;
 	}
