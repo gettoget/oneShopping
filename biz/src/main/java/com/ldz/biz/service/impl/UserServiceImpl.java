@@ -21,6 +21,7 @@ import com.ldz.util.redis.RedisTemplateUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
@@ -39,6 +40,9 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 
     @Autowired
     private RedisTemplateUtil redis;
+
+    @Autowired
+    private StringRedisTemplate redisDao;
 
     @Autowired
     private ProInfoService proInfoService;
@@ -108,7 +112,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 
         // 用户登录成功后 生成token  保存token 和 用户信息  有效一天
         String token = JwtUtil.createToken(user.getId(), System.currentTimeMillis() + "");
-        redis.boundValueOps(user.getId()).set(token, 30, TimeUnit.DAYS);
+        redisDao.boundValueOps(user.getId()).set(token, 30, TimeUnit.DAYS);
 
         ApiResponse<Map<String,Object>> res = new ApiResponse<>();
         res.setMessage(MessageUtils.get("user.loginSuccess"));
