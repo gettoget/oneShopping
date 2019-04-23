@@ -67,7 +67,7 @@ public class AppInterceptor extends HandlerInterceptorAdapter {
             request.getRequestDispatcher("/authFiled").forward(request, response);
             return false;
         }
-        if(user.getZt().equals("0")){
+        if(!user.getZt().equals("0")){
             request.getRequestDispatcher("/authFiled").forward(request, response);
             return false;
         }

@@ -1,15 +1,16 @@
 package com.ldz.biz.appctrl;
 
 import com.ldz.biz.model.ProInfo;
+import com.ldz.biz.model.WinRecord;
 import com.ldz.biz.service.ProInfoService;
 import com.ldz.sys.base.BaseController;
 import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
+import com.ldz.util.bean.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/app/guest/proinfo")
@@ -54,5 +55,39 @@ public class ProInfoCtrl extends BaseController<ProInfo, String> {
     public ApiResponse<String> getUserInfo(String id, @RequestParam(defaultValue = "1") int pageNum,@RequestParam(defaultValue = "8") int pageSize){
         return service.getUserInfo(id,pageNum,pageSize);
     }
+
+   /*
+    即将结束
+    */
+   @GetMapping("/getRePager")
+    public PageResponse<ProInfo> getRePager(@RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "8") int pageSize){
+       return service.getRePager(pageNum, pageSize);
+   }
+    /**
+     * 获取商品上一期的中奖记录
+     */
+    @PostMapping("/getLastestRecord")
+    public ApiResponse<WinRecord> getLastestRecord(String id){
+        return service.getLastestRecord(id);
+    }
+
+    /**
+     * 获取你当前参与的号码
+     */
+    @PostMapping("/getMyNums")
+    public ApiResponse<List<String>> getMyNums(String id){
+        return service.getMyNums(id);
+    }
+
+    /**
+     * 往期中奖列表
+     * @return
+     */
+    @PostMapping("/winrecords")
+    public PageResponse<WinRecord> winrecords(String id, @RequestParam(defaultValue = "1")int pageNum, @RequestParam(defaultValue = "8")int pageSize){
+        return service.winrecoeds(id, pageNum, pageSize);
+    }
+
+
 
 }

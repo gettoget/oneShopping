@@ -1,9 +1,11 @@
 package com.ldz.biz.service;
 
+import com.ldz.biz.model.PaymentBean;
 import com.ldz.biz.model.User;
 import com.ldz.biz.model.UserModel;
 import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
+import com.ldz.util.bean.PageResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -62,7 +64,7 @@ public interface UserService extends BaseService<User, String> {
      * @param pageSize
      * @return
      */
-    ApiResponse<String> getMyWallet(int pageNum, int pageSize);
+    PageResponse<PaymentBean> getMyWallet(int pageNum, int pageSize);
 
     /**
      * 发送短信接口

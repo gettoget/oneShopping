@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/app/receiveaddr")
+@RequestMapping("/app/user/receiveaddr")
 public class ReceiveAddrCtrl extends BaseController<ReceiveAddr, String> {
 
     @Autowired

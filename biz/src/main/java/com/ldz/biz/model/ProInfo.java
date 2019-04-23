@@ -42,7 +42,7 @@ public class ProInfo implements Serializable {
     private String proStore;
 
     /**
-     * 商品状态。上架、下架、已开奖  1 上架  2 下架 3 已开奖
+     * 商品状态。上架、下架、已开奖  1 上架  2 下架 3 待开奖 4 已开奖
      */
     @Column(name = "pro_zt")
     private String proZt;

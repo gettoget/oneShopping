@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/app/recharge")
+@RequestMapping("/app/user/recharge")
 public class RechargeCtrl extends BaseController<Recharge,String> {
 
     @Autowired

@@ -1,9 +1,11 @@
 package com.ldz.biz.appctrl;
 
+import com.ldz.biz.model.PaymentBean;
 import com.ldz.biz.model.User;
 import com.ldz.biz.model.UserModel;
 import com.ldz.biz.service.UserService;
 import com.ldz.util.bean.ApiResponse;
+import com.ldz.util.bean.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -83,7 +85,7 @@ public class UserCtrl  {
      * @return
      */
     @PostMapping("/myWallet")
-    public ApiResponse<String> getMyWallet(@RequestParam(defaultValue = "1") Integer pageNum,@RequestParam(defaultValue = "8") int pageSize){
+    public PageResponse<PaymentBean> getMyWallet(@RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "8") int pageSize){
         return service.getMyWallet(pageNum,pageSize);
     }
 

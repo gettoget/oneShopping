@@ -1,5 +1,7 @@
 package com.ldz.biz.service;
 
+import com.github.pagehelper.Page;
+import com.ldz.util.bean.PageResponse;
 import com.ldz.biz.model.ProBaseinfo;
 import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
@@ -14,4 +16,5 @@ public interface ProBaseinfoService extends BaseService<ProBaseinfo, String> {
      * @return
      */
     ApiResponse<String> saveEntity(ProBaseinfo entity);
+
 }

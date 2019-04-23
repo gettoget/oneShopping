@@ -13,6 +13,7 @@ import com.ldz.biz.service.ProInfoService;
 import com.ldz.biz.service.UserService;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.util.bean.ApiResponse;
+import com.ldz.util.bean.PageResponse;
 import com.ldz.util.bean.SimpleCondition;
 import com.ldz.util.commonUtil.*;
 import com.ldz.util.exception.RuntimeCheck;
@@ -20,6 +21,7 @@ import com.ldz.util.redis.RedisTemplateUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
@@ -38,6 +40,9 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 
     @Autowired
     private RedisTemplateUtil redis;
+
+    @Autowired
+    private StringRedisTemplate redisDao;
 
     @Autowired
     private ProInfoService proInfoService;
@@ -70,7 +75,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         RuntimeCheck.ifBlank(regCode, MessageUtils.get("user.regCodeBlank"));
         RuntimeCheck.ifFalse(StringUtils.equals(regCode, code), MessageUtils.get("user.regCodeError"));
 
-        String imei = (String) getAttribute("imei");
+        String imei = getHeader("imei");
         RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
 
         // 保存用户
@@ -107,7 +112,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 
         // 用户登录成功后 生成token  保存token 和 用户信息  有效一天
         String token = JwtUtil.createToken(user.getId(), System.currentTimeMillis() + "");
-        redis.boundValueOps(user.getId()).set(token, 30, TimeUnit.DAYS);
+        redisDao.boundValueOps(user.getId()).set(token, 30, TimeUnit.DAYS);
 
         ApiResponse<Map<String,Object>> res = new ApiResponse<>();
         res.setMessage(MessageUtils.get("user.loginSuccess"));
@@ -183,7 +188,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     }
 
     @Override
-    public ApiResponse<String> getMyWallet(int pageNum, int pageSize) {
+    public PageResponse<PaymentBean> getMyWallet(int pageNum, int pageSize) {
         String userId = (String) getAttribute("userId");
         RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
         User user = findById(userId);
@@ -191,8 +196,11 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         PageInfo<PaymentBean> info = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> {
             baseMapper.getMyPayRecord(userId);
         });
-        ApiResponse<String> res = new ApiResponse<>();
-        res.setPage(info);
+        PageResponse<PaymentBean> res = new PageResponse<>();
+        res.setList(info.getList());
+        res.setPageNum(pageNum);
+        res.setPageSize(pageSize);
+        res.setTotal(info.getTotal());
         return res;
     }
 

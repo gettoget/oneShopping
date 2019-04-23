@@ -61,7 +61,21 @@ public class WinRecord implements Serializable {
      */
     private String bz3;
 
+    /**
+     * 商品名称
+     */
+    @Transient
+    private String proName;
+
     private static final long serialVersionUID = 1L;
+
+    public String getProName() {
+        return proName;
+    }
+
+    public void setProName(String proName) {
+        this.proName = proName;
+    }
 
     /**
      * @return id

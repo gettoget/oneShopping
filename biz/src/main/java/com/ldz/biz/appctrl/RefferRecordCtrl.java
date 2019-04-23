@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/app/refferrecord")
+@RequestMapping("/app/user/refferrecord")
 public class RefferRecordCtrl extends BaseController<RefferRecord, String> {
 
     @Autowired

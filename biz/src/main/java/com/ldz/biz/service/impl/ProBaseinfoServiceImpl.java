@@ -1,8 +1,10 @@
 package com.ldz.biz.service.impl;
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
-import com.ldz.biz.model.ProInfo;
+import com.ldz.util.bean.PageResponse;
 import com.ldz.sys.base.BaseServiceImpl;
+import com.ldz.sys.base.LimitedCondition;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.MessageUtils;
@@ -19,7 +21,6 @@ import com.ldz.biz.mapper.ProBaseinfoMapper;
 import com.ldz.biz.model.ProBaseinfo;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
