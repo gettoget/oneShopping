@@ -4,6 +4,7 @@ package com.ldz.sys.base;
 import com.github.pagehelper.Page;
 import com.ldz.sys.model.SysYh;
 import com.ldz.util.bean.ApiResponse;
+import com.ldz.util.bean.PageResponse;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -89,6 +90,15 @@ public abstract class BaseController<T, PK extends Serializable> {
 	public ApiResponse<List<T>> pager(T entity, Page<T> pager){
 		return getBaseService().pager(pager);
 	}
+
+	/**
+	 * 用于安卓的分页搜索
+	 */
+	@RequestMapping(value = "/newPager",method = {RequestMethod.POST,RequestMethod.GET})
+	public PageResponse<T> newPager(Page<T> page){
+		return getBaseService().newPager(page);
+	}
+
 
 	/**
      * 数据新增方法

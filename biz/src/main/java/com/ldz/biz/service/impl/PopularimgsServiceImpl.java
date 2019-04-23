@@ -1,5 +1,6 @@
 package com.ldz.biz.service.impl;
 
+import com.ldz.biz.service.ProBaseinfoService;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.commonUtil.DateUtils;
@@ -23,6 +24,7 @@ public class PopularimgsServiceImpl extends BaseServiceImpl<Popularimgs, String>
 
 	@Autowired
 	private PopularimgsMapper baseMapper;
+
 
 	@Value("${filePath}")
 	private String filePath;

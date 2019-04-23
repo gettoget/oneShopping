@@ -5,6 +5,7 @@ import com.ldz.biz.service.ProInfoService;
 import com.ldz.sys.base.BaseController;
 import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
+import com.ldz.util.bean.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,5 +55,13 @@ public class ProInfoCtrl extends BaseController<ProInfo, String> {
     public ApiResponse<String> getUserInfo(String id, @RequestParam(defaultValue = "1") int pageNum,@RequestParam(defaultValue = "8") int pageSize){
         return service.getUserInfo(id,pageNum,pageSize);
     }
+
+   /*
+    即将结束
+    */
+   @PostMapping("/getRePager")
+    public PageResponse<ProInfo> getRePager(@RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "8") int pageSize){
+       return service.getRePager(pageNum, pageSize);
+   }
 
 }

@@ -6,6 +6,7 @@ import com.ldz.biz.model.*;
 import com.ldz.biz.service.*;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.util.bean.ApiResponse;
+import com.ldz.util.bean.PageResponse;
 import com.ldz.util.bean.SimpleCondition;
 import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.MessageUtils;
@@ -76,6 +77,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 		proInfo.setGxsj(proInfo.getCjsj());
 		proInfo.setProStore("1");
 		proInfo.setProZt("1");
+		proInfo.setProLx("2");
 		save(proInfo);
 		// 生成当前商品的中奖号码
 		List<String> nums = new ArrayList<>();
@@ -166,6 +168,20 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 		String baseId = baseMapper.getBaseId(id);
 		return baseId;
     }
+
+	@Override
+	public PageResponse<ProInfo> getRePager(int pageNum, int pageSize) {
+		PageInfo<ProInfo> info = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> baseMapper.getRePager());
+		PageResponse<ProInfo> response = new PageResponse<>();
+		response.setTotal(info.getTotal());
+		response.setPageSize(pageSize);
+		response.setPageNum(pageNum);
+		for (ProInfo proInfo : info.getList()) {
+			setImgUrl(proInfo);
+		}
+		response.setList(info.getList());
+		return response;
+	}
 
 
 	@Override

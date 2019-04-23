@@ -3,6 +3,7 @@ package com.ldz.biz.service;
 import com.ldz.biz.model.ProInfo;
 import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
+import com.ldz.util.bean.PageResponse;
 
 /**
  * @author slu
@@ -34,4 +35,5 @@ public interface ProInfoService extends BaseService<ProInfo, String> {
 
     String getBaseId(String id);
 
+    PageResponse<ProInfo> getRePager(int pageNum, int pageSize);
 }

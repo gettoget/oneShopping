@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/app/store")
+@RequestMapping("/app/user/store")
 public class StoreCtrl extends BaseController<Store,String> {
 
     @Autowired

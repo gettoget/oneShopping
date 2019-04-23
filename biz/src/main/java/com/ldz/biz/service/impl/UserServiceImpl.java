@@ -13,6 +13,7 @@ import com.ldz.biz.service.ProInfoService;
 import com.ldz.biz.service.UserService;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.util.bean.ApiResponse;
+import com.ldz.util.bean.PageResponse;
 import com.ldz.util.bean.SimpleCondition;
 import com.ldz.util.commonUtil.*;
 import com.ldz.util.exception.RuntimeCheck;
@@ -70,7 +71,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         RuntimeCheck.ifBlank(regCode, MessageUtils.get("user.regCodeBlank"));
         RuntimeCheck.ifFalse(StringUtils.equals(regCode, code), MessageUtils.get("user.regCodeError"));
 
-        String imei = (String) getAttribute("imei");
+        String imei = getHeader("imei");
         RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
 
         // 保存用户
@@ -183,7 +184,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     }
 
     @Override
-    public ApiResponse<String> getMyWallet(int pageNum, int pageSize) {
+    public PageResponse<PaymentBean> getMyWallet(int pageNum, int pageSize) {
         String userId = (String) getAttribute("userId");
         RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
         User user = findById(userId);
@@ -191,8 +192,11 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         PageInfo<PaymentBean> info = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> {
             baseMapper.getMyPayRecord(userId);
         });
-        ApiResponse<String> res = new ApiResponse<>();
-        res.setPage(info);
+        PageResponse<PaymentBean> res = new PageResponse<>();
+        res.setList(info.getList());
+        res.setPageNum(pageNum);
+        res.setPageSize(pageSize);
+        res.setTotal(info.getTotal());
         return res;
     }
 
