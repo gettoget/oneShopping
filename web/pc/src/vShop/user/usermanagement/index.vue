@@ -31,8 +31,12 @@
 </template>
 
 <script>
+   import usermessage from './comp/usermessage'
     export default {
       name: "index",
+      components:{
+        usermessage
+      },
       data(){
           return{
             tableTiT: [{
@@ -76,6 +80,67 @@
                 width: 120,
                 align: 'center',
                 key: 'zt'
+              },
+              {
+                title: '操作',
+                key: 'action',
+                width: 180,
+                align: 'center',
+                render: (h, params) => {
+                  return h('div', [
+                    h('Button', {
+                      props: {
+                        type: 'warning',
+                        icon: 'ios-lock',
+                        shape: 'circle',
+                        size: 'small'
+                      },
+                      style: {
+                        cursor: "pointer",
+                        margin: '0 8px 0 0'
+                      },
+                      on: {
+                        click: () => {
+
+                        }
+                      }
+                    }),
+                    h('Button', {
+                      props: {
+                        type: 'primary',
+                        icon: 'md-menu',
+                        shape: 'circle',
+                        size: 'small'
+                      },
+                      style: {
+                        cursor: "pointer",
+                        margin: '0 8px 0 0'
+                      },
+                      on: {
+                        click: () => {
+
+                        }
+                      }
+                    }),
+                    h('Button', {
+                      props: {
+                        type: 'error',
+                        icon: 'md-close',
+                        shape: 'circle',
+                        size: 'small'
+                      },
+                      style: {
+                        cursor: "pointer",
+                        margin: '0 8px 0 0'
+                      },
+                      on: {
+                        click: () => {
+
+                        }
+                      }
+                    })
+                  ]);
+                }
               }
             ],
             tableData: [

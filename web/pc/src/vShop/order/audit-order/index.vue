@@ -99,7 +99,7 @@
                     h('Button', {
                       props: {
                         type: 'success',
-                        icon: 'md-create',
+                        icon: 'md-checkmark',
                         shape: 'circle',
                         size: 'small'
                       },
@@ -108,6 +108,9 @@
                         margin: '0 8px 0 0'
                       },
                       on: {
+                        click: () => {
+                          this.compName = mess
+                        }
                       }
                     }),
                     h('Button', {
@@ -140,7 +143,10 @@
                       },
                       on: {
                         click: () => {
-
+                          this.$Modal.warning({
+                            title: '驳回订单',
+                            content: '确定驳回此订单?',
+                          });
                         }
                       }
                     })
