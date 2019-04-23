@@ -98,7 +98,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         condition.eq(User.InnerColumn.phone, phone);
         List<User> users = findByCondition(condition);
         RuntimeCheck.ifTrue(CollectionUtils.isEmpty(users), MessageUtils.get("user.notregister"));
-        String imei = (String) getAttribute("imei");
+        String imei = getHeader("imei");
         RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
         User user = users.get(0);
         RuntimeCheck.ifFalse(user.getZt().equals("0"), MessageUtils.get("user.isLocked"));
@@ -107,16 +107,19 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 
         // 用户登录成功后 生成token  保存token 和 用户信息  有效一天
         String token = JwtUtil.createToken(user.getId(), System.currentTimeMillis() + "");
-        redis.boundValueOps(user.getId()).set(token, 1, TimeUnit.DAYS);
-        redis.boundValueOps(user.getId() + "_userInfo").set(JSON.toJSON(user), 1, TimeUnit.DAYS);
+        redis.boundValueOps(user.getId()).set(token, 30, TimeUnit.DAYS);
+
         ApiResponse<Map<String,Object>> res = new ApiResponse<>();
         res.setMessage(MessageUtils.get("user.loginSuccess"));
         user.setLastImei(imei);
         user.setLastTime(DateUtils.getNowTime());
         update(user);
+        UserModel model = new UserModel(user);
+        model.setToken(token);
+        redis.boundValueOps(user.getId() + "_userInfo").set(JSON.toJSON(model), 30, TimeUnit.DAYS);
         Map<String,Object> tokenMap = new HashMap<>();
         tokenMap.put("token", token);
-        tokenMap.put("userInfo",user);
+        tokenMap.put("userInfo",model);
         res.setResult(tokenMap);
         return res;
     }
@@ -142,14 +145,15 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     }
 
     @Override
-    public ApiResponse<User> editUserInfo(User user) {
-        ApiResponse<User> res = new ApiResponse<>();
+    public ApiResponse<UserModel> editUserInfo(User user) {
+        ApiResponse<UserModel> res = new ApiResponse<>();
         User u = findById(user.getId());
         BeanUtil.copyProperties(user, u, CopyOptions.create().setIgnoreNullValue(true).setIgnoreError(true).setIgnoreProperties("id", "phone", "pwd", "source", "lastTime", "lastImei", "regImei", "balance", "cjsj", "refCode", "score", "zjcs"));
         update(u);
-        redis.boundValueOps(u.getId() + "_userInfo").set(JSON.toJSON(user), 1, TimeUnit.DAYS);
+        UserModel model = new UserModel(u);
+        redis.boundValueOps(u.getId() + "_userInfo").set(JSON.toJSON(model), 1, TimeUnit.DAYS);
         res.setMessage(MessageUtils.get("user.editInfoSuc"));
-        res.setResult(u);
+        res.setResult(model);
         return res;
     }
 
@@ -181,6 +185,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     @Override
     public ApiResponse<String> getMyWallet(int pageNum, int pageSize) {
         String userId = (String) getAttribute("userId");
+        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
         User user = findById(userId);
         RuntimeCheck.ifNull(user, MessageUtils.get("user.null"));
         PageInfo<PaymentBean> info = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> {
@@ -220,6 +225,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         } else if (StringUtils.equals(type, "3")) {
             // 找回支付密码不需要填手机号
             String userId = (String) getAttribute("userId");
+            RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
             User user = findById(userId);
             String code = SendSmsUtil.sendMSG(user.getPhone(), type);
             // 存储验证码
@@ -235,17 +241,20 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         List<String> nums = new ArrayList<>();
 
         String userId = (String) getAttribute("userId");
+        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
         ProInfo proInfo = proInfoService.findById(id);
         RuntimeCheck.ifNull(proInfo, MessageUtils.get("pro.isNull"));
-
-        SimpleCondition condition = new SimpleCondition(OrderList.class);
-        condition.eq(OrderList.InnerColumn.userid, userId);
-        condition.eq(OrderList.InnerColumn.proId, id);
-        List<OrderList> orderLists = orderListService.findByCondition(condition);
-        if (CollectionUtils.isNotEmpty(orderLists)) {
-            List<String> collect = orderLists.stream().map(OrderList::getNum).sorted(Comparator.reverseOrder()).collect(Collectors.toList());
-            return ApiResponse.success(collect);
+        if(StringUtils.isNotBlank(userId)){
+            SimpleCondition condition = new SimpleCondition(OrderList.class);
+            condition.eq(OrderList.InnerColumn.userid, userId);
+            condition.eq(OrderList.InnerColumn.proId, id);
+            List<OrderList> orderLists = orderListService.findByCondition(condition);
+            if (CollectionUtils.isNotEmpty(orderLists)) {
+                List<String> collect = orderLists.stream().map(OrderList::getNum).sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+                return ApiResponse.success(collect);
+            }
         }
+
         return ApiResponse.success(nums);
     }
 
@@ -254,8 +263,9 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         RuntimeCheck.ifBlank(pwd, MessageUtils.get("user.paypwdblank"));
         RuntimeCheck.ifFalse(StringUtils.equals(pwd, pwd1), MessageUtils.get("user.pwdnotsame"));
         String userId = (String) getAttribute("userId");
+        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
         User user = findById(userId);
-       RuntimeCheck.ifTrue( StringUtils.isNotBlank(user.getPayPwd()), MessageUtils.get("user.paypwdIsNotNull"));
+        RuntimeCheck.ifTrue( StringUtils.isNotBlank(user.getPayPwd()), MessageUtils.get("user.paypwdIsNotNull"));
         String userPwd = EncryptUtil.encryptUserPwd(pwd);
         user.setPayPwd(userPwd);
         update(user);
@@ -267,6 +277,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         RuntimeCheck.ifBlank(newPwd,MessageUtils.get("user.pwdblank"));
         RuntimeCheck.ifFalse(StringUtils.equals(newPwd1,newPwd), MessageUtils.get("user.pwdnotsame"));
         String userId = (String) getAttribute("userId");
+        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
         User user = findById(userId);
         String code1 = (String) redis.boundValueOps(user.getPhone() + "_find_pay_pwd").get();
         RuntimeCheck.ifBlank(code1, MessageUtils.get("user.regCodeBlank"));
@@ -280,6 +291,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     @Override
     public ApiResponse<String> genRefferCode() {
         String userId = (String) getAttribute("userId");
+        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
         User user = findById(userId);
         if(StringUtils.isBlank(user.getRefCode())){
             long id = Long.parseLong(user.getId());
@@ -293,10 +305,12 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     }
 
     @Override
-    public ApiResponse<User> getUserInfo() {
+    public ApiResponse<UserModel> getUserInfo() {
         String userId = getAttributeAsString("userId");
-        User user = findById(userId);
-        return ApiResponse.success(user);
+        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
+        String s = (String) redis.boundValueOps(userId + "_userInfo").get();
+        UserModel userModel = JSON.parseObject(s, UserModel.class);
+        return ApiResponse.success(userModel);
     }
 
 

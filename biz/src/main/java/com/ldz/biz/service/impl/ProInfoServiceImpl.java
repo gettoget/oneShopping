@@ -120,16 +120,18 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 				List<String> nums = orderLists.stream().map(OrderList::getNum).collect(Collectors.toList());
 				proInfo.setNums(nums);
 			}
-			// 获取上一期中奖的 商品id
-			ProInfo info = baseMapper.getLatestPerson(proInfo.getProBaseid());
-			SimpleCondition simpleCondition = new SimpleCondition(WinRecord.class);
-			simpleCondition.eq(WinRecord.InnerColumn.proId, info.getId());
-			List<WinRecord> winRecordList = winRecordService.findByCondition(simpleCondition);
-			if(CollectionUtils.isNotEmpty(winRecordList)){
-				proInfo.setWinRecord(winRecordList.get(0));
-			}
+
 		}
+		proInfo.setCycs(0);
 		setImgUrl(proInfo);
+		// 获取上一期中奖的 商品id
+		ProInfo info = baseMapper.getLatestPerson(proInfo.getProBaseid());
+		SimpleCondition simpleCondition = new SimpleCondition(WinRecord.class);
+		simpleCondition.eq(WinRecord.InnerColumn.proId, info.getId());
+		List<WinRecord> winRecordList = winRecordService.findByCondition(simpleCondition);
+		if(CollectionUtils.isNotEmpty(winRecordList)){
+			proInfo.setWinRecord(winRecordList.get(0));
+		}
 		return ApiResponse.success(proInfo);
 	}
 

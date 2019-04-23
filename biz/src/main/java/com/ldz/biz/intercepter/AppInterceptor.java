@@ -1,8 +1,11 @@
 package com.ldz.biz.intercepter;
 
+import com.ldz.biz.model.User;
+import com.ldz.biz.service.UserService;
 import com.ldz.sys.mapper.SysYhJsMapper;
 import com.ldz.sys.service.GnService;
 import com.ldz.sys.service.YhService;
+import com.ldz.util.commonUtil.JwtUtil;
 import com.ldz.util.spring.SpringContextUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -15,11 +18,7 @@ import java.util.List;
 
 public class AppInterceptor extends HandlerInterceptorAdapter {
 
-    private GnService gnService;
-
-    private YhService yhService;
-
-    private SysYhJsMapper sysYhJsMapper;
+    private UserService userService;
 
     private StringRedisTemplate redisDao;
 
@@ -28,9 +27,7 @@ public class AppInterceptor extends HandlerInterceptorAdapter {
     }
 
     public AppInterceptor(StringRedisTemplate redisTemp) {
-        this.gnService = SpringContextUtil.getBean(GnService.class);
-        this.yhService = SpringContextUtil.getBean(YhService.class);
-        this.sysYhJsMapper = SpringContextUtil.getBean(SysYhJsMapper.class);
+        this.userService = SpringContextUtil.getBean(UserService.class);
         this.redisDao = redisTemp;
     }
 
@@ -48,14 +45,51 @@ public class AppInterceptor extends HandlerInterceptorAdapter {
         if (userId == null) {
             userId = request.getParameter("userId");
         }
-        request.setAttribute("userId",userId);
+        String token = request.getHeader("token");
+        if(token == null){
+            token =  request.getParameter("token");
+        }
+
+
 
         String imei = request.getHeader("imei");
         if (StringUtils.isBlank(imei)) {
             imei = request.getParameter("imei");
         }
 
-        request.setAttribute("imei", imei);
+        if (StringUtils.isEmpty(userId) || StringUtils.isEmpty(token) || StringUtils.isBlank(imei)){
+            request.getRequestDispatcher("/authFiled").forward(request, response);
+            return false;
+        }
+
+        User user = userService.findById(userId);
+        if(user == null){
+            request.getRequestDispatcher("/authFiled").forward(request, response);
+            return false;
+        }
+        if(user.getZt().equals("0")){
+            request.getRequestDispatcher("/authFiled").forward(request, response);
+            return false;
+        }
+
+        try {
+            // 验证访问者是否合法
+            String userid = JwtUtil.getClaimAsString(token, "userId");
+            if (!userid.equals(userId)){
+                request.getRequestDispatcher("/authFiled").forward(request, response);
+                return false;
+            }
+            String value = redisDao.boundValueOps(userid).get();
+            if (StringUtils.isEmpty(value) || !value.equals(token)){
+                request.getRequestDispatcher("/authFiled").forward(request, response);
+                return false;
+            }
+            request.setAttribute("userInfo", user);
+            request.setAttribute("imei", imei);
+            request.setAttribute("userId",userId);
+        } catch (Exception e) {
+            return false;
+        }
 
         return super.preHandle(request, response, handler);
     }

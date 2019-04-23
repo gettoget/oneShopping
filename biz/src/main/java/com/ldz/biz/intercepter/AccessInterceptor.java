@@ -72,7 +72,6 @@ public class AccessInterceptor extends HandlerInterceptorAdapter {
 		String userid = request.getHeader("userid");
 		String token = request.getHeader("token");
 		String url = request.getHeader("url");
-
 		if (token == null)
 		{
 			token = request.getParameter("token");

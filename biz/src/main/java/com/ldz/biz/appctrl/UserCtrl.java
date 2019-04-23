@@ -1,13 +1,11 @@
 package com.ldz.biz.appctrl;
 
 import com.ldz.biz.model.User;
+import com.ldz.biz.model.UserModel;
 import com.ldz.biz.service.UserService;
 import com.ldz.util.bean.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -61,7 +59,7 @@ public class UserCtrl  {
      * @return
      */
     @PostMapping("/editUserInfo")
-    public ApiResponse<User> editUserInfo(User user){
+    public ApiResponse<UserModel> editUserInfo(User user){
         return service.editUserInfo(user);
     }
 
@@ -141,7 +139,7 @@ public class UserCtrl  {
      * @return
      */
     @PostMapping("/getUserInfo")
-    public ApiResponse<User> getUserInfo(){
+    public ApiResponse<UserModel> getUserInfo(){
         return service.getUserInfo();
     }
 

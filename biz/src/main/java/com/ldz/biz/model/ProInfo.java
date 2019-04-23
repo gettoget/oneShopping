@@ -354,7 +354,7 @@ public class ProInfo implements Serializable {
     /**
      * 设置商品状态。上架、下架、已开奖
      *
-     * @param proZt 商品状态。上架、下架、已开奖
+     * @param proZt 商品状态。 1 上架、 2 下架、 3 待开奖  4 已开奖
      */
     public void setProZt(String proZt) {
         this.proZt = proZt;

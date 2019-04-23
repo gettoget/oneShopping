@@ -143,6 +143,11 @@ public abstract class BaseServiceImpl<T, PK extends Serializable> implements Bas
         return request;
     }
 
+    public String getHeader(String key){
+        HttpServletRequest requset = getRequset();
+        return requset.getHeader(key);
+    }
+
     /**
      * 根据前台传值封装条件查询对象Example，属性名必须要和查询bean对象中的属性名要一致。
      * 也可实现前台自定义指定排序方式，排序关键字固定为：orderBy，排序可以多值组合

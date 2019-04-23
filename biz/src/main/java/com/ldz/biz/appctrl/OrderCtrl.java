@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/app/order")
+@RequestMapping("/app/user/order")
 public class OrderCtrl  {
 
     @Autowired
