@@ -37,6 +37,12 @@ public class Order implements Serializable {
     private String userId;
 
     /**
+     * 收货地址 id
+     */
+    @Column(name = "rece_id")
+    private String receId;
+
+    /**
      * 购买份数
      */
     private String gmfs;
@@ -86,6 +92,8 @@ public class Order implements Serializable {
      */
     private String bz3;
 
+
+
     /**
      * 抽奖订单详情
      */
@@ -94,6 +102,27 @@ public class Order implements Serializable {
 
     @Transient
     private String userName;
+    @Transient
+    private ReceiveAddr addr;
+
+    @Transient
+    private String payPwd;
+
+    public String getPayPwd() {
+        return payPwd;
+    }
+
+    public void setPayPwd(String payPwd) {
+        this.payPwd = payPwd;
+    }
+
+    public ReceiveAddr getAddr() {
+        return addr;
+    }
+
+    public void setAddr(ReceiveAddr addr) {
+        this.addr = addr;
+    }
 
     private static final long serialVersionUID = 1L;
 
@@ -119,6 +148,14 @@ public class Order implements Serializable {
 
     public void setOrderLists(List<OrderList> orderLists) {
         this.orderLists = orderLists;
+    }
+
+    public String getReceId() {
+        return receId;
+    }
+
+    public void setReceId(String receId) {
+        this.receId = receId;
     }
 
     /**
@@ -388,7 +425,8 @@ public class Order implements Serializable {
         zjhm("zjhm"),
         bz1("bz1"),
         bz2("bz2"),
-        bz3("bz3");
+        bz3("bz3"),
+        receId("rece_id");
 
         private final String column;
 

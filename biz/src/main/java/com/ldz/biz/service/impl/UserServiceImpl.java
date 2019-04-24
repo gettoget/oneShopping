@@ -3,6 +3,7 @@ package com.ldz.biz.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.ldz.biz.mapper.UserMapper;
@@ -156,7 +157,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         BeanUtil.copyProperties(user, u, CopyOptions.create().setIgnoreNullValue(true).setIgnoreError(true).setIgnoreProperties("id", "phone", "pwd", "source", "lastTime", "lastImei", "regImei", "balance", "cjsj", "refCode", "score", "zjcs"));
         update(u);
         UserModel model = new UserModel(u);
-        redis.boundValueOps(u.getId() + "_userInfo").set(JSON.toJSON(model), 1, TimeUnit.DAYS);
+//        redis.boundValueOps(u.getId() + "_userInfo").set(JSON.toJSON(model), 30, TimeUnit.DAYS);
         res.setMessage(MessageUtils.get("user.editInfoSuc"));
         res.setResult(model);
         return res;
@@ -238,6 +239,14 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
             String code = SendSmsUtil.sendMSG(user.getPhone(), type);
             // 存储验证码
             redis.boundValueOps(user.getPhone() + "_find_pay_pwd").set(code, 5, TimeUnit.MINUTES);
+        } else if (StringUtils.equals(type, "4")) {
+            // 找回支付密码不需要填手机号
+            String userId = (String) getAttribute("userId");
+            RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
+            User user = findById(userId);
+            String code = SendSmsUtil.sendMSG(user.getPhone(), type);
+            // 存储验证码
+            redis.boundValueOps(user.getPhone() + "_pay").set(code, 5, TimeUnit.MINUTES);
         } else {
             return ApiResponse.fail(MessageUtils.get("user.typeError"));
         }
@@ -316,8 +325,8 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     public ApiResponse<UserModel> getUserInfo() {
         String userId = getAttributeAsString("userId");
         RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
-        String s = (String) redis.boundValueOps(userId + "_userInfo").get();
-        UserModel userModel = JSON.parseObject(s, UserModel.class);
+        User user = findById(userId);
+        UserModel userModel = new UserModel(user);
         return ApiResponse.success(userModel);
     }
 

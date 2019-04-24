@@ -1,14 +1,19 @@
 package com.ldz.biz.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageInfo;
 import com.ldz.biz.model.User;
 import com.ldz.biz.service.UserService;
 import com.ldz.sys.base.BaseServiceImpl;
+import com.ldz.sys.base.LimitedCondition;
 import com.ldz.util.bean.ApiResponse;
+import com.ldz.util.bean.PageResponse;
 import com.ldz.util.bean.SimpleCondition;
 import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,5 +59,22 @@ public class RefferRecordServiceImpl extends BaseServiceImpl<RefferRecord, Strin
 		record.setCjsj(DateUtils.getNowTime());
 		save(record);
 		return ApiResponse.success();
+    }
+
+    @Override
+    public PageResponse<RefferRecord> getNewPager(Page<RefferRecord> page) {
+
+		PageResponse<RefferRecord> res = new PageResponse<>();
+		String userId = getAttributeAsString("userId");
+		if(StringUtils.isNotBlank(userId)){
+			LimitedCondition condition = getQueryCondition();
+			condition.eq(RefferRecord.InnerColumn.userId, userId);
+			PageInfo<RefferRecord> info = findPage(page, condition);
+			res.setPageNum(page.getPageNum());
+			res.setPageSize(page.getPageSize());
+			res.setList(info.getList());
+			res.setTotal(info.getTotal());
+		}
+		return res;
     }
 }

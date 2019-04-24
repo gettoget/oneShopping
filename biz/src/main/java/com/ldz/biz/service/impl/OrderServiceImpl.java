@@ -8,9 +8,10 @@ import com.ldz.biz.service.*;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.sys.base.LimitedCondition;
 import com.ldz.util.bean.ApiResponse;
+import com.ldz.util.bean.PageResponse;
 import com.ldz.util.bean.SimpleCondition;
 import com.ldz.util.commonUtil.DateUtils;
-import com.ldz.util.commonUtil.JsonUtil;
+import com.ldz.util.commonUtil.EncryptUtil;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.redis.RedisTemplateUtil;
@@ -21,7 +22,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.SortParameters;
-import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
@@ -52,6 +52,9 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 
     @Autowired
     private ProInfoService proInfoService;
+
+    @Autowired
+    private ReceiveAddrService addrService;
 
 
     @Autowired
@@ -120,6 +123,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         RuntimeCheck.ifBlank(entity.getProId(), MessageUtils.get("order.proBlank"));
         RuntimeCheck.ifBlank(entity.getZfje(), MessageUtils.get("order.jeBlank"));
         RuntimeCheck.ifBlank(entity.getGmfs(), MessageUtils.get("order.gmfsBlank"));
+        RuntimeCheck.ifBlank(entity.getReceId(), MessageUtils.get("order.receIsBlank"));
+        RuntimeCheck.ifBlank(entity.getPayPwd(), MessageUtils.get("user.paypwdblank"));
 
 
         ProBaseinfo baseinfo;
@@ -164,8 +169,9 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         } else {
             return ApiResponse.fail(MessageUtils.get("order.typeError"));
         }
+
         // 存储订单支付 30 分钟过期 , 若未支付则  取消支付
-        redis.boundValueOps(order.getId() + "_dzf").set(1, 30, TimeUnit.MINUTES);
+        // redis.boundValueOps(order.getId() + "_dzf").set(1, 30, TimeUnit.MINUTES);
 
         //
 
@@ -214,7 +220,13 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             }
 
         }
-        return ApiResponse.success(MessageUtils.get("order.saveSuc"));
+        ApiResponse<String> apiResponse = payOrder(order.getId(), entity.getPayPwd());
+        if(apiResponse.getCode() == 200){
+            return ApiResponse.success(MessageUtils.get("order.saveSuc"));
+        }else{
+            return apiResponse;
+        }
+
     }
 
     @Override
@@ -222,9 +234,25 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         RuntimeCheck.ifBlank(id, MessageUtils.get("order.idBlank"));
         String userId = (String) getAttribute("userId");
         User user = userService.findById(userId);
+        RuntimeCheck.ifNull(user, MessageUtils.get("user.null"));
         RuntimeCheck.ifBlank(user.getPayPwd(), MessageUtils.get("user.paypwdnull"));
         RuntimeCheck.ifBlank(payPwd, MessageUtils.get("user.paypwdblank"));
-        Order order = findById(id);
+
+        String userPwd = EncryptUtil.encryptUserPwd(payPwd);
+        String o = (String) redis.boundValueOps(user.getPhone() + "_pay").get();
+        if(!userPwd.equals(user.getPayPwd() ) && !payPwd.equals(o)){
+            return ApiResponse.success(MessageUtils.get("order.payPwdError"));
+        }
+
+        SimpleCondition ocondition = new SimpleCondition(Order.class);
+        ocondition.eq(Order.InnerColumn.userId, userId);
+        ocondition.eq(Order.InnerColumn.id, id);
+        List<Order> list = findByCondition(ocondition);
+        Order order = null;
+        if(CollectionUtils.isNotEmpty(list)){
+            order = list.get(0);
+        }
+        RuntimeCheck.ifNull(order, MessageUtils.get("order.notTrue"));
         RuntimeCheck.ifFalse(order.getDdzt().equals("3"), MessageUtils.get("order.ztError"));
         RuntimeCheck.ifFalse(order.getUserId().equals(user.getId()), MessageUtils.get("order.notTrue"));
         Exchange exchange = new Exchange();
@@ -263,7 +291,15 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         userService.update(user);
         update(order);
         ProInfo proInfo = proInfoService.findById(order.getProId());
-        baseMapper.updateCyyhs(proInfo.getId());
+        // 查看当前用户是否已经参与过
+        SimpleCondition oderCondition = new SimpleCondition(Order.class);
+        oderCondition.eq(Order.InnerColumn.userId, userId);
+        oderCondition.eq(Order.InnerColumn.proId,proInfo.getId());
+        oderCondition.and().andCondition(" id !=  '" + id + "'");
+        List<Order> orderList1 = findByCondition(oderCondition);
+        if(CollectionUtils.isEmpty(orderList1)){
+            baseMapper.updateCyyhs(proInfo.getId());
+        }
         if (StringUtils.equals(order.getOrderType(), "2")) {
 
             // 订单支付完成 分配号码
@@ -324,16 +360,32 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
     }
 
     @Override
-    public ApiResponse<String> getPageInfo(Page<Order> page) {
-        LimitedCondition condition = getQueryCondition();
-        PageInfo<Order> pageInfo = findPage(page, condition);
-        ApiResponse<String> res = new ApiResponse<>();
-        res.setPage(pageInfo);
-        return res;
+    public PageResponse<Order> getPageInfo(Page<Order> page) {
+        PageResponse<Order> res = new PageResponse<>();
+
+        String userId = getAttributeAsString("userId");
+        if(StringUtils.isNotBlank(userId)){
+            LimitedCondition condition = getQueryCondition();
+            condition.eq(Order.InnerColumn.userId, userId);
+            PageInfo<Order> pageInfo = findPage(page, condition);
+
+            if(CollectionUtils.isNotEmpty(pageInfo.getList())){
+                List<String> collect = pageInfo.getList().stream().map(Order::getReceId).collect(Collectors.toList());
+                List<ReceiveAddr> addrs = addrService.findByIds(collect);
+                Map<String, ReceiveAddr> listMap = addrs.stream().collect(Collectors.toMap(ReceiveAddr::getId, p -> p));
+                pageInfo.getList().stream().forEach(order -> order.setAddr(listMap.get(order.getReceId())));
+            }
+            res.setTotal(pageInfo.getTotal());
+            res.setPageSize(page.getPageSize());
+            res.setList(pageInfo.getList());
+            res.setPageNum(pageInfo.getPageNum());
+        }
+
+       return res;
     }
 
     @Override
-    public ApiResponse<String> orderCancel(String id) {
+    public ApiResponse<String> updateOrderCancel(String id) {
         Order order = findById(id);
         RuntimeCheck.ifFalse(order.getDdzt().equals("3"), MessageUtils.get("order.ztError"));
         order.setDdzt("5");

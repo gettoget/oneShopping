@@ -3,9 +3,8 @@ package com.ldz.biz.appctrl;
 import com.github.pagehelper.Page;
 import com.ldz.biz.model.Order;
 import com.ldz.biz.service.OrderService;
-import com.ldz.sys.base.BaseController;
-import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
+import com.ldz.util.bean.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,9 +41,10 @@ public class OrderCtrl  {
 
     /**
      * 订单查询
+     * @return
      */
-    @GetMapping("/pager")
-    public ApiResponse<String> pager(Page<Order> page){
+    @GetMapping("/newPager")
+    public PageResponse<Order> pager(Page<Order> page){
         return service.getPageInfo(page);
     }
 
@@ -53,7 +53,7 @@ public class OrderCtrl  {
      */
     @PostMapping("/orderCanel")
     public ApiResponse<String> orderCancel(String id){
-        return service.orderCancel(id);
+        return service.updateOrderCancel(id);
     }
 
 
