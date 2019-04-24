@@ -176,7 +176,7 @@ export default [
         name:'usermess',
         meta: {
           icon: 'md-trending-up',
-          title: '用户分析'
+          title: '用户查询'
         },
         component: () => import('@/vShop/user/usermess')
       }
