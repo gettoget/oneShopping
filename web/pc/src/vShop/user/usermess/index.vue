@@ -48,12 +48,12 @@
                 align: 'center',
                 children: [
               {
-                title: '订单编号',
+                title: '账号',
                 align: 'center',
                 key: 'bh'
               },
               {
-                title: '下单时间',
+                title: '姓名',
                 align: 'center',
                 key: 'sj'
               }
@@ -63,12 +63,12 @@
                 align: 'center',
                 children: [
               {
-                title: '下单手机号',
+                title: '中奖单号',
                 align: 'center',
                 key: 'sjh'
               },
               {
-                title: '收货地址',
+                title: '中奖商品',
                 align: 'center',
                 key: 'dz',
               },
@@ -79,13 +79,13 @@
               align: 'center',
               children: [
               {
-                title: '订单状态',
+                title: '充值次数',
                 width: 120,
                 align: 'center',
                 key: 'zt'
               },
               {
-                title: '订单类别',
+                title: '累计金额',
                 width: 120,
                 align: 'center',
                 key: 'ddzt'
@@ -165,21 +165,21 @@
             tableData: [
               {
                 bh:'20180909000123431',
-                sj:'2018-04-01',
+                sj:'201jd',
                 sjh:'0908-1678-18766',
                 dz:'sjhfjsfkjdakd',
-                zt:'待审核',
+                zt:'3',
                 bz:'赠品111',
-                ddzt:'直购'
+                ddzt:'7500'
               },
               {
                 bh:'20180909000123541',
-                sj:'2018-04-01',
+                sj:'askjf',
                 sjh:'0908-1678-18766',
                 dz:'阿萨德',
-                zt:'待审核',
+                zt:'2',
                 bz:'赠品211',
-                ddzt:'中奖'
+                ddzt:'1500'
               }
             ],
           }

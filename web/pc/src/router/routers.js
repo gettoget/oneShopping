@@ -179,6 +179,15 @@ export default [
           title: '用户查询'
         },
         component: () => import('@/vShop/user/usermess')
+      },
+      {
+        path:'/showorder',
+        name:'showorder',
+        meta: {
+          icon: 'md-trending-up',
+          title: '晒单审核'
+        },
+        component: () => import('@/vShop/user/showorder')
       }
     ]
   },
@@ -238,7 +247,26 @@ export default [
       }
     ]
   },
-
+  {
+    path:'/statistical',
+    name:'statistical',
+    meta: {
+      icon: 'md-trending-up',
+      title: '统计分析',
+    },
+    component:Main,
+    children:[
+      {
+        path: '/statistical-cz',
+        name: 'statistical-cz',
+        meta: {
+          icon: 'md-trending-up',
+          title: '充值统计'
+        },
+        component: () => import('@/vShop/statistical/statistical-cz')
+      }
+    ]
+  },
   {
     path: '/iview',
     name: 'iview',

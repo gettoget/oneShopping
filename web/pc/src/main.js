@@ -15,7 +15,6 @@ import installPlugin from '@/plugin'
 import './index.less'
 import '@/assets/icons/iconfont.css'
 import '@/assets/css/box.less'
-
 import TreeTable from 'tree-table-vue'
 import VOrgTree from 'v-org-tree'
 import 'v-org-tree/dist/v-org-tree.css'
@@ -26,7 +25,6 @@ Vue.prototype.apis = apis;
 //网络数据请求
 import http from '@/axios/index';
 Vue.prototype.$http = http;
-
 //提示插件引入
 import swal from 'sweetalert2';
 Vue.prototype.swal = swal;
