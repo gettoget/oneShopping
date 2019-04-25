@@ -20,13 +20,60 @@
           <!--查询-->
         </Button>
       </div>
-      <div>
-        <Row style="position: relative;padding: 5px">
-          <Table
-            size='large' stripe border
-            :height="AF.getPageHeight()-320"
-            :columns="tableTiT"
-            :data="tableData"></Table>
+      <!--<div>-->
+        <!--<Row style="position: relative;padding: 5px">-->
+          <!--<Table-->
+            <!--size='large' stripe border-->
+            <!--:height="AF.getPageHeight()-320"-->
+            <!--:columns="tableTiT"-->
+            <!--:data="tableData"></Table>-->
+        <!--</Row>-->
+      <!--</div>-->
+      <div style="padding: 10px">
+        <Row>
+          <Col span="6">
+            <Card style="width:380px">
+              <div style="height:220px;text-align:center;color: white;background:url(http://bpic.588ku.com/back_pic/05/81/20/255c34496468dd2.jpg)">
+                <div style="padding-top: 15px">
+                  <img width="120" height="120" style="border-radius: 60px" src="http://img3.duitang.com/uploads/item/201508/18/20150818202351_8CBUT.jpeg">
+                </div>
+                <br>
+                <h3>用户名</h3>
+                <h6>zhanghao</h6>
+              </div>
+              <div>
+                <CellGroup>
+                  <Cell title=" 个人账号信息" />
+                  <Cell title="注册日期" extra="2017-08-12" />
+                  <Cell title="消费金额" extra="2895" />
+                  <Cell title="钱包余额" extra="125" />
+                  <Cell title="累计充值金额" extra="3596" />
+                  <Cell title="充值次数" extra="3" />
+                  <Cell title="参与次数" extra="8" />
+                  <Cell title="中奖次数" extra="1" />
+                  <Cell title="直接购买次数" extra="1" />
+                </CellGroup>
+              </div>
+            </Card>
+          </Col>
+          <Col span="18" style="padding-left: 5px">
+            <Card>
+              <Row>
+                <Table
+                  stripe border
+                  :columns="tableTiT"
+                  :data="tableData"></Table>
+              </Row>
+            </Card>
+            <Card>
+              <Row>
+                <Table
+                  stripe border
+                  :columns="tableTiT"
+                  :data="tableData"></Table>
+              </Row>
+            </Card>
+          </Col>
         </Row>
       </div>
     </div>
@@ -44,21 +91,6 @@
               type: 'index'
             },
               {
-                title: '基本信息',
-                align: 'center',
-                children: [
-              {
-                title: '账号',
-                align: 'center',
-                key: 'bh'
-              },
-              {
-                title: '姓名',
-                align: 'center',
-                key: 'sj'
-              }
-             ]},
-              {
                 title: '中奖信息',
                 align: 'center',
                 children: [
@@ -75,17 +107,17 @@
              ]
             },
             {
-              title: '充值信息',
+              title: '参与商品信息',
               align: 'center',
               children: [
               {
-                title: '充值次数',
+                title: '商品名称',
                 width: 120,
                 align: 'center',
                 key: 'zt'
               },
               {
-                title: '累计金额',
+                title: '规格',
                 width: 120,
                 align: 'center',
                 key: 'ddzt'
@@ -97,70 +129,70 @@
                 align: 'center',
                 key: 'bz'
               },
-              {
-                title: '操作',
-                key: 'action',
-                width: 180,
-                align: 'center',
-                render: (h, params) => {
-                  return h('div', [
-                    h('Button', {
-                      props: {
-                        type: 'success',
-                        icon: 'md-checkmark',
-                        shape: 'circle',
-                        size: 'small'
-                      },
-                      style: {
-                        cursor: "pointer",
-                        margin: '0 8px 0 0'
-                      },
-                      on: {
-                        click: () => {
-                          this.compName = mess
-                        }
-                      }
-                    }),
-                    h('Button', {
-                      props: {
-                        type: 'primary',
-                        icon: 'md-menu',
-                        shape: 'circle',
-                        size: 'small'
-                      },
-                      style: {
-                        cursor: "pointer",
-                        margin: '0 8px 0 0'
-                      },
-                      on: {
-                        click: () => {
-                          this.compName = mess
-                        }
-                      }
-                    }),
-                    h('Button', {
-                      props: {
-                        type: 'error',
-                        icon: 'md-close',
-                        shape: 'circle',
-                        size: 'small'
-                      },
-                      style: {
-                        cursor: "pointer",
-                        margin: '0 8px 0 0'
-                      },
-                      on: {
-                        click: () => {
-                          this.$Modal.warning({
-                            title: '驳回订单',
-                            content: '确定驳回此订单?',
-                          });
-                        }
-                      }
-                    })
-                  ]);
-                }
-              }
+              // {
+              //   title: '操作',
+              //   key: 'action',
+              //   width: 180,
+              //   align: 'center',
+              //   render: (h, params) => {
+              //     return h('div', [
+              //       h('Button', {
+              //         props: {
+              //           type: 'success',
+              //           icon: 'md-checkmark',
+              //           shape: 'circle',
+              //           size: 'small'
+              //         },
+              //         style: {
+              //           cursor: "pointer",
+              //           margin: '0 8px 0 0'
+              //         },
+              //         on: {
+              //           click: () => {
+              //             this.compName = mess
+              //           }
+              //         }
+              //       }),
+              //       h('Button', {
+              //         props: {
+              //           type: 'primary',
+              //           icon: 'md-menu',
+              //           shape: 'circle',
+              //           size: 'small'
+              //         },
+              //         style: {
+              //           cursor: "pointer",
+              //           margin: '0 8px 0 0'
+              //         },
+              //         on: {
+              //           click: () => {
+              //             this.compName = mess
+              //           }
+              //         }
+              //       }),
+              //       h('Button', {
+              //         props: {
+              //           type: 'error',
+              //           icon: 'md-close',
+              //           shape: 'circle',
+              //           size: 'small'
+              //         },
+              //         style: {
+              //           cursor: "pointer",
+              //           margin: '0 8px 0 0'
+              //         },
+              //         on: {
+              //           click: () => {
+              //             this.$Modal.warning({
+              //               title: '驳回订单',
+              //               content: '确定驳回此订单?',
+              //             });
+              //           }
+              //         }
+              //       })
+              //     ]);
+              //   }
+              // }
             ],
             tableData: [
               {
