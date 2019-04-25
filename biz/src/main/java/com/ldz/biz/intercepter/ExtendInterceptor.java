@@ -24,7 +24,7 @@ public class ExtendInterceptor extends BaseWebConfigure {
 						,"/upload");
 		registry.addInterceptor(new AppInterceptor(redisDao))
 				.addPathPatterns("/app/user/**")
-				.excludePathPatterns("/app/user/login","/app/user/register","/app/user/sendMsg","/app/user/findPwd","/app/guest/**");
+				.excludePathPatterns("/app/user/login","/app/user/register","/app/user/sendMsg","/app/user/findPwd","/app/guest/**","/app/user/proeval/newPager");
 		super.addInterceptors(registry);
 	}
 	

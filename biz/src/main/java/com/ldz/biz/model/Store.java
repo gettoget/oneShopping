@@ -31,6 +31,12 @@ public class Store implements Serializable {
     @Column(name = "pro_name")
     private String proName;
 
+    @Transient
+    private ProInfo proInfo;
+
+
+
+
     /**
      * 备注一
      */
@@ -47,6 +53,15 @@ public class Store implements Serializable {
     private String bz3;
 
     private static final long serialVersionUID = 1L;
+
+
+    public ProInfo getProInfo() {
+        return proInfo;
+    }
+
+    public void setProInfo(ProInfo proInfo) {
+        this.proInfo = proInfo;
+    }
 
     /**
      * @return id

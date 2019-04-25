@@ -31,7 +31,7 @@ public class ExpiredListener implements MessageListener {
                 Order order = orderService.findById(split[0]);
                 if(StringUtils.equals("3",order.getDdzt())){
                     // 订单取消支付
-                    orderService.orderCancel(split[0]);
+                    orderService.updateOrderCancel(split[0]);
                 }
             }
         }

@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.ldz.biz.model.Order;
 import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
+import com.ldz.util.bean.PageResponse;
 
 /**
  * @author slu
@@ -24,7 +25,7 @@ public interface OrderService extends BaseService<Order, String> {
      */
     ApiResponse<String> payOrder(String id, String payPwd);
 
-    ApiResponse<String> getPageInfo(Page<Order> page);
+    PageResponse<Order> getPageInfo(Page<Order> page);
 
-    ApiResponse<String> orderCancel(String id);
+    ApiResponse<String> updateOrderCancel(String id);
 }

@@ -23,6 +23,7 @@ import java.util.List;
  * @param <PK>
  */
 public interface BaseService<T, PK extends Serializable> {
+
 	boolean fillNewPagerCondition(LimitedCondition condition);
 
 	LimitedCondition getQueryCondition();
@@ -32,6 +33,7 @@ public interface BaseService<T, PK extends Serializable> {
 	ApiResponse<List<T>> pager(Page<T> pager);
 
 	List<List<String>> getSheetData(ExcelParams params);
+
 	List<List<String>> getSheetData(List<T> list, ExcelParams params);
 	/**
 	 * 根据主键查询对象

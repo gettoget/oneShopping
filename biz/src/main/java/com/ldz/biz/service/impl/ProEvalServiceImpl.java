@@ -1,9 +1,13 @@
 package com.ldz.biz.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageInfo;
 import com.ldz.biz.model.User;
 import com.ldz.biz.service.UserService;
 import com.ldz.sys.base.BaseServiceImpl;
+import com.ldz.sys.base.LimitedCondition;
 import com.ldz.util.bean.ApiResponse;
+import com.ldz.util.bean.PageResponse;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +40,24 @@ public class ProEvalServiceImpl extends BaseServiceImpl<ProEval, String> impleme
 		RuntimeCheck.ifBlank(entity.getContent(), MessageUtils.get("eval.contentBlank"));
 		String userId = (String) getAttribute("userId");
 		User user = userService.findById(userId);
+		RuntimeCheck.ifNull(user, MessageUtils.get("user.null"));
+
 		entity.setUserId(userId);
 		entity.setUserName(user.getUserName());
 		entity.setId(genId());
-		return null;
+		save(entity);
+		return ApiResponse.saveSuccess();
+	}
+
+	@Override
+	public PageResponse<ProEval> getNewPager(Page<ProEval> page) {
+		LimitedCondition condition = getQueryCondition();
+		PageInfo<ProEval> info = findPage(page, condition);
+		PageResponse<ProEval> res = new PageResponse<>();
+		res.setList(info.getList());
+		res.setPageNum(page.getPageNum());
+		res.setPageSize(page.getPageSize());
+		res.setTotal(info.getTotal());
+		return res;
 	}
 }
