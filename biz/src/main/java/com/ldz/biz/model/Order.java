@@ -104,9 +104,29 @@ public class Order implements Serializable {
     private String userName;
     @Transient
     private ReceiveAddr addr;
+    @Transient
+    private String kjsj;
 
     @Transient
     private String payPwd;
+    @Transient
+    private String coverUrl;
+
+    public String getCoverUrl() {
+        return coverUrl;
+    }
+
+    public void setCoverUrl(String coverUrl) {
+        this.coverUrl = coverUrl;
+    }
+
+    public String getKjsj() {
+        return kjsj;
+    }
+
+    public void setKjsj(String kjsj) {
+        this.kjsj = kjsj;
+    }
 
     public String getPayPwd() {
         return payPwd;

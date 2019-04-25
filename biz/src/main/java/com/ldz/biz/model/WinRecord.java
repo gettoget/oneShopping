@@ -67,7 +67,18 @@ public class WinRecord implements Serializable {
     @Transient
     private String proName;
 
+    @Transient
+    private String himg;
+
     private static final long serialVersionUID = 1L;
+
+    public String getHimg() {
+        return himg;
+    }
+
+    public void setHimg(String himg) {
+        this.himg = himg;
+    }
 
     public String getProName() {
         return proName;

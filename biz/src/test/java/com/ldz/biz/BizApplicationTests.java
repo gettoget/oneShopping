@@ -50,38 +50,6 @@ public class BizApplicationTests {
 
     @Test
     public void test() throws IOException, InterruptedException {
-        SimpleCondition simpleCondition = new SimpleCondition(User.class);
-        simpleCondition.eq(User.InnerColumn.balance , "500");
-        simpleCondition.eq(User.InnerColumn.source, "0");
-
-        List<User> users = userService.findByCondition(simpleCondition);
-        for (int i = 0 ; i<7699; i++){
-            User user = users.get(i);
-            Map<String,String> m = new HashMap<>();
-            m.put("userId",user.getId());
-            m.put("imei","011472001978695");
-
-
-                m.put("orderType","2");
-                m.put("proId","568853274027884544");
-                m.put("zfje","1");
-                m.put("gmfs","1");
-               String post = HttpUtil.post("http://localhost:8088/app/order/save", m);
-               ApiResponse apiResponse = JsonUtil.toBean(post, ApiResponse.class);
-                if(apiResponse.getCode() == 200){
-                    SimpleCondition condition = new SimpleCondition(Order.class);
-                    condition.eq(Order.InnerColumn.userId,m.get("userId"));
-                    condition.eq(Order.InnerColumn.proId, m.get("proId"));
-                    condition.eq(Order.InnerColumn.ddzt, "3");
-                    List<Order> orders = orderService.findByCondition(condition);
-                    Order order = orders.get(0);
-                    m.put("id",order.getId());
-                    m.put("payPwd","123456");
-                    post = HttpUtil.post("http://localhost:8088/app/order/payOrder", m);
-                }
-
-
-        }
 
 
 

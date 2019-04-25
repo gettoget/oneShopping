@@ -1,10 +1,10 @@
 package com.ldz.biz.appctrl;
 
+import com.github.pagehelper.Page;
+import com.ldz.biz.model.CyyhModel;
 import com.ldz.biz.model.ProInfo;
 import com.ldz.biz.model.WinRecord;
 import com.ldz.biz.service.ProInfoService;
-import com.ldz.sys.base.BaseController;
-import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,15 +14,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/app/guest/proinfo")
-public class ProInfoCtrl extends BaseController<ProInfo, String> {
+public class ProInfoCtrl  {
 
     @Autowired
     private ProInfoService service;
 
-    @Override
-    protected BaseService<ProInfo, String> getBaseService() {
-        return service;
-    }
+
 
 
 
@@ -87,6 +84,22 @@ public class ProInfoCtrl extends BaseController<ProInfo, String> {
     public PageResponse<WinRecord> winrecords(String id, @RequestParam(defaultValue = "1")int pageNum, @RequestParam(defaultValue = "8")int pageSize){
         return service.winrecoeds(id, pageNum, pageSize);
     }
+
+    /**
+     * 商品分页接口
+     */
+    @GetMapping("/newPager")
+    public PageResponse<ProInfo> getNewPager(Page<ProInfo> page){
+        return service.getNewPager(page);
+    }
+
+    @GetMapping("/getCyyh")
+    public PageResponse<CyyhModel> getCyyh(@RequestParam(defaultValue =  "1") int pageNum, @RequestParam(defaultValue =  "8") int pageSize, String id ){
+        return  service.getCyyh(pageNum, pageSize , id);
+    }
+
+
+
 
 
 

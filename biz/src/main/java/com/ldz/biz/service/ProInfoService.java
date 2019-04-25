@@ -1,5 +1,7 @@
 package com.ldz.biz.service;
 
+import com.github.pagehelper.Page;
+import com.ldz.biz.model.CyyhModel;
 import com.ldz.biz.model.ProInfo;
 import com.ldz.biz.model.WinRecord;
 import com.ldz.sys.base.BaseService;
@@ -45,4 +47,8 @@ public interface ProInfoService extends BaseService<ProInfo, String> {
     ApiResponse<List<String>> getMyNums(String id);
 
     PageResponse<WinRecord> winrecoeds(String id, int pageNum , int pageSize);
+
+    PageResponse<ProInfo> getNewPager(Page<ProInfo> page);
+
+    PageResponse<CyyhModel> getCyyh(int pageNum, int pageSize , String id);
 }
