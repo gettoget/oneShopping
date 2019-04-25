@@ -1,10 +1,12 @@
 package com.ldz.biz.service.impl;
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.ldz.biz.model.*;
 import com.ldz.biz.service.*;
 import com.ldz.sys.base.BaseServiceImpl;
+import com.ldz.sys.base.LimitedCondition;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
 import com.ldz.util.bean.SimpleCondition;
@@ -12,6 +14,7 @@ import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.redis.RedisTemplateUtil;
+import com.sun.jmx.snmp.SnmpUnknownModelLcdException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +48,11 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private ProInfoService proInfoService;
+
+
 
     @Value("${filePath}")
     private String filePath;
@@ -129,14 +137,17 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         setImgUrl(proInfo);
         // 获取上一期中奖的 商品id
         ProInfo info = baseMapper.getLatestPerson(proInfo.getProBaseid());
-        SimpleCondition simpleCondition = new SimpleCondition(WinRecord.class);
-        simpleCondition.eq(WinRecord.InnerColumn.proId, info.getId());
-        List<WinRecord> winRecordList = winRecordService.findByCondition(simpleCondition);
-        if (CollectionUtils.isNotEmpty(winRecordList)) {
-            WinRecord record = winRecordList.get(0);
-            record.setProName(proInfo.getProName());
-            proInfo.setWinRecord(record);
+        if(info != null){
+            SimpleCondition simpleCondition = new SimpleCondition(WinRecord.class);
+            simpleCondition.eq(WinRecord.InnerColumn.proId, info.getId());
+            List<WinRecord> winRecordList = winRecordService.findByCondition(simpleCondition);
+            if (CollectionUtils.isNotEmpty(winRecordList)) {
+                WinRecord record = winRecordList.get(0);
+                record.setProName(proInfo.getProName());
+                proInfo.setWinRecord(record);
+            }
         }
+
         return ApiResponse.success(proInfo);
     }
 
@@ -200,8 +211,13 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
             List<WinRecord> winRecordList = winRecordService.findByCondition(simpleCondition);
 
             if (CollectionUtils.isNotEmpty(winRecordList)) {
+
                 record = winRecordList.get(0);
                 record.setProName(proInfo.getProName());
+                if(StringUtils.isNotBlank(info.getUserId())){
+                    User user = userService.findById(info.getUserId());
+                    record.setHimg(user.gethImg());
+                }
                 return ApiResponse.success(record);
             }
         }
@@ -247,8 +263,18 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         if (CollectionUtils.isNotEmpty(ids)) {
             SimpleCondition wincon = new SimpleCondition(WinRecord.class);
             wincon.in(WinRecord.InnerColumn.proId, ids);
-            wincon.setOrderByClause(" cjsjs desc ");
+            wincon.setOrderByClause(" cjsj desc ");
             records = winRecordService.findByCondition(wincon);
+            if(CollectionUtils.isNotEmpty(records)){
+                records.forEach(
+                        winRecord -> {
+                            ProInfo info1 = proInfoService.findById(winRecord.getProId());
+                            winRecord.setProName(info1.getProName());
+                            User user = userService.findById(winRecord.getUserId());
+                            winRecord.setHimg(user.gethImg());
+                        }
+                );
+            }
         }
 
 
@@ -258,6 +284,57 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         page.setPageSize(pageSize);
         page.setTotal(info.getTotal());
         return page;
+    }
+
+    @Override
+    public PageResponse<ProInfo> getNewPager(Page<ProInfo> page) {
+        PageResponse<ProInfo> res= new PageResponse<>();
+        LimitedCondition condition = getQueryCondition();
+        PageInfo<ProInfo> info = findPage(page, condition);
+        res.setPageNum(page.getPageNum());
+        res.setPageSize(page.getPageSize());
+        res.setList(info.getList());
+        res.setTotal(info.getTotal());
+        if(CollectionUtils.isNotEmpty(res.getList())){
+            res.getList().forEach(proInfo -> setImgUrl(proInfo));
+        }
+        return res;
+    }
+
+    @Override
+    public PageResponse<CyyhModel> getCyyh(int pageNum, int pageSize , String id) {
+
+        PageResponse<CyyhModel> response = new PageResponse<>();
+        List<CyyhModel> models = new ArrayList<>();
+        // 获取所有购买当前商品的 用户已支付的订单
+        SimpleCondition condition = new SimpleCondition(Order.class);
+        condition.eq(Order.InnerColumn.proId , id);
+        condition.notIn(Order.InnerColumn.ddzt, Arrays.asList("3", "5"));
+        condition.setOrderByClause(" zfsj desc ");
+        PageInfo<Order> pageInfo = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> {
+            orderService.findByCondition(condition);
+        });
+        List<Order> orders = pageInfo.getList();
+        if(CollectionUtils.isNotEmpty(orders)){
+            for (Order order : orders) {
+                CyyhModel model = new CyyhModel();
+                List<OrderList> lists = orderListService.findEq(OrderList.InnerColumn.orderId, order.getId());
+                User user = userService.findById(order.getUserId());
+                model.setGmfs(lists.size()+"");
+                model.setGmsj(order.getZfsj());
+                model.setHimg(user.gethImg());
+                model.setUserId(user.getId());
+                model.setUserName(user.getUserName());
+                models.add(model);
+            }
+        }
+        response.setTotal(pageInfo.getTotal());
+        response.setList(models);
+        response.setPageSize(pageSize);
+        response.setPageNum(pageNum);
+
+
+        return response;
     }
 
 
