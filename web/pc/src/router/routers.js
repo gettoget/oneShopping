@@ -179,6 +179,15 @@ export default [
           title: '用户查询'
         },
         component: () => import('@/vShop/user/usermess')
+      },
+      {
+        path:'/showorder',
+        name:'showorder',
+        meta: {
+          icon: 'md-trending-up',
+          title: '晒单审核'
+        },
+        component: () => import('@/vShop/user/showorder')
       }
     ]
   },
