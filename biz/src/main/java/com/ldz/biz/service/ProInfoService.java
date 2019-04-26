@@ -51,4 +51,8 @@ public interface ProInfoService extends BaseService<ProInfo, String> {
     PageResponse<ProInfo> getNewPager(Page<ProInfo> page);
 
     PageResponse<CyyhModel> getCyyh(int pageNum, int pageSize , String id);
+
+    PageResponse<CyyhModel> getInUser(String userId, int pageNum, int pageSize);
+
+    PageResponse<CyyhModel> getWin(String userId, int pageNum, int pageSize);
 }

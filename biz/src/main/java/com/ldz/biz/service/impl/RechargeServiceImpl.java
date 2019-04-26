@@ -74,7 +74,7 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 		recharge.setCzzt("1");
 		recharge.setCzqjbs(user.getBalance());
 		recharge.setCzqd("1");
-
+		recharge.setUserId(userId);
 		RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
 		user.setBalance(Integer.parseInt(user.getBalance()) + amount + "");
 		recharge.setCzhjbs(user.getBalance());

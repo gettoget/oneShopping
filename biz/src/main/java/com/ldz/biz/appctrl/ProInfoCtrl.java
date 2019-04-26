@@ -19,10 +19,6 @@ public class ProInfoCtrl  {
     @Autowired
     private ProInfoService service;
 
-
-
-
-
     /**
      * 查询商品上一次中奖的信息
      * @param baseid 商品基本信息的id
@@ -98,7 +94,21 @@ public class ProInfoCtrl  {
         return  service.getCyyh(pageNum, pageSize , id);
     }
 
+    /**
+     * 查询某个用户的参与记录
+     */
+    @GetMapping("/getInUser")
+    public PageResponse<CyyhModel> getInUser(String userId, @RequestParam(defaultValue = "0")int pageNum, @RequestParam(defaultValue = "8") int pageSize){
+        return service.getInUser(userId, pageNum, pageSize);
+    }
 
+    /**
+     * 查询某个用户的获奖记录
+     */
+    @GetMapping("/getWin")
+    public PageResponse<CyyhModel> getWin(String userId, @RequestParam(defaultValue = "0")int pageNum, @RequestParam(defaultValue = "8") int pageSize){
+        return service.getWin(userId, pageNum, pageSize);
+    }
 
 
 

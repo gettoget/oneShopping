@@ -14,7 +14,7 @@ public interface UserMapper extends Mapper<User> {
      * @param userId 用户id
      * @return
      */
-    @Select(" SELECT * FROM (SELECT id ,xfsj sj,userid userId,xfjb je,'1' as type  from exchange UNION all SELECT id ,cjsj sj,user_id userId,amonut je,'2' as type  from recharge) t where t.userid = #{userId} order by t.sj desc ")
+    @Select(" SELECT * FROM (SELECT id ,xfsj sj,userid userId,xfjb amount,'1' as type  from exchange UNION all SELECT id ,cjsj sj,user_id userId,amonut amount,'2' as type  from recharge) t where t.userid = #{userId} order by t.sj desc ")
     List<PaymentBean> getMyPayRecord(@Param("userId") String userId);
 
 }

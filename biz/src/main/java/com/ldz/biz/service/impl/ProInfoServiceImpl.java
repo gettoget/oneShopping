@@ -19,8 +19,10 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.connection.SortParameters;
 import org.springframework.stereotype.Service;
 
+import sun.awt.ModalityListener;
 import tk.mybatis.mapper.common.Mapper;
 
 import com.ldz.biz.mapper.ProInfoMapper;
@@ -295,8 +297,22 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         res.setPageSize(page.getPageSize());
         res.setList(info.getList());
         res.setTotal(info.getTotal());
+
         if(CollectionUtils.isNotEmpty(res.getList())){
-            res.getList().forEach(proInfo -> setImgUrl(proInfo));
+            Set<String> set = res.getList().stream().map(ProInfo::getUserId).collect(Collectors.toSet());
+            List<User> users = userService.findByIds(set);
+            Map<String, User> userMap = new HashMap<>();
+            if(CollectionUtils.isNotEmpty(users)){
+                userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
+            }
+            Map<String, User> finalUserMap = userMap;
+            res.getList().forEach(proInfo -> {
+                if(StringUtils.isNotBlank(proInfo.getUserId()) && finalUserMap.containsKey(proInfo.getUserId())){
+                    proInfo.setUserName(finalUserMap.get(proInfo.getUserId()).getUserName());
+                }
+                setImgUrl(proInfo);
+            });
+
         }
         return res;
     }
@@ -335,6 +351,111 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
 
         return response;
+    }
+
+    @Override
+    public PageResponse<CyyhModel> getInUser(String userId, int pageNum , int pageSize) {
+        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.idIsnull"));
+        User user = userService.findById(userId);
+        RuntimeCheck.ifNull(user, MessageUtils.get("user.null"));
+        PageResponse<CyyhModel> res = new PageResponse<>();
+        List<CyyhModel> models = new ArrayList<>();
+        SimpleCondition condition = new SimpleCondition(Order.class);
+        condition.eq(Order.InnerColumn.userId, userId);
+        condition.setOrderByClause(" zfsj desc ");
+        PageInfo<Order> objectPageInfo = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> orderService.findByCondition(condition));
+        List<Order> orders = objectPageInfo.getList();
+        if(CollectionUtils.isNotEmpty(orders)){
+            Set<String> proIds = orders.stream().map(Order::getProId).collect(Collectors.toSet());
+            List<ProInfo> infos = proInfoService.findByIds(proIds);
+            // 拿到中奖用户的信息
+            Map<String, ProInfo> infoMap = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
+            Set<String> userIds = infos.stream().map(ProInfo::getUserId).collect(Collectors.toSet());
+            List<User> users = userService.findByIds(userIds);
+            Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
+            for (Order order : orders) {
+                CyyhModel model = new CyyhModel();
+
+                model.setUserId(userId);
+                model.setHimg(user.gethImg());
+                model.setGmsj(order.getZfsj());
+                model.setGmfs(order.getGmfs());
+                model.setProName(order.getProName());
+                model.setUserName(user.getUserName());
+                model.setProId(order.getProId());
+                model.setNum(order.getZjhm());
+                if(infoMap.containsKey(order.getProId())){
+                    ProInfo proInfo = infoMap.get(order.getProId());
+                    model.setProPrice(proInfo.getProPrice());
+                    model.setRePrice(proInfo.getRePrice());
+                    model.setCoverUrl(proInfo.getCoverUrl());
+                    if(userMap.containsKey(proInfo.getUserId())){
+                        model.setWinName(userMap.get(order.getUserId()).getUserName());
+                    }
+                }
+                models.add(model);
+            }
+        }
+        res.setPageNum(pageNum);
+        res.setPageSize(pageSize);
+        res.setList(models);
+        res.setTotal(objectPageInfo.getTotal());
+        return res;
+    }
+
+    @Override
+    public PageResponse<CyyhModel> getWin(String userId, int pageNum, int pageSize) {
+        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.idIsnull"));
+        User user = userService.findById(userId);
+        RuntimeCheck.ifNull(user, MessageUtils.get("user.null"));
+        PageResponse<CyyhModel> res = new PageResponse<>();
+        List<CyyhModel> models = new ArrayList<>();
+        // 查询 此用户的所有中奖信息
+        List<WinRecord> records = winRecordService.findEq(WinRecord.InnerColumn.userId, userId);
+        Set<String> proIds = records.stream().map(WinRecord::getProId).collect(Collectors.toSet());
+        SimpleCondition condition = new SimpleCondition(Order.class);
+        condition.in(Order.InnerColumn.proId, proIds);
+        condition.eq(Order.InnerColumn.userId, userId);
+        condition.eq(Order.InnerColumn.ddzt, "1");
+        condition.setOrderByClause(" zfsj desc ");
+        PageInfo<Order> info = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> orderService.findByCondition(condition));
+        List<Order> orders = info.getList();
+        if(CollectionUtils.isNotEmpty(orders)){
+            List<ProInfo> infos = proInfoService.findByIds(proIds);
+            Map<String, ProInfo> infoMap = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
+            Set<String> userIds = infos.stream().map(ProInfo::getUserId).collect(Collectors.toSet());
+            List<User> users = userService.findByIds(userIds);
+            Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
+            for (Order order : orders) {
+                CyyhModel model = new CyyhModel();
+                if(userMap.containsKey(order.getUserId())){
+                    model.setWinName(userMap.get(order.getUserId()).getUserName());
+                }
+                model.setUserName(user.getUserName());
+                model.setUserId(userId);
+                model.setHimg(user.gethImg());
+                model.setGmsj(order.getZfsj());
+                model.setGmfs(order.getGmfs());
+                model.setProName(order.getProName());
+                model.setProId(order.getProId());
+                model.setNum(order.getZjhm());
+                if(infoMap.containsKey(order.getProId())){
+                    ProInfo proInfo = infoMap.get(order.getProId());
+                    model.setProPrice(proInfo.getProPrice());
+                    model.setRePrice(proInfo.getRePrice());
+                    model.setCoverUrl(proInfo.getCoverUrl());
+                    if(userMap.containsKey(proInfo.getUserId())){
+                        model.setWinName(userMap.get(order.getUserId()).getUserName());
+                    }
+                }
+                models.add(model);
+            }
+        }
+        res.setPageNum(pageNum);
+        res.setPageSize(pageSize);
+        res.setList(models);
+        res.setTotal(info.getTotal());
+        return res;
     }
 
 

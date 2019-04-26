@@ -295,7 +295,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 // 查看商品剩余名额是否 为 0   且所有订单都已支付
 
                 int rePrice = Integer.parseInt(proInfo.getRePrice()) - Integer.parseInt(order.getGmfs());
-
+                proInfo.setGxsj(DateUtils.getNowTime());
+                proInfoService.update(proInfo);
                 if (rePrice <= 0) {
                     SimpleCondition condition = new SimpleCondition(Order.class);
                     condition.eq(Order.InnerColumn.ddzt, "3");
@@ -305,7 +306,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                         // 号码分配完 清理redis key
                         redis.delete(order.getProId() + "_nums");
                         // 更新商品状态为 待开奖
-                        proInfo.setGxsj(DateUtils.getNowTime());
+
                         proInfo.setProZt("3");
                         proInfo.setKjsj(DateTime.now().plusMinutes(1).toString("yyyy-MM-dd HH:mm:ss.SSS"));
                         proInfoService.update(proInfo);
