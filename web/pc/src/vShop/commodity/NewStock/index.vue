@@ -3,104 +3,101 @@
 </style>
 <template>
   <div class="box_col NewStockSty">
-    <div>
+    <div style="padding: 18px 0">
       <h1>商品上架</h1>
     </div>
-    <div class="box_col_autoY" style="margin-top: 22px">
-      <Row :gutter="16">
-        <Col span="4" class-name="coverImgBoxSty">
-          <h2>封面图</h2>
-          <up-file-img @handleSuccess="(url)=>{handleSuccess(url,'coverImg')}">
-            <img v-if="formData.coverImg" :src="formData.coverImg" alt="">
-            <Button v-else type="dashed">
-              <Icon type="md-cloud-upload" size="120"/>
-            </Button>
-          </up-file-img>
-        </Col>
-        <Col span="4" class-name="tuijianImgBoxSty">
-          <h2>推荐图</h2>
-          <up-file-img @handleSuccess="(url)=>{handleSuccess(url,'tuijianImg')}">
-            <img v-if="formData.tuijianImg" :src="formData.tuijianImg" alt="">
-            <Button v-else type="dashed">
-              <Icon type="md-cloud-upload" size="120"/>
-            </Button>
-          </up-file-img>
-        </Col>
-      </Row>
-      <div style="margin-top: 24px">
-        <h2>内容图</h2>
-      </div>
-      <Row :gutter="16" class-name="contentImgSty">
-        <Col span="4" class-name="contentItemSty" v-for="(it,index) in formData.content" :key="index">
-          <img :src="it" alt="">
-          <div class="ingMask">
-            <Icon type="ios-trash" size="60" color="#fff" @click.native="removeItem(index)"/>
-          </div>
-        </Col>
-        <Col span="4" v-if="formData.content.length<6">
-          <up-file-img @handleSuccess="contentImg">
-            <Button type="dashed">
-              <Icon type="md-cloud-upload" size="120"/>
-            </Button>
-          </up-file-img>
-        </Col>
-      </Row>
-
-      <!-------------------------------->
-      <div class="formDataSty">
-        <Form ref="formValidate" :model="formValidate" :rules="ruleValidate">
-          <Row :gutter="16">
-            <Col span="6">
-              <FormItem label="商品类型" prop="classify">
-                <Select v-model="formValidate.classify" placeholder="选择商品分类">
-                  <Option value="computer">电脑</Option>
-                  <Option value="phone">手机</Option>
-                  <Option value="pad">平板电脑</Option>
-                  <Option value="camero">相机</Option>
-                  <Option value="accessories">数码配件</Option>
-                  <Option value="other">其他</Option>
-                </Select>
-              </FormItem>
-            </Col>
-            <Col span="6">
-              <FormItem label="商品名称" prop="name">
-                <Input v-model="formValidate.name" placeholder="输入商品名称"></Input>
-              </FormItem>
-            </Col>
-            <Col span="6">
-              <FormItem label="商品参数" prop="price">
-                <Input v-model="formValidate.price" placeholder="输入商品参数"></Input>
-              </FormItem>
-            </Col>
-            <Col span="6">
-              <FormItem label="商品详情" prop="desc">
-                <Input v-model="formValidate.desc" type="textarea" :autosize="{minRows: 1,maxRows: 5}"
-                       placeholder="输入商品详情."></Input>
-              </FormItem>
-            </Col>
-          </Row>
-          <Row :gutter="16">
-            <Col span="6">
-              <FormItem label="销售份额" prop="amount">
-                <Input v-model="formValidate.amount" placeholder="输入商品售价"></Input>
-              </FormItem>
-            </Col>
-            <Col span="6">
-              <FormItem label="销售份额" prop="amount">
-                <Input v-model="formValidate.amount" placeholder="输入商品售价"></Input>
-              </FormItem>
-            </Col>
-          </Row>
-
-
-
-          <FormItem>
-            <Button type="primary" @click="handleSubmit('formValidate')">提交</Button>
-            <Button @click="handleReset('formValidate')" style="margin-left: 8px">重置</Button>
-          </FormItem>
-        </Form>
-      </div>
+    <hr style="margin: 18px 0">
+    <Row :gutter="16">
+      <Col span="4" class-name="coverImgBoxSty">
+        <h2>封面图</h2>
+        <up-file-img @handleSuccess="(url)=>{handleSuccess(url,'coverImg')}">
+          <img v-if="formData.coverImg" :src="formData.coverImg" alt="">
+          <Button v-else type="dashed">
+            <Icon type="md-cloud-upload" size="120"/>
+          </Button>
+        </up-file-img>
+      </Col>
+      <Col span="4" class-name="tuijianImgBoxSty">
+        <h2>推荐图</h2>
+        <up-file-img @handleSuccess="(url)=>{handleSuccess(url,'tuijianImg')}">
+          <img v-if="formData.tuijianImg" :src="formData.tuijianImg" alt="">
+          <Button v-else type="dashed">
+            <Icon type="md-cloud-upload" size="120"/>
+          </Button>
+        </up-file-img>
+      </Col>
+    </Row>
+    <div style="margin-top: 24px">
+      <h2>内容图</h2>
     </div>
+    <Row :gutter="16" class-name="contentImgSty">
+      <Col span="4" class-name="contentItemSty" v-for="(it,index) in formData.content" :key="index">
+        <img :src="it" alt="">
+        <div class="ingMask">
+          <Icon type="ios-trash" size="60" color="#fff" @click.native="removeItem(index)"/>
+        </div>
+      </Col>
+      <Col span="4" v-if="formData.content.length<6">
+        <up-file-img @handleSuccess="contentImg">
+          <Button type="dashed">
+            <Icon type="md-cloud-upload" size="120"/>
+          </Button>
+        </up-file-img>
+      </Col>
+    </Row>
+
+    <!-------------------------------->
+    <Form ref="formValidate" :model="formValidate" :rules="ruleValidate">
+      <Row :gutter="16">
+        <Col span="6">
+          <FormItem label="商品类型" prop="classify">
+            <Select v-model="formValidate.classify" placeholder="选择商品分类">
+              <Option value="computer">电脑</Option>
+              <Option value="phone">手机</Option>
+              <Option value="pad">平板电脑</Option>
+              <Option value="camero">相机</Option>
+              <Option value="accessories">数码配件</Option>
+              <Option value="other">其他</Option>
+            </Select>
+          </FormItem>
+        </Col>
+        <Col span="6">
+          <FormItem label="商品名称" prop="name">
+            <Input v-model="formValidate.name" placeholder="输入商品名称"></Input>
+          </FormItem>
+        </Col>
+        <Col span="6">
+          <FormItem label="商品参数" prop="price">
+            <Input v-model="formValidate.price" placeholder="输入商品参数"></Input>
+          </FormItem>
+        </Col>
+        <Col span="6">
+          <FormItem label="商品详情" prop="desc">
+            <Input v-model="formValidate.desc" type="textarea" :autosize="{minRows: 1,maxRows: 5}"
+                   placeholder="输入商品详情."></Input>
+          </FormItem>
+        </Col>
+      </Row>
+      <Row :gutter="16">
+        <Col span="6">
+          <FormItem label="销售份额" prop="amount">
+            <Input v-model="formValidate.amount" placeholder="输入商品售价"></Input>
+          </FormItem>
+        </Col>
+        <Col span="6">
+          <FormItem label="销售份额" prop="amount">
+            <Input v-model="formValidate.amount" placeholder="输入商品售价"></Input>
+          </FormItem>
+        </Col>
+      </Row>
+
+
+      <FormItem>
+        <Button type="primary" @click="handleSubmit('formValidate')">提交</Button>
+        <Button @click="handleReset('formValidate')" style="margin-left: 8px">重置</Button>
+      </FormItem>
+    </Form>
+    <!--</div>-->
   </div>
 </template>
 
