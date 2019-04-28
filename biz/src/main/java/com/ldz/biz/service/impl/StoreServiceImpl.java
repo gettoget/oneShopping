@@ -4,8 +4,10 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import com.ldz.biz.model.ProBaseinfo;
 import com.ldz.biz.model.ProInfo;
+import com.ldz.biz.model.User;
 import com.ldz.biz.service.ProBaseinfoService;
 import com.ldz.biz.service.ProInfoService;
+import com.ldz.biz.service.UserService;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.sys.base.LimitedCondition;
 import com.ldz.util.bean.ApiResponse;
@@ -39,6 +41,8 @@ public class StoreServiceImpl extends BaseServiceImpl<Store, String> implements 
     private StoreMapper baseMapper;
     @Autowired
     private ProInfoService proInfoService;
+    @Autowired
+    private UserService userService;
 
     @Override
     protected Mapper<Store> getBaseMapper() {
@@ -77,7 +81,14 @@ public class StoreServiceImpl extends BaseServiceImpl<Store, String> implements 
                 List<String> proIds = info.getList().stream().map(Store::getProId).collect(Collectors.toList());
                 List<ProInfo> infos = proInfoService.findByIds(proIds);
                 Map<String, ProInfo> proInfoMap = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
-                info.getList().stream().forEach(store -> store.setProInfo(proInfoMap.get(store.getProId())));
+                info.getList().stream().forEach(store -> {
+                    ProInfo proInfo = proInfoMap.get(store.getProId());
+                    store.setProInfo(proInfo);
+                    if (org.apache.commons.lang3.StringUtils.isNotBlank(proInfo.getUserId())) {
+                        User user = userService.findById(proInfo.getUserId());
+                        proInfo.setUserName(user.getUserName());
+                    }
+                });
             }
             res.setTotal(info.getTotal());
             res.setList(info.getList());
@@ -97,7 +108,8 @@ public class StoreServiceImpl extends BaseServiceImpl<Store, String> implements 
         condition.eq(Store.InnerColumn.id, id);
         List<Store> stores = findByCondition(condition);
         if(CollectionUtils.isNotEmpty(stores)){
-           remove(id);
+            List<String> ids = stores.stream().map(Store::getId).collect(Collectors.toList());
+            ids.forEach(s -> remove(s));
         }
 
         return ApiResponse.deleteSuccess();
