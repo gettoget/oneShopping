@@ -2,27 +2,35 @@
     <div>
       <pager-tit title="晒单审核"></pager-tit>
 
-      <Row>
-        <Col span="4" v-for="item in 10">
-          <div style="padding: 5px">
-            <Card style="width:240px" shadow>
+      <Row :gutter="16">
+        <Col :span="4" :xxl="4" :xl="6" :lg="8" :md="12" :sm="24" :xs="24"
+             v-for="item in 10">
+            <Card>
               <p slot="title">用户名的晒单</p>
               <div>
-                <Carousel autoplay v-model="value2" loop>
+                <Carousel v-model="value2" loop>
                   <CarouselItem>
-                    <div class="demo-carousel"> <p><img height="150" src="http://img.zcool.cn/community/01c69f594d35d8a8012193a3ed77b3.jpg@1280w_1l_2o_100sh.jpg"></p>
+                    <div class="demo-carousel">
+                        <img style="width: 100%"
+                          src="http://img.zcool.cn/community/01c69f594d35d8a8012193a3ed77b3.jpg@1280w_1l_2o_100sh.jpg">
                     </div>
                   </CarouselItem>
                   <CarouselItem>
-                    <div class="demo-carousel"> <p><img height="150" src="http://img.zcool.cn/community/01c69f594d35d8a8012193a3ed77b3.jpg@1280w_1l_2o_100sh.jpg"></p>
+                    <div class="demo-carousel">
+                      <img style="width: 100%"
+                           src="http://img.zcool.cn/community/01c69f594d35d8a8012193a3ed77b3.jpg@1280w_1l_2o_100sh.jpg">
                     </div>
                   </CarouselItem>
                   <CarouselItem>
-                    <div class="demo-carousel"> <p><img height="150" src="http://img.zcool.cn/community/01c69f594d35d8a8012193a3ed77b3.jpg@1280w_1l_2o_100sh.jpg"></p>
+                    <div class="demo-carousel">
+                      <img style="width: 100%"
+                           src="http://img.zcool.cn/community/01c69f594d35d8a8012193a3ed77b3.jpg@1280w_1l_2o_100sh.jpg">
                     </div>
                   </CarouselItem>
                   <CarouselItem>
-                    <div class="demo-carousel"> <p><img  height="150" src="http://img.zcool.cn/community/01c69f594d35d8a8012193a3ed77b3.jpg@1280w_1l_2o_100sh.jpg"></p>
+                    <div class="demo-carousel">
+                      <img style="width: 100%"
+                           src="http://img.zcool.cn/community/01c69f594d35d8a8012193a3ed77b3.jpg@1280w_1l_2o_100sh.jpg">
                     </div>
                   </CarouselItem>
                 </Carousel>
@@ -43,7 +51,6 @@
                 </Row>
               </div>
             </Card>
-          </div>
         </Col>
       </Row>
     </div>
@@ -93,7 +100,3 @@
       }
     }
 </script>
-
-<style scoped>
-
-</style>
