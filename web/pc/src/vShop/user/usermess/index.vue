@@ -98,12 +98,14 @@
               {
                 title: '中奖单号',
                 align: 'center',
+                minWidth: 120,
                 key: 'sjh'
               },
               {
                 title: '中奖商品',
                 align: 'center',
                 key: 'dz',
+                minWidth: 120,
               },
             ]
           },
@@ -113,13 +115,13 @@
             children: [
               {
                 title: '商品名称',
-                width: 120,
+                minWidth: 120,
                 align: 'center',
                 key: 'zt'
               },
               {
                 title: '规格',
-                width: 120,
+                minWidth: 120,
                 align: 'center',
                 key: 'ddzt'
               }
@@ -129,6 +131,7 @@
           {
             title: '备注',
             align: 'center',
+            minWidth: 120,
             key: 'bz'
           },
           // {
