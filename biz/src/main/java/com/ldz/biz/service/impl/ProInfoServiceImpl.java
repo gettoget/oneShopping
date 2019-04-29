@@ -109,8 +109,10 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         RuntimeCheck.ifBlank(id, MessageUtils.get("pro.idBlank"));
         ProInfo proInfo = baseMapper.getLatestPerson(id);
         if (proInfo != null) {
-            User user = userService.findById(proInfo.getUserId());
-            proInfo.setUserName(user.getUserName());
+            if(StringUtils.isNotBlank(proInfo.getUserId())){
+                User user = userService.findById(proInfo.getUserId());
+                proInfo.setUserName(user.getUserName());
+            }
         }
         return ApiResponse.success(proInfo);
     }
@@ -335,12 +337,15 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
             for (Order order : orders) {
                 CyyhModel model = new CyyhModel();
                 List<OrderList> lists = orderListService.findEq(OrderList.InnerColumn.orderId, order.getId());
-                User user = userService.findById(order.getUserId());
+                if(StringUtils.isNotBlank(order.getUserId())){
+                    User user = userService.findById(order.getUserId());
+                    model.setHimg(user.gethImg());
+                    model.setUserId(user.getId());
+                    model.setUserName(user.getUserName());
+                }
                 model.setGmfs(lists.size()+"");
                 model.setGmsj(order.getZfsj());
-                model.setHimg(user.gethImg());
-                model.setUserId(user.getId());
-                model.setUserName(user.getUserName());
+
                 models.add(model);
             }
         }
