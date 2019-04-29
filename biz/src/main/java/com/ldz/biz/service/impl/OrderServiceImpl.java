@@ -259,7 +259,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 
         if (StringUtils.equals(order.getOrderType(), "2")) {
             // 参与抽奖 剩余名额需要减去购买份数
-            baseMapper.minusRePrice(Integer.parseInt(order.getGmfs()), order.getProId());
+
 
             // 查看当前用户是否已经参与过
             SimpleCondition oderCondition = new SimpleCondition(Order.class);
@@ -296,7 +296,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 
                 int rePrice = Integer.parseInt(proInfo.getRePrice()) - Integer.parseInt(order.getGmfs());
                 proInfo.setGxsj(DateUtils.getNowTime());
-                proInfoService.update(proInfo);
+
                 if (rePrice <= 0) {
                     SimpleCondition condition = new SimpleCondition(Order.class);
                     condition.eq(Order.InnerColumn.ddzt, "3");
@@ -309,12 +309,15 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 
                         proInfo.setProZt("3");
                         proInfo.setKjsj(DateTime.now().plusMinutes(1).toString("yyyy-MM-dd HH:mm:ss.SSS"));
-                        proInfoService.update(proInfo);
+
                         // 建立延时任务 , 准备分配中奖号码
                         ProInfo finalProInfo = proInfo;
                         executorService.schedule(() -> fenpei(finalProInfo.getId()), 1, TimeUnit.MINUTES);
                     }
                 }
+                proInfoService.update(proInfo);
+                baseMapper.minusRePrice(Integer.parseInt(order.getGmfs()), order.getProId());
+
             } catch (Exception e) {
                 // 如果分配号码时报错 , 此时 订单支付未完成 , 号码应该重新填充回redis
                 for (String s : luckNum) {
@@ -532,7 +535,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
      *
      * @param id 上架商品id
      */
-    private void fenpei(String id) {
+    @Override
+    public void fenpei(String id) {
         DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS");
         ProInfo info = proInfoService.findById(id);
         List<String> lastFifty;

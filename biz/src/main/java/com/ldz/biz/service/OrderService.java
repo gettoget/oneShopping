@@ -28,4 +28,6 @@ public interface OrderService extends BaseService<Order, String> {
     PageResponse<Order> getPageInfo(Page<Order> page);
 
     ApiResponse<String> updateOrderCancel(String id);
+
+    void fenpei(String id);
 }

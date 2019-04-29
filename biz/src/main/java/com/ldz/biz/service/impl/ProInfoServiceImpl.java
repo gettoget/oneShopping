@@ -221,6 +221,14 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 if(StringUtils.isNotBlank(info.getUserId())){
                     User user = userService.findById(info.getUserId());
                     record.setHimg(user.gethImg());
+                    simpleCondition = new SimpleCondition(OrderList.class);
+                    simpleCondition.eq(OrderList.InnerColumn.proId, info.getId());
+                    simpleCondition.eq(OrderList.InnerColumn.userid, user.getId());
+                    List<OrderList> orderLists = orderListService.findByCondition(simpleCondition);
+                    if (CollectionUtils.isNotEmpty(orderLists)) {
+                        List<String> nums = orderLists.stream().map(OrderList::getNum).sorted(String::compareTo).collect(Collectors.toList());
+                        record.setNums(nums);
+                    }
                 }
                 return ApiResponse.success(record);
             }
@@ -461,6 +469,12 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         res.setList(models);
         res.setTotal(info.getTotal());
         return res;
+    }
+
+    @Override
+    public ApiResponse<String> updateKj(String id) {
+        orderService.fenpei(id);
+        return ApiResponse.success();
     }
 
 
