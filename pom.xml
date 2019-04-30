@@ -18,7 +18,6 @@
         <module>biz</module>
         <module>util</module>
         <module>sys</module>
-        <module>demo</module>
     </modules>
     <description>Demo project for Spring Boot</description>
 
@@ -202,10 +201,17 @@
 
     <build>
         <plugins>
-            <plugin>
+            <!--<plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
+                <configuration>
+                    <classifier>exec</classifier>
+                </configuration>
+            </plugin>-->
+            <!--<plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>-->
         </plugins>
     </build>
 

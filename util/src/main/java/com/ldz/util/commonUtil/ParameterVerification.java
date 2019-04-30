@@ -10,12 +10,12 @@ import java.util.regex.Pattern;
  * 参数验证
  */
 public class ParameterVerification {
-    public static void main(String[] args) throws ParseException {
+    /*public static void main(String[] args) throws ParseException {
         //验证手机号码是否正确
         System.out.println(isPhoneValid("19911111111"));
         //验证身份证号码
         System.out.println(IDCardValidate("320111142211111111".toUpperCase()));
-    }
+    }*/
 
     /**
      * 判断手机号是否合格

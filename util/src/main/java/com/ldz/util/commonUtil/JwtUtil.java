@@ -127,7 +127,7 @@ public class JwtUtil {
         return jwt.getClaim(key).asString();
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         String t = create();
         System.out.println(t);
         t+="aa";
@@ -137,5 +137,5 @@ public class JwtUtil {
             System.out.println("val="+entry.getValue().asInt());
         }
         System.out.println(jwt.getClaim("age").asInt());
-    }
+    }*/
 }

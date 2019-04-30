@@ -155,7 +155,7 @@ public class pinyin4jUtis {
         return py.trim();
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         pinyin4jUtis pinyin4j = new pinyin4jUtis();
         try {
         System.out.println(pinyin4j.toPinYinUppercase("我是杨强"));	//输出结果：WSYQ
@@ -163,5 +163,5 @@ public class pinyin4jUtis {
             E.printStackTrace();
         }
 
-    }
+    }*/
 }
