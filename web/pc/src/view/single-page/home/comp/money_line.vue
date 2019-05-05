@@ -29,14 +29,32 @@
 
 
         let option = {
+          grid: {
+            top: 30,
+            left: 18,
+            right: 0,
+            bottom: 18,
+            containLabel: true
+          },
           title: {
-            text: "未来一周气温变化"
+            text: "消费走势"
           },
           tooltip: {
             trigger: "axis"
           },
           legend: {
-            data: ["最高气温", "最低气温"]
+            data: [{
+              name: '充值',
+              // 强制设置图形为圆。
+              icon: 'circle'
+            },{
+              name: '消费',
+              // 强制设置图形为圆。
+              icon: 'circle'
+            },
+            ],
+            orient:'vertical',
+
           },
           toolbox: {
             show: false,
@@ -67,7 +85,7 @@
               boundaryGap: false,
               data: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
               axisLine: {
-                show: false
+                show: true
               },
               axisTick: {
                 show: false
@@ -80,18 +98,18 @@
               position: "left",
               nameLocation: "end",
               axisLine: {
-                show: false
+                show: true
               }
             }
           ],
           series: [
             {
-              name: "最高气温",
+              name: "充值",
               type: "line",
               data: [11, 11, 15, 13, 12, 13, 10]
             },
             {
-              name: "最低气温",
+              name: "消费",
               type: "line",
               data: [1, 6, 2, 5, 3, 2, 0]
             }
