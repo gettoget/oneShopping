@@ -272,7 +272,7 @@ export default [
     name: 'iview',
     component: Main,
     meta: {
-      hideInMenu:true,
+      // hideInMenu:true,
       icon: 'logo-buffer',
       title: 'iviewDemoComp'
     },

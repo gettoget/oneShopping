@@ -1,6 +1,8 @@
 <template>
-  <div :id="echartID" class="box" style="height: 100%">
+  <div class="box_col">
+    <div :id="echartID" class="box_col_100">
 
+    </div>
   </div>
 </template>
 
@@ -27,34 +29,25 @@
       this.$nextTick(() => {
         var myChart = echarts.init(document.getElementById(this.echartID));
 
-
-        let option = {
+        let option ={
+          title: {
+            show:false,
+            text: "充值/消费"
+          },
           grid: {
-            top: 30,
-            left: 18,
-            right: 0,
+            top: 50,
+            left: 20,
+            right: 20,
             bottom: 18,
             containLabel: true
-          },
-          title: {
-            text: "消费走势"
           },
           tooltip: {
             trigger: "axis"
           },
           legend: {
-            data: [{
-              name: '充值',
-              // 强制设置图形为圆。
-              icon: 'circle'
-            },{
-              name: '消费',
-              // 强制设置图形为圆。
-              icon: 'circle'
-            },
-            ],
-            orient:'vertical',
-
+            data: ["充值", "消费"],
+            left:0,
+            top:0,
           },
           toolbox: {
             show: false,
@@ -83,9 +76,9 @@
             {
               type: "category",
               boundaryGap: false,
-              data: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+              data: ["07.01", "07.02", "07.03", "07.04", "07.05", "07.06", "07.06"],
               axisLine: {
-                show: true
+                show: false
               },
               axisTick: {
                 show: false
@@ -98,7 +91,10 @@
               position: "left",
               nameLocation: "end",
               axisLine: {
-                show: true
+                show: false
+              },
+              axisTick: {
+                show: false
               }
             }
           ],
@@ -132,8 +128,7 @@
         myChart.setOption(option);
       })
     },
-    methods: {
-    }
+    methods: {}
   }
 </script>
 
