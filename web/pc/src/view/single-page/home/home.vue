@@ -1,8 +1,5 @@
 <template>
   <div>
-    <div>
-      用户
-    </div>
     <Row :gutter="20">
       <i-col :xs="12" :md="8" :lg="4" v-for="(infor, i) in addUser" :key="`infor-${i}`"
              style="height: 130px;padding-bottom: 10px;">
@@ -11,26 +8,20 @@
           <p>{{ infor.title }}</p>
         </infor-card>
       </i-col>
-    </Row>
 
-
-    <div>
-      商品
-    </div>
-    <Row :gutter="20">
       <i-col :xs="12" :md="8" :lg="4" style="height: 130px;padding-bottom: 10px;">
         <div class="box_col">
           <div class="box_col_100">
-            <infor-card shadow :color="'#E46CBB'" :icon="'md-locate'" :icon-size="36">
+            <infor-card shadow :color="'#E46CBB'" :icon="'md-cube'" :icon-size="36">
               <count-to :end="100" count-class="count-style-M"/>
-              <p>今日充值</p>
+              <p>今日上架商品</p>
             </infor-card>
           </div>
           <div style="height: 4px"></div>
           <div class="box_col_100">
-            <infor-card shadow :color="'#E46CBB'" :icon="'ios-pricetags'" :icon-size="36">
+            <infor-card shadow :color="'#E46CBB'" :icon="'md-ribbon'" :icon-size="36">
               <count-to :end="100" count-class="count-style-M"/>
-              <p>今日消费</p>
+              <p>今日中奖商品</p>
             </infor-card>
           </div>
         </div>
@@ -39,14 +30,14 @@
       <i-col :xs="12" :md="8" :lg="4" style="height: 130px;padding-bottom: 10px;">
         <div class="box_col">
           <div class="box_col_100">
-            <infor-card shadow :color="'#9A66E4'" :icon="'md-locate'" :icon-size="36">
+            <infor-card shadow :color="'#9A66E4'" :icon="'md-cube'" :icon-size="36">
               <count-to :end="100" count-class="count-style-M"/>
               <p>本月充值</p>
             </infor-card>
           </div>
           <div style="height: 4px"></div>
           <div class="box_col_100">
-            <infor-card shadow :color="'#9A66E4'" :icon="'md-locate'" :icon-size="36">
+            <infor-card shadow :color="'#9A66E4'" :icon="'md-ribbon'" :icon-size="36">
               <count-to :end="100" count-class="count-style-M"/>
               <p>本月消费</p>
             </infor-card>
@@ -57,14 +48,14 @@
       <i-col :xs="12" :md="8" :lg="4" style="height: 130px;padding-bottom: 10px;">
         <div class="box_col">
           <div class="box_col_100">
-            <infor-card shadow :color="'#2d8cf0'" :icon="'md-locate'" :icon-size="36">
+            <infor-card shadow :color="'#2d8cf0'" :icon="'md-cube'" :icon-size="36">
               <count-to :end="100" count-class="count-style-M"/>
               <p>累计充值</p>
             </infor-card>
           </div>
           <div style="height: 4px"></div>
           <div class="box_col_100">
-            <infor-card shadow :color="'#2d8cf0'" :icon="'md-locate'" :icon-size="36">
+            <infor-card shadow :color="'#2d8cf0'" :icon="'md-ribbon'" :icon-size="36">
               <count-to :end="100" count-class="count-style-M"/>
               <p>累计消费</p>
             </infor-card>
@@ -72,80 +63,43 @@
         </div>
       </i-col>
     </Row>
+    <Row :gutter="20" style="margin-top: 20px;">
+      <i-col :md="24" :lg="12">
+        <div style="height: 500px">
+          <money-line></money-line>
+        </div>
+      </i-col>
+      <i-col :md="24" :lg="12">
+        <table-box></table-box>
+      </i-col>
+    </Row>
 
-
-    <div>
-      消费
-    </div>
-    <div style="height: 400px">
-      <money-line></money-line>
-    </div>
-    <div>
-      开奖
-    </div>
-
-    <!--<Row :gutter="20" style="margin-top: 10px;">-->
-    <!--<i-col :md="24" :lg="8" style="margin-bottom: 20px;">-->
-    <!--<Card shadow>-->
-    <!--<div style="height: 300px">-->
-    <!--<new-shop-d echartID="newShopD" echartTiT="今日商品统计"></new-shop-d>-->
-    <!--</div>-->
-    <!--</Card>-->
-    <!--</i-col>-->
-    <!--<i-col :md="24" :lg="8" style="margin-bottom: 20px;">-->
-    <!--<Card shadow>-->
-    <!--<div style="height: 300px">-->
-    <!--<new-shop-d echartID="newShopM" echartTiT="本月商品统计"></new-shop-d>-->
-    <!--</div>-->
-    <!--</Card>-->
-    <!--</i-col>-->
-    <!--<i-col :md="24" :lg="8" style="margin-bottom: 20px;">-->
-    <!--<Card shadow>-->
-    <!--<div style="height: 300px">-->
-    <!--<new-shop-d echartID="newShopA" echartTiT="商品累计统计"></new-shop-d>-->
-    <!--</div>-->
-    <!--</Card>-->
-    <!--</i-col>-->
+    <!--<Row :gutter="20">-->
+      <!--<i-col :xs="12" :md="8" :lg="4" v-for="(infor, i) in inforCardData" :key="`infor-${i}`"-->
+             <!--style="height: 120px;padding-bottom: 10px;">-->
+        <!--<infor-card shadow :color="infor.color" :icon="infor.icon" :icon-size="36">-->
+          <!--<count-to :end="infor.count" count-class="count-style"/>-->
+          <!--<p>{{ infor.title }}</p>-->
+        <!--</infor-card>-->
+      <!--</i-col>-->
     <!--</Row>-->
-
-
-    <Row :gutter="20" style="margin-top: 10px;">
-    <i-col :md="24" :lg="8" style="margin-bottom: 20px;">
-    <Card shadow>
-    <div style="height: 300px">
-    <money-bar echartID="moneyBar" echartTiT="充值消费"></money-bar>
-    </div>
-    </Card>
-    </i-col>
-    </Row>
-
-
-    <Row :gutter="20">
-      <i-col :xs="12" :md="8" :lg="4" v-for="(infor, i) in inforCardData" :key="`infor-${i}`"
-             style="height: 120px;padding-bottom: 10px;">
-        <infor-card shadow :color="infor.color" :icon="infor.icon" :icon-size="36">
-          <count-to :end="infor.count" count-class="count-style"/>
-          <p>{{ infor.title }}</p>
-        </infor-card>
-      </i-col>
-    </Row>
-    <Row :gutter="20" style="margin-top: 10px;">
-      <i-col :md="24" :lg="8" style="margin-bottom: 20px;">
-        <Card shadow>
-          <chart-pie style="height: 300px;" :value="pieData" text="用户访问来源"></chart-pie>
-        </Card>
-      </i-col>
-      <i-col :md="24" :lg="16" style="margin-bottom: 20px;">
-        <Card shadow>
-          <chart-bar style="height: 300px;" :value="barData" text="每周用户活跃量"/>
-        </Card>
-      </i-col>
-    </Row>
-    <Row>
-      <Card shadow>
-        <example style="height: 310px;"/>
-      </Card>
-    </Row>
+    <!--<Row :gutter="20" style="margin-top: 10px;">-->
+      <!--<i-col :md="24" :lg="8" style="margin-bottom: 20px;">-->
+        <!--<Card shadow>-->
+          <!--<chart-pie style="height: 300px;" :value="pieData" text="用户访问来源"></chart-pie>-->
+        <!--</Card>-->
+      <!--</i-col>-->
+      <!--<i-col :md="24" :lg="16" style="margin-bottom: 20px;">-->
+        <!--<Card shadow>-->
+          <!--<chart-bar style="height: 300px;" :value="barData" text="每周用户活跃量"/>-->
+        <!--</Card>-->
+      <!--</i-col>-->
+    <!--</Row>-->
+    <!--<Row>-->
+      <!--<Card shadow>-->
+        <!--<example style="height: 310px;"/>-->
+      <!--</Card>-->
+    <!--</Row>-->
   </div>
 </template>
 
@@ -153,6 +107,7 @@
   import newShopD from './comp/newShop_D'
   import moneyBar from './comp/moneyBar'
   import moneyLine from './comp/money_line'
+  import tableBox from './comp/homeTab'
 
   import TCard from './comp/T_Card'
 
@@ -167,6 +122,7 @@
       newShopD,
       moneyBar,
       moneyLine,
+      tableBox,
       TCard,
 
 
@@ -219,7 +175,8 @@
   .count-style {
     font-size: 50px;
   }
-  .count-style-M{
+
+  .count-style-M {
     font-size: 25px;
   }
 </style>
