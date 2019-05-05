@@ -43,6 +43,14 @@ public class ProInfoContrl extends BaseController<ProInfo, String> {
     }
 
 
+    /**
+     * 手动开奖
+     */
+    @PostMapping("/kj")
+    public ApiResponse<String> updateKj(String id){
+        return service.updateKj(id);
+    }
+
 
 
 

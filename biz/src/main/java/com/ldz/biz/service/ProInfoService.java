@@ -55,4 +55,6 @@ public interface ProInfoService extends BaseService<ProInfo, String> {
     PageResponse<CyyhModel> getInUser(String userId, int pageNum, int pageSize);
 
     PageResponse<CyyhModel> getWin(String userId, int pageNum, int pageSize);
+
+    ApiResponse<String> updateKj(String id);
 }

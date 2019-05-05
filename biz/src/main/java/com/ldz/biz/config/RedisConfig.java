@@ -14,12 +14,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import redis.clients.jedis.JedisPoolConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,15 +32,15 @@ public class RedisConfig {
 	@Autowired
 	private RedisConnectionFactory redisConnectionFactory;
 
-	@Autowired
-	private JedisConfig jedisConfig;
+/*	@Autowired
+	private JedisConfig jedisConfig;*/
 
 	private RedisTemplateUtil redisTemplateUtil;
 
 	/**
 	 * 从外部提取数据的Redis对象
 	 * @return
-	 */
+	 *//*
 	@Bean(name="redisOtherDB")
 	public RedisTemplateUtil redisTemplateOtherDB(){
 		RedisStandaloneConfiguration rf=new RedisStandaloneConfiguration();
@@ -66,7 +62,7 @@ public class RedisConfig {
 		RedisTemplateUtil bean = new RedisTemplateUtil(jedisConnectionFactory);
 		return bean;
 	}
-
+*/
 
 
 	/**

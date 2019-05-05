@@ -121,7 +121,7 @@ public class MainController {
         ApiResponse<Map<String, Object>> result = new ApiResponse<>();
 
         try {
-            String token = JwtUtil.createToken(user.getYhid(), System.currentTimeMillis() + "");
+            String token = JwtUtil.createToken(user.getYhid(),  "");
             redisDao.boundValueOps(user.getYhid()).set(token, 1, TimeUnit.DAYS);
             redisDao.boundValueOps(user.getYhid() + "-userInfo").set(mapper.writeValueAsString(user), 1, TimeUnit.DAYS);
             AccessToken aToken = new AccessToken();

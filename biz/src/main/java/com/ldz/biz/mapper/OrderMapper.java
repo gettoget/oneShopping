@@ -14,8 +14,8 @@ public interface OrderMapper extends Mapper<Order> {
     /**
      * 获取最后 50 笔交易的时间
      */
-    @Select(" select zfsj from order_form where zfsj is not null and zfsj != '' and pro_id =  #{id}  order by zfsj desc limit #{limi}")
-    List<String> getLastFifty(@Param("id") String id, @Param("limi") int limi);
+    @Select(" select * from order_form where zfsj is not null and zfsj != '' and pro_id =  #{id}  order by zfsj desc limit #{limi}")
+    List<Order> getLastFifty(@Param("id") String id, @Param("limi") int limi);
 
     /**
      * 充值所有未中奖状态

@@ -222,7 +222,7 @@ public class FileUtil {
             return filename;
         }
     }
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         String path = "/Users/yangx/Desktop/ccc.jpg";
         System.out.println(path+"\n结果："+getNamePart(path));
         System.out.println(path+"\n结果："+trimType(path));
@@ -232,6 +232,6 @@ public class FileUtil {
 
 
 
-    }
+    }*/
 
 }

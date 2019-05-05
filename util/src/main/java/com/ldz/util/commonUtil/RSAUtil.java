@@ -360,7 +360,7 @@ public class RSAUtil {
         return null;  
     }
     
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
 //    	generateKeyPair("D:/RSA");
     	
     	String publicKey; 
@@ -389,5 +389,5 @@ public class RSAUtil {
         System.out.println("加密后文字：\r\n" + aData.replaceAll("\r\n", ""));
         String dData = RSAUtil.decrypt(privateKey, aData);
         System.out.println("解密后文字: \r\n" + dData);  	
-	}
+	}*/
 }

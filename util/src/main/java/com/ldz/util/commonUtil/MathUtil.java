@@ -43,9 +43,9 @@ public class MathUtil {
         return bd.floatValue();
     }
 
-    public static void main(String[] args) {
+   /* public static void main(String[] args) {
         System.out.println(isNumeric("12a3"));
-    }
+    }*/
     public static boolean isNumeric(String str){
         Pattern pattern = Pattern.compile("[0-9]*");
         return pattern.matcher(str).matches();
