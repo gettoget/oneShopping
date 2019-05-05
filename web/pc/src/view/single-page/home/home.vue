@@ -1,39 +1,122 @@
 <template>
   <div>
-
-    <Row :gutter="20" style="margin-top: 10px;">
-      <i-col :md="24" :lg="8" style="margin-bottom: 20px;">
-        <Card shadow>
-          <div style="height: 300px">
-            <new-shop-d echartID="newShopD" echartTiT="今日商品统计"></new-shop-d>
-          </div>
-        </Card>
-      </i-col>
-      <i-col :md="24" :lg="8" style="margin-bottom: 20px;">
-        <Card shadow>
-          <div style="height: 300px">
-            <new-shop-d echartID="newShopM" echartTiT="本月商品统计"></new-shop-d>
-          </div>
-        </Card>
-      </i-col>
-      <i-col :md="24" :lg="8" style="margin-bottom: 20px;">
-        <Card shadow>
-          <div style="height: 300px">
-            <new-shop-d echartID="newShopA" echartTiT="商品累计统计"></new-shop-d>
-          </div>
-        </Card>
+    <div>
+      用户
+    </div>
+    <Row :gutter="20">
+      <i-col :xs="12" :md="8" :lg="4" v-for="(infor, i) in addUser" :key="`infor-${i}`"
+             style="height: 130px;padding-bottom: 10px;">
+        <infor-card shadow :color="infor.color" :icon="infor.icon" :icon-size="36">
+          <count-to :end="infor.count" count-class="count-style"/>
+          <p>{{ infor.title }}</p>
+        </infor-card>
       </i-col>
     </Row>
 
 
-    <Row :gutter="20" style="margin-top: 10px;">
-      <i-col :md="24" :lg="8" style="margin-bottom: 20px;">
-        <Card shadow>
-          <div style="height: 300px">
-            <money-bar echartID="moneyBar" echartTiT="充值消费"></money-bar>
+    <div>
+      商品
+    </div>
+    <Row :gutter="20">
+      <i-col :xs="12" :md="8" :lg="4" style="height: 130px;padding-bottom: 10px;">
+        <div class="box_col">
+          <div class="box_col_100">
+            <infor-card shadow :color="'#E46CBB'" :icon="'md-locate'" :icon-size="36">
+              <count-to :end="100" count-class="count-style-M"/>
+              <p>今日充值</p>
+            </infor-card>
           </div>
-        </Card>
+          <div style="height: 4px"></div>
+          <div class="box_col_100">
+            <infor-card shadow :color="'#E46CBB'" :icon="'ios-pricetags'" :icon-size="36">
+              <count-to :end="100" count-class="count-style-M"/>
+              <p>今日消费</p>
+            </infor-card>
+          </div>
+        </div>
       </i-col>
+
+      <i-col :xs="12" :md="8" :lg="4" style="height: 130px;padding-bottom: 10px;">
+        <div class="box_col">
+          <div class="box_col_100">
+            <infor-card shadow :color="'#9A66E4'" :icon="'md-locate'" :icon-size="36">
+              <count-to :end="100" count-class="count-style-M"/>
+              <p>本月充值</p>
+            </infor-card>
+          </div>
+          <div style="height: 4px"></div>
+          <div class="box_col_100">
+            <infor-card shadow :color="'#9A66E4'" :icon="'md-locate'" :icon-size="36">
+              <count-to :end="100" count-class="count-style-M"/>
+              <p>本月消费</p>
+            </infor-card>
+          </div>
+        </div>
+      </i-col>
+
+      <i-col :xs="12" :md="8" :lg="4" style="height: 130px;padding-bottom: 10px;">
+        <div class="box_col">
+          <div class="box_col_100">
+            <infor-card shadow :color="'#2d8cf0'" :icon="'md-locate'" :icon-size="36">
+              <count-to :end="100" count-class="count-style-M"/>
+              <p>累计充值</p>
+            </infor-card>
+          </div>
+          <div style="height: 4px"></div>
+          <div class="box_col_100">
+            <infor-card shadow :color="'#2d8cf0'" :icon="'md-locate'" :icon-size="36">
+              <count-to :end="100" count-class="count-style-M"/>
+              <p>累计消费</p>
+            </infor-card>
+          </div>
+        </div>
+      </i-col>
+    </Row>
+
+
+    <div>
+      消费
+    </div>
+    <div style="height: 400px">
+      <money-line></money-line>
+    </div>
+    <div>
+      开奖
+    </div>
+
+    <!--<Row :gutter="20" style="margin-top: 10px;">-->
+    <!--<i-col :md="24" :lg="8" style="margin-bottom: 20px;">-->
+    <!--<Card shadow>-->
+    <!--<div style="height: 300px">-->
+    <!--<new-shop-d echartID="newShopD" echartTiT="今日商品统计"></new-shop-d>-->
+    <!--</div>-->
+    <!--</Card>-->
+    <!--</i-col>-->
+    <!--<i-col :md="24" :lg="8" style="margin-bottom: 20px;">-->
+    <!--<Card shadow>-->
+    <!--<div style="height: 300px">-->
+    <!--<new-shop-d echartID="newShopM" echartTiT="本月商品统计"></new-shop-d>-->
+    <!--</div>-->
+    <!--</Card>-->
+    <!--</i-col>-->
+    <!--<i-col :md="24" :lg="8" style="margin-bottom: 20px;">-->
+    <!--<Card shadow>-->
+    <!--<div style="height: 300px">-->
+    <!--<new-shop-d echartID="newShopA" echartTiT="商品累计统计"></new-shop-d>-->
+    <!--</div>-->
+    <!--</Card>-->
+    <!--</i-col>-->
+    <!--</Row>-->
+
+
+    <Row :gutter="20" style="margin-top: 10px;">
+    <i-col :md="24" :lg="8" style="margin-bottom: 20px;">
+    <Card shadow>
+    <div style="height: 300px">
+    <money-bar echartID="moneyBar" echartTiT="充值消费"></money-bar>
+    </div>
+    </Card>
+    </i-col>
     </Row>
 
 
@@ -69,6 +152,9 @@
 <script>
   import newShopD from './comp/newShop_D'
   import moneyBar from './comp/moneyBar'
+  import moneyLine from './comp/money_line'
+
+  import TCard from './comp/T_Card'
 
   import InforCard from '_c/info-card'
   import CountTo from '_c/count-to'
@@ -80,6 +166,9 @@
     components: {
       newShopD,
       moneyBar,
+      moneyLine,
+      TCard,
+
 
       InforCard,
       CountTo,
@@ -89,6 +178,11 @@
     },
     data() {
       return {
+        addUser: [
+          {title: '今日新增用户', icon: 'md-person-add', count: 803, color: '#E46CBB'},
+          {title: '本月新增用户', icon: 'md-person-add', count: 232, color: '#9A66E4'},
+          {title: '累计新增用户', icon: 'md-person-add', count: 142, color: '#2d8cf0'},
+        ],
         inforCardData: [
           {title: '新增用户', icon: 'md-person-add', count: 803, color: '#2d8cf0'},
           {title: '累计点击', icon: 'md-locate', count: 232, color: '#19be6b'},
@@ -124,5 +218,8 @@
 <style lang="less">
   .count-style {
     font-size: 50px;
+  }
+  .count-style-M{
+    font-size: 25px;
   }
 </style>
