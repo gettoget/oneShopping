@@ -16,18 +16,19 @@ import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.redis.RedisTemplateUtil;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.connection.SortParameters;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
-import javax.naming.InsufficientResourcesException;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -130,6 +131,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         RuntimeCheck.ifBlank(entity.getReceId(), MessageUtils.get("order.receIsBlank"));
         RuntimeCheck.ifBlank(entity.getPayPwd(), MessageUtils.get("user.paypwdblank"));
 
+
         ProBaseinfo baseinfo= null;
         ProInfo proInfo = null;
         int gmfs = Integer.parseInt(entity.getGmfs());
@@ -213,7 +215,6 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         if (StringUtils.equals(order.getOrderType(), "2")) {
             // 参与抽奖 剩余名额需要减去购买份数
 
-
             // 查看当前用户是否已经参与过
             SimpleCondition oderCondition = new SimpleCondition(Order.class);
             oderCondition.eq(Order.InnerColumn.userId, userId);
@@ -267,9 +268,10 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                         ProInfo finalProInfo = proInfo;
                         executorService.schedule(() -> fenpei(finalProInfo.getId()), 1, TimeUnit.MINUTES);
                     }
+                    proInfoService.update(proInfo);
+                    baseMapper.minusRePrice(gmfs, order.getProId());
                 }
-                proInfoService.update(proInfo);
-                baseMapper.minusRePrice(Integer.parseInt(order.getGmfs()), order.getProId());
+
 
             } catch (Exception e) {
                 // 如果分配号码时报错 , 此时 订单支付未完成 , 号码应该重新填充回redis
@@ -284,12 +286,10 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         if ("2".equals(proInfo.getrType()) && Integer.parseInt(proInfo.getProPrice()) / Integer.parseInt(proInfo.getRePrice()) > 1 && Integer.parseInt(proInfo.getProPrice()) >=2) {
 
             // 查询是否有 机器人下单
-            SimpleCondition condition = new SimpleCondition(OrderList.class);
-            condition.eq(OrderList.InnerColumn.yhlx, "1");
-            condition.eq(OrderList.InnerColumn.proId, proInfo.getId());
-            List<OrderList> lists = orderListService.findByCondition(condition);
-            if (CollectionUtils.isEmpty(lists)) {
-                // 随机生成2个用户创建订单 , 到时 一个 负责中奖 一个负责控制号码
+            String s = (String) redis.boundValueOps(order.getProId() + "_robot").get();
+
+            if (StringUtils.isNotBlank(s)) {
+                // 随机生成 2 个用户创建订单 , 负责控制号码
                 List<User> users = baseMapper.ranUsers(2);
                 for (User user : users) {
                     Order ord = new Order();
@@ -321,6 +321,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                     orderList.setId(genId());
                     orderList.setCjsj(DateUtils.getNowTime());
                     orderListService.save(orderList);
+                    redis.boundValueOps(order.getProId()+ "_robot").set(ord.getId());
                 }
             }
 
@@ -763,19 +764,24 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         ProInfo info = proInfoService.findById(id);
         List<Order> lastFifty  = baseMapper.getLastFifty(info.getId(), 50);
 
-        long zjhm = 0;
+        long zjhm;
         if (StringUtils.equals(info.getrType(), "2")) {
             // 从机器人的号码中随机取一个
+            String ordId = (String) redis.boundValueOps(id + "_robot").get();
             SimpleCondition condition = new SimpleCondition(OrderList.class);
             condition.eq(OrderList.InnerColumn.yhlx, "1");
             condition.eq(OrderList.InnerColumn.proId, info.getId());
+            if(StringUtils.isNotBlank(ordId)){
+                condition.notIn(OrderList.InnerColumn.orderId , Arrays.asList(ordId));
+            }
             List<OrderList> lists = orderListService.findByCondition(condition);
 
-            if (lists.size() == 2) {
+            if (lists.size() >= 1) {
                 List<String> strings = lastFifty.stream().map(Order::getId).collect(Collectors.toList());
-
-                String num = lists.get(0).getNum();
-                String orderId = lists.get(1).getOrderId();
+                int max = Math.max(0, lists.size());
+                int num = RandomUtils.nextInt(max);
+                String hm = lists.get(num).getNum();
+                String orderId = ordId;
                 Order order = findById(orderId);
                 if(!strings.contains(orderId)){
                     lastFifty= lastFifty.subList(0, lastFifty.size() - 1);
@@ -783,10 +789,9 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                     lastFifty.add(order);
                 }
 
-
                 Long hHmmssSSS = lastFifty.stream().map(Order::getZfsj).map(s -> Long.parseLong(DateTime.parse(s, formatter).toString("HHmmssSSS"))).reduce(Long::sum).get();
                 zjhm = (hHmmssSSS % Long.parseLong(info.getProPrice())) + 10000001;
-                int anInt = Integer.parseInt(num);
+                int anInt = Integer.parseInt(hm);
                 int l = (int) (anInt - zjhm);
                 if(l < 0){
                     l += Long.parseLong(info.getProPrice());
@@ -800,7 +805,6 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 order.setZfsj(s);
                 order.setCjsj(s);
                 update(order);
-                zjhm = Long.parseLong(num);
             }
         }
         lastFifty  = baseMapper.getLastFifty(info.getId(), 50);
@@ -859,6 +863,11 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             }
         }
 
+    }
+
+    @Override
+    public void saveList(List<Order> orders) {
+        baseMapper.insertList(orders);
     }
 
 

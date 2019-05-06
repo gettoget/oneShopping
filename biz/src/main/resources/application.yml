@@ -44,4 +44,6 @@ mapper:
   identity: MYSQL
 
 filePath:
+point: 0.01
+people: 5
 

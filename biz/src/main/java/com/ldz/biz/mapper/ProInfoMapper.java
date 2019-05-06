@@ -1,12 +1,11 @@
 package com.ldz.biz.mapper;
 
 import com.ldz.biz.model.ProInfo;
-import com.ldz.biz.model.User;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import tk.mybatis.mapper.common.Mapper;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ProInfoMapper extends Mapper<ProInfo> {
 
@@ -18,4 +17,8 @@ public interface ProInfoMapper extends Mapper<ProInfo> {
 
     @Select(" select * from pro_info where pro_zt = '1' order by CAST( re_price as unsigned ) ")
     List<ProInfo> getRePager();
+
+    @Select(" select id, re_price rePrice, pro_name proName from pro_info where r_type ='2' and pro_zt = '1'")
+    List<ProInfo> getAllReprice();
+
 }

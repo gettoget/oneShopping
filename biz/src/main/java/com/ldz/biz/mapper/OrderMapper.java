@@ -2,6 +2,7 @@ package com.ldz.biz.mapper;
 
 import com.ldz.biz.model.Order;
 import com.ldz.biz.model.User;
+import com.ldz.util.mapperprovider.InsertListMapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -9,7 +10,7 @@ import tk.mybatis.mapper.common.Mapper;
 
 import java.util.List;
 
-public interface OrderMapper extends Mapper<Order> {
+public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
 
     /**
      * 获取最后 50 笔交易的时间

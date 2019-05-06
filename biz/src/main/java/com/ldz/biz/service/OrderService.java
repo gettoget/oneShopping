@@ -6,6 +6,8 @@ import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
 
+import java.util.List;
+
 /**
  * @author slu
  */
@@ -30,4 +32,6 @@ public interface OrderService extends BaseService<Order, String> {
     ApiResponse<String> updateOrderCancel(String id);
 
     void fenpei(String id);
+
+    void saveList(List<Order>orders);
 }

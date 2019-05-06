@@ -87,7 +87,7 @@ public class MainController {
      * @param userCred
      * @return
      */
-    @RequestMapping(value = "/login")
+    @PostMapping(value = "/login")
     public ApiResponse<Map<String, Object>> login(UserPassCredential userCred) {
         RuntimeCheck.ifTrue((StringUtils.isEmpty(userCred.getUsername()) || StringUtils.isEmpty(userCred.getPassword())), "请提交登陆用户信息！");
         //加密密码
