@@ -55,13 +55,13 @@ public class BizApplicationTests {
     		for (int p=0; p<10; p++){
     			redis.boundListOps(key+"_nums").leftPush(String.valueOf(idWorker.nextId()));
     		}
-    		
+
     	}*/
-    	
+
     	/*for (int i=0; i<50; i++){
     		//redis.boundSetOps("572827119164325888_nums").add(String.valueOf(idWorker));
     	}*/
-    	
+
     	/*for (int i=0; i<5; i++){
     		Set<Object> sets = redis.boundSetOps(User.class.getName()).distinctRandomMembers(5);
         	Iterator<Object> ites = sets.iterator();
@@ -86,8 +86,8 @@ public class BizApplicationTests {
     	}catch(Exception e){
     		e.printStackTrace();
     	}
-    	
-    	
+
+
 
     }
 

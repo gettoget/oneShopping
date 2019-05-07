@@ -14,18 +14,19 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 public class ResponseAdvice implements ResponseBodyAdvice {
     @Override
     public boolean supports(MethodParameter methodParameter, Class aClass) {
-        System.out.println("111 ");
+//        System.out.println("111 ");
         return true;
     }
 
     @Override
     public Object beforeBodyWrite(Object o, MethodParameter methodParameter, MediaType mediaType, Class aClass, ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse) {
-        String rsa="";
+       /* String rsa="";
         try {
             rsa = RSAUtils.encryptWithRSA(JsonUtil.toJson(o));
         } catch (Exception e) {
             MessageUtils.get("error");
         }
-        return rsa;
+        return rsa;*/
+       return o;
     }
 }

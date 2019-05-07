@@ -35,7 +35,7 @@ public class ExchangeServiceImpl extends BaseServiceImpl<Exchange, String> imple
     @Override
     public PageResponse<Exchange> getNewPager(Page<Exchange> page) {
         PageResponse<Exchange> res = new PageResponse<>();
-
+		// 用户需要登录才能查询
 		String userId = getAttributeAsString("userId");
 		if(StringUtils.isNotBlank(userId)){
 			User user = userService.findById(userId);

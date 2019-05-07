@@ -31,7 +31,7 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
     /**
      * 库存减1
      */
-    @Update("update pro_baseinfo set pro_store = CAST(pro_store as unsigned) - #{gmfs} where id = #{baseId}")
+    @Update("update pro_baseinfo set pro_store = CAST(pro_store as unsigned) - #{gmfs} where id = #{baseId} and pro_store >= #{gmfs}")
     int minusStore(@Param("baseId") String baseId,@Param("gmfs") int gmfs);
 
     /**

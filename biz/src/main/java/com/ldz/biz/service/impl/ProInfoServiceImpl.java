@@ -127,7 +127,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         }
         Collections.shuffle(nums);
         for (String num : nums) {
-            redis.boundListOps(proInfo.getId() + "_nums").leftPush(num);
+            redis.boundSetOps(proInfo.getId() + "_nums").add(num);
 
         }
 
@@ -672,7 +672,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         orderMapper.insertList(orders);
         int updateNum = orderMapper.minusRePrice(allocNum, proId);
         if (updateNum == 0){
-        	throw new RuntimeCheckException("扣减商品份数失败");
+        	throw new RuntimeCheckException(MessageUtils.get("pro.minusFail"));
         }
         //执行成功后，删除redis的中奖号码
         Iterator<Object> removeNum = luckNums.iterator();
