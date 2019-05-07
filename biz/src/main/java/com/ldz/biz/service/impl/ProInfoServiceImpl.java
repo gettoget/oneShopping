@@ -1,10 +1,41 @@
 package com.ldz.biz.service.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.math.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.ldz.biz.model.*;
-import com.ldz.biz.service.*;
+import com.ldz.biz.mapper.OrderListMapper;
+import com.ldz.biz.mapper.OrderMapper;
+import com.ldz.biz.mapper.ProInfoMapper;
+import com.ldz.biz.model.CyyhModel;
+import com.ldz.biz.model.Order;
+import com.ldz.biz.model.OrderList;
+import com.ldz.biz.model.ProBaseinfo;
+import com.ldz.biz.model.ProInfo;
+import com.ldz.biz.model.User;
+import com.ldz.biz.model.WinRecord;
+import com.ldz.biz.service.OrderListService;
+import com.ldz.biz.service.OrderService;
+import com.ldz.biz.service.ProBaseinfoService;
+import com.ldz.biz.service.ProInfoService;
+import com.ldz.biz.service.UserService;
+import com.ldz.biz.service.WinRecordService;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.sys.base.LimitedCondition;
 import com.ldz.util.bean.ApiResponse;
@@ -13,22 +44,10 @@ import com.ldz.util.bean.SimpleCondition;
 import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
+import com.ldz.util.exception.RuntimeCheckException;
 import com.ldz.util.redis.RedisTemplateUtil;
-import com.sun.jmx.snmp.SnmpUnknownModelLcdException;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.connection.SortParameters;
-import org.springframework.stereotype.Service;
 
-import sun.awt.ModalityListener;
 import tk.mybatis.mapper.common.Mapper;
-
-import com.ldz.biz.mapper.ProInfoMapper;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> implements ProInfoService {
@@ -53,8 +72,19 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
     @Autowired
     private ProInfoService proInfoService;
+    
+    @Autowired
+	private OrderListMapper orderListMapper;
+    @Autowired
+	private OrderMapper orderMapper;
+    
 
-
+    @Value("${robot.point}")
+    private double point;
+    @Value("${robot.people}")
+    private int people;
+    @Value("${robot.lowsize}")
+    private int lowsize;
 
     @Value("${filePath}")
     private String filePath;
@@ -530,4 +560,110 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
     }
 
+    @Override
+    public void saveRobot(String redisProInfoKey) {
+    	String proId = redisProInfoKey.toString().split("_")[0];
+        //1.生成本次多少个用户参与
+        int randomMaxUserNum = RandomUtils.nextInt(people);
+        if (randomMaxUserNum == 0) {
+            return;
+        }
+        //2.商品剩余名额。将剩余名额分配给用户
+        int allocNum = 0;
+		long proSyNum = redis.boundSetOps(redisProInfoKey).size();
+		if (proSyNum == 0){
+			//商品名额已经用完
+			return;
+		}else if (proSyNum <= lowsize){
+			//如果商品剩下最后设定的份数，一次性全分给用户
+			allocNum = (int)proSyNum;
+		}else{
+			//随机生成本次消费商品份数
+            int randomMaxNum = Math.max(1, (int) (proSyNum * point));
+            allocNum = RandomUtils.nextInt(randomMaxNum);
+            if (allocNum == 0) {
+            	allocNum = 1;
+            }
+		}
+		//随机提取中奖号码
+		Set<Object> luckNums = redis.boundSetOps(redisProInfoKey).distinctRandomMembers(allocNum);
+		List<Object> elements = new ArrayList<>();
+		CollectionUtils.addAll(elements, luckNums.iterator());
+        //3.查询商品详情
+		ProInfo proInfo = findById(proId);
+        //4.从redis随机获取机器人用户
+        Set<Object> users = redis.boundSetOps(User.class.getName()).distinctRandomMembers(randomMaxUserNum);
+        Iterator<Object> iteUsers = users.iterator();
+        int tmpNum = allocNum;
+        List<OrderList> orderLists = new ArrayList<>();
+        List<Order> orders = new ArrayList<>();
+        int allocUserIndex = 0;
+    	while(iteUsers.hasNext()){
+    		User user = (User)iteUsers.next();
+    		//3.参与的用户,每个用户随机分配商品份数.最终随机的份数不超过本次消费的商品份数
+            //获取单个用户消费份数
+            int pUserNum = RandomUtils.nextInt(tmpNum);
+            if (allocUserIndex == (randomMaxUserNum - 1)) {
+                pUserNum = tmpNum;
+            } else if (pUserNum == 0 && tmpNum > 0) {
+                pUserNum = 1;
+            }
+            if (pUserNum >= elements.size()){
+            	pUserNum = elements.size();
+            }
+            // 生成订单
+            Order order = new Order();
+            order.setUserName(user.getUserName());
+            order.setZfsj(DateUtils.getNowTime());
+            order.setId(genId());
+            order.setOrderType("2");
+            order.setProId(proId);
+            order.setProName(proInfo.getProName());
+            order.setUserId(user.getId());
+            order.setGmfs(pUserNum+"");
+            order.setZfje(pUserNum+"");
+            order.setCjsj(DateUtils.getNowTime());
+            order.setImei(user.getRegImei());
+            order.setDdzt("0");
+            
+            //用户消费记录,获取中奖号码
+            List<Object> tmpList = elements.subList(0, pUserNum);
+            for (int j = 0; j < tmpList.size(); j++) {
+                String luckNum = tmpList.get(j).toString();
+                OrderList orderList = new OrderList();
+                orderList.setId(genId());
+                orderList.setOrderId(order.getId());
+                orderList.setProId(proId);
+                orderList.setProName(proInfo.getProName());
+                orderList.setUserid(user.getId());
+                orderList.setUserName(user.getUserName());
+                orderList.setYhlx(user.getSource());
+                orderList.setNum(luckNum);
+                orderList.setCjsj(DateUtils.getNowTime());
+                orderLists.add(orderList);
+            }
+            orders.add(order);
+            //扣减本次消费份数剩余额度
+            tmpNum -= pUserNum;
+            elements.removeAll(tmpList);
+            allocUserIndex++;
+            if (tmpNum <= 0) {
+                break;
+            }
+    	}
+    	
+    	// 产品分配完成 更新 添加 sql
+    	orderListMapper.insertList(orderLists);
+        orderMapper.insertList(orders);
+        int updateNum = orderMapper.minusRePrice(allocNum, proId);
+        if (updateNum == 0){
+        	throw new RuntimeCheckException("扣减商品份数失败");
+        }
+        //执行成功后，删除redis的中奖号码
+        Iterator<Object> removeNum = luckNums.iterator();
+        while(removeNum.hasNext()){
+            redis.boundSetOps(redisProInfoKey).remove(removeNum.next());
+        }
+        
+    }
 }
