@@ -36,8 +36,9 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
 
     /**
      * 剩余名额减掉购买份数
+     * 本次消费份数必须小于商品剩余份数，并且商品状态为'销售中'
      */
-    @Update("update pro_info set re_price = CAST(re_price as unsigned) - #{gmfs} where id  = #{proId} and re_price>#{gmfs}")
+    @Update("update pro_info set re_price = CAST(re_price as unsigned) - #{gmfs} where id  = #{proId} and re_price>=#{gmfs} and pro_zt='1'")
     int minusRePrice(@Param("gmfs")int gmfs,@Param("proId") String proId);
 
     /**

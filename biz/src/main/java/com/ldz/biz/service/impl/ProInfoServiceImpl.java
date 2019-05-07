@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.ldz.biz.bean.ProInfoLuckNumBean;
 import com.ldz.biz.mapper.OrderListMapper;
 import com.ldz.biz.mapper.OrderMapper;
 import com.ldz.biz.mapper.ProInfoMapper;
@@ -589,18 +591,27 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 		Set<Object> luckNums = redis.boundSetOps(redisProInfoKey).distinctRandomMembers(allocNum);
 		List<Object> elements = new ArrayList<>();
 		CollectionUtils.addAll(elements, luckNums.iterator());
-        //3.查询商品详情
-		ProInfo proInfo = findById(proId);
-        //4.从redis随机获取机器人用户
-        Set<Object> users = redis.boundSetOps(User.class.getName()).distinctRandomMembers(randomMaxUserNum);
+        //3.从redis随机获取机器人用户
+		Set<Object> users = redis.boundSetOps(User.class.getName()).distinctRandomMembers(randomMaxUserNum);
+		//同一个商品，用户不重复参与购买商品
+		Set<Object> existUsers = redis.boundSetOps(proId+"_join_"+User.class.getName()).members();
+		if (CollectionUtils.isNotEmpty(existUsers)){
+			users = (Set<Object>)CollectionUtils.subtract(users, existUsers);
+			if (users.size() == 0){
+				return;
+			}
+		}
+		
         Iterator<Object> iteUsers = users.iterator();
         int tmpNum = allocNum;
         List<OrderList> orderLists = new ArrayList<>();
         List<Order> orders = new ArrayList<>();
+        List<User> joinUsers = new ArrayList<>();
         int allocUserIndex = 0;
     	while(iteUsers.hasNext()){
     		User user = (User)iteUsers.next();
-    		//3.参与的用户,每个用户随机分配商品份数.最终随机的份数不超过本次消费的商品份数
+    		joinUsers.add(user);
+    		//4.参与的用户,每个用户随机分配商品份数.最终随机的份数不超过本次消费的商品份数
             //获取单个用户消费份数
             int pUserNum = RandomUtils.nextInt(tmpNum);
             if (allocUserIndex == (randomMaxUserNum - 1)) {
@@ -611,6 +622,9 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
             if (pUserNum >= elements.size()){
             	pUserNum = elements.size();
             }
+            //用户消费记录,获取中奖号码
+            List<Object> tmpList = elements.subList(0, pUserNum);
+            ProInfoLuckNumBean proInfo = (ProInfoLuckNumBean)tmpList.get(0);
             // 生成订单
             Order order = new Order();
             order.setUserName(user.getUserName());
@@ -626,20 +640,21 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
             order.setImei(user.getRegImei());
             order.setDdzt("0");
             
-            //用户消费记录,获取中奖号码
-            List<Object> tmpList = elements.subList(0, pUserNum);
             for (int j = 0; j < tmpList.size(); j++) {
-                String luckNum = tmpList.get(j).toString();
+            	ProInfoLuckNumBean tmpItem = (ProInfoLuckNumBean)tmpList.get(j);
+                String luckNum = tmpItem.getLuckNum();
                 OrderList orderList = new OrderList();
                 orderList.setId(genId());
                 orderList.setOrderId(order.getId());
                 orderList.setProId(proId);
-                orderList.setProName(proInfo.getProName());
+                orderList.setProName(tmpItem.getProName());
                 orderList.setUserid(user.getId());
                 orderList.setUserName(user.getUserName());
                 orderList.setYhlx(user.getSource());
                 orderList.setNum(luckNum);
-                orderList.setCjsj(DateUtils.getNowTime());
+                //执行加一下随机数，防止时间毫秒数都一致
+                int randomMillis = RandomUtils.nextInt(100);
+                orderList.setCjsj(DateTime.now().plusMillis(randomMillis).toString("yyyy-MM-dd HH:mm:ss.SSS"));
                 orderLists.add(orderList);
             }
             orders.add(order);
@@ -663,6 +678,15 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         Iterator<Object> removeNum = luckNums.iterator();
         while(removeNum.hasNext()){
             redis.boundSetOps(redisProInfoKey).remove(removeNum.next());
+        }
+        //try catch为容错机制，只要上面保证执行成功，下面执行失败也不影响整体
+        try{
+        	//商品已参与用户信息
+            for (int i=0; i<joinUsers.size(); i++){
+            	redis.boundSetOps(proId+"_join_"+User.class.getName()).add(joinUsers.get(i));
+            }
+        }catch(Exception e){
+        	
         }
         
     }
