@@ -14,6 +14,7 @@ import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.EncryptUtil;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
+import com.ldz.util.exception.RuntimeCheckException;
 import com.ldz.util.redis.RedisTemplateUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.math.RandomUtils;
@@ -109,8 +110,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         }
     }
 
-
-    public ApiResponse<String> saveNewEntity(Order entity) {
+    @Override
+    public ApiResponse<String> saveEntity(Order entity) {
         String imei = getAttributeAsString("imei");
         String userId = getAttributeAsString("userId");
         RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
@@ -221,11 +222,13 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             int anInt = Integer.parseInt(order.getGmfs());
             List<String> luckNum = new ArrayList<>();
             // 获取当前商品 剩余的中奖号码
+            Set<Object> objects = redis.boundSetOps(order.getProId() + "_nums").distinctRandomMembers(anInt);
+            List<Object> elements = new ArrayList<>();
+            CollectionUtils.addAll(elements,objects);
             for (int i = 0; i < anInt; i++) {
-                String num = (String) redis.boundListOps(order.getProId() + "_nums").rightPop();
+                String num = elements.get(i).toString();
                 luckNum.add(num);
             }
-            try {
                 // 获取中奖号码
                 List<OrderList> orderLists = new ArrayList<>();
                 for (String s : luckNum) {
@@ -261,24 +264,26 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 
                 }
                 proInfoService.update(proInfo);
-                baseMapper.minusRePrice(gmfs, order.getProId());
-
-            } catch (Exception e) {
-                // 如果分配号码时报错 , 此时 订单支付未完成 , 号码应该重新填充回redis
-                for (String s : luckNum) {
-                    redis.boundListOps(order.getProId() + "_nums").leftPush(s);
+                int updateNum =  baseMapper.minusRePrice(gmfs, order.getProId());
+                if (updateNum == 0){
+                    throw new RuntimeCheckException(MessageUtils.get("pro.minusFail"));
                 }
-
-            }
+                Iterator<Object> removeNum = objects.iterator();
+                while(removeNum.hasNext()){
+                    redis.boundSetOps(order.getProId() + "_nums").remove(removeNum.next());
+                }
         }
 
         // 当剩余名额剩余过半时
         String s = (String) redis.boundValueOps(order.getProId() + "_robot").get();
         if (StringUtils.isBlank(s) && "2".equals(proInfo.getrType()) && Integer.parseInt(proInfo.getProPrice()) / Integer.parseInt(proInfo.getRePrice()) > 1 && Integer.parseInt(proInfo.getProPrice()) >= 2) {
-
+            Set<Object> set = redis.boundSetOps(proInfo.getId() + "_nums").distinctRandomMembers(2);
+            List<Object> objectList = new ArrayList<>();
+            CollectionUtils.addAll(objectList,set);
             // 随机生成 2 个用户创建订单 , 负责控制号码
-            List<User> users = baseMapper.ranUsers(2);
-            for (User user : users) {
+            List<User> users = baseMapper.ranUsers(set.size());
+            for (int i = 0; i< users.size();i++) {
+                User user = users.get(i);
                 Order ord = new Order();
                 ord.setId(genId());
                 ord.setUserName(user.getUserName());
@@ -296,7 +301,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 baseMapper.minusRePrice(1, proInfo.getId());
                 baseMapper.updateCyyhs(proInfo.getId());
                 // 分配号码
-                String num = (String) redis.boundListOps(proInfo.getId() + "_nums").rightPop();
+                String num = objectList.get(i).toString();
                 OrderList orderList = new OrderList();
                 orderList.setYhlx("1");
                 orderList.setUserName(user.getUserName());
@@ -310,15 +315,13 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 orderListService.save(orderList);
                 redis.boundValueOps(order.getProId() + "_robot").set(ord.getId());
             }
-
+            Iterator<Object> removeNum = set.iterator();
+            while(removeNum.hasNext()){
+                redis.boundSetOps(order.getProId() + "_nums").remove(removeNum.next());
+            }
         }
         return ApiResponse.success(MessageUtils.get("order.paySuc"));
 
-    }
-
-    @Override
-    public ApiResponse<String> saveEntity(Order entity) {
-        return saveNewEntity(entity);
     }
 
     @Override

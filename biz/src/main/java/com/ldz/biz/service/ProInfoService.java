@@ -38,7 +38,7 @@ public interface ProInfoService extends BaseService<ProInfo, String> {
     /**
      * 自动分配用户参与商品购买
      */
-    public void saveRobot(String redisProInfoKey);
+    void saveRobot(String redisProInfoKey);
 
 
     ApiResponse<String> getUserInfo(String id, int pageNum, int pageSize);
