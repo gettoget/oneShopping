@@ -27,11 +27,29 @@ public interface OrderService extends BaseService<Order, String> {
      */
     ApiResponse<String> payOrder(String id, String payPwd);
 
+    /**
+     * 分页
+     * @param page
+     * @return
+     */
     PageResponse<Order> getPageInfo(Page<Order> page);
 
+    /**
+     * 取消订单
+     * @param id
+     * @return
+     */
     ApiResponse<String> updateOrderCancel(String id);
 
+    /**
+     * 开奖
+     * @param id
+     */
     void fenpei(String id);
 
+    /**
+     * save list
+     * @param orders
+     */
     void saveList(List<Order>orders);
 }

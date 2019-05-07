@@ -15,7 +15,7 @@ public interface ProInfoMapper extends Mapper<ProInfo> {
     @Select(" select pro_baseid from pro_info where id = #{id}")
     String getBaseId(@Param("id") String id);
 
-    @Select(" select * from pro_info where pro_zt = '1' order by CAST( re_price as unsigned ) ")
+    @Select(" select * from pro_info where pro_zt = '1' and (CAST(re_price as unsigned)/CAST(pro_price as unsigned) < 0.1)  order by CAST( re_price as unsigned ) ")
     List<ProInfo> getRePager();
 
     @Select(" select id, re_price rePrice, pro_name proName from pro_info where r_type ='2' and pro_zt = '1'")

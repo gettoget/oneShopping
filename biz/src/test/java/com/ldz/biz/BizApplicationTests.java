@@ -1,8 +1,11 @@
 package com.ldz.biz;
 
 import com.ldz.biz.mapper.ProInfoMapper;
+import com.ldz.biz.model.ProBaseinfo;
 import com.ldz.biz.model.ProInfo;
 import com.ldz.biz.service.OrderService;
+import com.ldz.biz.service.ProBaseinfoService;
+import com.ldz.biz.service.ProInfoService;
 import com.ldz.biz.service.UserService;
 import com.ldz.util.commonUtil.*;
 import com.ldz.util.redis.RedisTemplateUtil;
@@ -16,6 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -32,7 +36,10 @@ public class BizApplicationTests {
     private OrderService orderService;
     @Autowired
     private ProInfoMapper proInfoMapper;
-
+    @Autowired
+    private ProInfoService proInfoService;
+    @Autowired
+    private ProBaseinfoService baseinfoService;
     @Autowired
     private SnowflakeIdWorker idWorker;
     @Test
@@ -41,10 +48,11 @@ public class BizApplicationTests {
 
     @Test
     public void test() throws IOException, InterruptedException {
-        List<ProInfo> allReprice = proInfoMapper.getAllReprice();
-        System.out.println(allReprice);
-
-
+        List<ProBaseinfo> all = baseinfoService.findAll();
+        List<String> collect = all.stream().map(ProBaseinfo::getId).collect(Collectors.toList());
+        for (String s : collect) {
+            proInfoService.saveOne(s);
+        }
     }
 
 }
