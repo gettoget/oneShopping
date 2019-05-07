@@ -6,6 +6,8 @@ import com.ldz.util.mapperprovider.InsertListMapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.transaction.annotation.Transactional;
+
 import tk.mybatis.mapper.common.Mapper;
 
 import java.util.List;
@@ -30,13 +32,13 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
      * 库存减1
      */
     @Update("update pro_baseinfo set pro_store = CAST(pro_store as unsigned) - #{gmfs} where id = #{baseId}")
-    void minusStore(@Param("baseId") String baseId,@Param("gmfs") int gmfs);
+    int minusStore(@Param("baseId") String baseId,@Param("gmfs") int gmfs);
 
     /**
      * 剩余名额减掉购买份数
      */
-    @Update("update pro_info set re_price = CAST(re_price as unsigned) - #{gmfs} where id  = #{proId}")
-    void minusRePrice(@Param("gmfs")int gmfs,@Param("proId") String proId);
+    @Update("update pro_info set re_price = CAST(re_price as unsigned) - #{gmfs} where id  = #{proId} and re_price>#{gmfs}")
+    int minusRePrice(@Param("gmfs")int gmfs,@Param("proId") String proId);
 
     /**
      * 库存添加
