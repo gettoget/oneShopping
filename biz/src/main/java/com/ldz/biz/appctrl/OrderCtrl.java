@@ -20,7 +20,7 @@ public class OrderCtrl  {
 
 
     /**
-     * 新增一条订单接口
+     * 新增一条订单接口 创建订单后直接支付
      * @param entity
      * @return
      */

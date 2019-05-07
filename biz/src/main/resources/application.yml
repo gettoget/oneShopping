@@ -45,3 +45,8 @@ mapper:
 
 filePath:
 
+robot:
+  point: 0.01
+  people: 5
+  lowsize: 55
+

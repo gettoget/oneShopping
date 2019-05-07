@@ -56,7 +56,21 @@ public class ProEval implements Serializable {
      */
     private String bz3;
 
+    /**
+     * 登录用户是否点赞 0 未点  1 已点
+     */
+    @Transient
+    private String thumbs;
+
     private static final long serialVersionUID = 1L;
+
+    public String getThumbs() {
+        return thumbs;
+    }
+
+    public void setThumbs(String thumbs) {
+        this.thumbs = thumbs;
+    }
 
     /**
      * @return id

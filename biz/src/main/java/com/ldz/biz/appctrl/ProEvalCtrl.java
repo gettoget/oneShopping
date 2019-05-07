@@ -41,6 +41,16 @@ public class ProEvalCtrl  {
         return service.getNewPager(page);
     }
 
+    /**
+     * 点赞 或 取消赞
+     * @param id
+     * @return
+     */
+    @PostMapping("/giveThumbs")
+    public ApiResponse<String> giveThumbs(String id){
+        return service.saveThumbs(id);
+    }
+
 
 
 }
