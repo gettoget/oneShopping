@@ -1,9 +1,11 @@
 package com.ldz.biz;
 
 import com.ldz.biz.mapper.ProInfoMapper;
+import com.ldz.biz.model.ProBaseinfo;
 import com.ldz.biz.model.ProInfo;
 import com.ldz.biz.model.User;
 import com.ldz.biz.service.OrderService;
+import com.ldz.biz.service.ProBaseinfoService;
 import com.ldz.biz.service.ProInfoService;
 import com.ldz.biz.service.UserService;
 import com.ldz.util.commonUtil.*;
@@ -39,7 +41,8 @@ public class BizApplicationTests {
     private OrderService orderService;
     @Autowired
     private ProInfoService proInfoService;
-
+    @Autowired
+    private ProBaseinfoService baseinfoService;
     @Autowired
     private SnowflakeIdWorker idWorker;
     @Test
@@ -48,6 +51,8 @@ public class BizApplicationTests {
 
     @Test
     public void test() throws IOException, InterruptedException {
+        List<ProBaseinfo> all = baseinfoService.findAll();
+        all.forEach(baseinfo -> proInfoService.saveOne(baseinfo.getId()));
         //List<ProInfo> allReprice = proInfoMapper.getAllReprice();
         //System.out.println(allReprice);
     	/*for (int i=0; i<10; i++){
@@ -70,7 +75,7 @@ public class BizApplicationTests {
         		System.out.println("当前第["+i+"]序列:"+user.getId()+"="+user.getUserName());
         	}
     	}*/
-    	try{
+    	/*try{
     		System.out.println("测试之前："+redis.boundSetOps("572827119164325888_nums").size());
         	Set<Object> proInfos = redis.keys("*_nums");
         	if (CollectionUtils.isNotEmpty(proInfos)){
@@ -85,7 +90,7 @@ public class BizApplicationTests {
         	System.out.println("测试之后："+redis.boundSetOps("572827119164325888_nums").size());
     	}catch(Exception e){
     		e.printStackTrace();
-    	}
+    	}*/
 
 
 

@@ -11,6 +11,7 @@ import com.ldz.sys.base.LimitedCondition;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
 import com.ldz.util.bean.SimpleCondition;
+import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
 import org.apache.commons.collections4.CollectionUtils;
@@ -23,8 +24,10 @@ import com.ldz.biz.service.ProEvalService;
 import com.ldz.biz.mapper.ProEvalMapper;
 import com.ldz.biz.model.ProEval;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,6 +59,7 @@ public class ProEvalServiceImpl extends BaseServiceImpl<ProEval, String> impleme
 		entity.setUserId(userId);
 		entity.setUserName(user.getUserName());
 		entity.setId(genId());
+		entity.setCjsj(DateUtils.getNowTime());
 		save(entity);
 		return ApiResponse.saveSuccess();
 	}
@@ -66,23 +70,49 @@ public class ProEvalServiceImpl extends BaseServiceImpl<ProEval, String> impleme
 		PageInfo<ProEval> info = findPage(page, condition);
 		PageResponse<ProEval> res = new PageResponse<>();
 		if (CollectionUtils.isNotEmpty(info.getList())) {
+			Set<String> userIds = info.getList().stream().map(ProEval::getUserId).collect(Collectors.toSet());
+			List<User> users = userService.findByIds(userIds);
+			Map<String,String> userMap = new HashMap<>();
+			if(CollectionUtils.isNotEmpty(users)){
+				userMap = users.stream().collect(Collectors.toMap(User::getId, p-> p.gethImg()));
+			}
 			String userId = getHeader("userId");
 			List<String> evalIDs = info.getList().stream().map(ProEval::getId).collect(Collectors.toList());
 			SimpleCondition simpleCondition = new SimpleCondition(EvalCom.class);
-			simpleCondition.eq(EvalCom.InnerColumn.userId,userId);
+//			simpleCondition.eq(EvalCom.InnerColumn.userId,userId);
 			simpleCondition.in(EvalCom.InnerColumn.evalId,evalIDs);
 			List<EvalCom> coms = evalComService.findByCondition(simpleCondition);
+			Map<String, String> finalUserMap = userMap;
 			if(CollectionUtils.isNotEmpty(coms)){
-				Map<String, EvalCom> comMap = coms.stream().collect(Collectors.toMap(EvalCom::getEvalId, p -> p));
+				Map<String, List<EvalCom>> comMap = coms.stream().collect(Collectors.groupingBy(EvalCom::getEvalId));
+
 				info.getList().forEach(proEval -> {
 					if (comMap.containsKey(proEval.getId())){
-						proEval.setThumbs("1");
+						List<EvalCom> evalComs = comMap.get(proEval.getId());
+						List<String> collect = evalComs.stream().map(EvalCom::getUserId).collect(Collectors.toList());
+						if(collect.contains(userId)){
+							proEval.setThumbs("1");
+						}else{
+							proEval.setThumbs("0");
+						}
+
+						proEval.setThumbsSum(evalComs.size());
 					}else{
 						proEval.setThumbs("0");
+						proEval.setThumbsSum(0);
+					}
+					if(finalUserMap.containsKey(proEval.getUserId())){
+						proEval.setHimg(finalUserMap.get(proEval.getUserId()));
 					}
 				});
 			}else{
-				info.getList().forEach(proEval -> proEval.setThumbs("0"));
+				info.getList().forEach(proEval -> {
+					proEval.setThumbs("0");
+					proEval.setThumbsSum(0);
+					if (finalUserMap.containsKey(proEval.getUserId())) {
+						proEval.setHimg(finalUserMap.get(proEval.getUserId()));
+					}
+				});
 			}
 		}
 

@@ -296,7 +296,7 @@ public class OrderList implements Serializable {
         this.userid = order.getUserId();
         this.num = num;
         this.userName = user.getUserName();
-        this.yhlx = user.getScore();
+        this.yhlx = user.getSource();
         this.cjsj = DateUtils.getNowTime();
 
 

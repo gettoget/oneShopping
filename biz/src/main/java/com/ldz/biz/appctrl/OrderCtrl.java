@@ -29,15 +29,6 @@ public class OrderCtrl  {
         return service.saveEntity(entity);
     }
 
-    /**
-     * 支付订单接口
-     * @param id 订单id
-     * @return
-     */
-    @PostMapping("/payOrder")
-    public ApiResponse<String> payOrder(String id, String payPwd){
-        return  service.payOrder(id,payPwd);
-    }
 
     /**
      * 订单查询
