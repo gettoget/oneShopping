@@ -143,11 +143,20 @@ export default [
         component: () => import('@/vShop/commodity/NewStock')
       },
       {
+        path:'/reserve',
+        name:'reserve',
+        meta: {
+          icon: 'md-trending-up',
+          title: '库存管理'
+        },
+        component: () => import('@/vShop/commodity/reserve')
+      },
+      {
         path:'/manage',
         name:'manage',
         meta: {
           icon: 'md-trending-up',
-          title: '上架管理'
+          title: '上架商品'
         },
         component: () => import('@/vShop/commodity/Manage')
       }
