@@ -20,13 +20,42 @@
           <!--查询-->
         </Button>
       </div>
-      <Row style="position: relative;padding-top: 5px">
-        <Table
-          size='large' stripe
-          :height="AF.getPageHeight()-320"
-          :columns="tableTiT"
-          :data="tableData"></Table>
-      </Row>
+      <hr  style="margin-top: 20px">
+      <div class="box_row_100">
+        <div class="userM">
+          <Row>
+            <Col :xs="2" :sm="4" :md="6" :lg="3">头像</Col>
+            <Col :xs="2" :sm="4" :md="6" :lg="3">用户名</Col>
+            <Col :xs="2" :sm="4" :md="6" :lg="3">手机号</Col>
+            <Col :xs="2" :sm="4" :md="6" :lg="3">累计充值</Col>
+            <Col :xs="2" :sm="4" :md="6" :lg="3">累计消费</Col>
+            <Col :xs="2" :sm="4" :md="6" :lg="3">参与次数</Col>
+            <Col :xs="2" :sm="4" :md="6" :lg="3">中奖次数</Col>
+            <Col :xs="2" :sm="4" :md="6" :lg="3">操作</Col>
+          </Row>
+          <hr>
+        </div>
+        <div class="userMlist" v-for="item in tableData">
+          <Row>
+            <Col :xs="2" :sm="4" :md="6" :lg="3">{{item.zt}}</Col>
+            <Col :xs="2" :sm="4" :md="6" :lg="3">{{item.yhm}}</Col>
+            <Col :xs="2" :sm="4" :md="6" :lg="3">{{item.ye}}</Col>
+            <Col :xs="2" :sm="4" :md="6" :lg="3">{{item.ye}}</Col>
+            <Col :xs="2" :sm="4" :md="6" :lg="3">{{item.ye}}</Col>
+            <Col :xs="2" :sm="4" :md="6" :lg="3">{{item.ye}}</Col>
+            <Col :xs="2" :sm="4" :md="6" :lg="3">{{item.action}}</Col>
+            <Col :xs="2" :sm="4" :md="6" :lg="3">{{item.ljxf}}</Col>
+          </Row>
+          <hr>
+        </div>
+      </div>
+      <!--<Row style="position: relative;padding-top: 5px">-->
+        <!--<Table-->
+          <!--size='large' stripe-->
+          <!--:height="AF.getPageHeight()-320"-->
+          <!--:columns="tableTiT"-->
+          <!--:data="tableData"></Table>-->
+      <!--</Row>-->
     </div>
 </template>
 
@@ -169,5 +198,19 @@
 </script>
 
 <style scoped>
-
+   .userM{
+     background-color: #5cadff;
+     height: 60px;
+     text-align: center;
+     line-height: 60px;
+     font-size: 18px;
+     font-weight: 600;
+   }
+  .userMlist{
+    height: 60px;
+    text-align: center;
+    line-height: 60px;
+    font-size: 14px;
+    font-weight: 500;
+  }
 </style>

@@ -58,7 +58,13 @@
       </div>
 
       <div class="box_row_100">
-        <Card>
+        <div>
+          <Row style="padding: 5px">
+            <Col span="2" ><Button type="info" @click="corZ=true">他参与的</Button></Col>
+            <Col span="2" ><Button type="success" @click="corZ=false">他中奖的</Button></Col>
+          </Row>
+        </div>
+        <Card v-if="corZ">
           <Row>
             <Table
               stripe border
@@ -66,11 +72,11 @@
               :data="tableData"></Table>
           </Row>
         </Card>
-        <Card style="margin: 18px 0">
+        <Card v-else>
           <Row>
             <Table
               stripe border
-              :columns="tableTiT"
+              :columns="tableTiT1"
               :data="tableData"></Table>
           </Row>
         </Card>
@@ -84,6 +90,13 @@
     name: "index",
     data() {
       return {
+        corZ:true,
+        tableTiT1:[{
+          title: "序号",
+          width: 80,
+          align: 'center',
+          type: 'index'
+        },],
         tableTiT: [
           {
             title: "序号",
