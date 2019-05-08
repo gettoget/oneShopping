@@ -330,5 +330,15 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         return ApiResponse.success(userModel);
     }
 
+    @Override
+    public void initRobot() {
+        redis.delete(User.class.getName());
+        SimpleCondition condition = new SimpleCondition(User.class);
+        condition.eq(User.InnerColumn.source, "1");
+        condition.eq(User.InnerColumn.zt, "0");
+        List<User> users = findByCondition(condition);
+        users.stream().forEach(user -> redis.boundSetOps(User.class.getName()).add(user));
+    }
+
 
 }

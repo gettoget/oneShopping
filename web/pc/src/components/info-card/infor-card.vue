@@ -2,6 +2,9 @@
   <Card :shadow="shadow" class="info-card-wrapper" :padding="0">
     <div class="content-con">
       <div class="left-area" :style="{background: color, width: leftWidth}">
+        <div class="tit">
+          <h2>{{tit}}</h2>
+        </div>
         <common-icon class="icon" :type="icon" :size="iconSize" color="#fff"/>
       </div>
       <div class="right-area" :style="{width: rightWidth}">
@@ -21,6 +24,10 @@ export default {
     CommonIcon
   },
   props: {
+    tit:{
+      type: String,
+      default: ''
+    },
     left: {
       type: Number,
       default: 36
@@ -78,6 +85,15 @@ export default {
     .size;
     position: relative;
     .left-area{
+      position: relative;
+      .tit{
+        position: absolute;
+        top:8px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #fff;
+        min-width: 100px;
+      }
       .common;
       & > .icon{
         .middle-center;

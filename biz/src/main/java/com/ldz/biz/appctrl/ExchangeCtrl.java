@@ -18,6 +18,11 @@ public class ExchangeCtrl  {
     @Autowired
     private ExchangeService service;
 
+    /**
+     * 消费记录分页接口
+     * @param page
+     * @return
+     */
     @GetMapping("/newPager")
     public PageResponse<Exchange> getNewPager(Page<Exchange> page){
         return service.getNewPager(page);

@@ -3,12 +3,9 @@ package com.ldz.biz.appctrl;
 import com.github.pagehelper.Page;
 import com.ldz.biz.model.ReceiveAddr;
 import com.ldz.biz.service.ReceiveAddrService;
-import com.ldz.sys.base.BaseController;
-import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.system.ApplicationPid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
