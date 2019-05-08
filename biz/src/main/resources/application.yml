@@ -45,6 +45,8 @@ mapper:
 
 filePath:
 
+staticPath:  D:/static/common/
+
 robot:
   point: 0.01
   people: 5

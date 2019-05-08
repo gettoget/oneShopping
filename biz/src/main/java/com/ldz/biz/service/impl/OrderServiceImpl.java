@@ -415,10 +415,9 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             if (StringUtils.isBlank(ordId)) {
                 ordId = baseMapper.findLatestRobot();
             }
-            condition.notIn(OrderList.InnerColumn.orderId, Arrays.asList(ordId));
             List<OrderList> lists = orderListService.findByCondition(condition);
 
-            if (lists.size() >= 1) {
+            if (lists.size() >= 1 && StringUtils.isNotBlank(ordId)) {
                 List<String> strings = lastFifty.stream().map(Order::getId).collect(Collectors.toList());
                 int max = Math.max(0, lists.size());
                 int num = RandomUtils.nextInt(max);
