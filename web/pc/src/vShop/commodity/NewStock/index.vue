@@ -37,7 +37,7 @@
           <Icon type="ios-trash" size="60" color="#fff" @click.native="removeItem(index)"/>
         </div>
       </Col>
-      <Col span="4" v-if="formData.content.length<6">
+      <Col span="4" v-if="formData.content.length<5">
         <up-file-img @handleSuccess="contentImg">
           <Button type="dashed">
             <Icon type="md-cloud-upload" size="120"/>

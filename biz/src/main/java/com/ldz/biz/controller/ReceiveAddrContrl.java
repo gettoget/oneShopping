@@ -20,7 +20,6 @@ public class ReceiveAddrContrl extends BaseController<ReceiveAddr,String> {
 
     @Override
     protected BaseService<ReceiveAddr, String> getBaseService() {
-
         return service;
     }
 }
