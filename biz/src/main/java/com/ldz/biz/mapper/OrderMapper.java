@@ -1,16 +1,16 @@
 package com.ldz.biz.mapper;
 
-import com.ldz.biz.model.Order;
-import com.ldz.biz.model.User;
-import com.ldz.util.mapperprovider.InsertListMapper;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-import org.springframework.transaction.annotation.Transactional;
+
+import com.ldz.biz.model.Order;
+import com.ldz.biz.model.User;
+import com.ldz.util.mapperprovider.InsertListMapper;
 
 import tk.mybatis.mapper.common.Mapper;
-
-import java.util.List;
 
 public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
 
@@ -38,8 +38,15 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
      * 剩余名额减掉购买份数
      * 本次消费份数必须小于商品剩余份数，并且商品状态为'销售中'
      */
-    @Update("update pro_info set re_price = CAST(re_price as unsigned) - #{gmfs} where id  = #{proId} and re_price>=#{gmfs} and pro_zt='1'")
+    @Update("update pro_info set re_price = CAST(re_price as unsigned) - #{gmfs},gxsj=CURRENT_TIMESTAMP(3) where id  = #{proId} and re_price>=#{gmfs} and pro_zt='1'")
     int minusRePrice(@Param("gmfs")int gmfs,@Param("proId") String proId);
+    
+    /**
+     * 剩余名额减掉购买份数
+     * 本次消费份数必须小于商品剩余份数，并且商品状态为'销售中'
+     */
+    @Update("update pro_info set pro_zt ='3',gxsj=CURRENT_TIMESTAMP(3),kjsj=CURRENT_TIMESTAMP(3) where id= #{proId} and re_price=0 and pro_zt='1'")
+    int updateFinish(@Param("proId") String proId);
 
     /**
      * 库存添加
@@ -59,7 +66,7 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
     @Update("update pro_info set cyyhs = CAST(cyyhs as unsigned ) + 1 where id = #{id}")
     void updateCyyhs(@Param("id") String id);
 
-    @Select(" select order_id from order_list order by cjsj desc limit 1 ")
+    @Select(" select id from order_form order by zfsj desc limit 1 ")
     String findLatestRobot();
 
 

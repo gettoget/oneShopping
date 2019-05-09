@@ -39,7 +39,7 @@ public interface UserService extends BaseService<User, String> {
      * @param newPwd1
      * @return
      */
-    ApiResponse<String> editPwd(String phone, String pwd, String newPwd, String newPwd1);
+    ApiResponse<String> editPwd(String pwd, String newPwd, String newPwd1);
 
     /**
      * 修改用户信息
