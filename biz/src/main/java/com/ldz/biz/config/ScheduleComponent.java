@@ -13,6 +13,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Component;
 
 import com.ldz.biz.bean.JobConfig;
+import com.ldz.biz.job.ProInfoFinishSyncJob;
 import com.ldz.biz.job.RobotSyncJob;
 
 @Component
@@ -31,7 +32,7 @@ public class ScheduleComponent {
         jobConfigs.add(new JobConfig(RobotSyncJob.class,"0/5 * * * * ? *","RobotSyncJob"));
 
         // 每10秒运行一次。商品开奖功能
-        //jobConfigs.add(new JobConfig(SbYxSjJlJob.class,"0/10 * * * * ? *","sbyxsjjl"));
+        jobConfigs.add(new JobConfig(ProInfoFinishSyncJob.class,"0/10 * * * * ? *","ProInfoFinishSyncJob"));
 
         try {
             for (JobConfig jobConfig : jobConfigs) {
