@@ -218,6 +218,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             int index = 0;
             while(ites.hasNext()){
             	Object element = ites.next();
+            	// 防止并发操作时，中奖号码被重复分。先进行删除，redis删除结果不为0，表示号码可用
             	long removeFlag = luckNumSet.remove(element);
                 if (removeFlag > 0){
                 	elements.add(element);
