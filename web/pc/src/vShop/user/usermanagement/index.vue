@@ -8,7 +8,6 @@
             placeholder="请输入用户名" style="width: 200px">
           </Input>
         </div>
-
         <div>
           <!--<Icon type="ios-call" size="34"/>-->
           <Input
