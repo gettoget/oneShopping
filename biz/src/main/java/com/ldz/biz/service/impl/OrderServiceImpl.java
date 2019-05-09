@@ -25,6 +25,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
@@ -207,12 +208,29 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             // 订单支付完成 分配号码
             // 根据购买份数 分配号码
             int anInt = Integer.parseInt(order.getGmfs());
+            // 判断库存是否足够
+            BoundSetOperations<Object, Object> luckNumSet = redis.boundSetOps(order.getProId() + "_nums");
+            RuntimeCheck.ifTrue(luckNumSet.size() < anInt, MessageUtils.get("pro.stroeNotEnough"));
             // 获取当前商品 剩余的中奖号码
-            Set<Object> objects = redis.boundSetOps(order.getProId() + "_nums").distinctRandomMembers(anInt);
+            Set<Object> objects = luckNumSet.members();
             List<Object> elements = new ArrayList<>();
-            CollectionUtils.addAll(elements, objects);
+            Iterator<Object> ites = objects.iterator();
+            int index = 0;
+            while(ites.hasNext()){
+            	Object element = ites.next();
+            	long removeFlag = luckNumSet.remove(element);
+                if (removeFlag > 0){
+                	elements.add(element);
+                	// 中奖号码未被使用，标记提取成功
+                	index++;
+                }
+            	// 用户购买号码数量提取成功后结束号码提取过程
+            	if (index == anInt){
+            		break;
+            	}
+            }
+            
             List<OrderList> orderLists = new ArrayList<>();
-            RuntimeCheck.ifTrue(elements.size() < anInt, MessageUtils.get("pro.stroeNotEnough"));
             for (int i = 0; i < elements.size(); i++) {
                 ProInfoLuckNumBean num = (ProInfoLuckNumBean) elements.get(i);
                 OrderList orderList = new OrderList(order, num.getLuckNum(), user1);
@@ -231,26 +249,15 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             if (updateNum == 0) {
                 throw new RuntimeCheckException(MessageUtils.get("pro.minusFail"));
             }
-            Iterator<Object> removeNum = objects.iterator();
-            while (removeNum.hasNext()) {
-                redis.boundSetOps(order.getProId() + "_nums").remove(removeNum.next());
-            }
-            Set<Object> members = redis.boundSetOps(order.getProId() + "_nums").members();
-            if (members.size() == 0) {
-                SimpleCondition condition = new SimpleCondition(Order.class);
-                condition.eq(Order.InnerColumn.ddzt, "3");
-                condition.eq(Order.InnerColumn.proId, proInfo.getId());
-                List<Order> orders = findByCondition(condition);
-                if (CollectionUtils.isEmpty(orders)) {
-                    // 号码分配完 清理redis key
-                    redis.delete(order.getProId() + "_nums");
-                    // 更新商品状态为 待开奖
-                    proInfo.setProZt("3");
-                    proInfo.setKjsj(DateTime.now().plusMinutes(1).toString("yyyy-MM-dd HH:mm:ss.SSS"));
-                    // 建立延时任务 , 准备分配中奖号码
-                    ProInfo finalProInfo = proInfo;
-                    executorService.schedule(() -> fenpei(finalProInfo.getId()), 1, TimeUnit.MINUTES);
-                }
+            if (luckNumSet.size() == 0) {
+                // 号码分配完 清理redis key
+                redis.delete(order.getProId() + "_nums");
+                // 更新商品状态为 待开奖
+                proInfo.setProZt("3");
+                proInfo.setKjsj(DateTime.now().plusMinutes(1).toString("yyyy-MM-dd HH:mm:ss.SSS"));
+                // 建立延时任务 , 准备分配中奖号码
+                long millis = DateTime.now().plusMinutes(1).getMillis();
+                redis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").add(proInfo.getId(), millis);
             }
             // todo 使用sql更新
             proInfoService.update(proInfo);
