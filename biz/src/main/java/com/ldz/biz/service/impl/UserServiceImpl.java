@@ -131,19 +131,17 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     }
 
     @Override
-    public ApiResponse<String> editPwd(String phone, String pwd, String newPwd, String newPwd1) {
-        RuntimeCheck.ifBlank(phone, MessageUtils.get("user.phoneblank"));
+    public ApiResponse<String> editPwd(String pwd, String newPwd, String newPwd1) {
         RuntimeCheck.ifBlank(pwd, MessageUtils.get("user.pwdblank"));
         RuntimeCheck.ifBlank(newPwd, MessageUtils.get("user.newPwdBlank"));
         RuntimeCheck.ifFalse(StringUtils.equals(newPwd1, newPwd), MessageUtils.get("user.pwdnotsame"));
+        RuntimeCheck.ifTrue(StringUtils.equals(pwd,newPwd), MessageUtils.get("user.pwdSameToNew"));
+        String userId = getAttributeAsString("userId");
+        User u = findById(userId);
+        RuntimeCheck.ifTrue(u == null , MessageUtils.get("user.notregister"));
 
-        SimpleCondition condition = new SimpleCondition(User.class);
-        condition.eq(User.InnerColumn.phone, phone);
-        List<User> users = findByCondition(condition);
-        RuntimeCheck.ifTrue(CollectionUtils.isEmpty(users), MessageUtils.get("user.notregister"));
-        User u = users.get(0);
         String userPwd = EncryptUtil.encryptUserPwd(pwd);
-        RuntimeCheck.ifTrue(StringUtils.equals(userPwd, u.getPwd()), MessageUtils.get("user.pwderror"));
+        RuntimeCheck.ifFalse(StringUtils.equals(userPwd, u.getPwd()), MessageUtils.get("user.pwderror"));
 
         u.setPwd(EncryptUtil.encryptUserPwd(newPwd));
         update(u);
@@ -153,7 +151,9 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     @Override
     public ApiResponse<UserModel> editUserInfo(User user) {
         ApiResponse<UserModel> res = new ApiResponse<>();
-        User u = findById(user.getId());
+        String userId = getAttributeAsString("userId");
+        User u = findById(userId);
+        RuntimeCheck.ifNull(user, MessageUtils.get("user.null"));
         BeanUtil.copyProperties(user, u, CopyOptions.create().setIgnoreNullValue(true).setIgnoreError(true).setIgnoreProperties("id", "phone", "pwd", "source", "lastTime", "lastImei", "regImei", "balance", "cjsj", "refCode", "score", "zjcs"));
         update(u);
         UserModel model = new UserModel(u);
@@ -328,6 +328,16 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         User user = findById(userId);
         UserModel userModel = new UserModel(user);
         return ApiResponse.success(userModel);
+    }
+
+    @Override
+    public void initRobot() {
+        redis.delete(User.class.getName());
+        SimpleCondition condition = new SimpleCondition(User.class);
+        condition.eq(User.InnerColumn.source, "1");
+        condition.eq(User.InnerColumn.zt, "0");
+        List<User> users = findByCondition(condition);
+        users.stream().forEach(user -> redis.boundSetOps(User.class.getName()).add(user));
     }
 
 

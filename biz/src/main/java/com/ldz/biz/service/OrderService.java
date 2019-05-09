@@ -20,12 +20,7 @@ public interface OrderService extends BaseService<Order, String> {
      */
     ApiResponse<String> saveEntity(Order entity);
 
-    /**
-     * 订单支付
-     * @param id
-     * @return
-     */
-    ApiResponse<String> payOrder(String id, String payPwd);
+
 
     /**
      * 分页

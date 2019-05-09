@@ -127,8 +127,11 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         }
         Collections.shuffle(nums);
         for (String num : nums) {
-            redis.boundSetOps(proInfo.getId() + "_nums").add(num);
-
+            ProInfoLuckNumBean numBean = new ProInfoLuckNumBean();
+            numBean.setProId(proInfo.getId());
+            numBean.setProName(proInfo.getProName());
+            numBean.setLuckNum(num);
+            redis.boundSetOps(proInfo.getId() + "_nums").add(numBean);
         }
 
         baseinfo.setProStore(storeNum - 1 + "");
@@ -320,8 +323,6 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 );
             }
         }
-
-
         PageResponse<WinRecord> page = new PageResponse<>();
         page.setList(records);
         page.setPageNum(pageNum);
@@ -342,18 +343,24 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
         if(CollectionUtils.isNotEmpty(res.getList())){
             Set<String> set = res.getList().stream().map(ProInfo::getUserId).collect(Collectors.toSet());
-            List<User> users = userService.findByIds(set);
-            Map<String, User> userMap = new HashMap<>();
-            if(CollectionUtils.isNotEmpty(users)){
-                userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
-            }
-            Map<String, User> finalUserMap = userMap;
-            res.getList().forEach(proInfo -> {
-                if(StringUtils.isNotBlank(proInfo.getUserId()) && finalUserMap.containsKey(proInfo.getUserId())){
-                    proInfo.setUserName(finalUserMap.get(proInfo.getUserId()).getUserName());
+            if(CollectionUtils.isNotEmpty(set)) {
+                List<User> users = userService.findByIds(set);
+                Map<String, User> userMap = new HashMap<>();
+                if (CollectionUtils.isNotEmpty(users)) {
+                    userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
                 }
-                setImgUrl(proInfo);
-            });
+                Map<String, User> finalUserMap = userMap;
+                res.getList().forEach(proInfo -> {
+                    if (StringUtils.isNotBlank(proInfo.getUserId()) && finalUserMap.containsKey(proInfo.getUserId())) {
+                        proInfo.setUserName(finalUserMap.get(proInfo.getUserId()).getUserName());
+                    }
+                    setImgUrl(proInfo);
+                });
+            }else{
+                res.getList().forEach(proInfo -> {
+                    setImgUrl(proInfo);
+                });
+            }
 
         }
         return res;

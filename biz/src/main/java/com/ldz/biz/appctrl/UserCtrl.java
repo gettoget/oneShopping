@@ -44,15 +44,14 @@ public class UserCtrl  {
 
     /**
      * 用户修改密码接口
-     * @param phone 账号
      * @param pwd 原始密码
      * @param newPwd 新密码
      * @param newPwd1 确认
      * @return
      */
     @PostMapping("/editPwd")
-    public ApiResponse<String> editPwd(String phone, String pwd, String newPwd, String newPwd1){
-        return service.editPwd(phone, pwd, newPwd, newPwd1);
+    public ApiResponse<String> editPwd( String pwd, String newPwd, String newPwd1){
+        return service.editPwd( pwd, newPwd, newPwd1);
     }
 
     /**

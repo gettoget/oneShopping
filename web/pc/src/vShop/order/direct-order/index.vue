@@ -1,43 +1,44 @@
 <template>
-  <div>
+  <div class="box_col" style="background-color:#fff">
     <pager-tit title="直购订单"></pager-tit>
-    <div class="box_row colCenter rowRight pageFindSty" style="border: none">
-      <div>
-        <!--<Icon type="md-person" size="34"/>-->
-        <Input
-               placeholder="请输入订单编号" style="width: 200px">
-              </Input>
-      </div>
-
-      <div>
-        <!--<Icon type="ios-call" size="34"/>-->
-        <Input
-               placeholder="请输入手机号码" style="width: 200px"
-              ></Input>
-      </div>
-      <Button type="primary">
-        <Icon type="md-search"></Icon>
-        <!--查询-->
-      </Button>
+    <div style="width: 1000px;margin:0 auto">
+      <order-card></order-card>
     </div>
-    <div>
-      <Row style="position: relative; padding: 5px">
-        <Table
-          size='large' stripe
-          :height="AF.getPageHeight()-320"
-          :columns="tableTiT"
-          :data="tableData"></Table>
-      </Row>
-    </div>
+    <!--<div class="box_row colCenter rowRight pageFindSty" style="border: none">-->
+      <!--<div>-->
+        <!--<Input-->
+          <!--placeholder="请输入订单编号" style="width: 200px"/>-->
+      <!--</div>-->
+      <!--<div>-->
+        <!--<Input-->
+          <!--placeholder="请输入手机号码" style="width: 200px"/>-->
+      <!--</div>-->
+      <!--<Button type="primary">-->
+        <!--<Icon type="md-search"></Icon>-->
+        <!--&lt;!&ndash;查询&ndash;&gt;-->
+      <!--</Button>-->
+    <!--</div>-->
+    <!--<div>-->
+      <!--<Table-->
+        <!--size='large' stripe-->
+        <!--:height="AF.getPageHeight()-320"-->
+        <!--:columns="tableTiT"-->
+        <!--:data="tableData"></Table>-->
+    <!--</div>-->
 
   </div>
 </template>
 
 <script>
+  import orderCard from '../comp/orderCard'
+
   export default {
     name: "index",
-    data(){
-      return{
+    components: {
+      orderCard
+    },
+    data() {
+      return {
         tableTiT: [{
           title: "序号",
           width: 80,
@@ -48,7 +49,7 @@
             title: '订单编号',
             align: 'center',
             key: 'bh',
-            width:180
+            width: 180
           },
           {
             title: '下单时间',
@@ -97,15 +98,15 @@
         ],
         tableData: [
           {
-            bh:'20180909000123431',
-            sj:'2018-04-01',
-            sjh:'0908-1678-18766',
-            dz:'sjhfjsfkjdakd',
-            zt:'待审核',
-            bz:'赠品111',
-            spm:'iphone',
-            splb:'数码',
-            spsl:'2'
+            bh: '20180909000123431',
+            sj: '2018-04-01',
+            sjh: '0908-1678-18766',
+            dz: 'sjhfjsfkjdakd',
+            zt: '待审核',
+            bz: '赠品111',
+            spm: 'iphone',
+            splb: '数码',
+            spsl: '2'
           }
         ],
       }
