@@ -1,12 +1,13 @@
-server:
-  port: 8088
 spring:
-  profiles:
-    active: test  #合并 application-test.yml 中的配置参数
-  messages:
-    basename: i18n/messages
-    cache-second: 3600
-    encoding: UTF-8
+  #线程池配置信息
+  thread:
+    pool:
+      corePoolSize: 5
+      maxPoolSize: 10
+      keepAliveSeconds: 60
+      queueCapacity: 100
+      waitForTasksToCompleteOnShutdown: true
+      awaitTerminationSeconds: 30
   redis:
     host: 127.0.0.1
     port: 6379
@@ -35,6 +36,7 @@ spring:
     filters: stat,wall,log4j
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
     cachePrepStmts: true
+    
 #mybatis配置信息
 mybatis:
   configLocation: classpath:mybatis/MapperConfig.xml
@@ -51,4 +53,3 @@ robot:
   point: 0.01
   people: 5
   lowsize: 55
-

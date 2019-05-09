@@ -587,107 +587,123 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
             	allocNum = 1;
             }
 		}
-		//随机提取中奖号码
-		Set<Object> luckNums = redis.boundSetOps(redisProInfoKey).distinctRandomMembers(allocNum);
 		List<Object> elements = new ArrayList<>();
-		CollectionUtils.addAll(elements, luckNums.iterator());
-        //3.从redis随机获取机器人用户
-		Set<Object> users = redis.boundSetOps(User.class.getName()).distinctRandomMembers(randomMaxUserNum);
-		//同一个商品，用户不重复参与购买商品
-		Set<Object> existUsers = redis.boundSetOps(proId+"_join_"+User.class.getName()).members();
-		if (CollectionUtils.isNotEmpty(existUsers)){
-			users = (Set<Object>)CollectionUtils.subtract(users, existUsers);
-			if (users.size() == 0){
-				return;
-			}
-		}
-		
-        Iterator<Object> iteUsers = users.iterator();
-        int tmpNum = allocNum;
-        List<OrderList> orderLists = new ArrayList<>();
-        List<Order> orders = new ArrayList<>();
-        List<User> joinUsers = new ArrayList<>();
-        int allocUserIndex = 0;
-    	while(iteUsers.hasNext()){
-    		User user = (User)iteUsers.next();
-    		joinUsers.add(user);
-    		//4.参与的用户,每个用户随机分配商品份数.最终随机的份数不超过本次消费的商品份数
-            //获取单个用户消费份数
-            int pUserNum = RandomUtils.nextInt(tmpNum);
-            if (allocUserIndex == (randomMaxUserNum - 1)) {
-                pUserNum = tmpNum;
-            } else if (pUserNum == 0 && tmpNum > 0) {
-                pUserNum = 1;
-            }
-            if (pUserNum >= elements.size()){
-            	pUserNum = elements.size();
-            }
-            //用户消费记录,获取中奖号码
-            List<Object> tmpList = elements.subList(0, pUserNum);
-            ProInfoLuckNumBean proInfo = (ProInfoLuckNumBean)tmpList.get(0);
-            // 生成订单
-            Order order = new Order();
-            order.setUserName(user.getUserName());
-            order.setZfsj(DateUtils.getNowTime());
-            order.setId(genId());
-            order.setOrderType("2");
-            order.setProId(proId);
-            order.setProName(proInfo.getProName());
-            order.setUserId(user.getId());
-            order.setGmfs(pUserNum+"");
-            order.setZfje(pUserNum+"");
-            order.setCjsj(DateUtils.getNowTime());
-            order.setImei(user.getRegImei());
-            order.setDdzt("0");
-            
-            for (int j = 0; j < tmpList.size(); j++) {
-            	ProInfoLuckNumBean tmpItem = (ProInfoLuckNumBean)tmpList.get(j);
-                String luckNum = tmpItem.getLuckNum();
-                OrderList orderList = new OrderList();
-                orderList.setId(genId());
-                orderList.setOrderId(order.getId());
-                orderList.setProId(proId);
-                orderList.setProName(tmpItem.getProName());
-                orderList.setUserid(user.getId());
-                orderList.setUserName(user.getUserName());
-                orderList.setYhlx(user.getSource());
-                orderList.setNum(luckNum);
-                //执行加一下随机数，防止时间毫秒数都一致
-                int randomMillis = RandomUtils.nextInt(100);
-                orderList.setCjsj(DateTime.now().plusMillis(randomMillis).toString("yyyy-MM-dd HH:mm:ss.SSS"));
-                orderLists.add(orderList);
-            }
-            orders.add(order);
-            //扣减本次消费份数剩余额度
-            tmpNum -= pUserNum;
-            elements.removeAll(tmpList);
-            allocUserIndex++;
-            if (tmpNum <= 0) {
-                break;
-            }
-    	}
-    	
-    	// 产品分配完成 更新 添加 sql
-    	orderListMapper.insertList(orderLists);
-        orderMapper.insertList(orders);
-        int updateNum = orderMapper.minusRePrice(allocNum, proId);
-        if (updateNum == 0){
-        	throw new RuntimeCheckException(MessageUtils.get("pro.minusFail"));
-        }
-        //执行成功后，删除redis的中奖号码
+		List<Object> cloneElements = new ArrayList<>();
+		// 随机提取中奖号码
+		Set<Object> luckNums = redis.boundSetOps(redisProInfoKey).distinctRandomMembers(allocNum);
+		// 删除redis的中奖号码
         Iterator<Object> removeNum = luckNums.iterator();
         while(removeNum.hasNext()){
-            redis.boundSetOps(redisProInfoKey).remove(removeNum.next());
-        }
-        //try catch为容错机制，只要上面保证执行成功，下面执行失败也不影响整体
-        try{
-        	//商品已参与用户信息
-            for (int i=0; i<joinUsers.size(); i++){
-            	redis.boundSetOps(proId+"_join_"+User.class.getName()).add(joinUsers.get(i));
+        	Object element = removeNum.next();
+        	// 防止并发操作时，中奖号码被重复分。先进行删除，redis删除结果不为0，表示号码可用
+            long removeFlag = redis.boundSetOps(redisProInfoKey).remove(element);
+            if (removeFlag > 0){
+            	elements.add(element);
             }
-        }catch(Exception e){
-        	
+        }
+        // 防止因并发抢购，造成随机element中奖号码没有获取成功
+        if (elements.size() == 0){
+        	return;
+        }else{
+        	CollectionUtils.addAll(cloneElements, elements);
         }
         
+        try{
+        	//3.从redis随机获取机器人用户
+    		Set<Object> users = redis.boundSetOps(User.class.getName()).distinctRandomMembers(randomMaxUserNum);
+    		
+            Iterator<Object> iteUsers = users.iterator();
+            int tmpNum = allocNum;
+            List<OrderList> orderLists = new ArrayList<>();
+            List<Order> orders = new ArrayList<>();
+            List<User> joinUsers = new ArrayList<>();
+            int allocUserIndex = 0;
+        	while(iteUsers.hasNext()){
+        		User user = (User)iteUsers.next();
+        		joinUsers.add(user);
+        		//4.参与的用户,每个用户随机分配商品份数.最终随机的份数不超过本次消费的商品份数
+                //获取单个用户消费份数
+                int pUserNum = RandomUtils.nextInt(tmpNum);
+                if (allocUserIndex == (randomMaxUserNum - 1)) {
+                    pUserNum = tmpNum;
+                } else if (pUserNum == 0 && tmpNum > 0) {
+                    pUserNum = 1;
+                }
+                if (pUserNum >= elements.size()){
+                	pUserNum = elements.size();
+                }
+                //用户消费记录,获取中奖号码
+                List<Object> tmpList = elements.subList(0, pUserNum);
+                ProInfoLuckNumBean proInfo = (ProInfoLuckNumBean)tmpList.get(0);
+                // 生成订单
+                Order order = new Order();
+                order.setUserName(user.getUserName());
+                order.setZfsj(DateUtils.getNowTime());
+                order.setId(genId());
+                order.setOrderType("2");
+                order.setProId(proId);
+                order.setProName(proInfo.getProName());
+                order.setUserId(user.getId());
+                order.setGmfs(pUserNum+"");
+                order.setZfje(pUserNum+"");
+                order.setCjsj(DateUtils.getNowTime());
+                order.setImei(user.getRegImei());
+                order.setDdzt("0");
+                
+                for (int j = 0; j < tmpList.size(); j++) {
+                	ProInfoLuckNumBean tmpItem = (ProInfoLuckNumBean)tmpList.get(j);
+                    String luckNum = tmpItem.getLuckNum();
+                    OrderList orderList = new OrderList();
+                    orderList.setId(genId());
+                    orderList.setOrderId(order.getId());
+                    orderList.setProId(proId);
+                    orderList.setProName(tmpItem.getProName());
+                    orderList.setUserid(user.getId());
+                    orderList.setUserName(user.getUserName());
+                    orderList.setYhlx(user.getSource());
+                    orderList.setNum(luckNum);
+                    //执行加一下随机数，防止时间毫秒数都一致
+                    int randomMillis = RandomUtils.nextInt(100);
+                    orderList.setCjsj(DateTime.now().plusMillis(randomMillis).toString("yyyy-MM-dd HH:mm:ss.SSS"));
+                    orderLists.add(orderList);
+                }
+                orders.add(order);
+                //扣减本次消费份数剩余额度
+                tmpNum -= pUserNum;
+                elements.removeAll(tmpList);
+                allocUserIndex++;
+                if (tmpNum <= 0) {
+                    break;
+                }
+        	}
+        	
+        	// 产品分配完成 更新 添加 sql
+        	orderListMapper.insertList(orderLists);
+            orderMapper.insertList(orders);
+            int updateNum = orderMapper.minusRePrice(allocNum, proId);
+            if (updateNum == 0){
+            	throw new RuntimeCheckException(MessageUtils.get("pro.minusFail"));
+            }
+            //如果商品已卖完，则更新商品状态
+            if (redis.boundSetOps(redisProInfoKey).size() == 0){
+            	// 更新商品状态为 待开奖
+                orderMapper.updateFinish(proId);
+            	// 号码分配完 清理redis key
+                redis.delete(proId + "_nums");
+                // 将待开奖的商品持久化存储起来，防止服务异常停止，造成商品无法开奖。同时建立延时任务 , 分配中奖号码
+                // 商品结束后1分钟执行开奖功能
+                long millis = DateTime.now().plusMinutes(1).getMillis();
+                redis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").add(proId, millis);
+            }
+        }catch(Exception e){
+        	if (cloneElements.size() > 0){
+        		// 执行发生异常后，需要先将中奖号码回压到redis中，防止号码丢失
+        		for (int i=0; i<cloneElements.size(); i++){
+        			redis.boundSetOps(redisProInfoKey).add(cloneElements.get(i));
+        		}
+        	}
+        	// 继续抛出异常，保证数据库事务回滚
+        	throw e;
+        }
     }
 }

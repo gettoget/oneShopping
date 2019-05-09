@@ -72,7 +72,11 @@
             <artifactId>spring-boot-starter-web</artifactId>
             <version>2.1.4.RELEASE</version>
         </dependency>
-
+        <!-- 计划任务 -->
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+		</dependency>
     </dependencies>
 
     <build>
