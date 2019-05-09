@@ -1,13 +1,17 @@
 <template>
-
+  <Card class="userCard">
+    asdf
+  </Card>
 </template>
 
 <script>
-    export default {
-        name: "usermessage"
-    }
+  export default {
+    name: "usermessage"
+  }
 </script>
 
-<style scoped>
-
+<style lang="less">
+  .userCard {
+    width: 300px;
+  }
 </style>

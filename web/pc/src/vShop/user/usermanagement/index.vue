@@ -1,54 +1,56 @@
 <template>
-    <div>
-      <pager-tit title="用户管理"></pager-tit>
-      <div class="box_row colCenter rowRight pageFindSty" style="border: none">
-        <div>
-          <!--<Icon type="md-person" size="34"/>-->
-          <Input
-            placeholder="请输入用户名" style="width: 200px">
-          </Input>
-        </div>
+    <div class="box_col">
+      <div class="box_row">
+        <pager-tit title="用户管理"></pager-tit>
+        <div class="box_row_100">
+          <div class="box_row colCenter rowRight pageFindSty" style="border: none">
+            <div>
+              <Input
+                placeholder="请输入用户名" style="width: 200px"/>
+            </div>
 
-        <div>
-          <!--<Icon type="ios-call" size="34"/>-->
-          <Input
-            placeholder="请输入手机号码" style="width: 200px"
-          ></Input>
-        </div>
-        <Button type="primary">
-          <Icon type="md-search"></Icon>
-          <!--查询-->
-        </Button>
-      </div>
-      <hr  style="margin-top: 20px">
-      <div class="box_row_100">
-        <div class="userM">
-          <Row>
-            <Col :xs="2" :sm="4" :md="6" :lg="3">头像</Col>
-            <Col :xs="2" :sm="4" :md="6" :lg="3">用户名</Col>
-            <Col :xs="2" :sm="4" :md="6" :lg="3">手机号</Col>
-            <Col :xs="2" :sm="4" :md="6" :lg="3">累计充值</Col>
-            <Col :xs="2" :sm="4" :md="6" :lg="3">累计消费</Col>
-            <Col :xs="2" :sm="4" :md="6" :lg="3">参与次数</Col>
-            <Col :xs="2" :sm="4" :md="6" :lg="3">中奖次数</Col>
-            <Col :xs="2" :sm="4" :md="6" :lg="3">操作</Col>
-          </Row>
-          <hr>
-        </div>
-        <div class="userMlist" v-for="item in tableData">
-          <Row>
-            <Col :xs="2" :sm="4" :md="6" :lg="3">{{item.zt}}</Col>
-            <Col :xs="2" :sm="4" :md="6" :lg="3">{{item.yhm}}</Col>
-            <Col :xs="2" :sm="4" :md="6" :lg="3">{{item.ye}}</Col>
-            <Col :xs="2" :sm="4" :md="6" :lg="3">{{item.ye}}</Col>
-            <Col :xs="2" :sm="4" :md="6" :lg="3">{{item.ye}}</Col>
-            <Col :xs="2" :sm="4" :md="6" :lg="3">{{item.ye}}</Col>
-            <Col :xs="2" :sm="4" :md="6" :lg="3">{{item.action}}</Col>
-            <Col :xs="2" :sm="4" :md="6" :lg="3">{{item.ljxf}}</Col>
-          </Row>
-          <hr>
+            <div>
+              <Input placeholder="请输入手机号码" style="width: 200px"/>
+            </div>
+            <Button type="primary">
+              <Icon type="md-search"></Icon>
+              <!--查询-->
+            </Button>
+          </div>
         </div>
       </div>
+      <div class="box_col_auto">
+        <user-message></user-message>
+      </div>
+      <!--<hr  style="margin-top: 20px">-->
+      <!--<div class="box_row_100">-->
+        <!--<div class="userM">-->
+          <!--<Row>-->
+            <!--<Col :xs="2" :sm="4" :md="6" :lg="3">头像</Col>-->
+            <!--<Col :xs="2" :sm="4" :md="6" :lg="3">用户名</Col>-->
+            <!--<Col :xs="2" :sm="4" :md="6" :lg="3">手机号</Col>-->
+            <!--<Col :xs="2" :sm="4" :md="6" :lg="3">累计充值</Col>-->
+            <!--<Col :xs="2" :sm="4" :md="6" :lg="3">累计消费</Col>-->
+            <!--<Col :xs="2" :sm="4" :md="6" :lg="3">参与次数</Col>-->
+            <!--<Col :xs="2" :sm="4" :md="6" :lg="3">中奖次数</Col>-->
+            <!--<Col :xs="2" :sm="4" :md="6" :lg="3">操作</Col>-->
+          <!--</Row>-->
+          <!--<hr>-->
+        <!--</div>-->
+        <!--<div class="userMlist" v-for="item in tableData">-->
+          <!--<Row>-->
+            <!--<Col :xs="2" :sm="4" :md="6" :lg="3">{{item.zt}}</Col>-->
+            <!--<Col :xs="2" :sm="4" :md="6" :lg="3">{{item.yhm}}</Col>-->
+            <!--<Col :xs="2" :sm="4" :md="6" :lg="3">{{item.ye}}</Col>-->
+            <!--<Col :xs="2" :sm="4" :md="6" :lg="3">{{item.ye}}</Col>-->
+            <!--<Col :xs="2" :sm="4" :md="6" :lg="3">{{item.ye}}</Col>-->
+            <!--<Col :xs="2" :sm="4" :md="6" :lg="3">{{item.ye}}</Col>-->
+            <!--<Col :xs="2" :sm="4" :md="6" :lg="3">{{item.action}}</Col>-->
+            <!--<Col :xs="2" :sm="4" :md="6" :lg="3">{{item.ljxf}}</Col>-->
+          <!--</Row>-->
+          <!--<hr>-->
+        <!--</div>-->
+      <!--</div>-->
       <!--<Row style="position: relative;padding-top: 5px">-->
         <!--<Table-->
           <!--size='large' stripe-->
@@ -60,11 +62,11 @@
 </template>
 
 <script>
-   import usermessage from './comp/usermessage'
+   import userMessage from './comp/usermessage'
     export default {
       name: "index",
       components:{
-        usermessage
+        userMessage
       },
       data(){
           return{
