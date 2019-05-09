@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import com.ldz.biz.bean.ProInfoLuckNumBean;
 import com.ldz.biz.mapper.OrderMapper;
+import com.ldz.biz.mapper.ProInfoMapper;
 import com.ldz.biz.model.*;
 import com.ldz.biz.service.*;
 import com.ldz.sys.base.BaseServiceImpl;
@@ -52,10 +53,9 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
     private ExchangeService exchangeService;
 
     @Autowired
-    private ProEvalService proEvalService;
-
-    @Autowired
     private ProInfoService proInfoService;
+    @Autowired
+    private ProInfoMapper infoMapper;
 
     @Autowired
     private ReceiveAddrService addrService;
@@ -114,16 +114,16 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
     @Override
     public ApiResponse<String> saveEntity(Order entity) {
         String imei = getAttributeAsString("imei");
-        String userId = getAttributeAsString("userId");
-        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
-        User user1 = userService.findById(userId);
-        RuntimeCheck.ifNull(user1, MessageUtils.get("user.null"));
         Object o = redis.boundValueOps(imei + "saveOrder").get();
         if (o != null) {
             return ApiResponse.fail(MessageUtils.get("FrequentOperation"));
         } else {
             redis.boundValueOps(imei + "saveOrder").set(1, 10, TimeUnit.SECONDS);
         }
+        String userId = getAttributeAsString("userId");
+        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
+        User user1 = userService.findById(userId);
+        RuntimeCheck.ifNull(user1, MessageUtils.get("user.null"));
         RuntimeCheck.ifBlank(entity.getOrderType(), MessageUtils.get("order.typeBlank"));
         RuntimeCheck.ifFalse(entity.getOrderType().equals("1") || entity.getOrderType().equals("2"), MessageUtils.get("order.typeError"));
         RuntimeCheck.ifBlank(entity.getProId(), MessageUtils.get("order.proBlank"));
@@ -132,10 +132,14 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         RuntimeCheck.ifBlank(entity.getReceId(), MessageUtils.get("order.receIsBlank"));
         RuntimeCheck.ifBlank(entity.getPayPwd(), MessageUtils.get("user.paypwdblank"));
 
-
+        int gmfs = Integer.parseInt(entity.getGmfs());
+        RuntimeCheck.ifTrue( gmfs < 0 , MessageUtils.get("order.gmLteZero"));
+        int dzf = Integer.parseInt(entity.getZfje());
+        RuntimeCheck.ifTrue(dzf < 0 , MessageUtils.get("order.jeLteZero"));
         ProBaseinfo baseinfo = null;
         ProInfo proInfo = null;
-        int gmfs = Integer.parseInt(entity.getGmfs());
+
+
         // 根据订单类型查询商品信息 1 为 直接购买  2 为参与抽奖
         if (entity.getOrderType().equals("1")) {
             baseinfo = proBaseinfoService.findById(entity.getProId());
@@ -164,7 +168,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         order.setZfje(entity.getZfje());
         // 生成消费记录
         Exchange exchange = new Exchange();
-        int dzf = Integer.parseInt(entity.getZfje());
+
         exchange.setXfjb(dzf + "");
         if (StringUtils.equals(entity.getOrderType(), "1")) {
             /*// 直接购买
@@ -180,9 +184,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             order.setDdzt("0");
             int balance = Integer.parseInt(user1.getBalance());
             int ye = balance - dzf;
-            if (ye < 0) {
-                return ApiResponse.fail(MessageUtils.get("order.balanceNotEnough"));
-            }
+            RuntimeCheck.ifTrue(ye < 0, MessageUtils.get("order.balanceNotEnough"));
             exchange.setXfqjbs(balance + "");
             exchange.setXfsj(DateUtils.getNowTime());
             exchange.setXfhjbs(ye + "");
@@ -200,24 +202,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         exchange.setUserid(userId);
         exchange.setXfddh(order.getId());
 
-        exchangeService.save(exchange);
-        userService.update(user1);
-
-        save(order);
-
         if (StringUtils.equals(order.getOrderType(), "2")) {
             // 参与抽奖 剩余名额需要减去购买份数
-
-            // 查看当前用户是否已经参与过
-            SimpleCondition oderCondition = new SimpleCondition(Order.class);
-            oderCondition.eq(Order.InnerColumn.userId, userId);
-            oderCondition.eq(Order.InnerColumn.proId, proInfo.getId());
-            oderCondition.notIn(Order.InnerColumn.ddzt, Arrays.asList("3", "5"));
-            oderCondition.and().andCondition(" id !=  '" + order.getId() + "'");
-            List<Order> orderList1 = findByCondition(oderCondition);
-            if (CollectionUtils.isEmpty(orderList1)) {
-                proInfo.setCyyhs(Integer.parseInt(proInfo.getCyyhs()) + 1 + "");
-            }
             // 订单支付完成 分配号码
             // 根据购买份数 分配号码
             int anInt = Integer.parseInt(order.getGmfs());
@@ -233,35 +219,14 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 orderList.setId(genId());
                 orderLists.add(orderList);
             }
+            // 查看商品剩余名额是否 为 0   且所有订单都已支付
+            proInfo.setGxsj(DateUtils.getNowTime());
+            proInfo.setCyyhs(Integer.parseInt(proInfo.getCyyhs()) + 1 + "");
+
             // 获取中奖号
             if (CollectionUtils.isNotEmpty(orderLists)) {
                 orderListService.saveList(orderLists);
             }
-            // 查看商品剩余名额是否 为 0   且所有订单都已支付
-
-            int rePrice = Integer.parseInt(proInfo.getRePrice()) - Integer.parseInt(order.getGmfs());
-            proInfo.setGxsj(DateUtils.getNowTime());
-
-            if (rePrice <= 0) {
-                SimpleCondition condition = new SimpleCondition(Order.class);
-                condition.eq(Order.InnerColumn.ddzt, "3");
-                condition.eq(Order.InnerColumn.proId, proInfo.getId());
-                List<Order> orders = findByCondition(condition);
-                if (CollectionUtils.isEmpty(orders)) {
-                    // 号码分配完 清理redis key
-                    redis.delete(order.getProId() + "_nums");
-                    // 更新商品状态为 待开奖
-
-                    proInfo.setProZt("3");
-                    proInfo.setKjsj(DateTime.now().plusMinutes(1).toString("yyyy-MM-dd HH:mm:ss.SSS"));
-
-                    // 建立延时任务 , 准备分配中奖号码
-                    ProInfo finalProInfo = proInfo;
-                    executorService.schedule(() -> fenpei(finalProInfo.getId()), 1, TimeUnit.MINUTES);
-                }
-
-            }
-            proInfoService.update(proInfo);
             int updateNum = baseMapper.minusRePrice(gmfs, order.getProId());
             if (updateNum == 0) {
                 throw new RuntimeCheckException(MessageUtils.get("pro.minusFail"));
@@ -270,10 +235,34 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             while (removeNum.hasNext()) {
                 redis.boundSetOps(order.getProId() + "_nums").remove(removeNum.next());
             }
+            Set<Object> members = redis.boundSetOps(order.getProId() + "_nums").members();
+            if (members.size() == 0) {
+                SimpleCondition condition = new SimpleCondition(Order.class);
+                condition.eq(Order.InnerColumn.ddzt, "3");
+                condition.eq(Order.InnerColumn.proId, proInfo.getId());
+                List<Order> orders = findByCondition(condition);
+                if (CollectionUtils.isEmpty(orders)) {
+                    // 号码分配完 清理redis key
+                    redis.delete(order.getProId() + "_nums");
+                    // 更新商品状态为 待开奖
+                    proInfo.setProZt("3");
+                    proInfo.setKjsj(DateTime.now().plusMinutes(1).toString("yyyy-MM-dd HH:mm:ss.SSS"));
+                    // 建立延时任务 , 准备分配中奖号码
+                    ProInfo finalProInfo = proInfo;
+                    executorService.schedule(() -> fenpei(finalProInfo.getId()), 1, TimeUnit.MINUTES);
+                }
+            }
+            // todo 使用sql更新
+            proInfoService.update(proInfo);
+        }else if(StringUtils.equals(order.getOrderType(),"1")){
+            baseMapper.minusStore(baseinfo.getId(), Integer.parseInt(order.getGmfs()));
         }
+        exchangeService.save(exchange);
+        userService.update(user1);
+        save(order);
 
         // 当剩余名额剩余过半时
-        String s = (String) redis.boundValueOps(order.getProId() + "_robot").get();
+       /* String s = (String) redis.boundValueOps(order.getProId() + "_robot").get();
         if (StringUtils.isBlank(s) && "2".equals(proInfo.getrType()) && Integer.parseInt(proInfo.getProPrice()) / Integer.parseInt(proInfo.getRePrice()) > 1 && Integer.parseInt(proInfo.getProPrice()) >= 2) {
             Set<Object> set = redis.boundSetOps(proInfo.getId() + "_nums").distinctRandomMembers(2);
             List<Object> objectList = new ArrayList<>();
@@ -317,7 +306,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             while (removeNum.hasNext()) {
                 redis.boundSetOps(order.getProId() + "_nums").remove(removeNum.next());
             }
-        }
+        }*/
         return ApiResponse.success(MessageUtils.get("order.paySuc"));
 
     }
@@ -407,14 +396,14 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 
         long zjhm;
         if (StringUtils.equals(info.getrType(), "2")) {
+
+            String  ordId = baseMapper.findLatestRobot();
+
             // 从机器人的号码中随机取一个
-            String ordId = (String) redis.boundValueOps(id + "_robot").get();
+//            String ordId = (String) redis.boundValueOps(id + "_robot").get();
             SimpleCondition condition = new SimpleCondition(OrderList.class);
             condition.eq(OrderList.InnerColumn.yhlx, "1");
             condition.eq(OrderList.InnerColumn.proId, info.getId());
-            if (StringUtils.isBlank(ordId)) {
-                ordId = baseMapper.findLatestRobot();
-            }
             List<OrderList> lists = orderListService.findByCondition(condition);
 
             if (lists.size() >= 1 && StringUtils.isNotBlank(ordId)) {
@@ -492,8 +481,6 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             SimpleCondition simpleCondition = new SimpleCondition(Order.class);
             simpleCondition.eq(Order.InnerColumn.proId, info.getId());
             simpleCondition.eq(Order.InnerColumn.userId, user.getId());
-            List<Order> orders = findByCondition(simpleCondition);
-
             //int sum = orders.stream().map(order1 -> Integer.parseInt(order1.getGmfs())).mapToInt(value -> value).sum();
             record.setZjfs(order.getGmfs());
             record.setZjlx(user.getScore());
