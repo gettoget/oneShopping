@@ -239,9 +239,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 orderLists.add(orderList);
             }
             // 查看商品剩余名额是否 为 0   且所有订单都已支付
-            proInfo.setGxsj(DateUtils.getNowTime());
-            proInfo.setCyyhs(Integer.parseInt(proInfo.getCyyhs()) + 1 + "");
-
+            /*proInfo.setGxsj(DateUtils.getNowTime());
+            proInfo.setCyyhs(Integer.parseInt(proInfo.getCyyhs()) + 1 + "");*/
             // 获取中奖号
             if (CollectionUtils.isNotEmpty(orderLists)) {
                 orderListService.saveList(orderLists);
