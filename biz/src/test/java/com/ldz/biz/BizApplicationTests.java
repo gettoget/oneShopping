@@ -79,7 +79,7 @@ public class BizApplicationTests {
     		Integer price = new Integer(item.getRePrice());
     		for (int p=0; p<price;p++){
     			ProInfoLuckNumBean bean = new ProInfoLuckNumBean();
-    			int num = 1000001 + (p+1);
+    			int num = 10000001 + (p+1);
     			bean.setProId(item.getId());
     			bean.setProName(item.getProName());
     			bean.setLuckNum(String.valueOf(num));
