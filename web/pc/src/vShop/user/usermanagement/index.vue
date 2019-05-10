@@ -20,7 +20,7 @@
         </div>
       </div>
       <div class="box_col_auto">
-        <user-message></user-message>
+        <user-card></user-card>
       </div>
       <!--<hr  style="margin-top: 20px">-->
       <!--<div class="box_row_100">-->
@@ -62,11 +62,11 @@
 </template>
 
 <script>
-   import userMessage from './comp/usermessage'
+   import userCard from './comp/userCard'
     export default {
       name: "index",
       components:{
-        userMessage
+        userCard
       },
       data(){
           return{

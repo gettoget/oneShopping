@@ -53,7 +53,7 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
      * 剩余名额减掉购买份数
      * 本次消费份数必须小于商品剩余份数，并且商品状态为'销售中'
      */
-    @Update("update pro_info set pro_zt ='3',gxsj=CURRENT_TIMESTAMP(3),kjsj=CURRENT_TIMESTAMP(3) where id= #{proId} and re_price=0 and pro_zt='1'")
+    @Update("update pro_info set pro_zt ='3',gxsj=CURRENT_TIMESTAMP(3),kjsj=date_add(CURRENT_TIMESTAMP(3), interval 1 minute) where id= #{proId} and re_price=0 and pro_zt='1'")
     int updateFinish(@Param("proId") String proId);
 
     /**
@@ -73,7 +73,8 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
 
     @Update("update pro_info set cyyhs = CAST(cyyhs as unsigned ) + 1 where id = #{id}")
     void updateCyyhs(@Param("id") String id);
+    
+    @Select(" select * from order_form where id in ( select order_id from order_list where yhlx= '1' and pro_id = #{proId} group by order_id) order by zfsj desc limit 1 ")
+    public Order findLatestRobot(@Param("proId") String proId);
 
-    @Select(" select * from order_form order by zfsj desc limit 1 ")
-    public Order findLatestRobot();
 }

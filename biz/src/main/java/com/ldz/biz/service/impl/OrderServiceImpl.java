@@ -430,7 +430,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         // 如果是需要机器人中奖，从机器人中抽取一个中间号码
         if (StringUtils.equals(info.getrType(), "2")) {
         	//获取最后一个机器人参与的订单号码
-            Order lastOrder = baseMapper.findLatestRobot();
+            Order lastOrder = baseMapper.findLatestRobot(info.getId());
             //从最后一个购买订单的抽取一个中间号码
             OrderList orderList = baseMapper.getOrderByRobotZjhm(lastOrder.getId());
 
