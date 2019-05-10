@@ -21,7 +21,7 @@ public interface ProInfoMapper extends Mapper<ProInfo> {
     @Select(" select id, re_price rePrice, pro_name proName from pro_info where r_type ='2' and pro_zt = '1'")
     List<ProInfo> getAllReprice();
 
-    @Update(" update pro_info set gxsj = CURRENT_TIMESTAMP(3) , pro_zt = '3' , kjsj = CURRENT_TIMESTAMP(3), cyyhs = CAST(cyyhs as unsigned) +1 where id = #{id} and  re_price = 0 and pro_zt = '1'")
+    @Update(" update pro_info set gxsj = CURRENT_TIMESTAMP(3) , pro_zt = '3' , kjsj = date_add(CURRENT_TIMESTAMP(3), interval 1 minute), cyyhs = CAST(cyyhs as unsigned) +1 where id = #{id} and  re_price = 0 and pro_zt = '1'")
     int updateFinish(@Param("id") String id);
 
     @Update("update pro_info set gxsj = CURRENT_TIMESTAMP(3), cyyhs = CAST(cyyhs as unsigned) +1 where id = #{id} and pro_zt = '1'  ")

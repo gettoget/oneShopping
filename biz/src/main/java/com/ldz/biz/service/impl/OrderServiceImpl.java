@@ -402,7 +402,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         long zjhm;
         if (StringUtils.equals(info.getrType(), "2")) {
 
-            String  ordId = baseMapper.findLatestRobot();
+            String  ordId = baseMapper.findLatestRobot(id);
 
             // 从机器人的号码中随机取一个
 //            String ordId = (String) redis.boundValueOps(id + "_robot").get();

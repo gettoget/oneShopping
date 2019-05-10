@@ -51,7 +51,7 @@ public class ProInfoFinishSyncJob implements Job {
     			TypedTuple<Object> item = ites.next();
     			DateTime exeTime = DateTime.now().withMillis(item.getScore().longValue());
     			String proId = item.getValue().toString();
-    			if (exeTime.isAfter(DateTime.now())){
+    			if (exeTime.isBefore(DateTime.now())){
     				// 开奖时间已到，执行开奖任务
     				long removeFlag = mainRedis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").remove(proId);
     				if (removeFlag > 0){
