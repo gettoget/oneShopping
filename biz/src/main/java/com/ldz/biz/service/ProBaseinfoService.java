@@ -1,10 +1,11 @@
 package com.ldz.biz.service;
 
-import com.github.pagehelper.Page;
-import com.ldz.util.bean.PageResponse;
+import com.ldz.biz.model.WinRecord;
 import com.ldz.biz.model.ProBaseinfo;
 import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
+
+import java.util.List;
 
 /**
  * @author slu
@@ -17,4 +18,5 @@ public interface ProBaseinfoService extends BaseService<ProBaseinfo, String> {
      */
     ApiResponse<String> saveEntity(ProBaseinfo entity);
 
+    ApiResponse<List<WinRecord>> getWinRecord(String id);
 }

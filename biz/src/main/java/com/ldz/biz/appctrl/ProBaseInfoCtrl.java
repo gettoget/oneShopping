@@ -1,14 +1,15 @@
 package com.ldz.biz.appctrl;
 
-import com.github.pagehelper.Page;
-import com.ldz.util.bean.PageResponse;
 import com.ldz.biz.model.ProBaseinfo;
+import com.ldz.biz.model.WinRecord;
 import com.ldz.biz.service.ProBaseinfoService;
 import com.ldz.sys.base.BaseController;
 import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/app/guest/probaseinfo")
@@ -50,6 +51,12 @@ public class ProBaseInfoCtrl extends BaseController<ProBaseinfo, String> {
     public ApiResponse<String> remove(String[] ids){
         return null;
     }
+
+    @GetMapping("/winrecords")
+    public ApiResponse<List<WinRecord>> getWinRecords(String id ){
+        return service.getWinRecord(id);
+    }
+
 
 
 

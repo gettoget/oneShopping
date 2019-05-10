@@ -253,15 +253,13 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             if (luckNumSet.size() == 0) {
                 // 号码分配完 清理redis key
                 redis.delete(order.getProId() + "_nums");
-                // 更新商品状态为 待开奖
-                proInfo.setProZt("3");
-                proInfo.setKjsj(DateTime.now().plusMinutes(1).toString("yyyy-MM-dd HH:mm:ss.SSS"));
+                infoMapper.updateFinish(order.getProId());
                 // 建立延时任务 , 准备分配中奖号码
                 long millis = DateTime.now().plusMinutes(1).getMillis();
                 redis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").add(proInfo.getId(), millis);
+            }else{
+                infoMapper.updateProInfo(order.getProId());
             }
-            // todo 使用sql更新
-            proInfoService.update(proInfo);
         }else if(StringUtils.equals(order.getOrderType(),"1")){
             baseMapper.minusStore(baseinfo.getId(), Integer.parseInt(order.getGmfs()));
         }
