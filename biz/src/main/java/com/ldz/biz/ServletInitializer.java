@@ -9,7 +9,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletException;
 
 public class ServletInitializer extends SpringBootServletInitializer {
 
@@ -22,7 +21,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 
 	// 全局缓存
 	@Override
-	public void onStartup(ServletContext servletContext) throws ServletException {
+	public void onStartup(ServletContext servletContext) {
 		this.logger = LogFactory.getLog(this.getClass());
 		final WebApplicationContext rootAppContext = this.createRootApplicationContext(servletContext);
 		if(rootAppContext != null) {
