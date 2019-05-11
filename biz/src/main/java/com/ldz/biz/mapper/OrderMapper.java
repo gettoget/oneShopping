@@ -75,6 +75,11 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
     void updateCyyhs(@Param("id") String id);
     
     @Select(" select * from order_form where id in ( select order_id from order_list where yhlx= '1' and pro_id = #{proId} group by order_id) order by zfsj desc limit 1 ")
-    public Order findLatestRobot(@Param("proId") String proId);
+    Order findLatestRobot(@Param("proId") String proId);
+
+    @Update(" update user set zjcs = CAST(zjcs as unsigned ) + 1 where id = #{id}")
+    int updateZjcs(@Param("id") String id);
+
+
 
 }

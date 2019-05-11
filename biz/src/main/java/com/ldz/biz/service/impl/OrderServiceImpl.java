@@ -492,8 +492,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             baseMapper.updateDdztToLost(info.getId(), zjhm + "");
             // 用户中奖次数加 1-------这里不需要先查询一次再update一次，直接使用update语句同步更新即可，也可以防止事务和并发问题
             User user = userService.findById(list.getUserid());
-            user.setZjcs(Integer.parseInt(user.getZjcs()) + 1 + "");
-            userService.update(user);
+            baseMapper.updateZjcs(user.getId());
             // 中奖记录生成
             WinRecord record = new WinRecord();
             record.setId(genId());
