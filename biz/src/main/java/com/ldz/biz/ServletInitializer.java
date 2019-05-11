@@ -29,6 +29,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 				public void contextInitialized(ServletContextEvent event) {
 					userService = rootAppContext.getBean(UserService.class);
 					userService.initRobot();
+					System.out.println("缓存所有机器人");
 				}
 			});
 		} else {

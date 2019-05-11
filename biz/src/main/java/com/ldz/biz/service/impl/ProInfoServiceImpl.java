@@ -516,6 +516,32 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         return ApiResponse.success();
     }
 
+    @Override
+    public ApiResponse<String> delLuckNums() {
+        Set<Object> keys = redis.keys("*_nums");
+        for (Object key : keys) {
+            String[] s = key.toString().split("_");
+            ProInfo info = findById(s[0]);
+            if(info == null){
+                redis.delete(key);
+            }
+        }
+        return ApiResponse.success();
+    }
+
+    @Override
+    public ApiResponse<String> initRobot() {
+        userService.initRobot();
+        return ApiResponse.success();
+    }
+
+    @Override
+    public ApiResponse<String> saveAll() {
+        List<ProBaseinfo> all = proBaseinfoService.findAll();
+        all.forEach(baseinfo -> proInfoService.saveOne(baseinfo.getId()));
+        return ApiResponse.success();
+    }
+
 
     @Override
     public void afterPager(PageInfo<ProInfo> result) {
