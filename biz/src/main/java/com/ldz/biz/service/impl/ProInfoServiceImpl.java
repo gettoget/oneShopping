@@ -1,23 +1,5 @@
 package com.ldz.biz.service.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.math.RandomUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -25,19 +7,8 @@ import com.ldz.biz.bean.ProInfoLuckNumBean;
 import com.ldz.biz.mapper.OrderListMapper;
 import com.ldz.biz.mapper.OrderMapper;
 import com.ldz.biz.mapper.ProInfoMapper;
-import com.ldz.biz.model.CyyhModel;
-import com.ldz.biz.model.Order;
-import com.ldz.biz.model.OrderList;
-import com.ldz.biz.model.ProBaseinfo;
-import com.ldz.biz.model.ProInfo;
-import com.ldz.biz.model.User;
-import com.ldz.biz.model.WinRecord;
-import com.ldz.biz.service.OrderListService;
-import com.ldz.biz.service.OrderService;
-import com.ldz.biz.service.ProBaseinfoService;
-import com.ldz.biz.service.ProInfoService;
-import com.ldz.biz.service.UserService;
-import com.ldz.biz.service.WinRecordService;
+import com.ldz.biz.model.*;
+import com.ldz.biz.service.*;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.sys.base.LimitedCondition;
 import com.ldz.util.bean.ApiResponse;
@@ -48,8 +19,17 @@ import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.exception.RuntimeCheckException;
 import com.ldz.util.redis.RedisTemplateUtil;
-
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.math.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> implements ProInfoService {
@@ -343,6 +323,9 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
         if(CollectionUtils.isNotEmpty(res.getList())){
             Set<String> set = res.getList().stream().map(ProInfo::getUserId).collect(Collectors.toSet());
+            Set<String> proIds = res.getList().stream().map(ProInfo::getId).collect(Collectors.toSet());
+            List<WinRecord> records = winRecordService.findIn(WinRecord.InnerColumn.proId, proIds);
+            Map<String, String> map = records.stream().collect(Collectors.toMap(WinRecord::getProId, p -> p.getZjfs()));
             if(CollectionUtils.isNotEmpty(set)) {
                 List<User> users = userService.findByIds(set);
                 Map<String, User> userMap = new HashMap<>();
@@ -353,6 +336,9 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 res.getList().forEach(proInfo -> {
                     if (StringUtils.isNotBlank(proInfo.getUserId()) && finalUserMap.containsKey(proInfo.getUserId())) {
                         proInfo.setUserName(finalUserMap.get(proInfo.getUserId()).getUserName());
+                    }
+                    if(map.containsKey(proInfo.getId())){
+                        proInfo.setZjfs(map.get(proInfo.getId()));
                     }
                     setImgUrl(proInfo);
                 });

@@ -3,7 +3,6 @@ package com.ldz.biz.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.ldz.biz.mapper.UserMapper;
@@ -60,17 +59,17 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     }
 
     @Override
-    public ApiResponse<String> register(String phone, String password, String password1, String code) {
+    public ApiResponse<String> register(String phone, String password, String password1, String code, String username) {
         RuntimeCheck.ifBlank(phone, MessageUtils.get("user.phoneblank"));
+        RuntimeCheck.ifBlank(password, MessageUtils.get("user.pwdblank"));
+        RuntimeCheck.ifFalse(StringUtils.equals(password1, password), MessageUtils.get("user.pwdnotsame"));
+        RuntimeCheck.ifBlank(code, MessageUtils.get("user.codeblank"));
+        RuntimeCheck.ifBlank(username, MessageUtils.get("user.nameIsBlank"));
         SimpleCondition condition = new SimpleCondition(User.class);
         condition.eq(User.InnerColumn.phone, phone);
         List<User> users = findByCondition(condition);
         // 判断用户是否注册
         RuntimeCheck.ifTrue(CollectionUtils.isNotEmpty(users), MessageUtils.get("user.registered"));
-        RuntimeCheck.ifBlank(password, MessageUtils.get("user.pwdblank"));
-        RuntimeCheck.ifFalse(StringUtils.equals(password1, password), MessageUtils.get("user.pwdnotsame"));
-        RuntimeCheck.ifBlank(code, MessageUtils.get("user.codeblank"));
-
 
         String regCode = (String) redis.boundValueOps(phone + "_register_code").get();
         RuntimeCheck.ifBlank(regCode, MessageUtils.get("user.regCodeBlank"));
@@ -92,6 +91,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         user.setScore("0");
         user.setSource("0");
         user.setRegImei(imei);
+        user.setUserName(username);
         save(user);
         return ApiResponse.success(MessageUtils.get("user.regSuccess"));
     }

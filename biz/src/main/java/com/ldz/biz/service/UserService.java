@@ -21,7 +21,7 @@ public interface UserService extends BaseService<User, String> {
      * @param code
      * @return
      */
-    ApiResponse<String> register(String username, String password, String password1, String code);
+    ApiResponse<String> register(String phone, String password, String password1, String code, String username);
 
     /**
      * 用户登录
@@ -33,7 +33,6 @@ public interface UserService extends BaseService<User, String> {
 
     /**
      * 用户修改密码
-     * @param phone
      * @param pwd
      * @param newPwd
      * @param newPwd1
