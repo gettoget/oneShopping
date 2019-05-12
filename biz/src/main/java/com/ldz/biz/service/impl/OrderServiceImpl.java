@@ -1,25 +1,17 @@
 package com.ldz.biz.service.impl;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageInfo;
-import com.ldz.biz.bean.ProInfoLuckNumBean;
-import com.ldz.biz.mapper.OrderMapper;
-import com.ldz.biz.mapper.ProInfoMapper;
-import com.ldz.biz.model.*;
-import com.ldz.biz.service.*;
-import com.ldz.sys.base.BaseServiceImpl;
-import com.ldz.sys.base.LimitedCondition;
-import com.ldz.util.bean.ApiResponse;
-import com.ldz.util.bean.PageResponse;
-import com.ldz.util.bean.SimpleCondition;
-import com.ldz.util.commonUtil.DateUtils;
-import com.ldz.util.commonUtil.EncryptUtil;
-import com.ldz.util.commonUtil.MessageUtils;
-import com.ldz.util.exception.RuntimeCheck;
-import com.ldz.util.exception.RuntimeCheckException;
-import com.ldz.util.redis.RedisTemplateUtil;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -27,13 +19,40 @@ import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.stereotype.Service;
-import tk.mybatis.mapper.common.Mapper;
 
-import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageInfo;
+import com.ldz.biz.bean.ProInfoLuckNumBean;
+import com.ldz.biz.mapper.OrderMapper;
+import com.ldz.biz.mapper.ProInfoMapper;
+import com.ldz.biz.model.Exchange;
+import com.ldz.biz.model.Order;
+import com.ldz.biz.model.OrderList;
+import com.ldz.biz.model.ProBaseinfo;
+import com.ldz.biz.model.ProInfo;
+import com.ldz.biz.model.ReceiveAddr;
+import com.ldz.biz.model.User;
+import com.ldz.biz.model.WinRecord;
+import com.ldz.biz.service.ExchangeService;
+import com.ldz.biz.service.OrderListService;
+import com.ldz.biz.service.OrderService;
+import com.ldz.biz.service.ProBaseinfoService;
+import com.ldz.biz.service.ProInfoService;
+import com.ldz.biz.service.ReceiveAddrService;
+import com.ldz.biz.service.UserService;
+import com.ldz.biz.service.WinRecordService;
+import com.ldz.sys.base.BaseServiceImpl;
+import com.ldz.sys.base.LimitedCondition;
+import com.ldz.util.bean.ApiResponse;
+import com.ldz.util.bean.PageResponse;
+import com.ldz.util.bean.SimpleCondition;
+import com.ldz.util.commonUtil.DateUtils;
+import com.ldz.util.commonUtil.MessageUtils;
+import com.ldz.util.exception.RuntimeCheck;
+import com.ldz.util.exception.RuntimeCheckException;
+import com.ldz.util.redis.RedisTemplateUtil;
+
+import tk.mybatis.mapper.common.Mapper;
 
 @Service
 public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements OrderService {
@@ -396,32 +415,33 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
     @Override
     public void fenpei(String id) {
         DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS");
-        ProInfo info = proInfoService.findById(id);
+        //查询状态为代开将的商品
+        ProInfo entity = new ProInfo();
+        entity.setId(id);
+        entity.setProZt("3");
+        ProInfo info = proInfoService.findOneByEntity(entity);
+        if (info == null){
+        	return;
+        }
+        
         List<Order> lastFifty = baseMapper.getLastFifty(info.getId(), 50);
 
-        long zjhm;
+        long zjhm = 0l;
+        // 如果是需要机器人中奖，从机器人中抽取一个中间号码
         if (StringUtils.equals(info.getrType(), "2")) {
+        	//获取最后一个机器人参与的订单号码
+            Order lastOrder = baseMapper.findLatestRobot(info.getId());
+            //从最后一个购买订单的抽取一个中间号码
+            OrderList orderList = baseMapper.getOrderByRobotZjhm(lastOrder.getId());
 
-            String  ordId = baseMapper.findLatestRobot(id);
-
-            // 从机器人的号码中随机取一个
-//            String ordId = (String) redis.boundValueOps(id + "_robot").get();
-            SimpleCondition condition = new SimpleCondition(OrderList.class);
-            condition.eq(OrderList.InnerColumn.yhlx, "1");
-            condition.eq(OrderList.InnerColumn.proId, info.getId());
-            List<OrderList> lists = orderListService.findByCondition(condition);
-
-            if (lists.size() >= 1 && StringUtils.isNotBlank(ordId)) {
+            if (orderList != null && StringUtils.isNotBlank(lastOrder.getId())) {
                 List<String> strings = lastFifty.stream().map(Order::getId).collect(Collectors.toList());
-                int max = Math.max(0, lists.size());
-                int num = RandomUtils.nextInt(max);
-                String hm = lists.get(num).getNum();
-                String orderId = ordId;
-                Order order = findById(orderId);
-                if (!strings.contains(orderId)) {
+                String hm = orderList.getNum();
+                //如果最后50个订单里面没有中间号码订单，则将中奖号码订单添加进去
+                if (!strings.contains(lastOrder.getId())) {
                     lastFifty = lastFifty.subList(0, lastFifty.size() - 1);
-                    order.setZfsj(lastFifty.get(lastFifty.size() - 1).getZfsj());
-                    lastFifty.add(order);
+                    lastOrder.setZfsj(lastFifty.get(lastFifty.size() - 1).getZfsj());
+                    lastFifty.add(lastOrder);
                 }
 
                 Long hHmmssSSS = lastFifty.stream().map(Order::getZfsj).map(s -> Long.parseLong(DateTime.parse(s, formatter).toString("HHmmssSSS"))).reduce(Long::sum).get();
@@ -432,22 +452,21 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                     l += Long.parseLong(info.getProPrice());
                 }
                 String s;
-                if (!strings.contains(orderId)) {
+                if (!strings.contains(lastOrder.getId())) {
                     s = DateTime.parse(lastFifty.get(lastFifty.size() - 1).getZfsj(), formatter).plusMillis(l).toString("yyyy-MM-dd HH:mm:ss.SSS");
                 } else {
-                    s = DateTime.parse(order.getZfsj(), formatter).plusMillis(l).toString("yyyy-MM-dd HH:mm:ss.SSS");
+                    s = DateTime.parse(lastOrder.getZfsj(), formatter).plusMillis(l).toString("yyyy-MM-dd HH:mm:ss.SSS");
                 }
-                order.setZfsj(s);
-                order.setCjsj(s);
-                update(order);
+                lastOrder.setZfsj(s);
+                lastOrder.setCjsj(s);
+                update(lastOrder);
             }
+        }else{
+        	lastFifty = baseMapper.getLastFifty(info.getId(), 50);
+            // 所有时间 按 HHmmssSSS 相加
+            Long hHmmssSSS = lastFifty.stream().map(Order::getZfsj).map(s -> Long.parseLong(DateTime.parse(s, formatter).toString("HHmmssSSS"))).reduce(Long::sum).get();
+            zjhm = (hHmmssSSS % Long.parseLong(info.getProPrice())) + 10000001;
         }
-        lastFifty = baseMapper.getLastFifty(info.getId(), 50);
-        // 所有时间 按 HHmmssSSS 相加
-        Long hHmmssSSS = lastFifty.stream().map(Order::getZfsj).map(s -> Long.parseLong(DateTime.parse(s, formatter).toString("HHmmssSSS"))).reduce(Long::sum).get();
-        zjhm = (hHmmssSSS % Long.parseLong(info.getProPrice())) + 10000001;
-
-
         // 时间总数除以需求总数 取余
 
         info.setZjhm(zjhm + "");
@@ -471,10 +490,9 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             update(order);
             // 将所有没有中奖的订单重置为未中奖
             baseMapper.updateDdztToLost(info.getId(), zjhm + "");
-            // 用户中奖次数加 1
+            // 用户中奖次数加 1-------这里不需要先查询一次再update一次，直接使用update语句同步更新即可，也可以防止事务和并发问题
             User user = userService.findById(list.getUserid());
-            user.setZjcs(Integer.parseInt(user.getZjcs()) + 1 + "");
-            userService.update(user);
+            baseMapper.updateZjcs(user.getId());
             // 中奖记录生成
             WinRecord record = new WinRecord();
             record.setId(genId());

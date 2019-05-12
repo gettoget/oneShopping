@@ -6,10 +6,7 @@ import com.ldz.sys.base.BaseController;
 import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/proinfo")
@@ -50,8 +47,6 @@ public class ProInfoContrl extends BaseController<ProInfo, String> {
     public ApiResponse<String> updateKj(String id){
         return service.updateKj(id);
     }
-
-
 
 
 

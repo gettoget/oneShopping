@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import com.ldz.biz.model.Order;
+import com.ldz.biz.model.OrderList;
 import com.ldz.biz.model.User;
 import com.ldz.util.mapperprovider.InsertListMapper;
 
@@ -19,6 +20,13 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
      */
     @Select(" select * from order_form where zfsj is not null and zfsj != '' and pro_id =  #{id}  order by zfsj desc limit #{limi}")
     List<Order> getLastFifty(@Param("id") String id, @Param("limi") int limi);
+    
+    /**
+     * 从待开奖商品中查询一个分配的中奖号码
+     * @return
+     */
+    @Select("SELECT * FROM order_list where yhlx='1' and order_id= #{orderId} order by cjsj desc LIMIT 1")
+    public OrderList getOrderByRobotZjhm(@Param("orderId") String orderId);
 
     /**
      * 充值所有未中奖状态
@@ -65,9 +73,13 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
 
     @Update("update pro_info set cyyhs = CAST(cyyhs as unsigned ) + 1 where id = #{id}")
     void updateCyyhs(@Param("id") String id);
+    
+    @Select(" select * from order_form where id in ( select order_id from order_list where yhlx= '1' and pro_id = #{proId} group by order_id) order by zfsj desc limit 1 ")
+    Order findLatestRobot(@Param("proId") String proId);
 
-    @Select(" select id from order_form where id in ( select order_id from order_list where yhlx= '1' and pro_id = #{proId}) order by zfsj desc limit 1 ")
-    String findLatestRobot(@Param("proId") String proId);
+    @Update(" update user set zjcs = CAST(zjcs as unsigned ) + 1 where id = #{id}")
+    int updateZjcs(@Param("id") String id);
+
 
 
 }

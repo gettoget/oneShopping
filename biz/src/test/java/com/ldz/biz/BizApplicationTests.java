@@ -57,8 +57,10 @@ public class BizApplicationTests {
 
     @Test
     public void test() throws IOException, InterruptedException {
-        List<ProBaseinfo> all = baseinfoService.findAll();
-        all.forEach(baseinfo -> proInfoService.saveOne(baseinfo.getId()));
+        /*long millis = DateTime.now().plusMinutes(1).getMillis();
+        redis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").add("576913984226066432", millis);*/
+        /*List<ProBaseinfo> all = baseinfoService.findAll();
+        all.forEach(baseinfo -> proInfoService.saveOne(baseinfo.getId()));*/
         //List<ProInfo> allReprice = proInfoMapper.getAllReprice();
         //System.out.println(allReprice);
     	/*for (int i=0; i<10; i++){
@@ -79,7 +81,7 @@ public class BizApplicationTests {
     		Integer price = new Integer(item.getRePrice());
     		for (int p=0; p<price;p++){
     			ProInfoLuckNumBean bean = new ProInfoLuckNumBean();
-    			int num = 1000001 + (p+1);
+    			int num = 10000001 + (p+1);
     			bean.setProId(item.getId());
     			bean.setProName(item.getProName());
     			bean.setLuckNum(String.valueOf(num));
@@ -103,37 +105,37 @@ public class BizApplicationTests {
     		}
     		redis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").add(i, DateTime.now().plusMinutes(time).getMillis());
     	}*/
-        
-    	try{
-    		
-    		Set<Object> objst = redis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").range(0, -1);
-    		Iterator<Object> itest =  objst.iterator();
-    		while(itest.hasNext()){
-    			System.out.println("all:"+itest.next());
-    		}
-    		Set<TypedTuple<Object>> objs = redis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").rangeByScoreWithScores(DateTime.now().plusDays(-1).getMillis(), DateTime.now().getMillis());
-    		Iterator<TypedTuple<Object>> ites =  objs.iterator();
-    		while(ites.hasNext()){
-    			TypedTuple<Object> item = ites.next();
-    			System.out.println("随机:"+DateTime.now().withMillis(item.getScore().longValue()).toString("yyyy-MM-dd HH:mm:ss")+"=="+item.getValue());
-    		}
-        	/*while(redis.keys("*_nums").size() > 0){
-        		Set<Object> proInfos = redis.keys("*_nums");
-        		if (CollectionUtils.isNotEmpty(proInfos)){
-            		int randomIndex = RandomUtils.nextInt(proInfos.size());
-            		if (randomIndex == proInfos.size()){
-            			randomIndex = proInfos.size() - 1;
-            		}
-            		//得到商品ID
-        			Object itemKey = CollectionUtils.get(proInfos.iterator(), randomIndex);
-        			System.out.println("测试之前："+redis.boundSetOps(itemKey).size());
-            		proInfoService.saveRobot(itemKey.toString());
-            		System.out.println("测试之后："+redis.boundSetOps(itemKey).size());
-            	}
-        	}*/
-    	}catch(Exception e){
-    		e.printStackTrace();
-    	}
+
+//    	try{
+//
+//    		Set<Object> objst = redis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").range(0, -1);
+//    		Iterator<Object> itest =  objst.iterator();
+//    		while(itest.hasNext()){
+//    			System.out.println("all:"+itest.next());
+//    		}
+//    		Set<TypedTuple<Object>> objs = redis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").rangeByScoreWithScores(DateTime.now().plusDays(-1).getMillis(), DateTime.now().getMillis());
+//    		Iterator<TypedTuple<Object>> ites =  objs.iterator();
+//    		while(ites.hasNext()){
+//    			TypedTuple<Object> item = ites.next();
+//    			System.out.println("随机:"+DateTime.now().withMillis(item.getScore().longValue()).toString("yyyy-MM-dd HH:mm:ss")+"=="+item.getValue());
+//    		}
+//        	/*while(redis.keys("*_nums").size() > 0){
+//        		Set<Object> proInfos = redis.keys("*_nums");
+//        		if (CollectionUtils.isNotEmpty(proInfos)){
+//            		int randomIndex = RandomUtils.nextInt(proInfos.size());
+//            		if (randomIndex == proInfos.size()){
+//            			randomIndex = proInfos.size() - 1;
+//            		}
+//            		//得到商品ID
+//        			Object itemKey = CollectionUtils.get(proInfos.iterator(), randomIndex);
+//        			System.out.println("测试之前："+redis.boundSetOps(itemKey).size());
+//            		proInfoService.saveRobot(itemKey.toString());
+//            		System.out.println("测试之后："+redis.boundSetOps(itemKey).size());
+//            	}
+//        	}*/
+//    	}catch(Exception e){
+//    		e.printStackTrace();
+//    	}
     }
 
 }
