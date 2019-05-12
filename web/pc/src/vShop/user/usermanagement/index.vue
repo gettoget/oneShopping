@@ -20,7 +20,11 @@
         </div>
       </div>
       <div class="box_col_auto">
-        <user-card></user-card>
+        <div class="box_row_list" :style="{width: 356*4+'px',margin:'0 auto'}">
+          <div v-for="(it,index) in 10" style="padding: 18px">
+            <user-card></user-card>
+          </div>
+        </div>
       </div>
       <!--<hr  style="margin-top: 20px">-->
       <!--<div class="box_row_100">-->
