@@ -398,67 +398,99 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 //        RuntimeCheck.ifNull(user, MessageUtils.get("user.null"));
         PageResponse<CyyhModel> res = new PageResponse<>();
         List<CyyhModel> models = new ArrayList<>();
-        SimpleCondition condition = new SimpleCondition(Order.class);
+        SimpleCondition condition;
         if(StringUtils.isNotBlank(userId)){
+            condition = new SimpleCondition(Order.class);
             user = userService.findById(userId);
             condition.eq(Order.InnerColumn.userId, userId);
-        }
-        condition.setOrderByClause(" zfsj desc ");
-        PageInfo<Order> objectPageInfo = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> orderService.findByCondition(condition));
-        List<Order> orders = objectPageInfo.getList();
-        if(CollectionUtils.isNotEmpty(orders)){
-            Set<String> proIds = orders.stream().map(Order::getProId).collect(Collectors.toSet());
-            List<ProInfo> infos = proInfoService.findByIds(proIds);
-            // 拿到中奖用户的信息
-            Map<String, ProInfo> infoMap = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
-            Set<String> userIds = infos.stream().map(ProInfo::getUserId).collect(Collectors.toSet());
-            List<User> users = userService.findByIds(userIds);
+            condition.setOrderByClause(" zfsj desc ");
+            PageInfo<Order> objectPageInfo = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> orderService.findByCondition(condition));
+            List<Order> orders = objectPageInfo.getList();
+            if(CollectionUtils.isNotEmpty(orders)){
+                Set<String> proIds = orders.stream().map(Order::getProId).collect(Collectors.toSet());
+                List<ProInfo> infos = proInfoService.findByIds(proIds);
+                // 拿到中奖用户的信息
+                Map<String, ProInfo> infoMap = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
+                Set<String> userIds = infos.stream().map(ProInfo::getUserId).collect(Collectors.toSet());
+                List<User> users = userService.findByIds(userIds);
+                Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
+                for (Order order : orders) {
+                    CyyhModel model = new CyyhModel();
+
+                    model.setUserId(userId);
+                    if(user != null){
+                        model.setHimg(user.gethImg());
+                        model.setUserName(user.getUserName());
+                    }
+                    model.setGmsj(order.getZfsj());
+                    model.setGmfs(order.getGmfs());
+                    model.setProName(order.getProName());
+
+                    model.setProId(order.getProId());
+                    model.setNum(order.getZjhm());
+                    if(infoMap.containsKey(order.getProId())){
+                        ProInfo proInfo = infoMap.get(order.getProId());
+                        model.setProPrice(proInfo.getProPrice());
+                        model.setRePrice(proInfo.getRePrice());
+                        model.setCoverUrl(proInfo.getCoverUrl());
+                        if(userMap.containsKey(proInfo.getUserId())){
+                            model.setWinName(userMap.get(order.getUserId()).getUserName());
+                        }
+                    }
+                    models.add(model);
+                }
+            }
+            res.setPageNum(pageNum);
+            res.setPageSize(pageSize);
+            res.setList(models);
+            res.setTotal(objectPageInfo.getTotal());
+            return res;
+        }else{
+            String baseId = getRequestParamterAsString("baseId");
+            RuntimeCheck.ifBlank(baseId, MessageUtils.get("pro.baseIdIsBlank"));
+            // 获取最新的开奖商品
+            ProInfo info = baseMapper.getLatestPerson(baseId);
+            condition = new SimpleCondition(OrderList.class);
+            condition.setOrderByClause(" cjsj desc ");
+            PageInfo<OrderList> pageInfo = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> orderListService.findByCondition(condition));
+            List<OrderList> infoList = pageInfo.getList();
+            Set<String> set = infoList.stream().map(OrderList::getUserid).collect(Collectors.toSet());
+            List<User> users = userService.findByIds(set);
             Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
-            List<String> orderIds = orders.stream().map(Order::getId).collect(Collectors.toList());
-            List<OrderList> lists = orderListService.findIn(OrderList.InnerColumn.orderId, orderIds);
-            Map<String, List<OrderList>> orderListMap = lists.stream().collect(Collectors.groupingBy(OrderList::getOrderId));
-            List<String> inUserIds = lists.stream().map(OrderList::getUserid).collect(Collectors.toList());
-            List<User> byIds = userService.findByIds(inUserIds);
-            Map<String, User> userMap1 = byIds.stream().collect(Collectors.toMap(User::getId, p -> p));
-            for (Order order : orders) {
+
+            infoList.forEach(orderList -> {
                 CyyhModel model = new CyyhModel();
 
                 model.setUserId(userId);
-                if(user != null){
-                    model.setHimg(user.gethImg());
-                    model.setUserName(user.getUserName());
-                }else{
-                    if(orderListMap.containsKey(order.getId())){
-                        List<OrderList> orderLists = orderListMap.get(order.getId());
-                        OrderList list = orderLists.get(0);
-                        User byId = userMap1.get(list.getUserid());
-                        model.setHimg(byId.gethImg());
-                        model.setUserName(byId.getUserName());
-                    }
+                if(userMap.containsKey(orderList.getUserid())){
+                    User user1 = userMap.get(orderList.getUserid());
+                    model.setHimg(user1.gethImg());
+                    model.setUserName(user1.getUserName());
                 }
-                model.setGmsj(order.getZfsj());
-                model.setGmfs(order.getGmfs());
-                model.setProName(order.getProName());
 
-                model.setProId(order.getProId());
-                model.setNum(order.getZjhm());
-                if(infoMap.containsKey(order.getProId())){
-                    ProInfo proInfo = infoMap.get(order.getProId());
-                    model.setProPrice(proInfo.getProPrice());
-                    model.setRePrice(proInfo.getRePrice());
-                    model.setCoverUrl(proInfo.getCoverUrl());
-                    if(userMap.containsKey(proInfo.getUserId())){
-                        model.setWinName(userMap.get(order.getUserId()).getUserName());
-                    }
-                }
+                model.setGmsj(orderList.getCjsj());
+                model.setProName(orderList.getProName());
+
+                model.setProId(orderList.getProId());
+                model.setNum(info.getZjhm());
+                model.setProPrice(info.getProPrice());
+                model.setRePrice(info.getRePrice());
+                model.setCoverUrl(info.getCoverUrl());
+                User winUser = userService.findById(info.getUserId());
+                model.setWinName(winUser.getUserName());
+
                 models.add(model);
-            }
+            });
+            res.setPageNum(pageNum);
+            res.setPageSize(pageSize);
+            res.setList(models);
+            res.setTotal(pageInfo.getTotal());
+            return res;
         }
-        res.setPageNum(pageNum);
-        res.setPageSize(pageSize);
-        res.setList(models);
-        res.setTotal(objectPageInfo.getTotal());
-        return res;
+
+
+
+
     }
 
     @Override
