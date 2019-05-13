@@ -30,7 +30,7 @@ public class UserCtrl  {
      * @return
      */
     @PostMapping("/register")
-    public ApiResponse<String> register(String phone, String password, String password1, String code,String username){
+    public ApiResponse<Map<String, Object>> register(String phone, String password, String password1, String code, String username){
         return service.register(phone, password,password1, code, username);
     }
 

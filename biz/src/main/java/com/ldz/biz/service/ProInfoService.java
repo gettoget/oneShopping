@@ -68,4 +68,6 @@ public interface ProInfoService extends BaseService<ProInfo, String> {
     ApiResponse<String> initRobot();
 
     ApiResponse<String> saveAll();
+
+    ApiResponse<String> getLatestPro(String id);
 }

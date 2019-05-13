@@ -528,6 +528,12 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         return ApiResponse.success();
     }
 
+    @Override
+    public ApiResponse<String> getLatestPro(String id) {
+        String s = baseMapper.getLatestPro(id);
+        return ApiResponse.success(s);
+    }
+
 
     @Override
     public void afterPager(PageInfo<ProInfo> result) {

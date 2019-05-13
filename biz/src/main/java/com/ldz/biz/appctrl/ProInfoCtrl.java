@@ -135,7 +135,13 @@ public class ProInfoCtrl  {
         return service.saveAll();
     }
 
-
+    /**
+     * 获取与往期商品相同的最新商品
+     */
+    @GetMapping("/latestPro")
+    public ApiResponse<String> getLatestPro(String id ){
+        return service.getLatestPro(id);
+    }
 
 
 }

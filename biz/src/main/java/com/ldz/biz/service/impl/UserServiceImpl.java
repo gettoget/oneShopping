@@ -59,7 +59,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     }
 
     @Override
-    public ApiResponse<String> register(String phone, String password, String password1, String code, String username) {
+    public ApiResponse<Map<String, Object>> register(String phone, String password, String password1, String code, String username) {
         RuntimeCheck.ifBlank(phone, MessageUtils.get("user.phoneblank"));
         RuntimeCheck.ifBlank(password, MessageUtils.get("user.pwdblank"));
         RuntimeCheck.ifFalse(StringUtils.equals(password1, password), MessageUtils.get("user.pwdnotsame"));
@@ -92,8 +92,21 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         user.setSource("0");
         user.setRegImei(imei);
         user.setUserName(username);
+        user.setLastImei(imei);
+        user.setLastTime(DateUtils.getNowTime());
         save(user);
-        return ApiResponse.success(MessageUtils.get("user.regSuccess"));
+        String token = JwtUtil.createToken(user.getId(), System.currentTimeMillis() + "");
+        redisDao.boundValueOps(user.getId()).set(token, 30, TimeUnit.DAYS);
+        ApiResponse<Map<String,Object>> response = new ApiResponse<>();
+        response.setMessage(MessageUtils.get("user.regSuccess"));
+        UserModel model = new UserModel(user);
+        model.setToken(token);
+        redis.boundValueOps(user.getId() + "_userInfo").set(JSON.toJSON(model), 30, TimeUnit.DAYS);
+        Map<String,Object> map = new HashMap<>();
+        map.put("token", token);
+        map.put("userInfo",model);
+        response.setResult(map);
+        return response;
     }
 
     @Override

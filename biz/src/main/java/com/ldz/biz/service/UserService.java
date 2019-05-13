@@ -16,12 +16,12 @@ import java.util.Map;
 public interface UserService extends BaseService<User, String> {
     /**
      * 用户注册
-     * @param username
      * @param password
      * @param code
+     * @param username
      * @return
      */
-    ApiResponse<String> register(String phone, String password, String password1, String code, String username);
+    ApiResponse<Map<String, Object>> register(String phone, String password, String password1, String code, String username);
 
     /**
      * 用户登录
