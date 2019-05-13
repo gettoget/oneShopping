@@ -393,13 +393,16 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
     @Override
     public PageResponse<CyyhModel> getInUser(String userId, int pageNum , int pageSize) {
-        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.idIsnull"));
-        User user = userService.findById(userId);
-        RuntimeCheck.ifNull(user, MessageUtils.get("user.null"));
+//        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.idIsnull"));
+        User user = null;
+//        RuntimeCheck.ifNull(user, MessageUtils.get("user.null"));
         PageResponse<CyyhModel> res = new PageResponse<>();
         List<CyyhModel> models = new ArrayList<>();
         SimpleCondition condition = new SimpleCondition(Order.class);
-        condition.eq(Order.InnerColumn.userId, userId);
+        if(StringUtils.isNotBlank(userId)){
+            user = userService.findById(userId);
+            condition.eq(Order.InnerColumn.userId, userId);
+        }
         condition.setOrderByClause(" zfsj desc ");
         PageInfo<Order> objectPageInfo = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> orderService.findByCondition(condition));
         List<Order> orders = objectPageInfo.getList();
@@ -411,15 +414,32 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
             Set<String> userIds = infos.stream().map(ProInfo::getUserId).collect(Collectors.toSet());
             List<User> users = userService.findByIds(userIds);
             Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
+            List<String> orderIds = orders.stream().map(Order::getId).collect(Collectors.toList());
+            List<OrderList> lists = orderListService.findIn(OrderList.InnerColumn.orderId, orderIds);
+            Map<String, List<OrderList>> orderListMap = lists.stream().collect(Collectors.groupingBy(OrderList::getOrderId));
+            List<String> inUserIds = lists.stream().map(OrderList::getUserid).collect(Collectors.toList());
+            List<User> byIds = userService.findByIds(inUserIds);
+            Map<String, User> userMap1 = byIds.stream().collect(Collectors.toMap(User::getId, p -> p));
             for (Order order : orders) {
                 CyyhModel model = new CyyhModel();
 
                 model.setUserId(userId);
-                model.setHimg(user.gethImg());
+                if(user != null){
+                    model.setHimg(user.gethImg());
+                    model.setUserName(user.getUserName());
+                }else{
+                    if(orderListMap.containsKey(order.getId())){
+                        List<OrderList> orderLists = orderListMap.get(order.getId());
+                        OrderList list = orderLists.get(0);
+                        User byId = userMap1.get(list.getUserid());
+                        model.setHimg(byId.gethImg());
+                        model.setUserName(byId.getUserName());
+                    }
+                }
                 model.setGmsj(order.getZfsj());
                 model.setGmfs(order.getGmfs());
                 model.setProName(order.getProName());
-                model.setUserName(user.getUserName());
+
                 model.setProId(order.getProId());
                 model.setNum(order.getZjhm());
                 if(infoMap.containsKey(order.getProId())){
@@ -590,6 +610,9 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
     @Override
     public void saveRobot(String redisProInfoKey) {
     	String proId = redisProInfoKey.toString().split("_")[0];
+    	if(StringUtils.equals(proId,"576416498793316352")){
+            System.out.println("a");
+        }
         //1.生成本次多少个用户参与
         int randomMaxUserNum = RandomUtils.nextInt(people);
         if (randomMaxUserNum == 0) {

@@ -249,34 +249,45 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             		break;
             	}
             }
-            
-            List<OrderList> orderLists = new ArrayList<>();
-            for (int i = 0; i < elements.size(); i++) {
-                ProInfoLuckNumBean num = (ProInfoLuckNumBean) elements.get(i);
-                OrderList orderList = new OrderList(order, num.getLuckNum(), user1);
-                orderList.setId(genId());
-                orderLists.add(orderList);
-            }
-            // 查看商品剩余名额是否 为 0   且所有订单都已支付
+            try {
+                List<OrderList> orderLists = new ArrayList<>();
+                for (int i = 0; i < elements.size(); i++) {
+                    ProInfoLuckNumBean num = (ProInfoLuckNumBean) elements.get(i);
+                    OrderList orderList = new OrderList(order, num.getLuckNum(), user1);
+                    orderList.setId(genId());
+                    orderLists.add(orderList);
+                }
+                // 查看商品剩余名额是否 为 0   且所有订单都已支付
             /*proInfo.setGxsj(DateUtils.getNowTime());
             proInfo.setCyyhs(Integer.parseInt(proInfo.getCyyhs()) + 1 + "");*/
-            // 获取中奖号
-            if (CollectionUtils.isNotEmpty(orderLists)) {
-                orderListService.saveList(orderLists);
-            }
-            int updateNum = baseMapper.minusRePrice(gmfs, order.getProId());
-            if (updateNum == 0) {
-                throw new RuntimeCheckException(MessageUtils.get("pro.minusFail"));
-            }
-            if (luckNumSet.size() == 0) {
-                // 号码分配完 清理redis key
-                redis.delete(order.getProId() + "_nums");
-                infoMapper.updateFinish(order.getProId());
-                // 建立延时任务 , 准备分配中奖号码
-                long millis = DateTime.now().plusMinutes(1).getMillis();
-                redis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").add(proInfo.getId(), millis);
-            }else{
-                infoMapper.updateProInfo(order.getProId());
+                // 获取中奖号
+                if (CollectionUtils.isNotEmpty(orderLists)) {
+                    orderListService.saveList(orderLists);
+                }
+                int updateNum = baseMapper.minusRePrice(gmfs, order.getProId());
+                if (updateNum == 0) {
+                    throw new RuntimeCheckException(MessageUtils.get("pro.minusFail"));
+                }
+                if (luckNumSet.size() == 0) {
+                    // 号码分配完 清理redis key
+                    redis.delete(order.getProId() + "_nums");
+                    infoMapper.updateFinish(order.getProId());
+                    // 建立延时任务 , 准备分配中奖号码
+                    long millis = DateTime.now().plusMinutes(1).getMillis();
+                    redis.boundZSetOps(ProInfo.class.getSimpleName() + "_award").add(proInfo.getId(), millis);
+                } else {
+                    infoMapper.updateProInfo(order.getProId());
+                }
+            }catch (Exception e){
+                // 异常处理 , 将号码添加回去
+                if (elements.size() > 0){
+                    // 执行发生异常后，需要先将中奖号码回压到redis中，防止号码丢失
+                    for (int i=0; i<elements.size(); i++){
+                        redis.boundSetOps(order.getProId() + "_nums").add(elements.get(i));
+                    }
+                }
+                // 继续抛出异常，保证数据库事务回滚
+                throw e;
             }
         }else if(StringUtils.equals(order.getOrderType(),"1")){
             baseMapper.minusStore(baseinfo.getId(), Integer.parseInt(order.getGmfs()));
@@ -371,10 +382,12 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 Map<String, String> finalUserMap = userMap;
                 pageInfo.getList().stream().forEach(order -> {
                     if (map.containsKey(order.getProId())) {
-                        order.setCoverUrl(map.get(order.getProId()).getCoverUrl());
-                        order.setKjsj(map.get(order.getProId()).getKjsj());
-                        if (finalUserMap.containsKey(map.get(order.getProId()).getUserId())) {
-                            order.setUserName(finalUserMap.get(map.get(order.getProId()).getUserId()));
+                        ProInfo proInfo = map.get(order.getProId());
+                        order.setCoverUrl(proInfo.getCoverUrl());
+                        order.setKjsj(proInfo.getKjsj());
+                        order.setRate(Integer.parseInt(proInfo.getRePrice())*100/Integer.parseInt(proInfo.getProPrice()));
+                        if (finalUserMap.containsKey(proInfo.getUserId())) {
+                            order.setUserName(finalUserMap.get(proInfo.getUserId()));
                         }
                     }
                     order.setAddr(listMap.get(order.getReceId()));
