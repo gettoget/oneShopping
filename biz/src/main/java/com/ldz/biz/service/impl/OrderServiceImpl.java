@@ -432,8 +432,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 //如果最后50个订单里面没有中间号码订单，则将中奖号码订单添加进去
                 if (!strings.contains(lastOrder.getId())) {
                     lastFifty = lastFifty.subList(0, lastFifty.size() - 1);
-                    orderList.setCjsj(lastFifty.get(lastFifty.size() - 1).getCjsj());
-                    lastFifty.add(orderList);
+                    lastOrder.setCjsj(lastFifty.get(lastFifty.size() - 1).getCjsj());
+                    lastFifty.add(lastOrder);
                 }
                 Long hHmmssSSS = lastFifty.stream().map(OrderList::getCjsj).map(s -> Long.parseLong(DateTime.parse(s, formatter).toString("HHmmssSSS"))).reduce(Long::sum).get();
                 zjhm = (hHmmssSSS % Long.parseLong(info.getProPrice())) + 10000001;
@@ -453,6 +453,10 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 lastOrder.setCjsj(s);
                 update(lastOrder);*/
                 orderListService.update(lastOrder);
+               /* lastFifty = baseMapper.getLastFifty(info.getId(), 50);
+                hHmmssSSS = lastFifty.stream().map(OrderList::getCjsj).map(s1 -> Long.parseLong(DateTime.parse(s1, formatter).toString("HHmmssSSS"))).reduce(Long::sum).get();
+                zjhm = (hHmmssSSS % Long.parseLong(info.getProPrice())) + 10000001;*/
+                zjhm = Long.parseLong(hm);
             }
         } else {
             lastFifty = baseMapper.getLastFifty(info.getId(), 50);

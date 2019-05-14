@@ -1,7 +1,9 @@
 package com.ldz.biz;
 
 import com.ldz.biz.bean.ProInfoLuckNumBean;
+import com.ldz.biz.mapper.OrderMapper;
 import com.ldz.biz.mapper.ProInfoMapper;
+import com.ldz.biz.model.OrderList;
 import com.ldz.biz.model.ProBaseinfo;
 import com.ldz.biz.model.ProInfo;
 import com.ldz.biz.model.User;
@@ -15,6 +17,8 @@ import com.ldz.util.redis.RedisTemplateUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.math.RandomUtils;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,12 +55,23 @@ public class BizApplicationTests {
     private ProBaseinfoService baseinfoService;
     @Autowired
     private SnowflakeIdWorker idWorker;
+    @Autowired
+    private OrderMapper orderMapper;
     @Test
     public void contextLoads() {
     }
 
     @Test
     public void test() throws IOException, InterruptedException {
+       /* DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS");
+        List<OrderList> lastFifty = orderMapper.getLastFifty("576416482989178880", 50);
+        Long hHmmssSSS = lastFifty.stream().map(OrderList::getCjsj).map(s -> Long.parseLong(DateTime.parse(s, formatter).toString("HHmmssSSS"))).reduce(Long::sum).get();
+        String zjhm = (hHmmssSSS % Long.parseLong("7699")) + 10000001 + "";*/
+//        orderService.fenpei("576416482989178880");
+//        System.out.println(zjhm);
+
+
+
         /*long millis = DateTime.now().plusMinutes(1).getMillis();
         redis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").add("576913984226066432", millis);*/
         /*List<ProBaseinfo> all = baseinfoService.findAll();

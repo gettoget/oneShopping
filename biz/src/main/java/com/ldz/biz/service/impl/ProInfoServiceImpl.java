@@ -411,7 +411,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 List<ProInfo> infos = proInfoService.findByIds(proIds);
                 // 拿到中奖用户的信息
                 Map<String, ProInfo> infoMap = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
-                Set<String> userIds = infos.stream().map(ProInfo::getUserId).collect(Collectors.toSet());
+                Set<String> userIds = infos.stream().filter(proInfo -> StringUtils.isNotBlank(proInfo.getUserId())).map(ProInfo::getUserId).collect(Collectors.toSet());
                 List<User> users = userService.findByIds(userIds);
                 Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
                 for (Order order : orders) {
@@ -434,7 +434,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                         model.setRePrice(proInfo.getRePrice());
                         model.setCoverUrl(proInfo.getCoverUrl());
                         if(userMap.containsKey(proInfo.getUserId())){
-                            model.setWinName(userMap.get(order.getUserId()).getUserName());
+                            model.setWinName(userMap.get(proInfo.getUserId()).getUserName());
                         }
                     }
                     models.add(model);
@@ -449,8 +449,16 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
             String baseId = getRequestParamterAsString("baseId");
             RuntimeCheck.ifBlank(baseId, MessageUtils.get("pro.baseIdIsBlank"));
             // 获取最新的开奖商品
-            ProInfo info = baseMapper.getLatestPerson(baseId);
+            ProInfo proInfo = proInfoService.findById(baseId);
+            if(proInfo == null ){
+                return res;
+            }
+            ProInfo info = baseMapper.getLatestPerson(proInfo.getProBaseid());
+            if(info == null){
+                return res;
+            }
             condition = new SimpleCondition(OrderList.class);
+            condition.eq(OrderList.InnerColumn.proId, info.getId());
             condition.setOrderByClause(" cjsj desc ");
             PageInfo<OrderList> pageInfo = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> orderListService.findByCondition(condition));
             List<OrderList> infoList = pageInfo.getList();

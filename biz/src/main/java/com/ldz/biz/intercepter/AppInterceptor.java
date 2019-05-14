@@ -23,6 +23,8 @@ public class AppInterceptor extends HandlerInterceptorAdapter {
     private StringRedisTemplate redisDao;
 
 
+    private List<String> whiteList = Arrays.asList("/app/user/login","/app/user/register","/app/user/sendMsg","/app/user/findPwd","/app/user/proeval/newPager");
+
     public AppInterceptor() {
     }
 
@@ -50,13 +52,20 @@ public class AppInterceptor extends HandlerInterceptorAdapter {
             token =  request.getParameter("token");
         }
 
-
-
         String imei = request.getHeader("imei");
         if (StringUtils.isBlank(imei)) {
             imei = request.getParameter("imei");
         }
-
+        String requestURI = request.getRequestURI();
+        if(StringUtils.startsWith(requestURI,"/app/guest") || whiteList.contains(requestURI)){
+            if(StringUtils.isBlank(imei)){
+                request.getRequestDispatcher("/authFiled").forward(request, response);
+                return false;
+            }else{
+                request.setAttribute("imei", imei);
+                return super.preHandle(request, response, handler);
+            }
+        }
         if (StringUtils.isEmpty(userId) || StringUtils.isEmpty(token) || StringUtils.isBlank(imei)){
             request.getRequestDispatcher("/authFiled").forward(request, response);
             return false;
