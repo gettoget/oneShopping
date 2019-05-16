@@ -20,13 +20,13 @@ public class ResponseAdvice implements ResponseBodyAdvice {
 
     @Override
     public Object beforeBodyWrite(Object o, MethodParameter methodParameter, MediaType mediaType, Class aClass, ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse) {
-       /* String rsa="";
+        String rsa="";
         try {
             rsa = RSAUtils.encryptWithRSA(JsonUtil.toJson(o));
         } catch (Exception e) {
             MessageUtils.get("error");
         }
-        return rsa;*/
-       return o;
+        return rsa;
+//       return o;
     }
 }
