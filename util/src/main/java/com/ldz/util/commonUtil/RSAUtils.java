@@ -84,7 +84,7 @@ public class RSAUtils {
 		cipher.init(Cipher.ENCRYPT_MODE, key);
 		// 加密时超过117字节就报错。为此采用分段加密的办法来加密  
 		ByteArrayOutputStream out = new ByteArrayOutputStream();  
-		byte[] data = str.getBytes();
+		byte[] data = str.getBytes("UTF-8");
 		int inputLen = data.length;  
 		int offSet = 0;  
         byte[] cache;  

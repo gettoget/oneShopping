@@ -2,7 +2,7 @@ server:
   port: 8088
 spring:
   profiles:
-    active: test  #合并 application-test.yml 中的配置参数
+    active: prod  #合并 application-test.yml 中的配置参数
   messages:
     basename: i18n/messages
     cache-second: 3600

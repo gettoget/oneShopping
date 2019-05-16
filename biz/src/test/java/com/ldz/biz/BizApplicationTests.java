@@ -11,6 +11,7 @@ import com.ldz.biz.service.OrderService;
 import com.ldz.biz.service.ProBaseinfoService;
 import com.ldz.biz.service.ProInfoService;
 import com.ldz.biz.service.UserService;
+import com.ldz.util.bean.SimpleCondition;
 import com.ldz.util.commonUtil.*;
 import com.ldz.util.redis.RedisTemplateUtil;
 
@@ -29,6 +30,7 @@ import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.beans.SimpleBeanInfo;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
@@ -63,6 +65,27 @@ public class BizApplicationTests {
 
     @Test
     public void test() throws IOException, InterruptedException {
+        /*Set<Object> keys = redis.keys("*_nums");
+        Iterator<Object> iterator = keys.iterator();
+        while (iterator.hasNext()){
+
+            String next = (String) iterator.next();
+            SimpleCondition condition =  new SimpleCondition(ProInfo.class);
+            String s = next.split("_")[0];
+            condition.eq(ProInfo.InnerColumn.id, s);
+            condition.eq(ProInfo.InnerColumn.proZt, "1");
+            condition.and().andCondition(" re_price = '0'");
+            List<ProInfo> proInfos = proInfoService.findByCondition(condition);
+            if(CollectionUtils.isNotEmpty(proInfos)){
+                ProInfo proInfo = proInfos.get(0);
+                proInfo.setProZt("3");
+                proInfoService.update(proInfo);
+                orderService.fenpei(proInfo.getId());
+                redis.delete(next);
+            }
+
+        }*/
+
        /* DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS");
         List<OrderList> lastFifty = orderMapper.getLastFifty("576416482989178880", 50);
         Long hHmmssSSS = lastFifty.stream().map(OrderList::getCjsj).map(s -> Long.parseLong(DateTime.parse(s, formatter).toString("HHmmssSSS"))).reduce(Long::sum).get();
