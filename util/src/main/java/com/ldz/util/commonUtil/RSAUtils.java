@@ -1,23 +1,14 @@
 package com.ldz.util.commonUtil;
 
+import org.apache.commons.codec.binary.Base64;
+import sun.misc.BASE64Encoder;
+
+import javax.crypto.Cipher;
 import java.io.ByteArrayOutputStream;
-import java.security.Key;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.SecureRandom;
+import java.security.*;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-
-import javax.crypto.Cipher;
-
-import org.apache.commons.codec.binary.Base64;
-
-import sun.misc.BASE64Encoder;
 
 /**
  * 生成RSA密钥文件，用于设备商数据交换加密用
@@ -143,7 +134,7 @@ public class RSAUtils {
         byte[] decryptedData = out.toByteArray();  
         out.close();  
 		//解密器解密由Base64解码后的密文,获得明文字节数组
-		return new String(decryptedData, "GBK");
+		return new String(decryptedData, "UTF-8");
 	}
 	
 	/**
