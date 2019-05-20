@@ -1,8 +1,8 @@
 import config from '@/config'
 // const ajaxUrl = process.env.NODE_ENV === 'development' ? config.baseUrl.dev : config.baseUrl.pro
 const ajaxUrl = process.env.NODE_ENV === 'development'
-  ? 'http://mt.xxpt123.com:81'
-  : 'http://mt.xxpt123.com:81'
+  ? '127.0.0.1:8088'
+  : '127.0.0.1:8088'
 
 export default {
   NETWORK_ERR_STR: '网络加载异常!',

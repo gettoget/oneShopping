@@ -9,13 +9,17 @@ import com.baidu.yun.push.model.PushMsgToAllRequest;
 import com.baidu.yun.push.model.PushMsgToAllResponse;
 import com.baidu.yun.push.model.PushMsgToSingleDeviceRequest;
 import com.baidu.yun.push.model.PushMsgToSingleDeviceResponse;
+import com.ldz.util.bean.ApiResponse;
+import net.sf.json.JSON;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 public class BaiduPushUtils {
 
 
     public static void pushSingleMsg(String chnnelId, int messageType,String message,int deviceType) throws PushClientException, PushServerException {
-        String apiKey = "";
-        String secretKey = "";
+        String apiKey = "zid2bvrlXw2KjoD85RfgFPAu";
+        String secretKey = "FlfACjZ6MCQZ52kAAA3vGv4nPcFu713Y";
 
         PushKeyPair pair = new PushKeyPair(apiKey,secretKey);
 
@@ -63,9 +67,22 @@ public class BaiduPushUtils {
 
 
     public static void pushAllMsg(int messageType, String message, int deviceType, long sendTime) throws PushClientException, PushServerException{
+
+       /* {
+            "title" : "hello" ,
+                "description": "hello world" //必选
+            "notification_builder_id": 0, //可选
+                "notification_basic_style": 7, //可选
+                "open_type":0, //可选
+                "url": "http://developer.baidu.com", //可选
+                "pkg_content":"", //可选
+                "custom_content":{"key":"value"},
+        }*/
+
+
         // 1. get apiKey and secretKey from developer console
-        String apiKey = "xxxxxxxxxxxxxxxxxxxx";
-        String secretKey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+        String apiKey = "zid2bvrlXw2KjoD85RfgFPAu";
+        String secretKey = "FlfACjZ6MCQZ52kAAA3vGv4nPcFu713Y";
         PushKeyPair pair = new PushKeyPair(apiKey, secretKey);
 
         // 2. build a BaidupushClient object to access released interfaces
@@ -75,13 +92,27 @@ public class BaiduPushUtils {
         // 3. register a YunLogHandler to get detail interacting information
         // in this request.
         pushClient.setChannelLogHandler(event -> System.out.println(event.getMessage()));
+//        JSONArray jsonArray = new JSONArray();
+        JSONObject object = new JSONObject();
+        if(messageType == 1){
+            ApiResponse apiResponse = new ApiResponse();
+            apiResponse.setCode(200);
 
+            object.put("title","hello");
+            object.put("description","hello world");
+            object.put("custom_content",JsonUtil.toJson(apiResponse));
+            object.put("notification_builder_id",0);
+            object.put("notification_basic_style",7);
+            object.put("open_type",0);
+//            jsonArray.add(object);
+        }
+        String s = object.toString();
         try {
             // 4. specify request arguments
             PushMsgToAllRequest request = new PushMsgToAllRequest()
                     .addMsgExpires(new Integer(3600))
                     .addMessageType(messageType)
-                    .addMessage(message)
+                    .addMessage(object.toString())
                     // 设置定时推送时间，必需超过当前时间一分钟，单位秒.实例70秒后推送
                     .addSendTime(sendTime)
                     .addDeviceType(deviceType);

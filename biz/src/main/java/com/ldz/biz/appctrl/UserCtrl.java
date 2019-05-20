@@ -41,7 +41,7 @@ public class UserCtrl  {
      * @return
      */
     @PostMapping("/login")
-    public ApiResponse<Map<String, Object>> login(String phone, String password){
+    public ApiResponse<Map<String, Object>> login(String phone, String password) throws Exception {
         return  service.login(phone, password);
     }
 

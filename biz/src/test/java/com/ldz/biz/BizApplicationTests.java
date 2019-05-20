@@ -1,5 +1,7 @@
 package com.ldz.biz;
 
+import com.baidu.yun.push.exception.PushClientException;
+import com.baidu.yun.push.exception.PushServerException;
 import com.ldz.biz.bean.ProInfoLuckNumBean;
 import com.ldz.biz.mapper.OrderMapper;
 import com.ldz.biz.mapper.ProInfoMapper;
@@ -64,7 +66,10 @@ public class BizApplicationTests {
     }
 
     @Test
-    public void test() throws IOException, InterruptedException {
+    public void test() throws IOException, InterruptedException, PushClientException, PushServerException {
+        BaiduPushUtils.pushAllMsg(1,"测试",3,System.currentTimeMillis()/1000 + 70);
+
+
         /*Set<Object> keys = redis.keys("*_nums");
         Iterator<Object> iterator = keys.iterator();
         while (iterator.hasNext()){

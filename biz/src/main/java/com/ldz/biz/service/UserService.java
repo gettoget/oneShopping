@@ -29,7 +29,7 @@ public interface UserService extends BaseService<User, String> {
      * @param password
      * @return
      */
-    ApiResponse<Map<String, Object>> login(String phone, String password);
+    ApiResponse<Map<String, Object>> login(String phone, String password) throws Exception;
 
     /**
      * 用户修改密码
