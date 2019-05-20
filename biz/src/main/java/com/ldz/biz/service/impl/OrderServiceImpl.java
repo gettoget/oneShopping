@@ -174,7 +174,9 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             order.setZfje(Integer.parseInt(baseinfo.getProPrice()) * Integer.parseInt(order.getGmfs()) + "");*/
             // 直接购买  baseInfo 库存 -1
             //            baseMapper.minusStore(baseinfo.getId(), Integer.parseInt(order.getGmfs()));
+
             // todo 直接购买可能是直接调用支付接口
+
             // 直接购买订单 订单状态改为已支付
             order.setDdzt("4");
         } else if (StringUtils.equals(entity.getOrderType(), "2")) {
@@ -232,7 +234,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 List<OrderList> orderLists = new ArrayList<>();
                 for (int i = 0; i < elements.size(); i++) {
                     ProInfoLuckNumBean num = (ProInfoLuckNumBean) elements.get(i);
-                    OrderList orderList = new OrderList(order, num.getLuckNum(), user1);
+                    OrderList orderList = new OrderList(order, num.getLuckNum(), user1, DateTime.now().plus(i).toString("yyyy-MM-dd HH:mm:ss.SSS"));
                     orderList.setId(genId());
                     orderLists.add(orderList);
                 }
@@ -254,6 +256,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                     // 建立延时任务 , 准备分配中奖号码
                     long millis = DateTime.now().plusMinutes(1).getMillis();
                     redis.boundZSetOps(ProInfo.class.getSimpleName() + "_award").add(proInfo.getId(), millis);
+                    //  todo 推送待开奖数据到前台
                 } else {
                     infoMapper.updateProInfo(order.getProId());
                 }
@@ -275,52 +278,6 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         userService.update(user1);
         save(order);
 
-        // 当剩余名额剩余过半时
-       /* String s = (String) redis.boundValueOps(order.getProId() + "_robot").get();
-        if (StringUtils.isBlank(s) && "2".equals(proInfo.getrType()) && Integer.parseInt(proInfo.getProPrice()) / Integer.parseInt(proInfo.getRePrice()) > 1 && Integer.parseInt(proInfo.getProPrice()) >= 2) {
-            Set<Object> set = redis.boundSetOps(proInfo.getId() + "_nums").distinctRandomMembers(2);
-            List<Object> objectList = new ArrayList<>();
-            CollectionUtils.addAll(objectList, set);
-            // 随机生成 2 个用户创建订单 , 负责控制号码
-            List<User> users = baseMapper.ranUsers(set.size());
-            for (int i = 0; i < users.size(); i++) {
-                User user = users.get(i);
-                Order ord = new Order();
-                ord.setId(genId());
-                ord.setUserName(user.getUserName());
-                ord.setUserId(user.getId());
-                ord.setProName(proInfo.getProName());
-                ord.setOrderType("2");
-                ord.setProId(proInfo.getId());
-                ord.setDdzt("0");
-                ord.setGmfs("1");
-                ord.setZfje("1");
-                ord.setZfsj(DateUtils.getNowTime());
-                ord.setImei(user.getRegImei());
-                ord.setCjsj(DateUtils.getNowTime());
-                save(ord);
-                baseMapper.minusRePrice(1, proInfo.getId());
-                baseMapper.updateCyyhs(proInfo.getId());
-                // 分配号码
-                ProInfoLuckNumBean num = (ProInfoLuckNumBean) objectList.get(i);
-                OrderList orderList = new OrderList();
-                orderList.setYhlx("1");
-                orderList.setUserName(user.getUserName());
-                orderList.setUserid(user.getId());
-                orderList.setOrderId(ord.getId());
-                orderList.setProId(proInfo.getId());
-                orderList.setProName(proInfo.getProName());
-                orderList.setNum(num.getLuckNum());
-                orderList.setId(genId());
-                orderList.setCjsj(DateUtils.getNowTime());
-                orderListService.save(orderList);
-                redis.boundValueOps(order.getProId() + "_robot").set(ord.getId());
-            }
-            Iterator<Object> removeNum = set.iterator();
-            while (removeNum.hasNext()) {
-                redis.boundSetOps(order.getProId() + "_nums").remove(removeNum.next());
-            }
-        }*/
         return ApiResponse.success(MessageUtils.get("order.paySuc"));
 
     }
@@ -364,7 +321,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                         ProInfo proInfo = map.get(order.getProId());
                         order.setCoverUrl(proInfo.getCoverUrl());
                         order.setKjsj(proInfo.getKjsj());
-                        order.setRate( (Integer.parseInt(proInfo.getProPrice()) -Integer.parseInt(proInfo.getRePrice())) * 100 / Integer.parseInt(proInfo.getProPrice()));
+                        order.setRate((Integer.parseInt(proInfo.getProPrice()) - Integer.parseInt(proInfo.getRePrice())) * 100 / Integer.parseInt(proInfo.getProPrice()));
                         if (finalUserMap.containsKey(proInfo.getUserId())) {
                             order.setUserName(finalUserMap.get(proInfo.getUserId()));
                         }

@@ -289,7 +289,7 @@ public class OrderList implements Serializable {
     public OrderList() {
     }
 
-    public OrderList(Order order, String num, User user){
+    public OrderList(Order order, String num, User user, String cjsj) {
         this.orderId = order.getId();
         this.proId = order.getProId();
         this.proName = order.getProName();
@@ -297,7 +297,7 @@ public class OrderList implements Serializable {
         this.num = num;
         this.userName = user.getUserName();
         this.yhlx = user.getSource();
-        this.cjsj = DateUtils.getNowTime();
+        this.cjsj = cjsj;
 
 
     }

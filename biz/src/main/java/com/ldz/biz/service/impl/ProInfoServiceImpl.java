@@ -54,12 +54,12 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
     @Autowired
     private ProInfoService proInfoService;
-    
+
     @Autowired
 	private OrderListMapper orderListMapper;
     @Autowired
 	private OrderMapper orderMapper;
-    
+
 
     @Value("${robot.point}")
     private double point;
@@ -695,11 +695,11 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         }else{
         	CollectionUtils.addAll(cloneElements, elements);
         }
-        
+
         try{
         	//3.从redis随机获取机器人用户
     		Set<Object> users = redis.boundSetOps(User.class.getName()).distinctRandomMembers(randomMaxUserNum);
-    		
+
             Iterator<Object> iteUsers = users.iterator();
             int tmpNum = allocNum;
             List<OrderList> orderLists = new ArrayList<>();
@@ -737,7 +737,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 order.setCjsj(DateUtils.getNowTime());
                 order.setImei(user.getRegImei());
                 order.setDdzt("0");
-                
+
                 for (int j = 0; j < tmpList.size(); j++) {
                 	ProInfoLuckNumBean tmpItem = (ProInfoLuckNumBean)tmpList.get(j);
                     String luckNum = tmpItem.getLuckNum();
@@ -752,6 +752,9 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                     orderList.setNum(luckNum);
                     //执行加一下随机数，防止时间毫秒数都一致
                     int randomMillis = RandomUtils.nextInt(100);
+                    if(randomMillis == 0){
+                        randomMillis =1;
+                    }
                     orderList.setCjsj(DateTime.now().plusMillis(randomMillis).toString("yyyy-MM-dd HH:mm:ss.SSS"));
                     orderLists.add(orderList);
                 }
@@ -764,7 +767,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                     break;
                 }
         	}
-        	
+
         	// 产品分配完成 更新 添加 sql
         	orderListMapper.insertList(orderLists);
             orderMapper.insertList(orders);
