@@ -33,7 +33,6 @@ public class ScheduleComponent {
 
         // 每10秒运行一次。商品开奖功能
         jobConfigs.add(new JobConfig(ProInfoFinishSyncJob.class,"0/10 * * * * ? *","ProInfoFinishSyncJob"));
-
         try {
             for (JobConfig jobConfig : jobConfigs) {
                 schedulerFactory.getScheduler().scheduleJob(jobConfig.getJobDetail(), jobConfig.getCronTrigger());

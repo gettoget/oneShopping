@@ -27,4 +27,7 @@ public interface ProInfoMapper extends Mapper<ProInfo> {
     @Update("update pro_info set gxsj = CURRENT_TIMESTAMP(3), cyyhs = CAST(cyyhs as unsigned) +1 where id = #{id} and pro_zt = '1'  ")
     int updateProInfo(@Param("id") String id);
 
+    @Select(" select id from pro_info where pro_baseid = ( select pro_baseid from pro_info where id = #{id} ) and pro_zt = '1' order by cjsj desc limit 1")
+    String getLatestPro(String id);
+
 }

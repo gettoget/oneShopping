@@ -16,12 +16,12 @@ import java.util.Map;
 public interface UserService extends BaseService<User, String> {
     /**
      * 用户注册
-     * @param username
      * @param password
      * @param code
+     * @param username
      * @return
      */
-    ApiResponse<String> register(String phone, String password, String password1, String code, String username);
+    ApiResponse<Map<String, Object>> register(String phone, String password, String password1, String code, String username);
 
     /**
      * 用户登录
@@ -29,7 +29,7 @@ public interface UserService extends BaseService<User, String> {
      * @param password
      * @return
      */
-    ApiResponse<Map<String, Object>> login(String phone, String password);
+    ApiResponse<Map<String, Object>> login(String phone, String password) throws Exception;
 
     /**
      * 用户修改密码

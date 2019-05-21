@@ -111,6 +111,28 @@ public class Order implements Serializable {
     private String payPwd;
     @Transient
     private String coverUrl;
+    @Transient
+    private int rate;
+
+    @Transient
+    private List<String> nums;
+
+
+    public List<String> getNums() {
+        return nums;
+    }
+
+    public void setNums(List<String> nums) {
+        this.nums = nums;
+    }
+
+    public int getRate() {
+        return rate;
+    }
+
+    public void setRate(int rate) {
+        this.rate = rate;
+    }
 
     public String getCoverUrl() {
         return coverUrl;

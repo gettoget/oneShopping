@@ -20,6 +20,7 @@ import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.redis.RedisTemplateUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -59,10 +60,17 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     }
 
     @Override
-    public ApiResponse<String> register(String phone, String password, String password1, String code, String username) {
-        RuntimeCheck.ifBlank(phone, MessageUtils.get("user.phoneblank"));
+    public ApiResponse<Map<String, Object>> register(String phone, String password, String password1, String code, String username) {
         RuntimeCheck.ifBlank(password, MessageUtils.get("user.pwdblank"));
-        RuntimeCheck.ifFalse(StringUtils.equals(password1, password), MessageUtils.get("user.pwdnotsame"));
+        RuntimeCheck.ifBlank(password1, MessageUtils.get("user.pwdBlank"));
+        password = checkPer(password);
+        RuntimeCheck.ifBlank(password, MessageUtils.get("user.timeError"));
+        password1 = checkPer(password1);
+        RuntimeCheck.ifBlank(password1, MessageUtils.get("user.timeError"));
+
+        RuntimeCheck.ifBlank(phone, MessageUtils.get("user.phoneblank"));
+
+        RuntimeCheck.ifFalse(StringUtils.equals(password, password1), MessageUtils.get("user.pwdnotsame"));
         RuntimeCheck.ifBlank(code, MessageUtils.get("user.codeblank"));
         RuntimeCheck.ifBlank(username, MessageUtils.get("user.nameIsBlank"));
         SimpleCondition condition = new SimpleCondition(User.class);
@@ -92,14 +100,29 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         user.setSource("0");
         user.setRegImei(imei);
         user.setUserName(username);
+        user.setLastImei(imei);
+        user.setLastTime(DateUtils.getNowTime());
         save(user);
-        return ApiResponse.success(MessageUtils.get("user.regSuccess"));
+        String token = JwtUtil.createToken(user.getId(), System.currentTimeMillis() + "");
+        redisDao.boundValueOps(user.getId()).set(token, 30, TimeUnit.DAYS);
+        ApiResponse<Map<String,Object>> response = new ApiResponse<>();
+        response.setMessage(MessageUtils.get("user.regSuccess"));
+        UserModel model = new UserModel(user);
+        model.setToken(token);
+        redis.boundValueOps(user.getId() + "_userInfo").set(JSON.toJSON(model), 30, TimeUnit.DAYS);
+        Map<String,Object> map = new HashMap<>();
+        map.put("token", token);
+        map.put("userInfo",model);
+        response.setResult(map);
+        return response;
     }
 
     @Override
-    public ApiResponse<Map<String, Object>> login(String phone, String password) {
-        RuntimeCheck.ifBlank(phone, MessageUtils.get("user.phoneblank"));
+    public ApiResponse<Map<String, Object>> login(String phone, String password) throws Exception {
         RuntimeCheck.ifBlank(password, MessageUtils.get("user.pwdblank"));
+        password = checkPer(password);
+        RuntimeCheck.ifBlank(password, MessageUtils.get("user.timeError"));
+        RuntimeCheck.ifBlank(phone, MessageUtils.get("user.phoneblank"));
         SimpleCondition condition = new SimpleCondition(User.class);
         condition.eq(User.InnerColumn.phone, phone);
         List<User> users = findByCondition(condition);
@@ -134,8 +157,16 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     public ApiResponse<String> editPwd(String pwd, String newPwd, String newPwd1) {
         RuntimeCheck.ifBlank(pwd, MessageUtils.get("user.pwdblank"));
         RuntimeCheck.ifBlank(newPwd, MessageUtils.get("user.newPwdBlank"));
-        RuntimeCheck.ifFalse(StringUtils.equals(newPwd1, newPwd), MessageUtils.get("user.pwdnotsame"));
-        RuntimeCheck.ifTrue(StringUtils.equals(pwd,newPwd), MessageUtils.get("user.pwdSameToNew"));
+        pwd = checkPer(pwd);
+        RuntimeCheck.ifBlank(pwd, MessageUtils.get("user.timeError"));
+        newPwd = checkPer(newPwd);
+        RuntimeCheck.ifBlank(newPwd, MessageUtils.get("user.timeError"));
+        newPwd1 = checkPer(newPwd1);
+        RuntimeCheck.ifBlank(newPwd1, MessageUtils.get("user.timeError"));
+
+
+        RuntimeCheck.ifFalse(StringUtils.equals(newPwd, newPwd1), MessageUtils.get("user.pwdnotsame"));
+        RuntimeCheck.ifTrue(StringUtils.equals(newPwd,pwd), MessageUtils.get("user.pwdSameToNew"));
         String userId = getAttributeAsString("userId");
         User u = findById(userId);
         RuntimeCheck.ifTrue(u == null , MessageUtils.get("user.notregister"));
@@ -206,12 +237,15 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     }
 
     @Override
-    public ApiResponse<String> sendMsg(String phone, String type) {
+    public ApiResponse<String> sendMsg(String phone, String type ) {
 
 
         if (StringUtils.equals(type, "1")) {
             // 用户注册验证码
             RuntimeCheck.ifBlank(phone, MessageUtils.get("user.codePhoneBlank"));
+            phone = checkPer(phone);
+            RuntimeCheck.ifBlank(phone, MessageUtils.get("user.timeError"));
+
             SimpleCondition condition = new SimpleCondition(User.class);
             condition.eq(User.InnerColumn.phone, phone);
             List<User> users = findByCondition(condition);
@@ -222,7 +256,8 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         } else if (StringUtils.equals(type, "2")) {
             // 用户找回密码 验证码
             RuntimeCheck.ifBlank(phone, MessageUtils.get("user.codePhoneBlank"));
-
+            phone = checkPer(phone);
+            RuntimeCheck.ifBlank(phone, MessageUtils.get("user.timeError"));
             SimpleCondition condition = new SimpleCondition(User.class);
             condition.eq(User.InnerColumn.phone, phone);
             List<User> users = findByCondition(condition);
@@ -338,6 +373,25 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         condition.eq(User.InnerColumn.zt, "0");
         List<User> users = findByCondition(condition);
         users.stream().forEach(user -> redis.boundSetOps(User.class.getName()).add(user));
+    }
+
+
+    private String checkPer(String secret){
+        String s = null;
+        try {
+            s = RSAUtils.decryptWithRSA(secret);
+            String[] split = s.split(";");
+            RuntimeCheck.ifTrue( split.length != 2, MessageUtils.get("user.timeError"));
+            String[] times = split[1].split(":");
+            RuntimeCheck.ifTrue(times.length != 2 , MessageUtils.get("user.timeError"));
+            long time = Long.parseLong(times[1]);
+            DateTime dateTime = new DateTime(time);
+            RuntimeCheck.ifTrue(dateTime.plusMinutes(10).compareTo(DateTime.now()) < 0,MessageUtils.get("user.timeError"));
+            return split[0];
+        } catch (Exception e) {
+            RuntimeCheck.ifTrue(true, MessageUtils.get("user.timeError") );
+        }
+        return "";
     }
 
 

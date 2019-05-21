@@ -11,7 +11,7 @@ public interface YhService extends BaseService<SysYh, String> {
 
 	/**
 	 * 新增用户
-	 * @param user 用户
+	 * @param entity 用户
 	 * @return 执行结果
 	 */
 //	ApiResponse<String> addUser(SysYh user);

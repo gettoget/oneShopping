@@ -1,5 +1,7 @@
 package com.ldz.biz.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -11,10 +13,13 @@ import com.ldz.biz.model.*;
 import com.ldz.biz.service.*;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.sys.base.LimitedCondition;
+import com.ldz.util.bean.AndroidMsgBean;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
 import com.ldz.util.bean.SimpleCondition;
+import com.ldz.util.commonUtil.BaiduPushUtils;
 import com.ldz.util.commonUtil.DateUtils;
+import com.ldz.util.commonUtil.JsonUtil;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.exception.RuntimeCheckException;
@@ -23,6 +28,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -33,6 +40,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> implements ProInfoService {
+
+    Logger errorLog = LoggerFactory.getLogger("error_info");
 
     @Autowired
     private ProInfoMapper baseMapper;
@@ -54,12 +63,12 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
     @Autowired
     private ProInfoService proInfoService;
-    
+
     @Autowired
 	private OrderListMapper orderListMapper;
     @Autowired
 	private OrderMapper orderMapper;
-    
+
 
     @Value("${robot.point}")
     private double point;
@@ -116,6 +125,14 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
         baseinfo.setProStore(storeNum - 1 + "");
         proBaseinfoService.update(baseinfo);
+        try {
+            AndroidMsgBean androidMsgBean = new AndroidMsgBean();
+            androidMsgBean.setJson(JsonUtil.toJson(proInfo));
+            androidMsgBean.setType("1");
+            BaiduPushUtils.pushAllMsg(0, JsonUtil.toJson(androidMsgBean),3,0);
+        } catch (Exception e) {
+            errorLog.error("百度推送异常 [{}]", e);
+        }
         return ApiResponse.success(MessageUtils.get("pro.groundSuc"));
     }
 
@@ -127,6 +144,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
             if(StringUtils.isNotBlank(proInfo.getUserId())){
                 User user = userService.findById(proInfo.getUserId());
                 proInfo.setUserName(user.getUserName());
+//                proInfo.setHimg(user.gethImg());
             }
         }
         return ApiResponse.success(proInfo);
@@ -393,52 +411,112 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
     @Override
     public PageResponse<CyyhModel> getInUser(String userId, int pageNum , int pageSize) {
-        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.idIsnull"));
-        User user = userService.findById(userId);
-        RuntimeCheck.ifNull(user, MessageUtils.get("user.null"));
+//        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.idIsnull"));
+        User user = null;
+//        RuntimeCheck.ifNull(user, MessageUtils.get("user.null"));
         PageResponse<CyyhModel> res = new PageResponse<>();
         List<CyyhModel> models = new ArrayList<>();
-        SimpleCondition condition = new SimpleCondition(Order.class);
-        condition.eq(Order.InnerColumn.userId, userId);
-        condition.setOrderByClause(" zfsj desc ");
-        PageInfo<Order> objectPageInfo = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> orderService.findByCondition(condition));
-        List<Order> orders = objectPageInfo.getList();
-        if(CollectionUtils.isNotEmpty(orders)){
-            Set<String> proIds = orders.stream().map(Order::getProId).collect(Collectors.toSet());
-            List<ProInfo> infos = proInfoService.findByIds(proIds);
-            // 拿到中奖用户的信息
-            Map<String, ProInfo> infoMap = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
-            Set<String> userIds = infos.stream().map(ProInfo::getUserId).collect(Collectors.toSet());
-            List<User> users = userService.findByIds(userIds);
+        SimpleCondition condition;
+        if(StringUtils.isNotBlank(userId)){
+            condition = new SimpleCondition(Order.class);
+            user = userService.findById(userId);
+            condition.eq(Order.InnerColumn.userId, userId);
+            condition.setOrderByClause(" zfsj desc ");
+            PageInfo<Order> objectPageInfo = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> orderService.findByCondition(condition));
+            List<Order> orders = objectPageInfo.getList();
+            if(CollectionUtils.isNotEmpty(orders)){
+                Set<String> proIds = orders.stream().map(Order::getProId).collect(Collectors.toSet());
+                List<ProInfo> infos = proInfoService.findByIds(proIds);
+                // 拿到中奖用户的信息
+                Map<String, ProInfo> infoMap = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
+                Set<String> userIds = infos.stream().filter(proInfo -> StringUtils.isNotBlank(proInfo.getUserId())).map(ProInfo::getUserId).collect(Collectors.toSet());
+                List<User> users = userService.findByIds(userIds);
+                Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
+                for (Order order : orders) {
+                    CyyhModel model = new CyyhModel();
+
+                    model.setUserId(userId);
+                    if(user != null){
+                        model.setHimg(user.gethImg());
+                        model.setUserName(user.getUserName());
+                    }
+                    model.setGmsj(order.getZfsj());
+                    model.setGmfs(order.getGmfs());
+                    model.setProName(order.getProName());
+
+                    model.setProId(order.getProId());
+                    model.setNum(order.getZjhm());
+                    if(infoMap.containsKey(order.getProId())){
+                        ProInfo proInfo = infoMap.get(order.getProId());
+                        model.setProPrice(proInfo.getProPrice());
+                        model.setRePrice(proInfo.getRePrice());
+                        model.setCoverUrl(proInfo.getCoverUrl());
+                        if(userMap.containsKey(proInfo.getUserId())){
+                            model.setWinName(userMap.get(proInfo.getUserId()).getUserName());
+                        }
+                    }
+                    models.add(model);
+                }
+            }
+            res.setPageNum(pageNum);
+            res.setPageSize(pageSize);
+            res.setList(models);
+            res.setTotal(objectPageInfo.getTotal());
+            return res;
+        }else{
+            String baseId = getRequestParamterAsString("baseId");
+            RuntimeCheck.ifBlank(baseId, MessageUtils.get("pro.baseIdIsBlank"));
+            // 获取最新的开奖商品
+            ProInfo proInfo = proInfoService.findById(baseId);
+            if(proInfo == null ){
+                return res;
+            }
+            ProInfo info = baseMapper.getLatestPerson(proInfo.getProBaseid());
+            if(info == null){
+                return res;
+            }
+            condition = new SimpleCondition(OrderList.class);
+            condition.eq(OrderList.InnerColumn.proId, info.getId());
+            condition.setOrderByClause(" cjsj desc ");
+            PageInfo<OrderList> pageInfo = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> orderListService.findByCondition(condition));
+            List<OrderList> infoList = pageInfo.getList();
+            Set<String> set = infoList.stream().map(OrderList::getUserid).collect(Collectors.toSet());
+            List<User> users = userService.findByIds(set);
             Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
-            for (Order order : orders) {
+
+            infoList.forEach(orderList -> {
                 CyyhModel model = new CyyhModel();
 
                 model.setUserId(userId);
-                model.setHimg(user.gethImg());
-                model.setGmsj(order.getZfsj());
-                model.setGmfs(order.getGmfs());
-                model.setProName(order.getProName());
-                model.setUserName(user.getUserName());
-                model.setProId(order.getProId());
-                model.setNum(order.getZjhm());
-                if(infoMap.containsKey(order.getProId())){
-                    ProInfo proInfo = infoMap.get(order.getProId());
-                    model.setProPrice(proInfo.getProPrice());
-                    model.setRePrice(proInfo.getRePrice());
-                    model.setCoverUrl(proInfo.getCoverUrl());
-                    if(userMap.containsKey(proInfo.getUserId())){
-                        model.setWinName(userMap.get(order.getUserId()).getUserName());
-                    }
+                if(userMap.containsKey(orderList.getUserid())){
+                    User user1 = userMap.get(orderList.getUserid());
+                    model.setHimg(user1.gethImg());
+                    model.setUserName(user1.getUserName());
                 }
+
+                model.setGmsj(orderList.getCjsj());
+                model.setProName(orderList.getProName());
+
+                model.setProId(orderList.getProId());
+                model.setNum(info.getZjhm());
+                model.setProPrice(info.getProPrice());
+                model.setRePrice(info.getRePrice());
+                model.setCoverUrl(info.getCoverUrl());
+                User winUser = userService.findById(info.getUserId());
+                model.setWinName(winUser.getUserName());
+
                 models.add(model);
-            }
+            });
+            res.setPageNum(pageNum);
+            res.setPageSize(pageSize);
+            res.setList(models);
+            res.setTotal(pageInfo.getTotal());
+            return res;
         }
-        res.setPageNum(pageNum);
-        res.setPageSize(pageSize);
-        res.setList(models);
-        res.setTotal(objectPageInfo.getTotal());
-        return res;
+
+
+
+
     }
 
     @Override
@@ -528,6 +606,39 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         return ApiResponse.success();
     }
 
+    @Override
+    public ApiResponse<String> getLatestPro(String id) {
+        String s = baseMapper.getLatestPro(id);
+        return ApiResponse.success(s);
+    }
+
+    @Override
+    public ApiResponse<String> updateEntity(ProInfo entity)  {
+        String id = entity.getId();
+        ProInfo proInfo = findById(id);
+        String proLx = proInfo.getProLx();
+        boolean flag = false;
+        if(StringUtils.containsNone(proLx,"3") && StringUtils.contains(entity.getProLx(),"3")){
+            // 代表当前产品的类型变成了热门商品
+            flag = true;
+        }
+        RuntimeCheck.ifNull( proInfo, MessageUtils.get("pro.isNull"));
+        BeanUtil.copyProperties(entity, proInfo, CopyOptions.create().setIgnoreNullValue(true).setIgnoreError(true).setIgnoreProperties("id"));
+        update(proInfo);
+        // 如果由非热门商品 转换为 热门商品 推送消息给前台
+        if (flag) {
+            AndroidMsgBean  msgBean = new AndroidMsgBean();
+            msgBean.setType("2");
+            msgBean.setJson(JsonUtil.toJson(proInfo));
+            try {
+                BaiduPushUtils.pushAllMsg(0,JsonUtil.toJson(msgBean),3,0);
+            } catch (Exception e) {
+                errorLog.error("百度推送热门商品异常  [{}]" , e);
+            }
+        }
+        return ApiResponse.success();
+    }
+
 
     @Override
     public void afterPager(PageInfo<ProInfo> result) {
@@ -535,7 +646,14 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
+        Set<String> userIds = list.stream().map(ProInfo::getUserId).collect(Collectors.toSet());
+        List<User> users = userService.findByIds(userIds);
+        Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
         for (ProInfo proBaseinfo : list) {
+            if(userMap.containsKey(proBaseinfo.getUserId())){
+                User user = userMap.get(proBaseinfo.getUserId());
+                proBaseinfo.setUserName(user.getUserName());
+            }
             setImgUrl(proBaseinfo);
         }
     }
@@ -584,6 +702,9 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
     @Override
     public void saveRobot(String redisProInfoKey) {
     	String proId = redisProInfoKey.toString().split("_")[0];
+    	if(StringUtils.equals(proId,"576416498793316352")){
+            System.out.println("a");
+        }
         //1.生成本次多少个用户参与
         int randomMaxUserNum = RandomUtils.nextInt(people);
         if (randomMaxUserNum == 0) {
@@ -626,11 +747,11 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         }else{
         	CollectionUtils.addAll(cloneElements, elements);
         }
-        
+
         try{
         	//3.从redis随机获取机器人用户
     		Set<Object> users = redis.boundSetOps(User.class.getName()).distinctRandomMembers(randomMaxUserNum);
-    		
+
             Iterator<Object> iteUsers = users.iterator();
             int tmpNum = allocNum;
             List<OrderList> orderLists = new ArrayList<>();
@@ -668,7 +789,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 order.setCjsj(DateUtils.getNowTime());
                 order.setImei(user.getRegImei());
                 order.setDdzt("0");
-                
+
                 for (int j = 0; j < tmpList.size(); j++) {
                 	ProInfoLuckNumBean tmpItem = (ProInfoLuckNumBean)tmpList.get(j);
                     String luckNum = tmpItem.getLuckNum();
@@ -683,6 +804,9 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                     orderList.setNum(luckNum);
                     //执行加一下随机数，防止时间毫秒数都一致
                     int randomMillis = RandomUtils.nextInt(100);
+                    if(randomMillis == 0){
+                        randomMillis =1;
+                    }
                     orderList.setCjsj(DateTime.now().plusMillis(randomMillis).toString("yyyy-MM-dd HH:mm:ss.SSS"));
                     orderLists.add(orderList);
                 }
@@ -695,7 +819,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                     break;
                 }
         	}
-        	
+
         	// 产品分配完成 更新 添加 sql
         	orderListMapper.insertList(orderLists);
             orderMapper.insertList(orders);
@@ -713,6 +837,16 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 // 商品结束后1分钟执行开奖功能
                 long millis = DateTime.now().plusMinutes(1).getMillis();
                 redis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").add(proId, millis);
+                // 商品进入待开奖状态 , 向前台推送信息
+                try {
+                    ProInfo proInfo = findById(proId);
+                    AndroidMsgBean msgBean = new AndroidMsgBean();
+                    msgBean.setType("3");
+                    msgBean.setJson(JsonUtil.toJson(proInfo));
+                    BaiduPushUtils.pushAllMsg(0,JsonUtil.toJson(msgBean),3,0);
+                }catch (Exception e){
+                    errorLog.error("商品待开奖推送异常 [{}]" , e);
+                }
             }
         }catch(Exception e){
         	if (cloneElements.size() > 0){

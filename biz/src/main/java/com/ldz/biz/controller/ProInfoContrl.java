@@ -48,6 +48,13 @@ public class ProInfoContrl extends BaseController<ProInfo, String> {
         return service.updateKj(id);
     }
 
+    /**
+     *  更新商品状态
+     */
+    @PostMapping("/update")
+    public ApiResponse<String> update(ProInfo entity){
+        return service.updateEntity(entity);
+    }
 
 
 

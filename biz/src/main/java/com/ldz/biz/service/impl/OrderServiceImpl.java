@@ -1,61 +1,47 @@
 package com.ldz.biz.service.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.BoundSetOperations;
-import org.springframework.stereotype.Service;
-
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import com.ldz.biz.bean.ProInfoLuckNumBean;
 import com.ldz.biz.mapper.OrderMapper;
 import com.ldz.biz.mapper.ProInfoMapper;
-import com.ldz.biz.model.Exchange;
-import com.ldz.biz.model.Order;
-import com.ldz.biz.model.OrderList;
-import com.ldz.biz.model.ProBaseinfo;
-import com.ldz.biz.model.ProInfo;
-import com.ldz.biz.model.ReceiveAddr;
-import com.ldz.biz.model.User;
-import com.ldz.biz.model.WinRecord;
-import com.ldz.biz.service.ExchangeService;
-import com.ldz.biz.service.OrderListService;
-import com.ldz.biz.service.OrderService;
-import com.ldz.biz.service.ProBaseinfoService;
-import com.ldz.biz.service.ProInfoService;
-import com.ldz.biz.service.ReceiveAddrService;
-import com.ldz.biz.service.UserService;
-import com.ldz.biz.service.WinRecordService;
+import com.ldz.biz.model.*;
+import com.ldz.biz.service.*;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.sys.base.LimitedCondition;
+import com.ldz.util.bean.AndroidMsgBean;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
 import com.ldz.util.bean.SimpleCondition;
+import com.ldz.util.commonUtil.BaiduPushUtils;
 import com.ldz.util.commonUtil.DateUtils;
+import com.ldz.util.commonUtil.JsonUtil;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.exception.RuntimeCheckException;
 import com.ldz.util.redis.RedisTemplateUtil;
-
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.BoundSetOperations;
+import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
+
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements OrderService {
+
+    Logger errorLog = LoggerFactory.getLogger("error_info");
 
     @Autowired
     private OrderMapper baseMapper;
@@ -97,11 +83,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 
     @Override
     public boolean fillPagerCondition(LimitedCondition condition) {
-        String userId = (String) getAttribute("userId");
-        if (StringUtils.isBlank(userId)) {
-            return false;
-        }
-        condition.eq(Order.InnerColumn.userId, userId);
+
         return true;
     }
 
@@ -111,20 +93,48 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             return;
         }
         List<Order> orders = result.getList();
-        List<String> list = orders.stream().filter(order -> StringUtils.equals(order.getOrderType(), "2")).map(Order::getId).collect(Collectors.toList());
+        List<String> list = orders.stream().map(Order::getId).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(list)) {
-            String userId = (String) getAttribute("userId");
+            Set<String> receIds = orders.stream().filter(order -> StringUtils.isNotBlank(order.getReceId())).map(Order::getReceId).collect(Collectors.toSet());
+            Map<String, ReceiveAddr> addrMap = new HashMap<>();
+            if(CollectionUtils.isNotEmpty(receIds)){
 
+                List<ReceiveAddr> addrs = addrService.findByIds(receIds);
+                addrMap = addrs.stream().collect(Collectors.toMap(ReceiveAddr::getId, p -> p));
+            }
             SimpleCondition condition = new SimpleCondition(OrderList.class);
-            condition.eq(OrderList.InnerColumn.userid, userId);
             condition.in(OrderList.InnerColumn.orderId, list);
             List<OrderList> orderLists = orderListService.findByCondition(condition);
 
             if (CollectionUtils.isNotEmpty(orderLists)) {
                 Map<String, List<OrderList>> listMap = orderLists.stream().collect(Collectors.groupingBy(OrderList::getOrderId));
+                Set<String> collect = orderLists.stream().filter(orderList -> StringUtils.isNotBlank(orderList.getProId())).map(OrderList::getProId).collect(Collectors.toSet());
+                Set<String> userIds = orderLists.stream().filter(orderList -> StringUtils.isNotBlank(orderList.getUserid())).map(OrderList::getUserid).collect(Collectors.toSet());
+
+                List<User> users = userService.findByIds(userIds);
+                Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
+
+                List<ProInfo> infos = proInfoService.findByIds(collect);
+                Map<String, ProInfo> map = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
+                Map<String, ReceiveAddr> finalAddrMap = addrMap;
                 orders.forEach(order -> {
                     if (listMap.containsKey(order.getId())) {
-                        order.setOrderLists(listMap.get(order.getId()));
+                        List<OrderList> lists = listMap.get(order.getId());
+                        order.setOrderLists(lists);
+                        List<String> nums = lists.stream().map(OrderList::getNum).collect(Collectors.toList());
+                        order.setNums(nums);
+                    }
+                    if(map.containsKey(order.getProId())){
+                        ProInfo info = map.get(order.getProId());
+                        order.setRate((Integer.parseInt(info.getProPrice()) - Integer.parseInt(info.getRePrice()) * 100 ) / Integer.parseInt(info.getProPrice()));
+                    }
+                    if(userMap.containsKey(order.getUserId())){
+                        User user = userMap.get(order.getUserId());
+                        order.setUserName(user.getUserName());
+                    }
+                    if(finalAddrMap.containsKey(order.getReceId())){
+                        ReceiveAddr addr = finalAddrMap.get(order.getReceId());
+                        order.setAddr(addr);
                     }
                 });
             }
@@ -153,9 +163,9 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         RuntimeCheck.ifBlank(entity.getPayPwd(), MessageUtils.get("user.paypwdblank"));
 
         int gmfs = Integer.parseInt(entity.getGmfs());
-        RuntimeCheck.ifTrue( gmfs < 0 , MessageUtils.get("order.gmLteZero"));
+        RuntimeCheck.ifTrue(gmfs < 0, MessageUtils.get("order.gmLteZero"));
         int dzf = Integer.parseInt(entity.getZfje());
-        RuntimeCheck.ifTrue(dzf < 0 , MessageUtils.get("order.jeLteZero"));
+        RuntimeCheck.ifTrue(dzf < 0, MessageUtils.get("order.jeLteZero"));
         ProBaseinfo baseinfo = null;
         ProInfo proInfo = null;
 
@@ -186,6 +196,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         order.setGmfs(entity.getGmfs());
         order.setReceId(entity.getReceId());
         order.setZfje(entity.getZfje());
+        order.setImei(imei);
         // 生成消费记录
         Exchange exchange = new Exchange();
 
@@ -195,7 +206,20 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             order.setZfje(Integer.parseInt(baseinfo.getProPrice()) * Integer.parseInt(order.getGmfs()) + "");*/
             // 直接购买  baseInfo 库存 -1
             //            baseMapper.minusStore(baseinfo.getId(), Integer.parseInt(order.getGmfs()));
+            String payType = getRequestParamterAsString("payType");
             // todo 直接购买可能是直接调用支付接口
+            // 如果不是调用的支付接口 则使用余额购买
+            if(StringUtils.isBlank(payType)){
+                int balance = Integer.parseInt(user1.getBalance());
+                int ye = balance - dzf;
+                RuntimeCheck.ifTrue(ye < 0, MessageUtils.get("order.balanceNotEnough"));
+                exchange.setXfqjbs(balance + "");
+                exchange.setXfsj(DateUtils.getNowTime());
+                exchange.setXfhjbs(ye + "");
+                user1.setBalance(ye + "");
+            }else{
+                // 调用支付接口
+            }
             // 直接购买订单 订单状态改为已支付
             order.setDdzt("4");
         } else if (StringUtils.equals(entity.getOrderType(), "2")) {
@@ -235,102 +259,76 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             List<Object> elements = new ArrayList<>();
             Iterator<Object> ites = objects.iterator();
             int index = 0;
-            while(ites.hasNext()){
-            	Object element = ites.next();
-            	// 防止并发操作时，中奖号码被重复分。先进行删除，redis删除结果不为0，表示号码可用
-            	long removeFlag = luckNumSet.remove(element);
-                if (removeFlag > 0){
-                	elements.add(element);
-                	// 中奖号码未被使用，标记提取成功
-                	index++;
+            while (ites.hasNext()) {
+                Object element = ites.next();
+                // 防止并发操作时，中奖号码被重复分。先进行删除，redis删除结果不为0，表示号码可用
+                long removeFlag = luckNumSet.remove(element);
+                if (removeFlag > 0) {
+                    elements.add(element);
+                    // 中奖号码未被使用，标记提取成功
+                    index++;
                 }
-            	// 用户购买号码数量提取成功后结束号码提取过程
-            	if (index == anInt){
-            		break;
-            	}
+                // 用户购买号码数量提取成功后结束号码提取过程
+                if (index == anInt) {
+                    break;
+                }
             }
-            
-            List<OrderList> orderLists = new ArrayList<>();
-            for (int i = 0; i < elements.size(); i++) {
-                ProInfoLuckNumBean num = (ProInfoLuckNumBean) elements.get(i);
-                OrderList orderList = new OrderList(order, num.getLuckNum(), user1);
-                orderList.setId(genId());
-                orderLists.add(orderList);
-            }
-            // 查看商品剩余名额是否 为 0   且所有订单都已支付
+            try {
+                List<OrderList> orderLists = new ArrayList<>();
+                for (int i = 0; i < elements.size(); i++) {
+                    ProInfoLuckNumBean num = (ProInfoLuckNumBean) elements.get(i);
+                    OrderList orderList = new OrderList(order, num.getLuckNum(), user1, DateTime.now().plus(i).toString("yyyy-MM-dd HH:mm:ss.SSS"));
+                    orderList.setId(genId());
+                    orderLists.add(orderList);
+                }
+                // 查看商品剩余名额是否 为 0   且所有订单都已支付
             /*proInfo.setGxsj(DateUtils.getNowTime());
             proInfo.setCyyhs(Integer.parseInt(proInfo.getCyyhs()) + 1 + "");*/
-            // 获取中奖号
-            if (CollectionUtils.isNotEmpty(orderLists)) {
-                orderListService.saveList(orderLists);
+                // 获取中奖号
+                if (CollectionUtils.isNotEmpty(orderLists)) {
+                    orderListService.saveList(orderLists);
+                }
+                int updateNum = baseMapper.minusRePrice(gmfs, order.getProId());
+                if (updateNum == 0) {
+                    throw new RuntimeCheckException(MessageUtils.get("pro.minusFail"));
+                }
+                if (luckNumSet.size() == 0) {
+                    // 号码分配完 清理redis key
+                    redis.delete(order.getProId() + "_nums");
+                    infoMapper.updateFinish(order.getProId());
+                    // 建立延时任务 , 准备分配中奖号码
+                    long millis = DateTime.now().plusMinutes(1).getMillis();
+                    redis.boundZSetOps(ProInfo.class.getSimpleName() + "_award").add(proInfo.getId(), millis);
+                    try {
+                        ProInfo info = proInfoService.findById(proInfo.getId());
+                        AndroidMsgBean msgBean = new AndroidMsgBean();
+                        msgBean.setType("3");
+                        msgBean.setJson(JsonUtil.toJson(info));
+                        BaiduPushUtils.pushAllMsg(0,JsonUtil.toJson(msgBean),3,0);
+                    }catch (Exception e){
+                        errorLog.error("商品待开奖推送异常 [{}]" , e);
+                    }
+                } else {
+                    infoMapper.updateProInfo(order.getProId());
+                }
+            } catch (Exception e) {
+                // 异常处理 , 将号码添加回去
+                if (elements.size() > 0) {
+                    // 执行发生异常后，需要先将中奖号码回压到redis中，防止号码丢失
+                    for (int i = 0; i < elements.size(); i++) {
+                        redis.boundSetOps(order.getProId() + "_nums").add(elements.get(i));
+                    }
+                }
+                // 继续抛出异常，保证数据库事务回滚
+                throw e;
             }
-            int updateNum = baseMapper.minusRePrice(gmfs, order.getProId());
-            if (updateNum == 0) {
-                throw new RuntimeCheckException(MessageUtils.get("pro.minusFail"));
-            }
-            if (luckNumSet.size() == 0) {
-                // 号码分配完 清理redis key
-                redis.delete(order.getProId() + "_nums");
-                infoMapper.updateFinish(order.getProId());
-                // 建立延时任务 , 准备分配中奖号码
-                long millis = DateTime.now().plusMinutes(1).getMillis();
-                redis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").add(proInfo.getId(), millis);
-            }else{
-                infoMapper.updateProInfo(order.getProId());
-            }
-        }else if(StringUtils.equals(order.getOrderType(),"1")){
+        } else if (StringUtils.equals(order.getOrderType(), "1")) {
             baseMapper.minusStore(baseinfo.getId(), Integer.parseInt(order.getGmfs()));
         }
         exchangeService.save(exchange);
         userService.update(user1);
         save(order);
 
-        // 当剩余名额剩余过半时
-       /* String s = (String) redis.boundValueOps(order.getProId() + "_robot").get();
-        if (StringUtils.isBlank(s) && "2".equals(proInfo.getrType()) && Integer.parseInt(proInfo.getProPrice()) / Integer.parseInt(proInfo.getRePrice()) > 1 && Integer.parseInt(proInfo.getProPrice()) >= 2) {
-            Set<Object> set = redis.boundSetOps(proInfo.getId() + "_nums").distinctRandomMembers(2);
-            List<Object> objectList = new ArrayList<>();
-            CollectionUtils.addAll(objectList, set);
-            // 随机生成 2 个用户创建订单 , 负责控制号码
-            List<User> users = baseMapper.ranUsers(set.size());
-            for (int i = 0; i < users.size(); i++) {
-                User user = users.get(i);
-                Order ord = new Order();
-                ord.setId(genId());
-                ord.setUserName(user.getUserName());
-                ord.setUserId(user.getId());
-                ord.setProName(proInfo.getProName());
-                ord.setOrderType("2");
-                ord.setProId(proInfo.getId());
-                ord.setDdzt("0");
-                ord.setGmfs("1");
-                ord.setZfje("1");
-                ord.setZfsj(DateUtils.getNowTime());
-                ord.setImei(user.getRegImei());
-                ord.setCjsj(DateUtils.getNowTime());
-                save(ord);
-                baseMapper.minusRePrice(1, proInfo.getId());
-                baseMapper.updateCyyhs(proInfo.getId());
-                // 分配号码
-                ProInfoLuckNumBean num = (ProInfoLuckNumBean) objectList.get(i);
-                OrderList orderList = new OrderList();
-                orderList.setYhlx("1");
-                orderList.setUserName(user.getUserName());
-                orderList.setUserid(user.getId());
-                orderList.setOrderId(ord.getId());
-                orderList.setProId(proInfo.getId());
-                orderList.setProName(proInfo.getProName());
-                orderList.setNum(num.getLuckNum());
-                orderList.setId(genId());
-                orderList.setCjsj(DateUtils.getNowTime());
-                orderListService.save(orderList);
-                redis.boundValueOps(order.getProId() + "_robot").set(ord.getId());
-            }
-            Iterator<Object> removeNum = set.iterator();
-            while (removeNum.hasNext()) {
-                redis.boundSetOps(order.getProId() + "_nums").remove(removeNum.next());
-            }
-        }*/
         return ApiResponse.success(MessageUtils.get("order.paySuc"));
 
     }
@@ -371,10 +369,12 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 Map<String, String> finalUserMap = userMap;
                 pageInfo.getList().stream().forEach(order -> {
                     if (map.containsKey(order.getProId())) {
-                        order.setCoverUrl(map.get(order.getProId()).getCoverUrl());
-                        order.setKjsj(map.get(order.getProId()).getKjsj());
-                        if (finalUserMap.containsKey(map.get(order.getProId()).getUserId())) {
-                            order.setUserName(finalUserMap.get(map.get(order.getProId()).getUserId()));
+                        ProInfo proInfo = map.get(order.getProId());
+                        order.setCoverUrl(proInfo.getCoverUrl());
+                        order.setKjsj(proInfo.getKjsj());
+                        order.setRate((Integer.parseInt(proInfo.getProPrice()) - Integer.parseInt(proInfo.getRePrice())) * 100 / Integer.parseInt(proInfo.getProPrice()));
+                        if (finalUserMap.containsKey(proInfo.getUserId())) {
+                            order.setUserName(finalUserMap.get(proInfo.getUserId()));
                         }
                     }
                     order.setAddr(listMap.get(order.getReceId()));
@@ -420,31 +420,30 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         entity.setId(id);
         entity.setProZt("3");
         ProInfo info = proInfoService.findOneByEntity(entity);
-        if (info == null){
-        	return;
+        if (info == null) {
+            return;
         }
-        
-        List<Order> lastFifty = baseMapper.getLastFifty(info.getId(), 50);
+
+        List<OrderList> lastFifty = baseMapper.getLastFifty(info.getId(), 50);
 
         long zjhm = 0l;
         // 如果是需要机器人中奖，从机器人中抽取一个中间号码
         if (StringUtils.equals(info.getrType(), "2")) {
-        	//获取最后一个机器人参与的订单号码
-            Order lastOrder = baseMapper.findLatestRobot(info.getId());
+            //获取最后一个机器人参与的订单号码
+            OrderList lastOrder = baseMapper.findLatestRobot(info.getId());
             //从最后一个购买订单的抽取一个中间号码
-            OrderList orderList = baseMapper.getOrderByRobotZjhm(lastOrder.getId());
+            OrderList orderList = baseMapper.getOrderByRobotZjhm(id);
 
             if (orderList != null && StringUtils.isNotBlank(lastOrder.getId())) {
-                List<String> strings = lastFifty.stream().map(Order::getId).collect(Collectors.toList());
+                List<String> strings = lastFifty.stream().map(OrderList::getId).collect(Collectors.toList());
                 String hm = orderList.getNum();
                 //如果最后50个订单里面没有中间号码订单，则将中奖号码订单添加进去
                 if (!strings.contains(lastOrder.getId())) {
                     lastFifty = lastFifty.subList(0, lastFifty.size() - 1);
-                    lastOrder.setZfsj(lastFifty.get(lastFifty.size() - 1).getZfsj());
+                    lastOrder.setCjsj(lastFifty.get(lastFifty.size() - 1).getCjsj());
                     lastFifty.add(lastOrder);
                 }
-
-                Long hHmmssSSS = lastFifty.stream().map(Order::getZfsj).map(s -> Long.parseLong(DateTime.parse(s, formatter).toString("HHmmssSSS"))).reduce(Long::sum).get();
+                Long hHmmssSSS = lastFifty.stream().map(OrderList::getCjsj).map(s -> Long.parseLong(DateTime.parse(s, formatter).toString("HHmmssSSS"))).reduce(Long::sum).get();
                 zjhm = (hHmmssSSS % Long.parseLong(info.getProPrice())) + 10000001;
                 int anInt = Integer.parseInt(hm);
                 int l = (int) (anInt - zjhm);
@@ -453,18 +452,24 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 }
                 String s;
                 if (!strings.contains(lastOrder.getId())) {
-                    s = DateTime.parse(lastFifty.get(lastFifty.size() - 1).getZfsj(), formatter).plusMillis(l).toString("yyyy-MM-dd HH:mm:ss.SSS");
+                    s = DateTime.parse(lastFifty.get(lastFifty.size() - 1).getCjsj(), formatter).plusMillis(l).toString("yyyy-MM-dd HH:mm:ss.SSS");
                 } else {
-                    s = DateTime.parse(lastOrder.getZfsj(), formatter).plusMillis(l).toString("yyyy-MM-dd HH:mm:ss.SSS");
+                    s = DateTime.parse(lastOrder.getCjsj(), formatter).plusMillis(l).toString("yyyy-MM-dd HH:mm:ss.SSS");
                 }
-                lastOrder.setZfsj(s);
                 lastOrder.setCjsj(s);
-                update(lastOrder);
+                /*lastOrder.setZfsj(s);
+                lastOrder.setCjsj(s);
+                update(lastOrder);*/
+                orderListService.update(lastOrder);
+               /* lastFifty = baseMapper.getLastFifty(info.getId(), 50);
+                hHmmssSSS = lastFifty.stream().map(OrderList::getCjsj).map(s1 -> Long.parseLong(DateTime.parse(s1, formatter).toString("HHmmssSSS"))).reduce(Long::sum).get();
+                zjhm = (hHmmssSSS % Long.parseLong(info.getProPrice())) + 10000001;*/
+                zjhm = Long.parseLong(hm);
             }
-        }else{
-        	lastFifty = baseMapper.getLastFifty(info.getId(), 50);
+        } else {
+            lastFifty = baseMapper.getLastFifty(info.getId(), 50);
             // 所有时间 按 HHmmssSSS 相加
-            Long hHmmssSSS = lastFifty.stream().map(Order::getZfsj).map(s -> Long.parseLong(DateTime.parse(s, formatter).toString("HHmmssSSS"))).reduce(Long::sum).get();
+            Long hHmmssSSS = lastFifty.stream().map(OrderList::getCjsj).map(s -> Long.parseLong(DateTime.parse(s, formatter).toString("HHmmssSSS"))).reduce(Long::sum).get();
             zjhm = (hHmmssSSS % Long.parseLong(info.getProPrice())) + 10000001;
         }
         // 时间总数除以需求总数 取余
@@ -508,6 +513,17 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             record.setZjfs(order.getGmfs());
             record.setZjlx(user.getScore());
             recordService.save(record);
+            try{
+//                info.setHimg(user.gethImg());
+                info.setUserName(user.getUserName());
+                info.setZjfs(record.getZjfs());
+                AndroidMsgBean msgBean = new AndroidMsgBean();
+                msgBean.setType("4");
+                msgBean.setJson(JsonUtil.toJson(info));
+                BaiduPushUtils.pushAllMsg(0,JsonUtil.toJson(msgBean),3,0);
+            }catch (Exception e){
+
+            }
             // 商品已中奖  自动上架 下个商品  如果还有库存的话
             ProBaseinfo baseinfo = proBaseinfoService.findById(info.getProBaseid());
             if (Integer.parseInt(baseinfo.getProStore()) > 0) {
