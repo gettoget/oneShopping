@@ -2,43 +2,31 @@ package com.ldz.biz;
 
 import com.baidu.yun.push.exception.PushClientException;
 import com.baidu.yun.push.exception.PushServerException;
-import com.ldz.biz.bean.ProInfoLuckNumBean;
 import com.ldz.biz.mapper.OrderMapper;
-import com.ldz.biz.mapper.ProInfoMapper;
-import com.ldz.biz.model.OrderList;
 import com.ldz.biz.model.ProBaseinfo;
 import com.ldz.biz.model.ProInfo;
-import com.ldz.biz.model.User;
 import com.ldz.biz.service.OrderService;
 import com.ldz.biz.service.ProBaseinfoService;
 import com.ldz.biz.service.ProInfoService;
 import com.ldz.biz.service.UserService;
+import com.ldz.util.bean.AndroidMsgBean;
 import com.ldz.util.bean.SimpleCondition;
 import com.ldz.util.commonUtil.*;
 import com.ldz.util.redis.RedisTemplateUtil;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.math.RandomUtils;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.connection.RedisZSetCommands.Limit;
-import org.springframework.data.redis.connection.RedisZSetCommands.Range;
-import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.beans.SimpleBeanInfo;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -67,7 +55,18 @@ public class BizApplicationTests {
 
     @Test
     public void test() throws IOException, InterruptedException, PushClientException, PushServerException {
-        BaiduPushUtils.pushAllMsg(1,"测试",3,System.currentTimeMillis()/1000 + 70);
+        /*AndroidMsgBean msgBean = new AndroidMsgBean();
+        ProInfo proInfo = proInfoService.findById("568838409968156672");
+        msgBean.setJson(JsonUtil.toJson(proInfo));
+        msgBean.setType("4");
+        BaiduPushUtils.pushAllMsg(0,JsonUtil.toJson(msgBean),3,System.currentTimeMillis()/1000 + 70);*/
+
+        List<ProBaseinfo> all = baseinfoService.findAll();
+        List<String> list = all.stream().map(ProBaseinfo::getId).collect(Collectors.toList());
+        for (String s : list) {
+            proInfoService.saveOne(s);
+            proInfoService.saveOne(s);
+        }
 
 
         /*Set<Object> keys = redis.keys("*_nums");
@@ -79,13 +78,9 @@ public class BizApplicationTests {
             String s = next.split("_")[0];
             condition.eq(ProInfo.InnerColumn.id, s);
             condition.eq(ProInfo.InnerColumn.proZt, "1");
-            condition.and().andCondition(" re_price = '0'");
             List<ProInfo> proInfos = proInfoService.findByCondition(condition);
-            if(CollectionUtils.isNotEmpty(proInfos)){
-                ProInfo proInfo = proInfos.get(0);
-                proInfo.setProZt("3");
-                proInfoService.update(proInfo);
-                orderService.fenpei(proInfo.getId());
+            List<String> ids = proInfos.stream().map(ProInfo::getId).collect(Collectors.toList());
+            if(!ids.contains(next)){
                 redis.delete(next);
             }
 

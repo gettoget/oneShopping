@@ -20,4 +20,7 @@ public class OrderContrl extends BaseController<Order,String> {
     protected BaseService<Order, String> getBaseService() {
         return service;
     }
+
+
+
 }

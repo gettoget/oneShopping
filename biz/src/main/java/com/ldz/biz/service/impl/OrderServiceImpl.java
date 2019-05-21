@@ -9,10 +9,13 @@ import com.ldz.biz.model.*;
 import com.ldz.biz.service.*;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.sys.base.LimitedCondition;
+import com.ldz.util.bean.AndroidMsgBean;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
 import com.ldz.util.bean.SimpleCondition;
+import com.ldz.util.commonUtil.BaiduPushUtils;
 import com.ldz.util.commonUtil.DateUtils;
+import com.ldz.util.commonUtil.JsonUtil;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.exception.RuntimeCheckException;
@@ -22,6 +25,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.stereotype.Service;
@@ -35,6 +40,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements OrderService {
+
+    Logger errorLog = LoggerFactory.getLogger("error_info");
 
     @Autowired
     private OrderMapper baseMapper;
@@ -76,11 +83,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 
     @Override
     public boolean fillPagerCondition(LimitedCondition condition) {
-        String userId = (String) getAttribute("userId");
-        if (StringUtils.isBlank(userId)) {
-            return false;
-        }
-        condition.eq(Order.InnerColumn.userId, userId);
+
         return true;
     }
 
@@ -90,20 +93,48 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             return;
         }
         List<Order> orders = result.getList();
-        List<String> list = orders.stream().filter(order -> StringUtils.equals(order.getOrderType(), "2")).map(Order::getId).collect(Collectors.toList());
+        List<String> list = orders.stream().map(Order::getId).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(list)) {
-            String userId = (String) getAttribute("userId");
+            Set<String> receIds = orders.stream().filter(order -> StringUtils.isNotBlank(order.getReceId())).map(Order::getReceId).collect(Collectors.toSet());
+            Map<String, ReceiveAddr> addrMap = new HashMap<>();
+            if(CollectionUtils.isNotEmpty(receIds)){
 
+                List<ReceiveAddr> addrs = addrService.findByIds(receIds);
+                addrMap = addrs.stream().collect(Collectors.toMap(ReceiveAddr::getId, p -> p));
+            }
             SimpleCondition condition = new SimpleCondition(OrderList.class);
-            condition.eq(OrderList.InnerColumn.userid, userId);
             condition.in(OrderList.InnerColumn.orderId, list);
             List<OrderList> orderLists = orderListService.findByCondition(condition);
 
             if (CollectionUtils.isNotEmpty(orderLists)) {
                 Map<String, List<OrderList>> listMap = orderLists.stream().collect(Collectors.groupingBy(OrderList::getOrderId));
+                Set<String> collect = orderLists.stream().filter(orderList -> StringUtils.isNotBlank(orderList.getProId())).map(OrderList::getProId).collect(Collectors.toSet());
+                Set<String> userIds = orderLists.stream().filter(orderList -> StringUtils.isNotBlank(orderList.getUserid())).map(OrderList::getUserid).collect(Collectors.toSet());
+
+                List<User> users = userService.findByIds(userIds);
+                Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
+
+                List<ProInfo> infos = proInfoService.findByIds(collect);
+                Map<String, ProInfo> map = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
+                Map<String, ReceiveAddr> finalAddrMap = addrMap;
                 orders.forEach(order -> {
                     if (listMap.containsKey(order.getId())) {
-                        order.setOrderLists(listMap.get(order.getId()));
+                        List<OrderList> lists = listMap.get(order.getId());
+                        order.setOrderLists(lists);
+                        List<String> nums = lists.stream().map(OrderList::getNum).collect(Collectors.toList());
+                        order.setNums(nums);
+                    }
+                    if(map.containsKey(order.getProId())){
+                        ProInfo info = map.get(order.getProId());
+                        order.setRate((Integer.parseInt(info.getProPrice()) - Integer.parseInt(info.getRePrice()) * 100 ) / Integer.parseInt(info.getProPrice()));
+                    }
+                    if(userMap.containsKey(order.getUserId())){
+                        User user = userMap.get(order.getUserId());
+                        order.setUserName(user.getUserName());
+                    }
+                    if(finalAddrMap.containsKey(order.getReceId())){
+                        ReceiveAddr addr = finalAddrMap.get(order.getReceId());
+                        order.setAddr(addr);
                     }
                 });
             }
@@ -165,6 +196,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         order.setGmfs(entity.getGmfs());
         order.setReceId(entity.getReceId());
         order.setZfje(entity.getZfje());
+        order.setImei(imei);
         // 生成消费记录
         Exchange exchange = new Exchange();
 
@@ -174,9 +206,20 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             order.setZfje(Integer.parseInt(baseinfo.getProPrice()) * Integer.parseInt(order.getGmfs()) + "");*/
             // 直接购买  baseInfo 库存 -1
             //            baseMapper.minusStore(baseinfo.getId(), Integer.parseInt(order.getGmfs()));
-
+            String payType = getRequestParamterAsString("payType");
             // todo 直接购买可能是直接调用支付接口
-
+            // 如果不是调用的支付接口 则使用余额购买
+            if(StringUtils.isBlank(payType)){
+                int balance = Integer.parseInt(user1.getBalance());
+                int ye = balance - dzf;
+                RuntimeCheck.ifTrue(ye < 0, MessageUtils.get("order.balanceNotEnough"));
+                exchange.setXfqjbs(balance + "");
+                exchange.setXfsj(DateUtils.getNowTime());
+                exchange.setXfhjbs(ye + "");
+                user1.setBalance(ye + "");
+            }else{
+                // 调用支付接口
+            }
             // 直接购买订单 订单状态改为已支付
             order.setDdzt("4");
         } else if (StringUtils.equals(entity.getOrderType(), "2")) {
@@ -256,7 +299,15 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                     // 建立延时任务 , 准备分配中奖号码
                     long millis = DateTime.now().plusMinutes(1).getMillis();
                     redis.boundZSetOps(ProInfo.class.getSimpleName() + "_award").add(proInfo.getId(), millis);
-                    //  todo 推送待开奖数据到前台
+                    try {
+                        ProInfo info = proInfoService.findById(proInfo.getId());
+                        AndroidMsgBean msgBean = new AndroidMsgBean();
+                        msgBean.setType("3");
+                        msgBean.setJson(JsonUtil.toJson(info));
+                        BaiduPushUtils.pushAllMsg(0,JsonUtil.toJson(msgBean),3,0);
+                    }catch (Exception e){
+                        errorLog.error("商品待开奖推送异常 [{}]" , e);
+                    }
                 } else {
                     infoMapper.updateProInfo(order.getProId());
                 }
@@ -462,6 +513,17 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             record.setZjfs(order.getGmfs());
             record.setZjlx(user.getScore());
             recordService.save(record);
+            try{
+//                info.setHimg(user.gethImg());
+                info.setUserName(user.getUserName());
+                info.setZjfs(record.getZjfs());
+                AndroidMsgBean msgBean = new AndroidMsgBean();
+                msgBean.setType("4");
+                msgBean.setJson(JsonUtil.toJson(info));
+                BaiduPushUtils.pushAllMsg(0,JsonUtil.toJson(msgBean),3,0);
+            }catch (Exception e){
+
+            }
             // 商品已中奖  自动上架 下个商品  如果还有库存的话
             ProBaseinfo baseinfo = proBaseinfoService.findById(info.getProBaseid());
             if (Integer.parseInt(baseinfo.getProStore()) > 0) {

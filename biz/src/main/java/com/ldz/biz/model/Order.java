@@ -114,6 +114,18 @@ public class Order implements Serializable {
     @Transient
     private int rate;
 
+    @Transient
+    private List<String> nums;
+
+
+    public List<String> getNums() {
+        return nums;
+    }
+
+    public void setNums(List<String> nums) {
+        this.nums = nums;
+    }
+
     public int getRate() {
         return rate;
     }

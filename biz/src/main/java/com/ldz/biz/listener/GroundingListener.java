@@ -26,6 +26,7 @@ public class GroundingListener implements MessageListener {
         if (StringUtils.equals(topicc, "grounding")) {
             String id = (String) eventMessage;
             proInfoService.saveOne(id);
+
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.ldz.biz.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -11,10 +13,13 @@ import com.ldz.biz.model.*;
 import com.ldz.biz.service.*;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.sys.base.LimitedCondition;
+import com.ldz.util.bean.AndroidMsgBean;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
 import com.ldz.util.bean.SimpleCondition;
+import com.ldz.util.commonUtil.BaiduPushUtils;
 import com.ldz.util.commonUtil.DateUtils;
+import com.ldz.util.commonUtil.JsonUtil;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.exception.RuntimeCheckException;
@@ -23,6 +28,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -33,6 +40,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> implements ProInfoService {
+
+    Logger errorLog = LoggerFactory.getLogger("error_info");
 
     @Autowired
     private ProInfoMapper baseMapper;
@@ -116,6 +125,14 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
         baseinfo.setProStore(storeNum - 1 + "");
         proBaseinfoService.update(baseinfo);
+        try {
+            AndroidMsgBean androidMsgBean = new AndroidMsgBean();
+            androidMsgBean.setJson(JsonUtil.toJson(proInfo));
+            androidMsgBean.setType("1");
+            BaiduPushUtils.pushAllMsg(0, JsonUtil.toJson(androidMsgBean),3,0);
+        } catch (Exception e) {
+            errorLog.error("百度推送异常 [{}]", e);
+        }
         return ApiResponse.success(MessageUtils.get("pro.groundSuc"));
     }
 
@@ -127,6 +144,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
             if(StringUtils.isNotBlank(proInfo.getUserId())){
                 User user = userService.findById(proInfo.getUserId());
                 proInfo.setUserName(user.getUserName());
+//                proInfo.setHimg(user.gethImg());
             }
         }
         return ApiResponse.success(proInfo);
@@ -594,6 +612,33 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         return ApiResponse.success(s);
     }
 
+    @Override
+    public ApiResponse<String> updateEntity(ProInfo entity)  {
+        String id = entity.getId();
+        ProInfo proInfo = findById(id);
+        String proLx = proInfo.getProLx();
+        boolean flag = false;
+        if(StringUtils.containsNone(proLx,"3") && StringUtils.contains(entity.getProLx(),"3")){
+            // 代表当前产品的类型变成了热门商品
+            flag = true;
+        }
+        RuntimeCheck.ifNull( proInfo, MessageUtils.get("pro.isNull"));
+        BeanUtil.copyProperties(entity, proInfo, CopyOptions.create().setIgnoreNullValue(true).setIgnoreError(true).setIgnoreProperties("id"));
+        update(proInfo);
+        // 如果由非热门商品 转换为 热门商品 推送消息给前台
+        if (flag) {
+            AndroidMsgBean  msgBean = new AndroidMsgBean();
+            msgBean.setType("2");
+            msgBean.setJson(JsonUtil.toJson(proInfo));
+            try {
+                BaiduPushUtils.pushAllMsg(0,JsonUtil.toJson(msgBean),3,0);
+            } catch (Exception e) {
+                errorLog.error("百度推送热门商品异常  [{}]" , e);
+            }
+        }
+        return ApiResponse.success();
+    }
+
 
     @Override
     public void afterPager(PageInfo<ProInfo> result) {
@@ -601,7 +646,14 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
+        Set<String> userIds = list.stream().map(ProInfo::getUserId).collect(Collectors.toSet());
+        List<User> users = userService.findByIds(userIds);
+        Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
         for (ProInfo proBaseinfo : list) {
+            if(userMap.containsKey(proBaseinfo.getUserId())){
+                User user = userMap.get(proBaseinfo.getUserId());
+                proBaseinfo.setUserName(user.getUserName());
+            }
             setImgUrl(proBaseinfo);
         }
     }
@@ -785,6 +837,16 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 // 商品结束后1分钟执行开奖功能
                 long millis = DateTime.now().plusMinutes(1).getMillis();
                 redis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").add(proId, millis);
+                // 商品进入待开奖状态 , 向前台推送信息
+                try {
+                    ProInfo proInfo = findById(proId);
+                    AndroidMsgBean msgBean = new AndroidMsgBean();
+                    msgBean.setType("3");
+                    msgBean.setJson(JsonUtil.toJson(proInfo));
+                    BaiduPushUtils.pushAllMsg(0,JsonUtil.toJson(msgBean),3,0);
+                }catch (Exception e){
+                    errorLog.error("商品待开奖推送异常 [{}]" , e);
+                }
             }
         }catch(Exception e){
         	if (cloneElements.size() > 0){

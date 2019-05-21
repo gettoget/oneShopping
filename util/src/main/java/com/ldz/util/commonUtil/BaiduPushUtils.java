@@ -80,14 +80,26 @@ public class BaiduPushUtils {
 //        JSONArray jsonArray = new JSONArray();
 
         try {
-            // 4. specify request arguments
-            PushMsgToAllRequest request = new PushMsgToAllRequest()
-                    .addMsgExpires(new Integer(3600))
-                    .addMessageType(messageType)
-                    .addMessage(message)
-                    // 设置定时推送时间，必需超过当前时间一分钟，单位秒.实例70秒后推送
-                    .addSendTime(sendTime)
-                    .addDeviceType(deviceType);
+            // 4. specify request
+            PushMsgToAllRequest request;
+            if(sendTime == 0){
+               request = new PushMsgToAllRequest()
+                        .addMsgExpires(new Integer(3600))
+                        .addMessageType(messageType)
+                        .addMessage(message)
+                        // 设置定时推送时间，必需超过当前时间一分钟，单位秒.实例70秒后推送
+//                        .addSendTime(sendTime)
+                        .addDeviceType(deviceType);
+            }else{
+                request = new PushMsgToAllRequest()
+                        .addMsgExpires(new Integer(3600))
+                        .addMessageType(messageType)
+                        .addMessage(message)
+                        // 设置定时推送时间，必需超过当前时间一分钟，单位秒.实例70秒后推送
+                        .addSendTime(sendTime)
+                        .addDeviceType(deviceType);
+            }
+
             // 5. http request
             PushMsgToAllResponse response = pushClient.pushMsgToAll(request);
             // Http请求返回值解析
