@@ -9,8 +9,12 @@ import com.baidu.yun.push.model.PushMsgToAllRequest;
 import com.baidu.yun.push.model.PushMsgToAllResponse;
 import com.baidu.yun.push.model.PushMsgToSingleDeviceRequest;
 import com.baidu.yun.push.model.PushMsgToSingleDeviceResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BaiduPushUtils {
+
+   private static Logger errorLog = LoggerFactory.getLogger("error_info");
 
 
     public static void pushSingleMsg(String chnnelId, int messageType, String message, int deviceType) throws PushClientException, PushServerException {
@@ -46,23 +50,21 @@ public class BaiduPushUtils {
             //ERROROPTTYPE 用于设置异常的处理方式 -- 抛出异常和捕获异常,
             //'true' 表示抛出, 'false' 表示捕获。
             if (BaiduPushConstants.ERROROPTTYPE) {
-                throw e;
+                errorLog.error("推送信息异常 :", e);
             } else {
-                e.printStackTrace();
+                errorLog.error("推送信息异常 :", e);
             }
         } catch (PushServerException e) {
             if (BaiduPushConstants.ERROROPTTYPE) {
-                throw e;
+                errorLog.error("推送信息异常 :", e);
             } else {
-                System.out.println(String.format(
-                        "requestId: %d, errorCode: %d, errorMsg: %s",
-                        e.getRequestId(), e.getErrorCode(), e.getErrorMsg()));
+                errorLog.error("推送信息异常 :", e);
             }
         }
     }
 
 
-    public static void pushAllMsg(int messageType, String message, int deviceType, long sendTime) throws PushClientException, PushServerException {
+    public static void pushAllMsg(int messageType, String message, int deviceType, long sendTime)  {
 
 
         // 1. get apiKey and secretKey from developer console
@@ -108,17 +110,15 @@ public class BaiduPushUtils {
                     + response.getTimerId());
         } catch (PushClientException e) {
             if (BaiduPushConstants.ERROROPTTYPE) {
-                throw e;
+                errorLog.error("推送信息异常 :", e);
             } else {
-                e.printStackTrace();
+                errorLog.error("推送信息异常 :", e);
             }
         } catch (PushServerException e) {
             if (BaiduPushConstants.ERROROPTTYPE) {
-                throw e;
+                errorLog.error("推送信息异常 :", e);
             } else {
-                System.out.println(String.format(
-                        "requestId: %d, errorCode: %d, errorMsg: %s",
-                        e.getRequestId(), e.getErrorCode(), e.getErrorMsg()));
+                errorLog.error("推送信息异常 :", e);
             }
         }
     }

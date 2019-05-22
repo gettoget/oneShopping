@@ -2,13 +2,12 @@ package com.ldz.biz;
 
 import com.baidu.yun.push.exception.PushClientException;
 import com.baidu.yun.push.exception.PushServerException;
+import com.ldz.biz.bean.ProInfoLuckNumBean;
 import com.ldz.biz.mapper.OrderMapper;
+import com.ldz.biz.model.OrderList;
 import com.ldz.biz.model.ProBaseinfo;
 import com.ldz.biz.model.ProInfo;
-import com.ldz.biz.service.OrderService;
-import com.ldz.biz.service.ProBaseinfoService;
-import com.ldz.biz.service.ProInfoService;
-import com.ldz.biz.service.UserService;
+import com.ldz.biz.service.*;
 import com.ldz.util.bean.AndroidMsgBean;
 import com.ldz.util.bean.SimpleCondition;
 import com.ldz.util.commonUtil.*;
@@ -27,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -49,25 +49,33 @@ public class BizApplicationTests {
     private SnowflakeIdWorker idWorker;
     @Autowired
     private OrderMapper orderMapper;
+    @Autowired
+    private OrderListService orderListService;
     @Test
     public void contextLoads() {
     }
 
     @Test
     public void test() throws IOException, InterruptedException, PushClientException, PushServerException {
-        /*AndroidMsgBean msgBean = new AndroidMsgBean();
+        AndroidMsgBean msgBean = new AndroidMsgBean();
         ProInfo proInfo = proInfoService.findById("568838409968156672");
         msgBean.setJson(JsonUtil.toJson(proInfo));
         msgBean.setType("4");
-        BaiduPushUtils.pushAllMsg(0,JsonUtil.toJson(msgBean),3,System.currentTimeMillis()/1000 + 70);*/
+        BaiduPushUtils.pushAllMsg(0,JsonUtil.toJson(msgBean),3,System.currentTimeMillis()/1000 + 70);
 
-        List<ProBaseinfo> all = baseinfoService.findAll();
+       /* List<ProBaseinfo> all = baseinfoService.findAll();
         List<String> list = all.stream().map(ProBaseinfo::getId).collect(Collectors.toList());
         for (String s : list) {
             proInfoService.saveOne(s);
             proInfoService.saveOne(s);
-        }
-
+        }*/
+       /* Set<Object> keys = redis.keys("*_nums");
+        Iterator<Object> iterator = keys.iterator();
+        while (iterator.hasNext()){
+            Object next = iterator.next();
+            Long size = redis.boundSetOps(next).size();
+            System.out.println(size);
+        }*/
 
         /*Set<Object> keys = redis.keys("*_nums");
         Iterator<Object> iterator = keys.iterator();
@@ -76,15 +84,44 @@ public class BizApplicationTests {
             String next = (String) iterator.next();
             SimpleCondition condition =  new SimpleCondition(ProInfo.class);
             String s = next.split("_")[0];
-            condition.eq(ProInfo.InnerColumn.id, s);
+            *//*condition.eq(ProInfo.InnerColumn.id, s);
             condition.eq(ProInfo.InnerColumn.proZt, "1");
-            List<ProInfo> proInfos = proInfoService.findByCondition(condition);
-            List<String> ids = proInfos.stream().map(ProInfo::getId).collect(Collectors.toList());
-            if(!ids.contains(next)){
-                redis.delete(next);
+            List<ProInfo> proInfos = proInfoService.findByCondition(condition);*//*
+            // List<String> ids = proInfos.stream().map(ProInfo::getId).collect(Collectors.toList());
+            ProInfo info = proInfoService.findById(s);
+            int parseInt = Integer.parseInt(info.getRePrice());
+            int anInt = Integer.parseInt(info.getProPrice());
+
+            condition = new SimpleCondition(OrderList.class);
+            condition.eq(OrderList.InnerColumn.proId, s);
+            List<OrderList> orderLists = orderListService.findByCondition(condition);
+            List<String> nums = orderLists.stream().map(OrderList::getNum).collect(Collectors.toList());
+            Long size = redis.boundSetOps(next).size();
+            if(anInt - parseInt == nums.size() && size != parseInt){
+                Set<Object> set = redis.boundSetOps(next).distinctRandomMembers(size);
+                Iterator<Object> iterator1 = set.iterator();
+                while (iterator1.hasNext()){
+                    Object next1 = iterator1.next();
+                    ProInfoLuckNumBean numBean = (ProInfoLuckNumBean) next1;
+                    if(nums.contains(numBean.getLuckNum())){
+                        redis.boundSetOps(next).remove(next1);
+                    }
+                }*/
+                /*for (Object o : set) {
+                    String num = (String) o;
+                    if(nums.contains(num)){
+                        redis.boundSetOps(next).remove(o);
+                    }
+                }*/
             }
 
-        }*/
+
+/*
+            if(!ids.contains(s)){
+                redis.delete(next);
+            }*/
+
+        }
 
        /* DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS");
         List<OrderList> lastFifty = orderMapper.getLastFifty("576416482989178880", 50);
@@ -174,6 +211,6 @@ public class BizApplicationTests {
 //    	}catch(Exception e){
 //    		e.printStackTrace();
 //    	}
-    }
 
-}
+
+

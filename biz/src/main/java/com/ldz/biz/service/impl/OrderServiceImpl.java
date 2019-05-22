@@ -97,7 +97,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         if (CollectionUtils.isNotEmpty(list)) {
             Set<String> receIds = orders.stream().filter(order -> StringUtils.isNotBlank(order.getReceId())).map(Order::getReceId).collect(Collectors.toSet());
             Map<String, ReceiveAddr> addrMap = new HashMap<>();
-            if(CollectionUtils.isNotEmpty(receIds)){
+            if (CollectionUtils.isNotEmpty(receIds)) {
 
                 List<ReceiveAddr> addrs = addrService.findByIds(receIds);
                 addrMap = addrs.stream().collect(Collectors.toMap(ReceiveAddr::getId, p -> p));
@@ -124,15 +124,15 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                         List<String> nums = lists.stream().map(OrderList::getNum).collect(Collectors.toList());
                         order.setNums(nums);
                     }
-                    if(map.containsKey(order.getProId())){
+                    if (map.containsKey(order.getProId())) {
                         ProInfo info = map.get(order.getProId());
-                        order.setRate((Integer.parseInt(info.getProPrice()) - Integer.parseInt(info.getRePrice()) * 100 ) / Integer.parseInt(info.getProPrice()));
+                        order.setRate((Integer.parseInt(info.getProPrice()) - Integer.parseInt(info.getRePrice()) * 100) / Integer.parseInt(info.getProPrice()));
                     }
-                    if(userMap.containsKey(order.getUserId())){
+                    if (userMap.containsKey(order.getUserId())) {
                         User user = userMap.get(order.getUserId());
                         order.setUserName(user.getUserName());
                     }
-                    if(finalAddrMap.containsKey(order.getReceId())){
+                    if (finalAddrMap.containsKey(order.getReceId())) {
                         ReceiveAddr addr = finalAddrMap.get(order.getReceId());
                         order.setAddr(addr);
                     }
@@ -209,7 +209,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             String payType = getRequestParamterAsString("payType");
             // todo 直接购买可能是直接调用支付接口
             // 如果不是调用的支付接口 则使用余额购买
-            if(StringUtils.isBlank(payType)){
+            if (StringUtils.isBlank(payType)) {
                 int balance = Integer.parseInt(user1.getBalance());
                 int ye = balance - dzf;
                 RuntimeCheck.ifTrue(ye < 0, MessageUtils.get("order.balanceNotEnough"));
@@ -217,7 +217,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 exchange.setXfsj(DateUtils.getNowTime());
                 exchange.setXfhjbs(ye + "");
                 user1.setBalance(ye + "");
-            }else{
+            } else {
                 // 调用支付接口
             }
             // 直接购买订单 订单状态改为已支付
@@ -299,15 +299,11 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                     // 建立延时任务 , 准备分配中奖号码
                     long millis = DateTime.now().plusMinutes(1).getMillis();
                     redis.boundZSetOps(ProInfo.class.getSimpleName() + "_award").add(proInfo.getId(), millis);
-                    try {
-                        ProInfo info = proInfoService.findById(proInfo.getId());
-                        AndroidMsgBean msgBean = new AndroidMsgBean();
-                        msgBean.setType("3");
-                        msgBean.setJson(JsonUtil.toJson(info));
-                        BaiduPushUtils.pushAllMsg(0,JsonUtil.toJson(msgBean),3,0);
-                    }catch (Exception e){
-                        errorLog.error("商品待开奖推送异常 [{}]" , e);
-                    }
+                    ProInfo info = proInfoService.findById(proInfo.getId());
+                    AndroidMsgBean msgBean = new AndroidMsgBean();
+                    msgBean.setType("3");
+                    msgBean.setJson(JsonUtil.toJson(info));
+                    BaiduPushUtils.pushAllMsg(0, JsonUtil.toJson(msgBean), 3, 0);
                 } else {
                     infoMapper.updateProInfo(order.getProId());
                 }
@@ -513,17 +509,13 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             record.setZjfs(order.getGmfs());
             record.setZjlx(user.getScore());
             recordService.save(record);
-            try{
-//                info.setHimg(user.gethImg());
-                info.setUserName(user.getUserName());
-                info.setZjfs(record.getZjfs());
-                AndroidMsgBean msgBean = new AndroidMsgBean();
-                msgBean.setType("4");
-                msgBean.setJson(JsonUtil.toJson(info));
-                BaiduPushUtils.pushAllMsg(0,JsonUtil.toJson(msgBean),3,0);
-            }catch (Exception e){
 
-            }
+            info.setUserName(user.getUserName());
+            info.setZjfs(record.getZjfs());
+            AndroidMsgBean msgBean = new AndroidMsgBean();
+            msgBean.setType("4");
+            msgBean.setJson(JsonUtil.toJson(info));
+            BaiduPushUtils.pushAllMsg(0, JsonUtil.toJson(msgBean), 3, 0);
             // 商品已中奖  自动上架 下个商品  如果还有库存的话
             ProBaseinfo baseinfo = proBaseinfoService.findById(info.getProBaseid());
             if (Integer.parseInt(baseinfo.getProStore()) > 0) {

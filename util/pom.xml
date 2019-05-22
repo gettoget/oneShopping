@@ -53,8 +53,6 @@
 			<groupId>com.baidu.push</groupId>
 			<artifactId>bccs.api</artifactId>
 			<version>3.0.1</version>
-			<scope>system</scope>
-      		<systemPath>${project.basedir}/bccs-api-3.0.1.jar</systemPath>
 		</dependency>
 	</dependencies>
 

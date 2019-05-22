@@ -12,7 +12,7 @@
     <artifactId>biz</artifactId>
     <version>0.0.1</version>
     <name>biz</name>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <description>Demo project for Spring Boot</description>
 
     <properties>
@@ -81,6 +81,11 @@
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>1.2.56</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baidu.push</groupId>
+            <artifactId>bccs.api</artifactId>
+            <version>3.0.1</version>
         </dependency>
     </dependencies>
 
