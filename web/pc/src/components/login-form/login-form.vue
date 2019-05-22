@@ -14,19 +14,19 @@
         </span>
       </Input>
     </FormItem>
-    <Row>
-      <Col span="14">
-        <Row>
-          <Col span="24">
-            <FormItem prop="captcha">
-              <Input v-model="form.captcha" placeholder="请输入验证码">
-              <span slot="prepend">
-              <Icon :size="14" type="md-key"></Icon>
-            </span>
-              </Input>
-            </FormItem>
-          </Col>
-        </Row>
+    <!--<Row>-->
+      <!--<Col span="14">-->
+        <!--<Row>-->
+          <!--<Col span="24">-->
+            <!--<FormItem prop="captcha">-->
+              <!--<Input v-model="form.captcha" placeholder="请输入验证码">-->
+              <!--<span slot="prepend">-->
+              <!--<Icon :size="14" type="md-key"></Icon>-->
+            <!--</span>-->
+              <!--</Input>-->
+            <!--</FormItem>-->
+          <!--</Col>-->
+        <!--</Row>-->
         <Row>
           <Col span="24">
             <Row>
@@ -39,11 +39,11 @@
             </Row>
           </Col>
         </Row>
-      </Col>
-      <Col span="10">
-        <img :src="YzUrl" width="100%" alt="验证码" style="margin-left: 8px;cursor: pointer"  @click="getUrl">
-      </Col>
-    </Row>
+      <!--</Col>-->
+      <!--<Col span="10">-->
+        <!--<img :src="YzUrl" width="100%" alt="验证码" style="margin-left: 8px;cursor: pointer"  @click="getUrl">-->
+      <!--</Col>-->
+    <!--</Row>-->
   </Form>
 </template>
 <script>
@@ -66,24 +66,24 @@ export default {
         ]
       }
     },
-    captchaRules:{
-      type: Array,
-      default: () => {
-        return [
-          {required: true, message: '请填写验证码', trigger: 'blur'}
-        ]
-      }
-    }
+    // captchaRules:{
+    //   type: Array,
+    //   default: () => {
+    //     return [
+    //       {required: true, message: '请填写验证码', trigger: 'blur'}
+    //     ]
+    //   }
+    // }
   },
   data () {
     return {
       YzUrl: '',
       form: {
-        username: '',
-        password: '',
-        captcha:'',
-        codeID:'',
+        username: 'admini',
+        password: '123456',
       }
+        // captcha:'',
+        // codeID:'',
     }
   },
   computed: {
@@ -96,16 +96,16 @@ export default {
     }
   },
   created(){
-    this.getUrl()
+    // this.getUrl()
   },
   methods: {
     newMess(){
       this.form = {
-        username: '',
-        password: '',
-        captcha:'',
-        codeID:''
+        username: 'admini',
+        password: '123456',
       }
+        // captcha:'',
+        // codeID:''
     },
     getRandom(val) {//取随机数
       let line = 1
