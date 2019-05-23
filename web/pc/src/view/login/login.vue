@@ -4,12 +4,22 @@
 
 <template>
   <div class="login">
+    <div class="login-TiT">
+      Go - ABC
+    </div>
     <div class="login-con">
-      <Card icon="log-in" title="欢迎登录" :bordered="false">
-        <div class="form-con">
+      <div class="FormBox box_col">
+        <div class="FormTit">
+          管理
+        </div>
+        <div class="FormCenter box_row_100">
           <login-form @on-success-valid="handleSubmit"></login-form>
         </div>
-      </Card>
+      </div>
+      <!--<Card icon="log-in" title="欢迎登录" :bordered="false">-->
+        <!--<div class="form-con">-->
+        <!--</div>-->
+      <!--</Card>-->
     </div>
   </div>
 </template>
