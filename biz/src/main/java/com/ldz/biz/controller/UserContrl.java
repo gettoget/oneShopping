@@ -9,10 +9,7 @@ import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -29,4 +26,19 @@ public class UserContrl extends BaseController<User,String> {
     protected BaseService<User, String> getBaseService() {
         return service;
     }
+
+    @Override
+    @PostMapping("/remove/{pkId}")
+    public ApiResponse<String> remove(@PathVariable("pkId") String id){
+        return ApiResponse.success();
+    }
+
+
+    @PostMapping("/update")
+    public ApiResponse<String> update(User entity){
+        return service.updateEntity(entity);
+    }
+
+
+
 }
