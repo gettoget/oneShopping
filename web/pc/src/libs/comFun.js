@@ -1,104 +1,54 @@
 // Vue.prototype.AF = comFun;
-import swal from 'sweetalert2'
-import iView from 'iview'
-import $http from '../axios/index'
-import store from '../store'
+import { localRead,localSave, } from '@/libs/util'
+let Met={
+}
 
-export default {
-  carCard(km, cardNo, callback) {
-    $http.post('/api/lccl/carInfo', {km: km, cardNo: cardNo}).then(res => {
-      console.log('........3', typeof res.code);
-      if (res.code == 200) {
-        callback && callback(true, res)
-      } else if (res.code === 501) {//code  = 501   (此卡正在训练中)    code = 505 此卡绑定车辆科目与当前选择科目不一致
-        swal({
-          title: "此卡正在训练中",
-          type: 'error'
-        })
-        return
-      } else if (res.code == 505) {
-        swal({
-          title: "此卡绑定车辆科目与当前选择科目不一致",
-          type: 'error'
-        })
-        return
-      } else {
-        swal({
-          title: 'bug',
-          type: 'error'
-        })
-        return
-      }
-    }).catch(err => {
-    })
+Met.WindowListener = (callback)=>{
+  // window.onresize = function(val) {
+  //   // 浏览器窗口变化后需要做的事情
+  //   //
+  //   //
+  // }
 
-  },
-  getPrintName: () => {
-    return store.state.app.printerName
-  },
-  Get_SERVER_Time(callback) {
-    $http.post('/pub/getTimeMillis', {notShowLoading: 'true'}).then(res => {
-      if (res.code == 200 && res.result) {
-        callback && callback(res.result)
-      }
-    })
-  },
-  ObjToStr(a) {
-    return JSON.stringify(a);
-  },
-  StrToObj(a) {
-    return JSON.parse(a);
-  },
-  setItem(key, val) {
-    let value = JSON.stringify(val)
-    sessionStorage.setItem(key, value)
-  },
-  getItem(key) {
-    let sessData = sessionStorage.getItem(key)
-    return JSON.parse(sessData)
-  },
-  idPrintMess(id, callback) {
-    $http.post('/api/chargemanagement/findTodayCharge', id).then((res) => {
-      let OBJ = {}
-      if (res.code == 200) {
-        OBJ = res.page.list[0]
-        if (res.page.list[0].pjbh == '') {
-          this.getPrintNum('pjdy', [res.page.list[0].traineeId], num => {
-            OBJ.pjbh = num
-          })
-        } else {
-          let a = res.page.list[0].pjbh.split('-')
-          OBJ = a[0] + '-' + a[1]
-        }
-      }
-      callback && callback(OBJ)
-      return OBJ
-    }).catch((err) => {
-    })
-  },
+  window.addEventListener('resize', function(val) {
+    // 变化后需要做的事
+    callback && callback()
+  })
+}
 
+Met.getBody_W = ()=>{
+  return document.body.clientWidth
+}
 
-  getPrintNum(num, ids, callback) {
-    var idList = ids.join(',');
-    $http.post('/api/chargemanagement/receiptNo', {num: num, ids: idList}).then((res) => {
-      if (res.code == 200) {
-        callback && callback(res.message)
-      }
-    }).catch((err) => {
+Met.getPageHeight= () => {//获取浏览器页面高度
+  var windowHeight = window.innerHeight
+  return windowHeight
+}
+Met.getDom_H = (id)=>{
+  return document.getElementById(id).offsetHeight
+}
+Met.getDom_W = (id)=>{
+  return document.getElementById(id).offsetWidth
+}
+/**
+ 网页可见区域宽： document.body.clientWidth
+ 网页可见区域高： document.body.clientHeight
+ 网页可见区域宽： document.body.offsetWidth (包括边线的宽)
+ 网页可见区域高： document.body.offsetHeight (包括边线的高)
+ 网页正文全文宽： document.body.scrollWidth
+ 网页正文全文高： document.body.scrollHeight
+ 网页被卷去的高： document.body.scrollTop
+ 网页被卷去的左： document.body.scrollLeft
+ 元素的实际高度：document.getElementById("div").offsetHeight
+ 元素的实际宽度：document.getElementById("div").offsetWidth
+ 元素的实际距离左边界的距离：document.getElementById("div").offsetLeft
+ 元素的实际距离上边界的距离：document.getElementById("div").offsetTop
+ */
 
-    })
-  },
-  WinPrint(v, mess, compName) {
-    if (mess.length == 0) {
-      swal({
-        title: '请先选着要打印的单据！！！',
-        type: 'warning',
-        confirmButtonText: '关闭'
-      })
-    } else {
-      v.compName = compName
-    }
-  },
+export default Met
+/**
+{
+
   getRandom(val) {//取随机数
     let line = 1
     if (val && val > 1) {
@@ -122,32 +72,6 @@ export default {
     for (var i = 0; i < n.length; i++)
       str += '零壹贰叁肆伍陆柒捌玖'.charAt(n.charAt(i)) + unit.charAt(i);
     return str.replace(/零(仟|佰|拾|角)/g, "零").replace(/(零)+/g, "零").replace(/零(万|亿|元)/g, "$1").replace(/(亿)万|壹(拾)/g, "$1$2").replace(/^元零?|零分/g, "").replace(/元$/g, "元整");
-  },
-  Dele: (v, url, id, callback) => {
-    swal({
-      text: "是否删除数据?",
-      type: "warning",
-      showCancelButton: true,
-      confirmButtonText: '确认',
-      cancelButtonText: '取消'
-    }).then((isConfirm) => {
-      if (isConfirm.value) {
-        v.$http.post(url + id).then((res) => {
-          if (res.code == 200) {
-            iView.Message.success(res.message);
-            callback && callback()
-          } else {
-            iView.Message.error(res.message);
-          }
-        })
-      } else {
-        iView.Message.info('操作取消');
-      }
-    });
-  },
-  getPageHeight: () => {//获取浏览器页面高度
-    var windowHeight = window.innerHeight
-    return windowHeight
   },
   getTime: () => {
     var NowDate = new Date()
@@ -237,38 +161,35 @@ export default {
   getBrowserTyp() {
     var Typ = navigator.userAgent; //取得浏览器的userAgent字符串
     return Typ
-    /*
     //判断是否Opera浏览器
-    if (userAgent.indexOf("Opera") > -1) {
-        return "Opera"
-    };
-    //判断是否Firefox浏览器
-    if (userAgent.indexOf("Firefox") > -1) {
-        return "FF";
-    }
-    //判断是否chorme浏览器
-    if (userAgent.indexOf("Chrome") > -1){
-		return "Chrome";
-    }
-    //判断是否Safari浏览器
-    if (userAgent.indexOf("Safari") > -1) {
-        return "Safari";
-    }
-    //判断是否IE11浏览器 !!
-    if (userAgent.indexOf("Trident") > -1) {
-        return "IE";
-    }
-    //判断是否IE10浏览器
-    if (userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1 && userAgent.indexOf("Opera") == -1) {
-        return "IE";
-    }
-    //判断是否Edge浏览器
-    if (userAgent.indexOf("Trident") > -1) {
-        return "Edge";
-    };
+    // if (userAgent.indexOf("Opera") > -1) {
+    //     return "Opera"
+    // };
+    // //判断是否Firefox浏览器
+    // if (userAgent.indexOf("Firefox") > -1) {
+    //     return "FF";
+    // }
+    // //判断是否chorme浏览器
+    // if (userAgent.indexOf("Chrome") > -1){
+		// return "Chrome";
+    // }
+    // //判断是否Safari浏览器
+    // if (userAgent.indexOf("Safari") > -1) {
+    //     return "Safari";
+    // }
+    // //判断是否IE11浏览器 !!
+    // if (userAgent.indexOf("Trident") > -1) {
+    //     return "IE";
+    // }
+    // //判断是否IE10浏览器
+    // if (userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1 && userAgent.indexOf("Opera") == -1) {
+    //     return "IE";
+    // }
+    // //判断是否Edge浏览器
+    // if (userAgent.indexOf("Trident") > -1) {
+    //     return "Edge";
+    // };
 
-    *
-    * */
   },
   getYear() {
     let date = new Date();
@@ -278,9 +199,10 @@ export default {
   getMonth() {
     let date = new Date();
     let month = date.getMonth();
-    return month+1
+    return month + 1
   }
 }
+*/
 /*
 this.$nextTick(() => {
         $(document).keypress(function (event) {//keypress 单件
