@@ -28,7 +28,8 @@ export default {
    */
 
   "NUMBER": "idid",
-  "SYSTEM_USER": "idid"
+  "SYSTEM_USER": "idid",
+  "ACCOUNT_NUMBER":"Nomor akun",
 
   /**********************************
    ***********************************/

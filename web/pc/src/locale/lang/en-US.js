@@ -28,7 +28,8 @@ export default {
    */
 
   "NUMBER": "Number",
-  "SYSTEM_USER": "System user"
+  "SYSTEM_USER": "System user",
+  "ACCOUNT_NUMBER":"Account number",
 
   /**********************************
    ***********************************/

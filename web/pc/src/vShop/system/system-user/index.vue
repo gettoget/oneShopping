@@ -84,6 +84,7 @@
         },
           {
             title: '帐号',
+            i18n:"ACCOUNT_NUMBER",
             align: 'center',
             key: 'zh'
           },
