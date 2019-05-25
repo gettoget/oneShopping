@@ -1,24 +1,30 @@
 package com.ldz.biz.mapper;
 
-import java.util.List;
-
+import com.ldz.biz.model.Order;
+import com.ldz.biz.model.OrderList;
+import com.ldz.biz.model.User;
+import com.ldz.util.mapperprovider.InsertListMapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-
-import com.ldz.biz.model.Order;
-import com.ldz.biz.model.User;
-import com.ldz.util.mapperprovider.InsertListMapper;
-
 import tk.mybatis.mapper.common.Mapper;
+
+import java.util.List;
 
 public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
 
     /**
      * 获取最后 50 笔交易的时间
      */
-    @Select(" select * from order_form where zfsj is not null and zfsj != '' and pro_id =  #{id}  order by zfsj desc limit #{limi}")
-    List<Order> getLastFifty(@Param("id") String id, @Param("limi") int limi);
+    @Select(" select * from order_list where  pro_id =  #{id}  order by cjsj desc limit #{limi}")
+    List<OrderList> getLastFifty(@Param("id") String id, @Param("limi") int limi);
+    
+    /**
+     * 从待开奖商品中查询一个分配的中奖号码
+     * @return
+     */
+    @Select("SELECT *,Rand() r FROM order_list where yhlx='1' and pro_id = #{id} order by r desc LIMIT 1")
+    OrderList getOrderByRobotZjhm(@Param("id") String id);
 
     /**
      * 充值所有未中奖状态
@@ -45,7 +51,7 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
      * 剩余名额减掉购买份数
      * 本次消费份数必须小于商品剩余份数，并且商品状态为'销售中'
      */
-    @Update("update pro_info set pro_zt ='3',gxsj=CURRENT_TIMESTAMP(3),kjsj=CURRENT_TIMESTAMP(3) where id= #{proId} and re_price=0 and pro_zt='1'")
+    @Update("update pro_info set pro_zt ='3',gxsj=CURRENT_TIMESTAMP(3),kjsj=date_add(CURRENT_TIMESTAMP(3), interval 1 minute) where id= #{proId} and re_price=0 and pro_zt='1'")
     int updateFinish(@Param("proId") String proId);
 
     /**
@@ -65,9 +71,13 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
 
     @Update("update pro_info set cyyhs = CAST(cyyhs as unsigned ) + 1 where id = #{id}")
     void updateCyyhs(@Param("id") String id);
+    
+    @Select(" select * from order_list  where yhlx= '1' and pro_id = #{proId}  order by cjsj desc limit 1 ")
+    OrderList findLatestRobot(@Param("proId") String proId);
 
-    @Select(" select id from order_form order by zfsj desc limit 1 ")
-    String findLatestRobot();
+    @Update(" update user set zjcs = CAST(zjcs as unsigned ) + 1 where id = #{id}")
+    int updateZjcs(@Param("id") String id);
+
 
 
 }

@@ -1,10 +1,9 @@
 package com.ldz.biz.service.impl;
 
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
-import com.ldz.util.bean.PageResponse;
+import com.ldz.biz.model.WinRecord;
+import com.ldz.biz.service.WinRecordService;
 import com.ldz.sys.base.BaseServiceImpl;
-import com.ldz.sys.base.LimitedCondition;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.MessageUtils;
@@ -21,13 +20,18 @@ import com.ldz.biz.mapper.ProBaseinfoMapper;
 import com.ldz.biz.model.ProBaseinfo;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProBaseinfoServiceImpl extends BaseServiceImpl<ProBaseinfo, String> implements ProBaseinfoService {
 
 	@Autowired
 	private ProBaseinfoMapper baseMapper;
+
+	@Autowired
+	private WinRecordService recordService;
 
 	@Value("${filePath}")
 	private String filePath;
@@ -52,6 +56,18 @@ public class ProBaseinfoServiceImpl extends BaseServiceImpl<ProBaseinfo, String>
 		save(entity);
 
 		return ApiResponse.saveSuccess();
+    }
+
+    @Override
+    public ApiResponse<List<WinRecord>> getWinRecord(String id) {
+        RuntimeCheck.ifBlank(id , MessageUtils.get("pro.baseIdIsBlank"));
+		// 找到前五十条已中奖的商品 id
+		List<String> proIds = baseMapper.getFifProId(id);
+		List<WinRecord> records = recordService.findIn(WinRecord.InnerColumn.proId, proIds);
+		if(CollectionUtils.isNotEmpty(records)){
+			records =  records.stream().sorted(Comparator.comparing(WinRecord::getCjsj).reversed()).collect(Collectors.toList());
+		}
+		return ApiResponse.success(records);
     }
 
     @Override

@@ -1,23 +1,9 @@
 package com.ldz.biz.service.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.math.RandomUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
+import com.baidu.yun.push.exception.PushClientException;
+import com.baidu.yun.push.exception.PushServerException;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -25,34 +11,39 @@ import com.ldz.biz.bean.ProInfoLuckNumBean;
 import com.ldz.biz.mapper.OrderListMapper;
 import com.ldz.biz.mapper.OrderMapper;
 import com.ldz.biz.mapper.ProInfoMapper;
-import com.ldz.biz.model.CyyhModel;
-import com.ldz.biz.model.Order;
-import com.ldz.biz.model.OrderList;
-import com.ldz.biz.model.ProBaseinfo;
-import com.ldz.biz.model.ProInfo;
-import com.ldz.biz.model.User;
-import com.ldz.biz.model.WinRecord;
-import com.ldz.biz.service.OrderListService;
-import com.ldz.biz.service.OrderService;
-import com.ldz.biz.service.ProBaseinfoService;
-import com.ldz.biz.service.ProInfoService;
-import com.ldz.biz.service.UserService;
-import com.ldz.biz.service.WinRecordService;
+import com.ldz.biz.model.*;
+import com.ldz.biz.service.*;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.sys.base.LimitedCondition;
+import com.ldz.util.bean.AndroidMsgBean;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
 import com.ldz.util.bean.SimpleCondition;
+import com.ldz.util.commonUtil.BaiduPushUtils;
 import com.ldz.util.commonUtil.DateUtils;
+import com.ldz.util.commonUtil.JsonUtil;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.exception.RuntimeCheckException;
 import com.ldz.util.redis.RedisTemplateUtil;
-
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.math.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> implements ProInfoService {
+
+    Logger errorLog = LoggerFactory.getLogger("error_info");
 
     @Autowired
     private ProInfoMapper baseMapper;
@@ -74,12 +65,12 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
     @Autowired
     private ProInfoService proInfoService;
-    
+
     @Autowired
-	private OrderListMapper orderListMapper;
+    private OrderListMapper orderListMapper;
     @Autowired
-	private OrderMapper orderMapper;
-    
+    private OrderMapper orderMapper;
+
 
     @Value("${robot.point}")
     private double point;
@@ -136,6 +127,10 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
         baseinfo.setProStore(storeNum - 1 + "");
         proBaseinfoService.update(baseinfo);
+        AndroidMsgBean androidMsgBean = new AndroidMsgBean();
+        androidMsgBean.setJson(JsonUtil.toJson(proInfo));
+        androidMsgBean.setType("1");
+        BaiduPushUtils.pushAllMsg(0, JsonUtil.toJson(androidMsgBean), 3, 0);
         return ApiResponse.success(MessageUtils.get("pro.groundSuc"));
     }
 
@@ -144,9 +139,10 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         RuntimeCheck.ifBlank(id, MessageUtils.get("pro.idBlank"));
         ProInfo proInfo = baseMapper.getLatestPerson(id);
         if (proInfo != null) {
-            if(StringUtils.isNotBlank(proInfo.getUserId())){
+            if (StringUtils.isNotBlank(proInfo.getUserId())) {
                 User user = userService.findById(proInfo.getUserId());
                 proInfo.setUserName(user.getUserName());
+//                proInfo.setHimg(user.gethImg());
             }
         }
         return ApiResponse.success(proInfo);
@@ -176,7 +172,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         setImgUrl(proInfo);
         // 获取上一期中奖的 商品id
         ProInfo info = baseMapper.getLatestPerson(proInfo.getProBaseid());
-        if(info != null){
+        if (info != null) {
             SimpleCondition simpleCondition = new SimpleCondition(WinRecord.class);
             simpleCondition.eq(WinRecord.InnerColumn.proId, info.getId());
             List<WinRecord> winRecordList = winRecordService.findByCondition(simpleCondition);
@@ -244,7 +240,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         RuntimeCheck.ifNull(proInfo, MessageUtils.get("pro.isNull"));
         ProInfo info = baseMapper.getLatestPerson(proInfo.getProBaseid());
         WinRecord record = null;
-        if(info != null){
+        if (info != null) {
             SimpleCondition simpleCondition = new SimpleCondition(WinRecord.class);
             simpleCondition.eq(WinRecord.InnerColumn.proId, info.getId());
             List<WinRecord> winRecordList = winRecordService.findByCondition(simpleCondition);
@@ -253,7 +249,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
                 record = winRecordList.get(0);
                 record.setProName(proInfo.getProName());
-                if(StringUtils.isNotBlank(info.getUserId())){
+                if (StringUtils.isNotBlank(info.getUserId())) {
                     User user = userService.findById(info.getUserId());
                     record.setHimg(user.gethImg());
                     simpleCondition = new SimpleCondition(OrderList.class);
@@ -277,7 +273,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         ProInfo proInfo = findById(id);
         RuntimeCheck.ifNull(proInfo, MessageUtils.get("pro.isNull"));
         List<String> nums = new ArrayList<>();
-        String userId =  getHeader("userId");
+        String userId = getHeader("userId");
         if (StringUtils.isNotBlank(userId)) {
             SimpleCondition condition = new SimpleCondition(OrderList.class);
             condition.eq(OrderList.InnerColumn.userid, userId);
@@ -312,7 +308,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
             wincon.in(WinRecord.InnerColumn.proId, ids);
             wincon.setOrderByClause(" cjsj desc ");
             records = winRecordService.findByCondition(wincon);
-            if(CollectionUtils.isNotEmpty(records)){
+            if (CollectionUtils.isNotEmpty(records)) {
                 records.forEach(
                         winRecord -> {
                             ProInfo info1 = proInfoService.findById(winRecord.getProId());
@@ -333,7 +329,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
     @Override
     public PageResponse<ProInfo> getNewPager(Page<ProInfo> page) {
-        PageResponse<ProInfo> res= new PageResponse<>();
+        PageResponse<ProInfo> res = new PageResponse<>();
         LimitedCondition condition = getQueryCondition();
         PageInfo<ProInfo> info = findPage(page, condition);
         res.setPageNum(page.getPageNum());
@@ -341,9 +337,12 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         res.setList(info.getList());
         res.setTotal(info.getTotal());
 
-        if(CollectionUtils.isNotEmpty(res.getList())){
+        if (CollectionUtils.isNotEmpty(res.getList())) {
             Set<String> set = res.getList().stream().map(ProInfo::getUserId).collect(Collectors.toSet());
-            if(CollectionUtils.isNotEmpty(set)) {
+            Set<String> proIds = res.getList().stream().map(ProInfo::getId).collect(Collectors.toSet());
+            List<WinRecord> records = winRecordService.findIn(WinRecord.InnerColumn.proId, proIds);
+            Map<String, String> map = records.stream().collect(Collectors.toMap(WinRecord::getProId, p -> p.getZjfs()));
+            if (CollectionUtils.isNotEmpty(set)) {
                 List<User> users = userService.findByIds(set);
                 Map<String, User> userMap = new HashMap<>();
                 if (CollectionUtils.isNotEmpty(users)) {
@@ -354,9 +353,12 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                     if (StringUtils.isNotBlank(proInfo.getUserId()) && finalUserMap.containsKey(proInfo.getUserId())) {
                         proInfo.setUserName(finalUserMap.get(proInfo.getUserId()).getUserName());
                     }
+                    if (map.containsKey(proInfo.getId())) {
+                        proInfo.setZjfs(map.get(proInfo.getId()));
+                    }
                     setImgUrl(proInfo);
                 });
-            }else{
+            } else {
                 res.getList().forEach(proInfo -> {
                     setImgUrl(proInfo);
                 });
@@ -367,30 +369,30 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
     }
 
     @Override
-    public PageResponse<CyyhModel> getCyyh(int pageNum, int pageSize , String id) {
+    public PageResponse<CyyhModel> getCyyh(int pageNum, int pageSize, String id) {
 
         PageResponse<CyyhModel> response = new PageResponse<>();
         List<CyyhModel> models = new ArrayList<>();
         // 获取所有购买当前商品的 用户已支付的订单
         SimpleCondition condition = new SimpleCondition(Order.class);
-        condition.eq(Order.InnerColumn.proId , id);
+        condition.eq(Order.InnerColumn.proId, id);
         condition.notIn(Order.InnerColumn.ddzt, Arrays.asList("3", "5"));
         condition.setOrderByClause(" zfsj desc ");
         PageInfo<Order> pageInfo = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> {
             orderService.findByCondition(condition);
         });
         List<Order> orders = pageInfo.getList();
-        if(CollectionUtils.isNotEmpty(orders)){
+        if (CollectionUtils.isNotEmpty(orders)) {
             for (Order order : orders) {
                 CyyhModel model = new CyyhModel();
                 List<OrderList> lists = orderListService.findEq(OrderList.InnerColumn.orderId, order.getId());
-                if(StringUtils.isNotBlank(order.getUserId())){
+                if (StringUtils.isNotBlank(order.getUserId())) {
                     User user = userService.findById(order.getUserId());
                     model.setHimg(user.gethImg());
                     model.setUserId(user.getId());
                     model.setUserName(user.getUserName());
                 }
-                model.setGmfs(lists.size()+"");
+                model.setGmfs(lists.size() + "");
                 model.setGmsj(order.getZfsj());
 
                 models.add(model);
@@ -406,53 +408,111 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
     }
 
     @Override
-    public PageResponse<CyyhModel> getInUser(String userId, int pageNum , int pageSize) {
-        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.idIsnull"));
-        User user = userService.findById(userId);
-        RuntimeCheck.ifNull(user, MessageUtils.get("user.null"));
+    public PageResponse<CyyhModel> getInUser(String userId, int pageNum, int pageSize) {
+//        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.idIsnull"));
+        User user = null;
+//        RuntimeCheck.ifNull(user, MessageUtils.get("user.null"));
         PageResponse<CyyhModel> res = new PageResponse<>();
         List<CyyhModel> models = new ArrayList<>();
-        SimpleCondition condition = new SimpleCondition(Order.class);
-        condition.eq(Order.InnerColumn.userId, userId);
-        condition.setOrderByClause(" zfsj desc ");
-        PageInfo<Order> objectPageInfo = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> orderService.findByCondition(condition));
-        List<Order> orders = objectPageInfo.getList();
-        if(CollectionUtils.isNotEmpty(orders)){
-            Set<String> proIds = orders.stream().map(Order::getProId).collect(Collectors.toSet());
-            List<ProInfo> infos = proInfoService.findByIds(proIds);
-            // 拿到中奖用户的信息
-            Map<String, ProInfo> infoMap = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
-            Set<String> userIds = infos.stream().map(ProInfo::getUserId).collect(Collectors.toSet());
-            List<User> users = userService.findByIds(userIds);
+        SimpleCondition condition;
+        if (StringUtils.isNotBlank(userId)) {
+            condition = new SimpleCondition(Order.class);
+            user = userService.findById(userId);
+            condition.eq(Order.InnerColumn.userId, userId);
+            condition.setOrderByClause(" zfsj desc ");
+            PageInfo<Order> objectPageInfo = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> orderService.findByCondition(condition));
+            List<Order> orders = objectPageInfo.getList();
+            if (CollectionUtils.isNotEmpty(orders)) {
+                Set<String> proIds = orders.stream().map(Order::getProId).collect(Collectors.toSet());
+                List<ProInfo> infos = proInfoService.findByIds(proIds);
+                // 拿到中奖用户的信息
+                Map<String, ProInfo> infoMap = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
+                Set<String> userIds = infos.stream().filter(proInfo -> StringUtils.isNotBlank(proInfo.getUserId())).map(ProInfo::getUserId).collect(Collectors.toSet());
+                List<User> users = userService.findByIds(userIds);
+                Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
+                for (Order order : orders) {
+                    CyyhModel model = new CyyhModel();
+
+                    model.setUserId(userId);
+                    if (user != null) {
+                        model.setHimg(user.gethImg());
+                        model.setUserName(user.getUserName());
+                    }
+                    model.setGmsj(order.getZfsj());
+                    model.setGmfs(order.getGmfs());
+                    model.setProName(order.getProName());
+
+                    model.setProId(order.getProId());
+                    model.setNum(order.getZjhm());
+                    if (infoMap.containsKey(order.getProId())) {
+                        ProInfo proInfo = infoMap.get(order.getProId());
+                        model.setProPrice(proInfo.getProPrice());
+                        model.setRePrice(proInfo.getRePrice());
+                        model.setCoverUrl(proInfo.getCoverUrl());
+                        if (userMap.containsKey(proInfo.getUserId())) {
+                            model.setWinName(userMap.get(proInfo.getUserId()).getUserName());
+                        }
+                    }
+                    models.add(model);
+                }
+            }
+            res.setPageNum(pageNum);
+            res.setPageSize(pageSize);
+            res.setList(models);
+            res.setTotal(objectPageInfo.getTotal());
+            return res;
+        } else {
+            String baseId = getRequestParamterAsString("baseId");
+            RuntimeCheck.ifBlank(baseId, MessageUtils.get("pro.baseIdIsBlank"));
+            // 获取最新的开奖商品
+            ProInfo proInfo = proInfoService.findById(baseId);
+            if (proInfo == null) {
+                return res;
+            }
+            ProInfo info = baseMapper.getLatestPerson(proInfo.getProBaseid());
+            if (info == null) {
+                return res;
+            }
+            condition = new SimpleCondition(OrderList.class);
+            condition.eq(OrderList.InnerColumn.proId, info.getId());
+            condition.setOrderByClause(" cjsj desc ");
+            PageInfo<OrderList> pageInfo = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> orderListService.findByCondition(condition));
+            List<OrderList> infoList = pageInfo.getList();
+            Set<String> set = infoList.stream().map(OrderList::getUserid).collect(Collectors.toSet());
+            List<User> users = userService.findByIds(set);
             Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
-            for (Order order : orders) {
+
+            infoList.forEach(orderList -> {
                 CyyhModel model = new CyyhModel();
 
                 model.setUserId(userId);
-                model.setHimg(user.gethImg());
-                model.setGmsj(order.getZfsj());
-                model.setGmfs(order.getGmfs());
-                model.setProName(order.getProName());
-                model.setUserName(user.getUserName());
-                model.setProId(order.getProId());
-                model.setNum(order.getZjhm());
-                if(infoMap.containsKey(order.getProId())){
-                    ProInfo proInfo = infoMap.get(order.getProId());
-                    model.setProPrice(proInfo.getProPrice());
-                    model.setRePrice(proInfo.getRePrice());
-                    model.setCoverUrl(proInfo.getCoverUrl());
-                    if(userMap.containsKey(proInfo.getUserId())){
-                        model.setWinName(userMap.get(order.getUserId()).getUserName());
-                    }
+                if (userMap.containsKey(orderList.getUserid())) {
+                    User user1 = userMap.get(orderList.getUserid());
+                    model.setHimg(user1.gethImg());
+                    model.setUserName(user1.getUserName());
                 }
+
+                model.setGmsj(orderList.getCjsj());
+                model.setProName(orderList.getProName());
+
+                model.setProId(orderList.getProId());
+                model.setNum(info.getZjhm());
+                model.setProPrice(info.getProPrice());
+                model.setRePrice(info.getRePrice());
+                model.setCoverUrl(info.getCoverUrl());
+                User winUser = userService.findById(info.getUserId());
+                model.setWinName(winUser.getUserName());
+
                 models.add(model);
-            }
+            });
+            res.setPageNum(pageNum);
+            res.setPageSize(pageSize);
+            res.setList(models);
+            res.setTotal(pageInfo.getTotal());
+            return res;
         }
-        res.setPageNum(pageNum);
-        res.setPageSize(pageSize);
-        res.setList(models);
-        res.setTotal(objectPageInfo.getTotal());
-        return res;
+
+
     }
 
     @Override
@@ -472,7 +532,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         condition.setOrderByClause(" zfsj desc ");
         PageInfo<Order> info = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> orderService.findByCondition(condition));
         List<Order> orders = info.getList();
-        if(CollectionUtils.isNotEmpty(orders)){
+        if (CollectionUtils.isNotEmpty(orders)) {
             List<ProInfo> infos = proInfoService.findByIds(proIds);
             Map<String, ProInfo> infoMap = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
             Set<String> userIds = infos.stream().map(ProInfo::getUserId).collect(Collectors.toSet());
@@ -480,7 +540,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
             Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
             for (Order order : orders) {
                 CyyhModel model = new CyyhModel();
-                if(userMap.containsKey(order.getUserId())){
+                if (userMap.containsKey(order.getUserId())) {
                     model.setWinName(userMap.get(order.getUserId()).getUserName());
                 }
                 model.setUserName(user.getUserName());
@@ -491,12 +551,12 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 model.setProName(order.getProName());
                 model.setProId(order.getProId());
                 model.setNum(order.getZjhm());
-                if(infoMap.containsKey(order.getProId())){
+                if (infoMap.containsKey(order.getProId())) {
                     ProInfo proInfo = infoMap.get(order.getProId());
                     model.setProPrice(proInfo.getProPrice());
                     model.setRePrice(proInfo.getRePrice());
                     model.setCoverUrl(proInfo.getCoverUrl());
-                    if(userMap.containsKey(proInfo.getUserId())){
+                    if (userMap.containsKey(proInfo.getUserId())) {
                         model.setWinName(userMap.get(order.getUserId()).getUserName());
                     }
                 }
@@ -516,6 +576,61 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         return ApiResponse.success();
     }
 
+    @Override
+    public ApiResponse<String> delLuckNums() {
+        Set<Object> keys = redis.keys("*_nums");
+        for (Object key : keys) {
+            String[] s = key.toString().split("_");
+            ProInfo info = findById(s[0]);
+            if (info == null) {
+                redis.delete(key);
+            }
+        }
+        return ApiResponse.success();
+    }
+
+    @Override
+    public ApiResponse<String> initRobot() {
+        userService.initRobot();
+        return ApiResponse.success();
+    }
+
+    @Override
+    public ApiResponse<String> saveAll() {
+        List<ProBaseinfo> all = proBaseinfoService.findAll();
+        all.forEach(baseinfo -> proInfoService.saveOne(baseinfo.getId()));
+        return ApiResponse.success();
+    }
+
+    @Override
+    public ApiResponse<String> getLatestPro(String id) {
+        String s = baseMapper.getLatestPro(id);
+        return ApiResponse.success(s);
+    }
+
+    @Override
+    public ApiResponse<String> updateEntity(ProInfo entity) {
+        String id = entity.getId();
+        ProInfo proInfo = findById(id);
+        String proLx = proInfo.getProLx();
+        boolean flag = false;
+        if (StringUtils.containsNone(proLx, "3") && StringUtils.contains(entity.getProLx(), "3")) {
+            // 代表当前产品的类型变成了热门商品
+            flag = true;
+        }
+        RuntimeCheck.ifNull(proInfo, MessageUtils.get("pro.isNull"));
+        BeanUtil.copyProperties(entity, proInfo, CopyOptions.create().setIgnoreNullValue(true).setIgnoreError(true).setIgnoreProperties("id"));
+        update(proInfo);
+        // 如果由非热门商品 转换为 热门商品 推送消息给前台
+        if (flag) {
+            AndroidMsgBean msgBean = new AndroidMsgBean();
+            msgBean.setType("2");
+            msgBean.setJson(JsonUtil.toJson(proInfo));
+            BaiduPushUtils.pushAllMsg(0, JsonUtil.toJson(msgBean), 3, 0);
+        }
+        return ApiResponse.success();
+    }
+
 
     @Override
     public void afterPager(PageInfo<ProInfo> result) {
@@ -523,7 +638,14 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
+        Set<String> userIds = list.stream().map(ProInfo::getUserId).collect(Collectors.toSet());
+        List<User> users = userService.findByIds(userIds);
+        Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
         for (ProInfo proBaseinfo : list) {
+            if (userMap.containsKey(proBaseinfo.getUserId())) {
+                User user = userMap.get(proBaseinfo.getUserId());
+                proBaseinfo.setUserName(user.getUserName());
+            }
             setImgUrl(proBaseinfo);
         }
     }
@@ -539,17 +661,30 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
     private void setImgUrl(ProInfo info) {
         List<String> imgUrls = new ArrayList<>();
         for (String s : info.getUrls().split(",")) {
-            imgUrls.add(filePath + s);
+            if(!StringUtils.startsWith(s,"http://")){
+                imgUrls.add(filePath + s);
+            }else{
+                imgUrls.add(s);
+            }
+
         }
         info.setImgUrls(imgUrls);
         List<String> coverUrls = new ArrayList<>();
         for (String s : info.getCoverUrl().split(",")) {
-            coverUrls.add(filePath + s);
+            if(!StringUtils.startsWith(s,"http://")) {
+                coverUrls.add(filePath + s);
+            }else{
+                coverUrls.add(s);
+            }
         }
         info.setCoverUrls(coverUrls);
         List<String> refUrls = new ArrayList<>();
         for (String s : info.getRefUrl().split(",")) {
-            refUrls.add(filePath + s);
+            if(!StringUtils.startsWith(s,"http://")) {
+                refUrls.add(filePath + s);
+            }else {
+                refUrls.add(s);
+            }
         }
         info.setRefUrls(refUrls);
     }
@@ -571,7 +706,10 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
     @Override
     public void saveRobot(String redisProInfoKey) {
-    	String proId = redisProInfoKey.toString().split("_")[0];
+        String proId = redisProInfoKey.toString().split("_")[0];
+        if (StringUtils.equals(proId, "580457619748028416 580396886364520448")) {
+            System.out.println("a");
+        }
         //1.生成本次多少个用户参与
         int randomMaxUserNum = RandomUtils.nextInt(people);
         if (randomMaxUserNum == 0) {
@@ -579,56 +717,56 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         }
         //2.商品剩余名额。将剩余名额分配给用户
         int allocNum = 0;
-		long proSyNum = redis.boundSetOps(redisProInfoKey).size();
-		if (proSyNum == 0){
-			//商品名额已经用完
-			return;
-		}else if (proSyNum <= lowsize){
-			//如果商品剩下最后设定的份数，一次性全分给用户
-			allocNum = (int)proSyNum;
-		}else{
-			//随机生成本次消费商品份数
+        long proSyNum = redis.boundSetOps(redisProInfoKey).size();
+        if (proSyNum == 0) {
+            //商品名额已经用完
+            return;
+        } else if (proSyNum <= lowsize) {
+            //如果商品剩下最后设定的份数，一次性全分给用户
+            allocNum = (int) proSyNum;
+        } else {
+            //随机生成本次消费商品份数
             int randomMaxNum = Math.max(1, (int) (proSyNum * point));
             allocNum = RandomUtils.nextInt(randomMaxNum);
             if (allocNum == 0) {
-            	allocNum = 1;
+                allocNum = 1;
             }
-		}
-		List<Object> elements = new ArrayList<>();
-		List<Object> cloneElements = new ArrayList<>();
-		// 随机提取中奖号码
-		Set<Object> luckNums = redis.boundSetOps(redisProInfoKey).distinctRandomMembers(allocNum);
-		// 删除redis的中奖号码
+        }
+        List<Object> elements = new ArrayList<>();
+        List<Object> cloneElements = new ArrayList<>();
+        // 随机提取中奖号码
+        Set<Object> luckNums = redis.boundSetOps(redisProInfoKey).distinctRandomMembers(allocNum);
+        // 删除redis的中奖号码
         Iterator<Object> removeNum = luckNums.iterator();
-        while(removeNum.hasNext()){
-        	Object element = removeNum.next();
-        	// 防止并发操作时，中奖号码被重复分。先进行删除，redis删除结果不为0，表示号码可用
+        while (removeNum.hasNext()) {
+            Object element = removeNum.next();
+            // 防止并发操作时，中奖号码被重复分。先进行删除，redis删除结果不为0，表示号码可用
             long removeFlag = redis.boundSetOps(redisProInfoKey).remove(element);
-            if (removeFlag > 0){
-            	elements.add(element);
+            if (removeFlag > 0) {
+                elements.add(element);
             }
         }
         // 防止因并发抢购，造成随机element中奖号码没有获取成功
-        if (elements.size() == 0){
-        	return;
-        }else{
-        	CollectionUtils.addAll(cloneElements, elements);
+        if (elements.size() == 0) {
+            return;
+        } else {
+            CollectionUtils.addAll(cloneElements, elements);
         }
-        
-        try{
-        	//3.从redis随机获取机器人用户
-    		Set<Object> users = redis.boundSetOps(User.class.getName()).distinctRandomMembers(randomMaxUserNum);
-    		
+
+        try {
+            //3.从redis随机获取机器人用户
+            Set<Object> users = redis.boundSetOps(User.class.getName()).distinctRandomMembers(randomMaxUserNum);
+
             Iterator<Object> iteUsers = users.iterator();
             int tmpNum = allocNum;
             List<OrderList> orderLists = new ArrayList<>();
             List<Order> orders = new ArrayList<>();
             List<User> joinUsers = new ArrayList<>();
             int allocUserIndex = 0;
-        	while(iteUsers.hasNext()){
-        		User user = (User)iteUsers.next();
-        		joinUsers.add(user);
-        		//4.参与的用户,每个用户随机分配商品份数.最终随机的份数不超过本次消费的商品份数
+            while (iteUsers.hasNext()) {
+                User user = (User) iteUsers.next();
+                joinUsers.add(user);
+                //4.参与的用户,每个用户随机分配商品份数.最终随机的份数不超过本次消费的商品份数
                 //获取单个用户消费份数
                 int pUserNum = RandomUtils.nextInt(tmpNum);
                 if (allocUserIndex == (randomMaxUserNum - 1)) {
@@ -636,12 +774,12 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 } else if (pUserNum == 0 && tmpNum > 0) {
                     pUserNum = 1;
                 }
-                if (pUserNum >= elements.size()){
-                	pUserNum = elements.size();
+                if (pUserNum >= elements.size()) {
+                    pUserNum = elements.size();
                 }
                 //用户消费记录,获取中奖号码
                 List<Object> tmpList = elements.subList(0, pUserNum);
-                ProInfoLuckNumBean proInfo = (ProInfoLuckNumBean)tmpList.get(0);
+                ProInfoLuckNumBean proInfo = (ProInfoLuckNumBean) tmpList.get(0);
                 // 生成订单
                 Order order = new Order();
                 order.setUserName(user.getUserName());
@@ -651,14 +789,14 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 order.setProId(proId);
                 order.setProName(proInfo.getProName());
                 order.setUserId(user.getId());
-                order.setGmfs(pUserNum+"");
-                order.setZfje(pUserNum+"");
+                order.setGmfs(pUserNum + "");
+                order.setZfje(pUserNum + "");
                 order.setCjsj(DateUtils.getNowTime());
                 order.setImei(user.getRegImei());
                 order.setDdzt("0");
-                
+
                 for (int j = 0; j < tmpList.size(); j++) {
-                	ProInfoLuckNumBean tmpItem = (ProInfoLuckNumBean)tmpList.get(j);
+                    ProInfoLuckNumBean tmpItem = (ProInfoLuckNumBean) tmpList.get(j);
                     String luckNum = tmpItem.getLuckNum();
                     OrderList orderList = new OrderList();
                     orderList.setId(genId());
@@ -671,6 +809,9 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                     orderList.setNum(luckNum);
                     //执行加一下随机数，防止时间毫秒数都一致
                     int randomMillis = RandomUtils.nextInt(100);
+                    if (randomMillis == 0) {
+                        randomMillis = 1;
+                    }
                     orderList.setCjsj(DateTime.now().plusMillis(randomMillis).toString("yyyy-MM-dd HH:mm:ss.SSS"));
                     orderLists.add(orderList);
                 }
@@ -682,35 +823,41 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 if (tmpNum <= 0) {
                     break;
                 }
-        	}
-        	
-        	// 产品分配完成 更新 添加 sql
-        	orderListMapper.insertList(orderLists);
+            }
+
+            // 产品分配完成 更新 添加 sql
+            orderListMapper.insertList(orderLists);
             orderMapper.insertList(orders);
             int updateNum = orderMapper.minusRePrice(allocNum, proId);
-            if (updateNum == 0){
-            	throw new RuntimeCheckException(MessageUtils.get("pro.minusFail"));
+            if (updateNum == 0) {
+                throw new RuntimeCheckException(MessageUtils.get("pro.minusFail"));
             }
             //如果商品已卖完，则更新商品状态
-            if (redis.boundSetOps(redisProInfoKey).size() == 0){
-            	// 更新商品状态为 待开奖
+            if (redis.boundSetOps(redisProInfoKey).size() == 0) {
+                // 更新商品状态为 待开奖
                 orderMapper.updateFinish(proId);
-            	// 号码分配完 清理redis key
+                // 号码分配完 清理redis key
                 redis.delete(proId + "_nums");
                 // 将待开奖的商品持久化存储起来，防止服务异常停止，造成商品无法开奖。同时建立延时任务 , 分配中奖号码
                 // 商品结束后1分钟执行开奖功能
                 long millis = DateTime.now().plusMinutes(1).getMillis();
-                redis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").add(proId, millis);
+                redis.boundZSetOps(ProInfo.class.getSimpleName() + "_award").add(proId, millis);
+                // 商品进入待开奖状态 , 向前台推送信息
+                ProInfo proInfo = findById(proId);
+                AndroidMsgBean msgBean = new AndroidMsgBean();
+                msgBean.setType("3");
+                msgBean.setJson(JsonUtil.toJson(proInfo));
+                BaiduPushUtils.pushAllMsg(0, JsonUtil.toJson(msgBean), 3, 0);
             }
-        }catch(Exception e){
-        	if (cloneElements.size() > 0){
-        		// 执行发生异常后，需要先将中奖号码回压到redis中，防止号码丢失
-        		for (int i=0; i<cloneElements.size(); i++){
-        			redis.boundSetOps(redisProInfoKey).add(cloneElements.get(i));
-        		}
-        	}
-        	// 继续抛出异常，保证数据库事务回滚
-        	throw e;
+        } catch (Exception e) {
+            if (cloneElements.size() > 0) {
+                // 执行发生异常后，需要先将中奖号码回压到redis中，防止号码丢失
+                for (int i = 0; i < cloneElements.size(); i++) {
+                    redis.boundSetOps(redisProInfoKey).add(cloneElements.get(i));
+                }
+            }
+            // 继续抛出异常，保证数据库事务回滚
+            throw e;
         }
     }
 }

@@ -7,7 +7,10 @@ import com.ldz.biz.service.UserService;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
@@ -27,8 +30,8 @@ public class UserCtrl  {
      * @return
      */
     @PostMapping("/register")
-    public ApiResponse<String> register(String phone, String password, String password1, String code){
-        return service.register(phone, password,password1, code);
+    public ApiResponse<Map<String, Object>> register(String phone, String password, String password1, String code, String username){
+        return service.register(phone, password,password1, code, username);
     }
 
     /**
@@ -38,7 +41,7 @@ public class UserCtrl  {
      * @return
      */
     @PostMapping("/login")
-    public ApiResponse<Map<String, Object>> login(String phone, String password){
+    public ApiResponse<Map<String, Object>> login(String phone, String password) throws Exception {
         return  service.login(phone, password);
     }
 

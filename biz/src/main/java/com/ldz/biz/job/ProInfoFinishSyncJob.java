@@ -2,6 +2,8 @@ package com.ldz.biz.job;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.joda.time.DateTime;
@@ -37,10 +39,10 @@ public class ProInfoFinishSyncJob implements Job {
 	@Autowired
     private OrderService orderService;
 	@Autowired
-	private ThreadPoolExecutor threadPool;
+	private Executor threadPool;
 
 	@Override
-	public void execute(JobExecutionContext context) throws JobExecutionException {
+	public void execute(JobExecutionContext context) {
 		try{
 			// 根据开奖商品时间排名，进行开奖线程执行。提取任务队列中在当前时间前6个小时的数据，为了容错
 			Set<TypedTuple<Object>> objs = mainRedis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").rangeByScoreWithScores(DateTime.now().plusHours(-6).getMillis(), DateTime.now().getMillis());
@@ -49,20 +51,17 @@ public class ProInfoFinishSyncJob implements Job {
     			TypedTuple<Object> item = ites.next();
     			DateTime exeTime = DateTime.now().withMillis(item.getScore().longValue());
     			String proId = item.getValue().toString();
-    			if (exeTime.isAfter(DateTime.now())){
+    			if (exeTime.isBefore(DateTime.now())){
     				// 开奖时间已到，执行开奖任务
     				long removeFlag = mainRedis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").remove(proId);
     				if (removeFlag > 0){
-    					threadPool.execute(new Runnable() {
-							@Override
-							public void run() {
-								try{
-									orderService.fenpei(proId);
-								}catch(Exception e){
-									errorInfo.error("商品["+proId+"]开奖执行异常", e);
-									//执行失败，再回填进队列，重新执行
-									mainRedis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").add(proId, item.getScore());
-								}
+    					threadPool.execute(() -> {
+							try{
+								orderService.fenpei(proId);
+							}catch(Exception e){
+								errorInfo.error("商品["+proId+"]开奖执行异常", e);
+								//执行失败，再回填进队列，重新执行
+								mainRedis.boundZSetOps(ProInfo.class.getSimpleName()+"_award").add(proId, item.getScore());
 							}
 						});
     				}

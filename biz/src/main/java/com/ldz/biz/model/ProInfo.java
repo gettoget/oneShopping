@@ -1,8 +1,11 @@
 package com.ldz.biz.model;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.List;
-import javax.persistence.*;
 
 @Table(name = "pro_info")
 public class ProInfo implements Serializable {
@@ -163,6 +166,16 @@ public class ProInfo implements Serializable {
     private List<String> coverUrls;
     @Transient
     private List<String> refUrls;
+    @Transient
+    private String zjfs;
+
+    public String getZjfs() {
+        return zjfs;
+    }
+
+    public void setZjfs(String zjfs) {
+        this.zjfs = zjfs;
+    }
 
     public List<String> getNums() {
         return nums;

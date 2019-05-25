@@ -111,6 +111,37 @@ public class ProInfoCtrl  {
     }
 
 
+    /**
+     * 清空不存在的商品中奖号码
+     */
+    @GetMapping("/delLuckNums")
+    public ApiResponse<String> delLuckNums(){
+        return service.delLuckNums();
+    }
+
+    /**
+     * 重新缓存所有的机器人
+     */
+    @GetMapping("/initRobot")
+    public ApiResponse<String> initRobot(){
+        return service.initRobot();
+    }
+
+    /**
+     * 上架所有商品
+     */
+    @GetMapping("/saveAll")
+    public ApiResponse<String> saveAll(){
+        return service.saveAll();
+    }
+
+    /**
+     * 获取与往期商品相同的最新商品
+     */
+    @GetMapping("/latestPro")
+    public ApiResponse<String> getLatestPro(String id ){
+        return service.getLatestPro(id);
+    }
 
 
 }

@@ -1,7 +1,10 @@
 package com.ldz.biz.model;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
-import javax.persistence.*;
 
 @Table(name = "recharge")
 public class Recharge implements Serializable {
@@ -83,6 +86,28 @@ public class Recharge implements Serializable {
      * 备注三
      */
     private String bz3;
+
+    @Transient
+    private String username;
+
+    @Transient
+    private String himg;
+
+    public String getHimg() {
+        return himg;
+    }
+
+    public void setHimg(String himg) {
+        this.himg = himg;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     private static final long serialVersionUID = 1L;
 
