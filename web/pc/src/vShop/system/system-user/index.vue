@@ -118,6 +118,11 @@
             key: 'zw'
           },
           {
+            title: '状态',
+            align: 'center',
+            key: 'zt'
+          },
+          {
             title: '类型',
             align: 'center',
             key: 'lx',
@@ -132,7 +137,7 @@
             width: 180,
             align: 'center',
             render: (h, params) => {
-              if (params.row.lx === 'su') {
+              if (params.row.zt === '00') {
                 return ''
               }
               return h('div', [

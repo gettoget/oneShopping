@@ -9,5 +9,11 @@ export default {
   url:ajaxUrl,
   READFILE:fileUrl,
 
-  LOGIN:"/login"
+  LOGIN:"/login",
+  USER: {
+    QUERY: '/api/yh/pager',//用户管理,查询
+    ADD: '/api/yh/save', //新增用户
+    CHANGE: '/api/yh/update',//修改
+    DELE: '/api/yh/remove',//  api/yh/remove/{pkid}  pkid为用户的id 例 :  /api/yh/remove/1   即可删除用户id 为 1 的用户信息
+  },
 }
