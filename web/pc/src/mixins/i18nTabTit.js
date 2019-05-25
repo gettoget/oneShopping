@@ -1,3 +1,9 @@
+/**
+ * author     :  赵虎
+ * direction  :  用于 i8n国际化语言切换时，
+ ****************设置 Table表格的表头设置
+ */
+
 import {mapState} from 'vuex'
 
 export default {
