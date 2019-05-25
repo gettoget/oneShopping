@@ -257,7 +257,8 @@ proPrice 商品单价(必填)
 proStore 商品库存(必填)
 proSign  商品标签(选填)  如 你搜索电脑的时候 搜 16G 这样的标签
 rType    商品抢购类型(必填 , 后期是可以改的)  1 为人类有可能中奖  2 为机器人必中奖
-urls     图片url , 用逗号隔开
+
+ urls     图片url , 用逗号隔开
 coverUrl  封面url
 refUrl    推荐图url
 
