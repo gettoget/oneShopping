@@ -1,7 +1,8 @@
 package com.ldz.biz.model;
 
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
-import javax.persistence.*;
 
 @Table(name = "exchange")
 public class Exchange implements Serializable {
@@ -65,6 +66,27 @@ public class Exchange implements Serializable {
      * bz3
      */
     private String bz3;
+
+    private String username;
+
+    private String himg;
+
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getHimg() {
+        return himg;
+    }
+
+    public void setHimg(String himg) {
+        this.himg = himg;
+    }
 
     private static final long serialVersionUID = 1L;
 
