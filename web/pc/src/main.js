@@ -15,6 +15,8 @@ import installPlugin from '@/plugin'
 import './index.less'
 import '@/assets/icons/iconfont.css'
 import '@/assets/css/box.less'
+import '@/assets/css/boxDistance.less'
+
 
 import TreeTable from 'tree-table-vue'
 import VOrgTree from 'v-org-tree'
