@@ -4,7 +4,7 @@
 <!--用户管理-->
 <template>
   <div class="boxbackborder box_col">
-    <pager-tit title="用户管理"></pager-tit>
+    <pager-tit :title='$t("SYSTEM_USER")'></pager-tit>
     <div class="box_row colCenter rowRight pageFindSty" style="border: none">
       <div>
         <!--<Icon type="md-person" size="34"/>-->
@@ -29,15 +29,14 @@
         <Icon type="md-add"></Icon>
       </Button>
     </div>
-
-    <Row style="position: relative;">
+    <div :id="tabBox" class="box_col_100">
       <Table
         size='large' stripe
-        :height="AF.getPageHeight()-320"
-        :row-class-name="rowClassName"
+        :height="tab_H"
+        v-if="tab_H>0"
         :columns="tableTiT"
         :data="tableData"></Table>
-    </Row>
+    </div>
     <Row class="margin-top-10 pageSty">
       <Page :total=pageTotal :current=param.pageNum :page-size=param.pageSize
             :page-size-opts=[8,10,20,30,40,50] @on-page-size-change='(e)=>{param.pageSize=e;pageChange()}'
@@ -52,7 +51,7 @@
 </template>
 
 <script>
-  import mixins from '@/mixins'
+  import i18nTabTit from '@/mixins/i18nTabTit'
   import ukey from './comp/ukey.vue'
   import newmess from './comp/newmes.vue'
   import changemes from './comp/changmes.vue'
@@ -64,22 +63,22 @@
       newmess,
       changemes
     },
-    mixins: [mixins],
+    mixins: [i18nTabTit],
     data() {
       return {
-        //tab高度
-        tabHeight: 220,
         //动态组建
         compName: '',
         //动态组建数据
         usermes: {},
         userMesType: true,
         //分页
-        //---数据总数
-        pageTotal: 2,
+        //tab高度
+        tab_H: 0,
+        tabBox:"tabBox",
         tableTiT: [{
           title: "序号",
-          width: 80,
+          i18n:"NUMBER",
+          width: 100,
           align: 'center',
           type: 'index'
         },
@@ -219,6 +218,8 @@
           }
         ],
         tableData: [],
+        //---数据总数
+        pageTotal: 2,
         //收索
         param: {
           sjhLike: '',

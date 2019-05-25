@@ -9,7 +9,6 @@ import iView from 'iview'
 import i18n from '@/locale'
 import config from '@/config'
 import importDirective from '@/directive'
-import comFun from './libs/comFun'
 import { directive as clickOutside } from 'v-click-outside-x'
 import installPlugin from '@/plugin'
 import './index.less'
@@ -70,6 +69,7 @@ Vue.prototype.$config = config
 /**
  * 注册指令
  */
+import comFun from './libs/comFun.js'
 Vue.prototype.AF = comFun;
 
 importDirective(Vue)
