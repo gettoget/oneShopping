@@ -2,7 +2,10 @@ package com.ldz.biz.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
+import com.ldz.biz.mapper.RechargeMapper;
+import com.ldz.biz.model.Recharge;
 import com.ldz.biz.model.User;
+import com.ldz.biz.service.RechargeService;
 import com.ldz.biz.service.UserService;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.sys.base.LimitedCondition;
@@ -12,18 +15,17 @@ import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.redis.RedisTemplateUtil;
-import com.sun.org.apache.regexp.internal.RE;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import tk.mybatis.mapper.common.Mapper;
 
-import com.ldz.biz.service.RechargeService;
-import com.ldz.biz.mapper.RechargeMapper;
-import com.ldz.biz.model.Recharge;
-
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> implements RechargeService {
@@ -38,6 +40,19 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 	@Override
 	protected Mapper<Recharge> getBaseMapper() {
 		return baseMapper;
+	}
+
+
+	@Override
+	public boolean fillPagerCondition(LimitedCondition condition){
+
+		String username = getRequestParamterAsString("username");
+		if(StringUtils.isNotBlank(username)){
+			List<User> users = userService.findLike(User.InnerColumn.userName, username);
+			Set<String> userid = users.stream().map(User::getId).collect(Collectors.toSet());
+			condition.in(Recharge.InnerColumn.userId, userid);
+		}
+		return true;
 	}
 
     @Override
@@ -104,4 +119,25 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 		}
 		return res;
 	}
+
+
+	@Override
+	public void afterPager(PageInfo<Recharge> info){
+		List<Recharge> list = info.getList();
+		if(CollectionUtils.isEmpty(list)){
+			return;
+		}
+
+		Set<String> set = list.stream().map(Recharge::getUserId).collect(Collectors.toSet());
+		List<User> users = userService.findByIds(set);
+		Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
+		list.forEach(recharge -> {
+			if(userMap.containsKey(recharge.getUserId())){
+				User user = userMap.get(recharge.getUserId());
+				recharge.setUsername(user.getUserName());
+				recharge.setHimg(user.gethImg());
+			}
+		});
+	}
+
 }

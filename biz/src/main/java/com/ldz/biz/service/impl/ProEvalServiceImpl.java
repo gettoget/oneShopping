@@ -158,4 +158,60 @@ public class ProEvalServiceImpl extends BaseServiceImpl<ProEval, String> impleme
 		res.setResult(count+"");
 		return res;
     }
+
+
+    @Override
+	public void afterPager(PageInfo<ProEval> result){
+		List<ProEval> list = result.getList();
+		if (CollectionUtils.isEmpty(list)) {
+			return;
+		}
+		Set<String> userIds = list.stream().map(ProEval::getUserId).collect(Collectors.toSet());
+		List<User> users = userService.findByIds(userIds);
+		Map<String,String> userMap = new HashMap<>();
+		if(CollectionUtils.isNotEmpty(users)){
+			userMap = users.stream().collect(Collectors.toMap(User::getId, p-> p.gethImg()));
+		}
+		String userId = getHeader("userId");
+		List<String> evalIDs = list.stream().map(ProEval::getId).collect(Collectors.toList());
+		SimpleCondition simpleCondition = new SimpleCondition(EvalCom.class);
+//			simpleCondition.eq(EvalCom.InnerColumn.userId,userId);
+		simpleCondition.in(EvalCom.InnerColumn.evalId,evalIDs);
+		List<EvalCom> coms = evalComService.findByCondition(simpleCondition);
+		Map<String, String> finalUserMap = userMap;
+		if(CollectionUtils.isNotEmpty(coms)){
+			Map<String, List<EvalCom>> comMap = coms.stream().collect(Collectors.groupingBy(EvalCom::getEvalId));
+
+			list.forEach(proEval -> {
+				if (comMap.containsKey(proEval.getId())){
+					List<EvalCom> evalComs = comMap.get(proEval.getId());
+					List<String> collect = evalComs.stream().map(EvalCom::getUserId).collect(Collectors.toList());
+					if(collect.contains(userId)){
+						proEval.setThumbs("1");
+					}else{
+						proEval.setThumbs("0");
+					}
+
+					proEval.setThumbsSum(evalComs.size());
+				}else{
+					proEval.setThumbs("0");
+					proEval.setThumbsSum(0);
+				}
+				if(finalUserMap.containsKey(proEval.getUserId())){
+					proEval.setHimg(finalUserMap.get(proEval.getUserId()));
+				}
+			});
+		}else{
+			list.forEach(proEval -> {
+				proEval.setThumbs("0");
+				proEval.setThumbsSum(0);
+				if (finalUserMap.containsKey(proEval.getUserId())) {
+					proEval.setHimg(finalUserMap.get(proEval.getUserId()));
+				}
+			});
+		}
+
+
+	}
+
 }

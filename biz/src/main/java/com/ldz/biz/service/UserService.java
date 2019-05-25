@@ -113,4 +113,6 @@ public interface UserService extends BaseService<User, String> {
      * 初始化所有的机器人用户
      */
     void initRobot();
+
+    ApiResponse<String> updateEntity(User entity);
 }

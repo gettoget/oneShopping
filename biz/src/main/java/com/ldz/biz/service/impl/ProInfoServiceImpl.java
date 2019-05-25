@@ -661,17 +661,30 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
     private void setImgUrl(ProInfo info) {
         List<String> imgUrls = new ArrayList<>();
         for (String s : info.getUrls().split(",")) {
-            imgUrls.add(filePath + s);
+            if(!StringUtils.startsWith(s,"http://")){
+                imgUrls.add(filePath + s);
+            }else{
+                imgUrls.add(s);
+            }
+
         }
         info.setImgUrls(imgUrls);
         List<String> coverUrls = new ArrayList<>();
         for (String s : info.getCoverUrl().split(",")) {
-            coverUrls.add(filePath + s);
+            if(!StringUtils.startsWith(s,"http://")) {
+                coverUrls.add(filePath + s);
+            }else{
+                coverUrls.add(s);
+            }
         }
         info.setCoverUrls(coverUrls);
         List<String> refUrls = new ArrayList<>();
         for (String s : info.getRefUrl().split(",")) {
-            refUrls.add(filePath + s);
+            if(!StringUtils.startsWith(s,"http://")) {
+                refUrls.add(filePath + s);
+            }else {
+                refUrls.add(s);
+            }
         }
         info.setRefUrls(refUrls);
     }

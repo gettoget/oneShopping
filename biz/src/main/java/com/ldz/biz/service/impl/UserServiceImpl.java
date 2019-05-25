@@ -22,6 +22,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
@@ -36,6 +37,9 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl extends BaseServiceImpl<User, String> implements UserService {
 
+
+    @Value("${filePath}")
+    private String filePath;
     @Autowired
     private UserMapper baseMapper;
 
@@ -58,6 +62,22 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     protected Mapper<User> getBaseMapper() {
         return baseMapper;
     }
+
+    @Override
+    public void afterPager(PageInfo<User> info){
+        List<User> list = info.getList();
+        if (CollectionUtils.isEmpty(list)) {
+            return;
+        }
+        list.forEach(user -> {
+            user.setPayPwd("");
+            user.setPwd("");
+            if (!StringUtils.startsWith(user.gethImg(), "http")) {
+                user.sethImg(filePath + "s");
+            }
+        });
+    }
+
 
     @Override
     public ApiResponse<Map<String, Object>> register(String phone, String password, String password1, String code, String username) {
@@ -375,9 +395,19 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         users.stream().forEach(user -> redis.boundSetOps(User.class.getName()).add(user));
     }
 
+    @Override
+    public ApiResponse<String> updateEntity(User entity) {
+        RuntimeCheck.ifBlank(entity.getId(), MessageUtils.get("user.idIsnull"));
+        User user = findById(entity.getId());
+        RuntimeCheck.ifNull(user, MessageUtils.get("user.notFind"));
+        BeanUtil.copyProperties(entity, user, CopyOptions.create().setIgnoreNullValue(true).setIgnoreProperties("id","payPwd","pwd","zjcs","score","balance"));
+        update(user);
+        return ApiResponse.success();
+    }
+
 
     private String checkPer(String secret){
-        String s = null;
+        String s;
         try {
             s = RSAUtils.decryptWithRSA(secret);
             String[] split = s.split(";");
