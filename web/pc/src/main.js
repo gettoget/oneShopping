@@ -15,6 +15,8 @@ import './index.less'
 import '@/assets/icons/iconfont.css'
 import '@/assets/css/box.less'
 import '@/assets/css/boxDistance.less'
+import '@/assets/css/oneShop.less'
+
 
 
 import TreeTable from 'tree-table-vue'
@@ -45,7 +47,8 @@ Vue.prototype.dictUtil = dictUtil;
 import pagerTit from './components/header'
 Vue.component('pagerTit',pagerTit)
 
-
+import onePage from './components/onePage'
+Vue.component('onePage',onePage)
 
 
 Vue.use(iView, {

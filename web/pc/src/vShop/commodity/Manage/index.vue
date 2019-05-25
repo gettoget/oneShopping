@@ -7,48 +7,21 @@
       <pager-tit title="商品"></pager-tit>
     </div>
     <!--图  名字 参与分数 剩余分数 状态（售卖中 开奖中  已开奖） 详情-->
-    <div class="box_col_auto">
-      <div class="box_row_list" style="width: 1328px;margin: auto">
-        <shop-card :inVal="index" v-for="(it,index) in shopList" :key="index"></shop-card>
+    <div class="box_col">
+      <div class="box_col_auto" style="height: 200px">
+        <div class="box_row_list" style="width: 1328px;margin: auto">
+        <shop-card :inVal="index" :mess="it"
+                   v-for="(it,index) in shopList" :key="index"></shop-card>
+        </div>
+      </div>
+      <div class="pagerBoxSty boxMar_T box_row rowRight">
+        <one-page :total="total" :size="param.pageSize"
+                  :opts="[4,8,12,16]"
+                  @chPager="chPager"></one-page>
       </div>
     </div>
-  </Card>
-  <!--<div class="box_col">-->
-  <!--<div class="box_row rowRight seachSty">-->
-  <!--<div>-->
-  <!--<pager-tit title="商品"></pager-tit>-->
-  <!--</div>-->
-  <!--<div class="box_row_100"></div>-->
-  <!--<Input class="item" value="" placeholder="商品" style="width: 180px"/>-->
-  <!--<Button class="item" type="primary" icon="ios-search"></Button>-->
-  <!--</div>-->
-  <!--<div class="box_row rowBetween colCenter listTiT">-->
-  <!--<div style="width: 120px;">-->
-  <!--</div>-->
-  <!--<div class="box_row_100">-->
-  <!--<h2>商品</h2>-->
-  <!--</div>-->
-  <!--<div class="box_row_100">-->
-  <!--<h2>参与分数</h2>-->
-  <!--</div>-->
-  <!--<div class="box_row_100">-->
-  <!--<h2>剩余分数</h2>-->
-  <!--</div>-->
-  <!--<div class="box_row_100">-->
-  <!--<h2>商品状态</h2>-->
-  <!--</div>-->
-  <!--<div class="box_row_100">-->
-  <!--<h2>操作</h2>-->
-  <!--</div>-->
-  <!--</div>-->
 
-  <!--图  名字 参与分数 剩余分数 状态（售卖中 开奖中  已开奖） 详情-->
-  <!--<div class="box_col_auto">-->
-  <!--<div class="box_row_list" style="width: 1328px;margin: auto">-->
-  <!--<shop-card :inVal="index" v-for="(it,index) in 5" :key="index"></shop-card>-->
-  <!--</div>-->
-  <!--</div>-->
-  <!--</div>-->
+  </Card>
 </template>
 
 <script>
@@ -62,9 +35,10 @@
     data(){
       return {
         shopList:[],
-        params:{
+        total:0,
+        param:{
           pageNum: 1,
-          pageSize: 2
+          pageSize: 8
         }
 
       }
@@ -73,11 +47,17 @@
       this.getDataList()
     },
     methods:{
+      chPager(p){
+        this.param.pageNum = p.pageNum
+        this.param.pageSize = p.pageSize
+        this.getDataList()
+      },
       getDataList(){
-        this.$http.post("/api/proinfo/pager",this.params).then(res=>{
+        this.$http.post("/api/proinfo/pager",this.param).then(res=>{
           console.log(res);
           if(res.code == 200){
             this.shopList = res.page.list
+            this.total = res.page.total
           }
         }).catch(err=>{})
       }

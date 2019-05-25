@@ -4,60 +4,43 @@
 <template>
   <Card class="NewStockSty box_col">
     <div slot="title">
-      <Icon type="ios-film-outline"></Icon>
-      Classic film
+      <pager-tit title="商品上架"></pager-tit>
     </div>
 
     <div class="UpBox box_row">
-      <div class="box_row_100" style="background-color: #F5CBD1 ">
-        <Form ref="formValidate" :model="formValidate" :rules="ruleValidate">
-          <Row :gutter="16">
-            <Col span="6">
-              <FormItem label="商品类型" prop="classify">
-                <Select v-model="formValidate.classify" placeholder="选择商品分类">
-                  <Option value="computer">电脑</Option>
-                  <Option value="phone">手机</Option>
-                  <Option value="pad">平板电脑</Option>
-                  <Option value="camero">相机</Option>
-                  <Option value="accessories">数码配件</Option>
-                  <Option value="other">其他</Option>
-                </Select>
-              </FormItem>
-            </Col>
-            <Col span="6">
-              <FormItem label="商品名称" prop="name">
-                <Input v-model="formValidate.name" placeholder="输入商品名称"></Input>
-              </FormItem>
-            </Col>
-            <Col span="6">
-              <FormItem label="商品参数" prop="price">
-                <Input v-model="formValidate.price" placeholder="输入商品参数"></Input>
-              </FormItem>
-            </Col>
-            <Col span="6">
-              <FormItem label="商品详情" prop="desc">
-                <Input v-model="formValidate.desc" type="textarea" :autosize="{minRows: 1,maxRows: 5}"
-                       placeholder="输入商品详情."></Input>
-              </FormItem>
-            </Col>
-          </Row>
-          <Row :gutter="16">
-            <Col span="6">
-              <FormItem label="销售份额" prop="amount">
-                <Input v-model="formValidate.amount" placeholder="输入商品售价"></Input>
-              </FormItem>
-            </Col>
-            <Col span="6">
-              <FormItem label="销售份额" prop="amount">
-                <Input v-model="formValidate.amount" placeholder="输入商品售价"></Input>
-              </FormItem>
-            </Col>
-          </Row>
-        </Form>
+      <!--<div class="box_row_100 boxPadd_R">-->
+        <!--<Form ref="formValidate" :model="formValidate" :rules="ruleValidate">-->
+          <!--<FormItem label="商品类型" prop="classify">-->
+            <!--<Select v-model="formValidate.classify" placeholder="选择商品分类">-->
+              <!--<Option value="computer">电脑</Option>-->
+              <!--<Option value="phone">手机</Option>-->
+              <!--<Option value="pad">平板电脑</Option>-->
+              <!--<Option value="camero">相机</Option>-->
+              <!--<Option value="accessories">数码配件</Option>-->
+              <!--<Option value="other">其他</Option>-->
+            <!--</Select>-->
+          <!--</FormItem>-->
+          <!--<FormItem label="商品名称" prop="name">-->
+            <!--<Input v-model="formValidate.name" placeholder="输入商品名称"></Input>-->
+          <!--</FormItem>-->
+          <!--<FormItem label="商品参数" prop="price">-->
+            <!--<Input v-model="formValidate.price" placeholder="输入商品参数"></Input>-->
+          <!--</FormItem>-->
+          <!--<FormItem label="商品详情" prop="desc">-->
+            <!--<Input v-model="formValidate.desc" type="textarea" :autosize="{minRows: 1,maxRows: 5}"-->
+                   <!--placeholder="输入商品详情."></Input>-->
+          <!--</FormItem>-->
+          <!--<FormItem label="销售份额" prop="amount">-->
+            <!--<Input v-model="formValidate.amount" placeholder="输入商品售价"></Input>-->
+          <!--</FormItem>-->
+          <!--<FormItem label="销售份额" prop="amount">-->
+            <!--<Input v-model="formValidate.amount" placeholder="输入商品售价"></Input>-->
+          <!--</FormItem>-->
+        <!--</Form>-->
 
 
-      </div>
-      <div style="width: 400px;background-color: #495060">
+      <!--</div>-->
+      <div  class="box_row_100 boxPadd_L" style="background-color: #495060">
 
       </div>
     </div>
@@ -172,14 +155,15 @@
     data() {
       return {
         formValidate: {
-          name: '',//商品名称
-          price: '',//商品参数
-          classify: '',//商品类型
-          amount: '',
-          peopleNum: '',
-          uploaddate: '',
-          downloaddate: '',
-          desc: '',//商品详情
+          proType:"",//商品类目(必填)
+          proName:"",//商品名称(必填)
+          proPrice:"",//商品单价(必填)
+          proStore:"",//商品库存(必填)
+          proSign:"",//商品标签(选填)  如 你搜索电脑的时候 搜 16G 这样的标签
+          rType:"",//商品抢购类型(必填 , 后期是可以改的)  1 为人类有可能中奖  2 为机器人必中奖
+          urls:"",//图片url , 用逗号隔开
+          coverUrl:"",//封面url
+          refUrl:"",
         },
         ruleValidate: {
           name: [

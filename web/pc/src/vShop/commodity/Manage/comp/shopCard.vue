@@ -4,16 +4,16 @@
       <div class="bqBox">
         售卖中
       </div>
-      <img :src="iphone" alt="">
+      <img :src="mess.coverUrls"  alt="">
     </div>
     <div class="shopMoney">
-      ￥8999
+      ￥{{mess.proPrice}}--{{inVal}}
     </div>
     <div class="shopTit">
-      iphoneX Max
+      {{mess.proName}}
     </div>
     <div class="lineBox">
-      <div class="lineVal">已售:5000份/剩余3999份</div>
+      <div class="lineVal">已售:5000份/剩余{{mess.proStore}}份</div>
       <div class="lineback">
         <div class="line"></div>
       </div>
@@ -33,6 +33,16 @@
 
   export default {
     name: "shopCard",
+    props:{
+      inVal:{
+        type:Number,
+        default:0
+      },
+      mess:{
+        type:Object,
+        default:{}
+      }
+    },
     data() {
       return {
         iphone,
@@ -49,6 +59,10 @@
     .ivu-card-head {
       text-align: center;
       position: relative;
+      height: 297px;
+      img{
+        width: 100%;
+      }
       .bqBox {
         position: absolute;
         left: -30px;

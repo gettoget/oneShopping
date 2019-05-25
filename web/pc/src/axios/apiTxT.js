@@ -251,7 +251,8 @@ POST: /app/yh/update
 /**
 POST:  /api/probaseinfo/save
 
-参数:    proType  商品类目(必填)
+参数:
+proType  商品类目(必填)
 proName  商品名称(必填)
 proPrice 商品单价(必填)
 proStore 商品库存(必填)
@@ -555,7 +556,7 @@ POST:  /api/probaseinfo/update
   "success": true
 }
 **/
-// 8. 上架商品信息查询
+// 8. 上架商品信息查询--end
 /**
 POST:  /api/proinfo/pager
 
