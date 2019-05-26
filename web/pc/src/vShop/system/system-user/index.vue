@@ -90,17 +90,20 @@
           },
           {
             title: '姓名',
+            i18n:"NAME",
             align: 'center',
             key: 'xm'
           },
           {
             title: '证件号码',
+            i18n:"IDENTIFICATION_NUMBER",
             align: 'center',
             key: 'zjhm'
           },
           {
             title: '性别',
             align: 'center',
+            i18n:"SEX",
             key: 'xb',
             render: (h, params) => {
               return h('div', params.row.xb == '10' ? '男' : '女')
@@ -110,16 +113,19 @@
             title: '手机号',
             width: 120,
             align: 'center',
+            i18n:"PHONE_NUMBER",
             key: 'sjh'
           },
           {
             title: '职务',
             align: 'center',
+            i18n:"ACCOUNT_NUMBER",
             key: 'zw'
           },
           {
             title: '状态',
             align: 'center',
+            i18n:"STATE",
             key: 'zt'
           },
           {
