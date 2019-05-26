@@ -1,48 +1,45 @@
 .NewStockSty {
+  max-width: 1000px;
+  margin: auto;
   .ivu-card-body{
     flex: 1;
     overflow: auto;
     .UpBox{
+      //max-width: 1000px;
       height: 100%;
-    }
-  }
-
-
-  .coverImgBoxSty, .tuijianImgBoxSty {
-    img {
-      width: 100%;
-      cursor: pointer;
-    }
-  }
-  .contentImgSty {
-    .contentItemSty {
-      position: relative;
-      //padding: 16px;
-      img {
-        width: 100%;
-      }
-      .ingMask {
-        display: none;
-        position: absolute;
-        left: 0;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 100;
-        background-color: rgba(0, 0, 0, 0.5);
-        i {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
+      .coverImgBoxSty, .tuijianImgBoxSty,.contentImgSty {
+        img {
+          width: 100%;
           cursor: pointer;
+        }
+        .contentItemSty {
+          position: relative;
+          .ingMask {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 100;
+            background-color: rgba(0, 0, 0, 0.5);
+            i {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              cursor: pointer;
+            }
+          }
+        }
+        .contentItemSty:hover {
+          .ingMask {
+            display: block;
+          }
         }
       }
     }
-    .contentItemSty:hover {
-      .ingMask {
-        display: block;
-      }
-    }
   }
+
+
 }

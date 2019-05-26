@@ -8,140 +8,100 @@
     </div>
 
     <div class="UpBox box_row">
-      <!--<div class="box_row_100 boxPadd_R">-->
-        <!--<Form ref="formValidate" :model="formValidate" :rules="ruleValidate">-->
-          <!--<FormItem label="商品类型" prop="classify">-->
-            <!--<Select v-model="formValidate.classify" placeholder="选择商品分类">-->
-              <!--<Option value="computer">电脑</Option>-->
-              <!--<Option value="phone">手机</Option>-->
-              <!--<Option value="pad">平板电脑</Option>-->
-              <!--<Option value="camero">相机</Option>-->
-              <!--<Option value="accessories">数码配件</Option>-->
-              <!--<Option value="other">其他</Option>-->
-            <!--</Select>-->
-          <!--</FormItem>-->
-          <!--<FormItem label="商品名称" prop="name">-->
-            <!--<Input v-model="formValidate.name" placeholder="输入商品名称"></Input>-->
-          <!--</FormItem>-->
-          <!--<FormItem label="商品参数" prop="price">-->
-            <!--<Input v-model="formValidate.price" placeholder="输入商品参数"></Input>-->
-          <!--</FormItem>-->
-          <!--<FormItem label="商品详情" prop="desc">-->
-            <!--<Input v-model="formValidate.desc" type="textarea" :autosize="{minRows: 1,maxRows: 5}"-->
-                   <!--placeholder="输入商品详情."></Input>-->
-          <!--</FormItem>-->
-          <!--<FormItem label="销售份额" prop="amount">-->
-            <!--<Input v-model="formValidate.amount" placeholder="输入商品售价"></Input>-->
-          <!--</FormItem>-->
-          <!--<FormItem label="销售份额" prop="amount">-->
-            <!--<Input v-model="formValidate.amount" placeholder="输入商品售价"></Input>-->
-          <!--</FormItem>-->
-        <!--</Form>-->
+      <div class="box_row_100 boxPadd_R">
+        <Form ref="formValidate" :model="formValidate" :rules="ruleValidate">
+          <FormItem label="商品类型" prop="classify">
+            <Select v-model="formValidate.proType" placeholder="选择商品分类">
+              <Option value="computer">电脑</Option>
+              <Option value="phone">手机</Option>
+              <Option value="pad">平板电脑</Option>
+              <Option value="camero">相机</Option>
+              <Option value="accessories">数码配件</Option>
+              <Option value="other">其他</Option>
+            </Select>
+          </FormItem>
+          <FormItem label="商品名称" prop="name">
+            <Input v-model="formValidate.proName" placeholder="输入商品名称"></Input>
+          </FormItem>
+          <FormItem label="商品单价" prop="price">
+            <Input v-model="formValidate.proPrice" placeholder="输入商品单价"></Input>
+          </FormItem>
+          <FormItem label="proStore" prop="amount">
+            <Input v-model="formValidate.proStore" placeholder="输入proStore"></Input>
+          </FormItem>
+          <FormItem label="商品标签" prop="desc">
+            <Input v-model="formValidate.proSign" type="textarea" :autosize="{minRows: 1,maxRows: 5}"
+                   placeholder="输入商品标签"></Input>
+          </FormItem>
+          <FormItem label="抢购类型" prop="amount">
+            <Input v-model="formValidate.rType" placeholder="输选择抢购类型"></Input>
+          </FormItem>
+        </Form>
+      </div>
+      <div class="box_row_1auto boxPadd_L">
+        <Row>
+          <Col span="12" class-name="coverImgBoxSty boxPadd_LR">
+            <h2>封面图</h2>
 
+            <div span="12" class="contentItemSty" v-if="formData.coverImg">
+              <img :src="formData.coverImg" alt="">
+              <div class="ingMask">
+                <Icon type="ios-trash" size="60" color="#fff" @click.native="formData.coverImg = ''"/>
+              </div>
+            </div>
+            <div class="" v-else>
+              <up-file-img @handleSuccess="(url)=>{handleSuccess(url,'coverImg')}">
+                <img v-if="formData.coverImg" :src="formData.coverImg" alt="">
+                <Button v-else type="dashed">
+                  <Icon type="md-cloud-upload" size="80"/>
+                </Button>
+              </up-file-img>
+            </div>
+          </Col>
+          <Col span="12" class-name="tuijianImgBoxSty boxPadd_LR">
+            <h2>推荐图</h2>
 
-      <!--</div>-->
-      <div  class="box_row_100 boxPadd_L" style="background-color: #495060">
-
+            <div class="contentItemSty" v-if="formData.tuijianImg">
+              <img :src="formData.tuijianImg" alt="">
+              <div class="ingMask">
+                <Icon type="ios-trash" size="60" color="#fff" @click.native="formData.tuijianImg = ''"/>
+              </div>
+            </div>
+            <div class="" v-else>
+              <up-file-img @handleSuccess="(url)=>{handleSuccess(url,'tuijianImg')}">
+                <img v-if="formData.tuijianImg" :src="formData.tuijianImg" alt="">
+                <Button v-else type="dashed">
+                  <Icon type="md-cloud-upload" size="80"/>
+                </Button>
+              </up-file-img>
+            </div>
+          </Col>
+        </Row>
+        <div style="margin-top: 12px;padding-left: 18px">
+          <h2>内容图</h2>
+        </div>
+        <Row>
+          <Col span="12" class-name="contentImgSty boxPadd_LR boxPadd_B" v-for="(it,index) in formData.content" :key="index">
+            <div class="contentItemSty">
+              <img :src="it" alt="">
+              <div class="ingMask">
+                <Icon type="ios-trash" size="60" color="#fff" @click.native="removeItem(index)"/>
+              </div>
+            </div>
+          </Col>
+          <Col span="12"  class-name="boxPadd_LR boxPadd_B" v-if="formData.content.length<6">
+            <div class="">
+              <up-file-img @handleSuccess="contentImg">
+                <Button type="dashed">
+                  <Icon type="md-cloud-upload" size="80"/>
+                </Button>
+              </up-file-img>
+            </div>
+          </Col>
+        </Row>
       </div>
     </div>
   </Card>
-
-  <!--<div class="box_col NewStockSty" style="background-color: #fff">-->
-  <!--<div class="boxPadd">-->
-  <!--<h1>商品上架</h1>-->
-  <!--</div>-->
-
-  <!--<Form ref="formValidate" :model="formValidate" :rules="ruleValidate">-->
-  <!--<Row :gutter="16">-->
-  <!--<Col span="6">-->
-  <!--<FormItem label="商品类型" prop="classify">-->
-  <!--<Select v-model="formValidate.classify" placeholder="选择商品分类">-->
-  <!--<Option value="computer">电脑</Option>-->
-  <!--<Option value="phone">手机</Option>-->
-  <!--<Option value="pad">平板电脑</Option>-->
-  <!--<Option value="camero">相机</Option>-->
-  <!--<Option value="accessories">数码配件</Option>-->
-  <!--<Option value="other">其他</Option>-->
-  <!--</Select>-->
-  <!--</FormItem>-->
-  <!--</Col>-->
-  <!--<Col span="6">-->
-  <!--<FormItem label="商品名称" prop="name">-->
-  <!--<Input v-model="formValidate.name" placeholder="输入商品名称"></Input>-->
-  <!--</FormItem>-->
-  <!--</Col>-->
-  <!--<Col span="6">-->
-  <!--<FormItem label="商品参数" prop="price">-->
-  <!--<Input v-model="formValidate.price" placeholder="输入商品参数"></Input>-->
-  <!--</FormItem>-->
-  <!--</Col>-->
-  <!--<Col span="6">-->
-  <!--<FormItem label="商品详情" prop="desc">-->
-  <!--<Input v-model="formValidate.desc" type="textarea" :autosize="{minRows: 1,maxRows: 5}"-->
-  <!--placeholder="输入商品详情."></Input>-->
-  <!--</FormItem>-->
-  <!--</Col>-->
-  <!--</Row>-->
-  <!--<Row :gutter="16">-->
-  <!--<Col span="6">-->
-  <!--<FormItem label="销售份额" prop="amount">-->
-  <!--<Input v-model="formValidate.amount" placeholder="输入商品售价"></Input>-->
-  <!--</FormItem>-->
-  <!--</Col>-->
-  <!--<Col span="6">-->
-  <!--<FormItem label="销售份额" prop="amount">-->
-  <!--<Input v-model="formValidate.amount" placeholder="输入商品售价"></Input>-->
-  <!--</FormItem>-->
-  <!--</Col>-->
-  <!--</Row>-->
-  <!--</Form>-->
-
-
-  <!--<Row :gutter="16">-->
-  <!--<Col span="4" class-name="coverImgBoxSty">-->
-  <!--<h2>封面图</h2>-->
-  <!--<up-file-img @handleSuccess="(url)=>{handleSuccess(url,'coverImg')}">-->
-  <!--<img v-if="formData.coverImg" :src="formData.coverImg" alt="">-->
-  <!--<Button v-else type="dashed">-->
-  <!--<Icon type="md-cloud-upload" size="120"/>-->
-  <!--</Button>-->
-  <!--</up-file-img>-->
-  <!--</Col>-->
-  <!--<Col span="4" class-name="tuijianImgBoxSty">-->
-  <!--<h2>推荐图</h2>-->
-  <!--<up-file-img @handleSuccess="(url)=>{handleSuccess(url,'tuijianImg')}">-->
-  <!--<img v-if="formData.tuijianImg" :src="formData.tuijianImg" alt="">-->
-  <!--<Button v-else type="dashed">-->
-  <!--<Icon type="md-cloud-upload" size="120"/>-->
-  <!--</Button>-->
-  <!--</up-file-img>-->
-  <!--</Col>-->
-  <!--</Row>-->
-  <!--<div style="margin-top: 24px">-->
-  <!--<h2>内容图</h2>-->
-  <!--</div>-->
-  <!--<Row :gutter="16" class-name="contentImgSty">-->
-  <!--<Col span="4" class-name="contentItemSty" v-for="(it,index) in formData.content" :key="index">-->
-  <!--<img :src="it" alt="">-->
-  <!--<div class="ingMask">-->
-  <!--<Icon type="ios-trash" size="60" color="#fff" @click.native="removeItem(index)"/>-->
-  <!--</div>-->
-  <!--</Col>-->
-  <!--<Col span="4" v-if="formData.content.length<5">-->
-  <!--<up-file-img @handleSuccess="contentImg">-->
-  <!--<Button type="dashed">-->
-  <!--<Icon type="md-cloud-upload" size="120"/>-->
-  <!--</Button>-->
-  <!--</up-file-img>-->
-  <!--</Col>-->
-  <!--</Row>-->
-  <!--<div>-->
-  <!--<Button type="primary" @click="handleSubmit('formValidate')">提交</Button>-->
-  <!--<Button @click="handleReset('formValidate')" style="margin-left: 8px">重置</Button>-->
-  <!--</div>-->
-  <!-------------------------------->
-  <!--</div>-->
-  <!--</div>-->
 </template>
 
 <script>
@@ -155,15 +115,15 @@
     data() {
       return {
         formValidate: {
-          proType:"",//商品类目(必填)
-          proName:"",//商品名称(必填)
-          proPrice:"",//商品单价(必填)
-          proStore:"",//商品库存(必填)
-          proSign:"",//商品标签(选填)  如 你搜索电脑的时候 搜 16G 这样的标签
-          rType:"",//商品抢购类型(必填 , 后期是可以改的)  1 为人类有可能中奖  2 为机器人必中奖
-          urls:"",//图片url , 用逗号隔开
-          coverUrl:"",//封面url
-          refUrl:"",
+          proType: "",//商品类目(必填)
+          proName: "",//商品名称(必填)
+          proPrice: "",//商品单价(必填)
+          proStore: "",//商品库存(必填)
+          proSign: "",//商品标签(选填)  如 你搜索电脑的时候 搜 16G 这样的标签
+          rType: "",//商品抢购类型(必填 , 后期是可以改的)  1 为人类有可能中奖  2 为机器人必中奖
+          urls: "",//图片url , 用逗号隔开
+          coverUrl: "",//封面url
+          refUrl: "",
         },
         ruleValidate: {
           name: [
@@ -203,16 +163,16 @@
 
     },
     methods: {
-      handleSuccess(url, key) {
+      handleSuccess(url, key) {//封面图 推荐图
         this.formData[key] = url
       },
-      contentImg(url) {
+      contentImg(url) {//内容图
         this.formData.content.push(url)
       },
       removeItem(index) {
         this.formData.content.splice(index, 1)
       },
-      handleSubmit(name) {
+      handleSubmit(name) { //表单提交
         this.$refs[name].validate((valid) => {
           if (valid) {
             this.$Message.success('Success!');

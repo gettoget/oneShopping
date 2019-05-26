@@ -43,7 +43,7 @@
     data() {
       return {
         // action:'http://mt.xxpt123.com:81/upload',
-        action: '//jsonplaceholder.typicode.com/posts/',
+        action: '',
         defaultList: [
           // {
           //   'name': 'a42bdcc1178e62b4694c830f028db5c0',
@@ -67,14 +67,14 @@
         alert("上传成功")
         console.log(res);
         // res.message //返回URL地址
-        temp / ce3c0ca016a44795bdce23141f994cce.jpg
+        // temp / ce3c0ca016a44795bdce23141f994cce.jpg
         console.log(file);
       },
       handleError() {
         alert("上传失败")
         // console.log(res);
         // console.log(file);
-        this.$emit('handleSuccess', 'http://mt.xxpt123.com:81/img/temp/ce3c0ca016a44795bdce23141f994cce.jpg')
+        this.$emit('handleSuccess', 'https://i.loli.net/2017/08/21/599a521472424.jpg')
       },
       handleFormatError(file) {
         this.$Notice.warning({
