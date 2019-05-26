@@ -29,7 +29,12 @@ export default {
 
   "NUMBER":"序号",
   "SYSTEM_USER":"用户管理",
-  "ACCOUNT_NUMBER":"账号"
+  "ACCOUNT_NUMBER":"账号",
+  "NAME":"姓名",
+  "IDENTIFICATION_NUMBER":"证件号码",
+  "PHONE_NUMBER":"手机号",
+  "SEX":"性别",
+  "STATE":"状态"
 
   /**********************************
    ***********************************/

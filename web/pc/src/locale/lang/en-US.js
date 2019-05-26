@@ -30,6 +30,11 @@ export default {
   "NUMBER": "Number",
   "SYSTEM_USER": "System user",
   "ACCOUNT_NUMBER":"Account number",
+  "NAME":"name",
+  "IDENTIFICATION_NUMBER":"identification Number",
+  "PHONE_NUMBER":"phone-number",
+  "SEX":"sex",
+  "STATE":"state"
 
   /**********************************
    ***********************************/
