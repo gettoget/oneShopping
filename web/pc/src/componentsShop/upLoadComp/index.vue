@@ -1,29 +1,23 @@
 <template>
   <div>
-    <!--<Upload-->
-    <!--ref="upload"-->
-    <!--:action="action"-->
-    <!--:show-upload-list="false"-->
-    <!--:default-file-list="defaultList"-->
-    <!--:on-success="handleSuccess"-->
-    <!--:on-error="handleError"-->
-    <!--:format="['jpg','jpeg','png']"-->
-    <!--:max-size="2048"-->
-    <!--:on-format-error="handleFormatError"-->
-    <!--:on-exceeded-size="handleMaxSize"-->
-    <!--multiple-->
-    <!--type="drag"-->
-    <!--style="">-->
-    <div @click="handleError">
-      <slot>
-          <div style="display: inline-block;text-align: center;
-          width: 58px;height:58px;line-height: 58px;">
-            <img v-if="FlieUrl" :src="FlieUrl" width="100%" height="100%" alt="">
-            <Icon v-else type="ios-cloud-upload" size="40" style="color: #3399ff"></Icon>
-          </div>
-      </slot>
-    </div>
-    <!--</Upload>-->
+    <Upload
+      ref="upload"
+      :action="action"
+      :show-upload-list="false"
+      :on-success="handleSuccess"
+      :on-error="handleError"
+      :format="['jpg','jpeg','png']"
+      :max-size="2048"
+      :on-format-error="handleFormatError"
+      :on-exceeded-size="handleMaxSize"
+      multiple
+      type="drag"
+      style="">
+        <div style="display: inline-block;text-align: center;
+        width: 58px;height:58px;line-height: 58px;">
+        <Icon type="ios-cloud-upload" size="40"></Icon>
+        </div>
+    </Upload>
   </div>
 </template>
 
@@ -31,28 +25,15 @@
   export default {
     name: "index",
     props: {
-      FlieUrl: {
+      upGroup: {
         type: String,
-        default: ''
-      },
-      VOICE: {
-        type: Boolean,
-        default: false
+        default: 'cover'// 封面图 cover 内容图 urls 推荐图refUrl
       }
     },
     data() {
       return {
-        // action:'http://mt.xxpt123.com:81/upload',
-        action: '',
+        action: this.apis.UPFILE + this.upGroup,
         defaultList: [
-          // {
-          //   'name': 'a42bdcc1178e62b4694c830f028db5c0',
-          //   'url': 'https://o5wwk8baw.qnssl.com/a42bdcc1178e62b4694c830f028db5c0/avatar'
-          // },
-          // {
-          //   'name': 'bc7521e033abdd1e92222d733590f104',
-          //   'url': 'https://o5wwk8baw.qnssl.com/bc7521e033abdd1e92222d733590f104/avatar'
-          // }
         ],
         imgName: '',
         visible: false,
@@ -64,17 +45,15 @@
     },
     methods: {
       handleSuccess(res, file) {
-        alert("上传成功")
-        console.log(res);
-        // res.message //返回URL地址
-        // temp / ce3c0ca016a44795bdce23141f994cce.jpg
-        console.log(file);
-      },
-      handleError() {
-        alert("上传失败")
+        // alert("上传成功")
         // console.log(res);
         // console.log(file);
-        this.$emit('handleSuccess', 'https://i.loli.net/2017/08/21/599a521472424.jpg')
+        this.$emit('handleSuccess', res.message)
+
+      },
+      handleError(res, file) {
+        this.$Message.error('文件上传失败');
+        // this.$emit('handleSuccess', 'https://i.loli.net/2017/08/21/599a521472424.jpg')
       },
       handleFormatError(file) {
         this.$Notice.warning({

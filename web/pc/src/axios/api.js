@@ -7,8 +7,8 @@ const fileUrl = "http://119.23.242.234:9092/"
 export default {
   NETWORK_ERR_STR: "网络加载异常!",
   url:ajaxUrl,
-  READFILE:fileUrl,
-
+  GETFILEURL:fileUrl,
+  UPFILE:ajaxUrl+'/upload?targetPath=',
   LOGIN:"/login",
   USER: {
     QUERY: '/api/yh/pager',//用户管理,查询

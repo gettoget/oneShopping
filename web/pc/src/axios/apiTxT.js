@@ -7,7 +7,7 @@
 
  *所有请求需要在 Header 添加  userid  和  token   否则 会返回 999 授权认证失败  需要重新登录
 
- *文件上传接口
+ *文件上传接口 http://119.23.242.234:8088/upload?targetPath=cover
 
  *参数:  targetPath (必填,谢谢)  此字段用于设置文件上传保存的路径 , 如果你传的是封面图 请传 targetPath = cover (这只是举个例子, 你随便 取名字)  为了区分文件不一样 , 请上传文件时一定要上传此字段 , 好区分每个文件的不同谢谢
 
@@ -270,7 +270,7 @@ refUrl    推荐图url
   "success": true
 }
  **/
-// 7.商品基础信息查询
+// 7.商品基础信息查询  库存
 /**
 POST: /api/probaseinfo/pager
 
