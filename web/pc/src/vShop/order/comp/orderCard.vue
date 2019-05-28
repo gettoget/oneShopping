@@ -1,30 +1,30 @@
 <template>
   <div class="orderCardSty">
     <div class="orderCardSty-tit">
-      <span>2019-02-02 11:11:11</span>
+      <span>{{mess.cjsj}}</span>
       <span style="margin-left: 30px">订单号:</span>
-      <span class="orderNum"> 85753602414</span>
+      <span class="orderNum"> {{mess.id}}</span>
     </div>
     <div class="orderCardSty-center box_row colCenter">
       <img :src="iphone" alt="">
       <div class="shopName">
-        iphoneX MAX
+        {{mess.proName}}
       </div>
       <div class="shopNum">
         X 1
       </div>
       <div class="buyer">
         <div class="buyer-name">
-          王小二
+          {{mess.userName}}
           <span class="buyer-phone">121****9876</span>
         </div>
         <div class="buyer-address">
-          湖北省 武汉市 洪山区 光谷广场xxxx大厦 99楼 99110室
+          {{mess.addr}}
         </div>
       </div>
       <div class="orderTyp">
         <div class="TypBox">
-          待审核
+          {{mess.ddzt}}
         </div>
       </div>
     </div>
@@ -36,11 +36,18 @@
 
   export default {
     name: "orderCard",
+    props:{
+      mess:{}
+    },
     data() {
       return {
-        iphone
+        iphone,
+        pager:{}
       }
+    },
+    created() {
     }
+
   }
 </script>
 
