@@ -631,6 +631,22 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         return ApiResponse.success();
     }
 
+    @Override
+    public ApiResponse<String> updateUnder(String id) {
+        RuntimeCheck.ifBlank(id , MessageUtils.get("pro.underIdIsBlank"));
+        ProInfo info = findById(id);
+        RuntimeCheck.ifNull(info, MessageUtils.get("pro.isNull"));
+        RuntimeCheck.ifFalse(info.getProZt().equals("1"), MessageUtils.get("pro.ztError"));
+        info.setProZt("2");
+        update(info);
+        redis.delete(id+"_nums");
+        AndroidMsgBean msgBean = new AndroidMsgBean();
+        msgBean.setType("5");
+        msgBean.setJson(JsonUtil.toJson(info));
+        BaiduPushUtils.pushAllMsg(0, JsonUtil.toJson(msgBean), 3, 0);
+        return ApiResponse.success();
+    }
+
 
     @Override
     public void afterPager(PageInfo<ProInfo> result) {
@@ -689,27 +705,9 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         info.setRefUrls(refUrls);
     }
 
-    public static void main(String[] args) {
-
-
-        List<String> nums = new ArrayList<>();
-        for (int i = 0; i < 7699; i++) {
-            nums.add(10000001 + i + "");
-        }
-        System.out.println(nums);
-        Collections.shuffle(nums);
-        System.out.println(nums);
-        Collections.shuffle(nums);
-        System.out.println(nums);
-
-    }
-
     @Override
     public void saveRobot(String redisProInfoKey) {
         String proId = redisProInfoKey.toString().split("_")[0];
-        if (StringUtils.equals(proId, "580457619748028416 580396886364520448")) {
-            System.out.println("a");
-        }
         //1.生成本次多少个用户参与
         int randomMaxUserNum = RandomUtils.nextInt(people);
         if (randomMaxUserNum == 0) {

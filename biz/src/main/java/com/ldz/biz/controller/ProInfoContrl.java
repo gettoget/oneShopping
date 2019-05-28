@@ -57,6 +57,13 @@ public class ProInfoContrl extends BaseController<ProInfo, String> {
     }
 
 
+    @PostMapping("/under")
+    public ApiResponse<String> updateUnder(String id){
+        return service.updateUnder(id);
+    }
+
+
+
 
 
 

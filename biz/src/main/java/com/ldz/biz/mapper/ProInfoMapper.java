@@ -30,4 +30,9 @@ public interface ProInfoMapper extends Mapper<ProInfo> {
     @Select(" select id from pro_info where pro_baseid = ( select pro_baseid from pro_info where id = #{id} ) and pro_zt = '1' order by cjsj desc limit 1")
     String getLatestPro(String id);
 
+    @Select(" SELECT count(DISTINCT(user_id))  from order_form where cjsj like '${today}%'")
+    int countCyyhToday(@Param("today") String today);
+
+
+
 }

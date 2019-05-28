@@ -54,8 +54,9 @@ public class ProBaseinfoServiceImpl extends BaseServiceImpl<ProBaseinfo, String>
 		entity.setId(genId());
 		entity.setCjsj(DateUtils.getNowTime());
 		save(entity);
-
-		return ApiResponse.saveSuccess();
+		ApiResponse<String> res = new ApiResponse<>();
+		res.setResult(entity.getId());
+		return res;
     }
 
     @Override

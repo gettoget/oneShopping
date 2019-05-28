@@ -126,7 +126,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                     }
                     if (map.containsKey(order.getProId())) {
                         ProInfo info = map.get(order.getProId());
-                        order.setRate((Integer.parseInt(info.getProPrice()) - Integer.parseInt(info.getRePrice()) * 100) / Integer.parseInt(info.getProPrice()));
+                        order.setRate((Integer.parseInt(info.getProPrice()) - Integer.parseInt(info.getRePrice()) ) * 100 / Integer.parseInt(info.getProPrice()));
                     }
                     if (userMap.containsKey(order.getUserId())) {
                         User user = userMap.get(order.getUserId());

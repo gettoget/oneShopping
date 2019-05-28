@@ -8,7 +8,7 @@ import java.io.Serializable;
  */
 public class AndroidMsgBean implements Serializable {
     /**
-     * 透传消息类型    1  商品上新  2 商品变更热门  3 商品待开奖 4 商品已开奖
+     * 透传消息类型    1  商品上新  2 商品变更热门  3 商品待开奖 4 商品已开奖  5 商品下架
      */
     private String type;
     /**
