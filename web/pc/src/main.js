@@ -55,6 +55,10 @@ Vue.use(iView, {
   i18n: (key, value) => i18n.t(key, value),
   size:"large"
 })
+iView.Message.config({
+  top: 130,
+  duration: 3
+});
 Vue.use(TreeTable)
 Vue.use(VOrgTree)
 /**

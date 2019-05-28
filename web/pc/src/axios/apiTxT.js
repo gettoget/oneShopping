@@ -7,7 +7,7 @@
 
  *所有请求需要在 Header 添加  userid  和  token   否则 会返回 999 授权认证失败  需要重新登录
 
- *文件上传接口
+ *文件上传接口 http://119.23.242.234:8088/upload?targetPath=cover
 
  *参数:  targetPath (必填,谢谢)  此字段用于设置文件上传保存的路径 , 如果你传的是封面图 请传 targetPath = cover (这只是举个例子, 你随便 取名字)  为了区分文件不一样 , 请上传文件时一定要上传此字段 , 好区分每个文件的不同谢谢
 
@@ -270,7 +270,7 @@ refUrl    推荐图url
   "success": true
 }
  **/
-// 7.商品基础信息查询
+// 7.商品基础信息查询  库存
 /**
 POST: /api/probaseinfo/pager
 
@@ -543,7 +543,7 @@ POST: /api/probaseinfo/pager
   "success": true
 }
 **/
-// 7.商品基本信息修改
+// 8.商品基本信息修改
 /**
 POST:  /api/probaseinfo/update
 
@@ -556,7 +556,7 @@ POST:  /api/probaseinfo/update
   "success": true
 }
 **/
-// 8. 上架商品信息查询--end
+// 9. 上架商品信息查询--end
 /**
 POST:  /api/proinfo/pager
 
@@ -938,7 +938,7 @@ POST:  /api/proinfo/pager
   "success": true
 }
 **/
-// 9. 订单查询接口
+// 10. 订单查询接口
 /**
 POST: /api/order/pager
 
@@ -1013,6 +1013,456 @@ POST: /api/order/pager
   "success": true
 }
  **/
+
+//
+// 接上个文档
+//
+// 1. 查询商品评论接口
+//
+// POST:  /api/proeval/pager
+//
+// 参数:  与上个文档中所说规则一致
+//
+// 返回:
+// {
+//   "code": 200,
+//   "message": "操作成功!",
+//   "page": {
+//   "pageNum": 1,
+//     "pageSize": 8,
+//     "size": 1,
+//     "startRow": 1,
+//     "endRow": 1,
+//     "total": 1,
+//     "pages": 1,
+//     "list": [
+//     {
+//       "id": "577120541844963328",                      // 评论id
+//       "proId": "572821537917239296",                   // 商品id
+//       "userId": "567293418435248128",                  // 评论用户id
+//       "userName": "Wiwin",                             // 评论用户名
+//       "content": "123",                                // 评论内容
+//       "cjsj": "2019-05-12 13:10:59.557",               // 评论时间
+//       "img": "winnerShowImage/b3de8fab5c884b599b2a2242ca00aa58.png,winnerShowImage/4136c81fc46f4c0a85b45358ea2bddcd.png,winnerShowImage/89e737295e144def9381f0aa4786f2ae.png,winnerShowImage/b369b29b5cf84da291735c641ef5d1ab.png,winnerShowImage/10c7945fce184e51b07cfe8d5003e95a.png,winnerShowImage/504ed3f038314172b1b2ed3c926d9e01.png,winnerShowImage/7202c731239c40949229b2218e5cf2de.png,winnerShowImage/53504e97079943aaadb5535b7cccee16.png,winnerShowImage/72b66e3681de4cf1a954649dc97fefbd.png,",   // 图片地址
+//       "bz1": "1",                                      // 当前评论点赞数
+//       "bz2": null,
+//       "bz3": null,
+//       "thumbs": null,                                  // 当前登录用户是否点赞了    0 未点   1 已点
+//       "thumbsSum": 0,                                  // 点赞数
+//       "himg": null                                     // 评论用户头像
+//     }
+//   ],
+//     "prePage": 0,
+//     "nextPage": 0,
+//     "isFirstPage": true,
+//     "isLastPage": true,
+//     "hasPreviousPage": false,
+//     "hasNextPage": false,
+//     "navigatePages": 8,
+//     "navigatepageNums": [
+//     1
+//   ],
+//     "navigateFirstPage": 1,
+//     "navigateLastPage": 1,
+//     "firstPage": 1,
+//     "lastPage": 1
+// },
+//   "success": true
+// }
+//
+//
+//
+// 2. 删除评论
+//
+// POST: /api/proeval/remove/{id}
+//
+// 参数:   路径参数  传评论id即可
+//
+// 返回
+// {
+//   "code": 200,
+//   "message": "操作成功!",
+//   "success": true
+// }
+//
+//
+//
+// 3. 平台注册用户信息
+//
+// POST: /api/user/pager
+//
+// 参数: 同上
+//
+// 返回:
+//
+//
+//
+// {
+//   "code": 200,
+//   "message": "操作成功!",
+//   "page": {
+//   "pageNum": 1,
+//     "pageSize": 8,
+//     "size": 8,
+//     "startRow": 1,
+//     "endRow": 8,
+//     "total": 50064,
+//     "pages": 6258,
+//     "list": [
+//     {
+//       "id": "579987979284512768",                 // userId
+//       "phone": "12312",                           // 手机号 , 账号
+//       "pwd": "4DA3BB20330A34F4",                  // 密码
+//       "payPwd": null,                             // 支付密码
+//       "userName": "11",                           // 用户昵称
+//       "source": "0",                              // 来源 0 人  1机
+//       "lastTime": "2019-05-20 11:05:34.299",      // 最后登录时间
+//       "lastImei": "008796749369364",              // 最后登录的imei
+//       "zt": "0",                                  // 状态 0 为正常  1 为禁用
+//       "regImei": "008796749369364",               // 注册 imei
+//       "hImg": null,                               // 头像
+//       "balance": "0",                             // 余额
+//       "cjsj": "2019-05-20 11:05:09.917",          // 注册时间
+//       "refCode": null,                            // 邀请码
+//       "score": "0",                               // 积分
+//       "zjcs": "0",                                // 中奖次数
+//       "bz1": null,
+//       "bz2": null,
+//       "bz3": null,
+//       "record": null
+//     },
+//     {
+//       "id": "579693223912407040",
+//       "phone": "12356",
+//       "pwd": "8465FC2A0A16701A",
+//       "payPwd": null,
+//       "userName": "56",
+//       "source": "0",
+//       "lastTime": "2019-05-19 15:33:54.760",
+//       "lastImei": "008796749369364",
+//       "zt": "0",
+//       "regImei": "008796749369364",
+//       "hImg": null,
+//       "balance": "0",
+//       "cjsj": "2019-05-19 15:33:54.760",
+//       "refCode": null,
+//       "score": "0",
+//       "zjcs": "0",
+//       "bz1": null,
+//       "bz2": null,
+//       "bz3": null,
+//       "record": null
+//     },
+//     {
+//       "id": "579693113547685888",
+//       "phone": "12355",
+//       "pwd": "8465FC2A0A16701A",
+//       "payPwd": null,
+//       "userName": "5",
+//       "source": "0",
+//       "lastTime": "2019-05-19 15:33:28.447",
+//       "lastImei": "008796749369364",
+//       "zt": "0",
+//       "regImei": "008796749369364",
+//       "hImg": null,
+//       "balance": "0",
+//       "cjsj": "2019-05-19 15:33:28.447",
+//       "refCode": null,
+//       "score": "0",
+//       "zjcs": "0",
+//       "bz1": null,
+//       "bz2": null,
+//       "bz3": null,
+//       "record": null
+//     },
+//     {
+//       "id": "579590080797081600",
+//       "phone": "18602714782",
+//       "pwd": "4DA3BB20330A34F4",
+//       "payPwd": null,
+//       "userName": "1860271478218602714782",
+//       "source": "0",
+//       "lastTime": "2019-05-20 15:59:07.135",
+//       "lastImei": "358240051111110",
+//       "zt": "0",
+//       "regImei": "99001021737592",
+//       "hImg": null,
+//       "balance": "996",
+//       "cjsj": "2019-05-19 08:44:03.525",
+//       "refCode": null,
+//       "score": "0",
+//       "zjcs": "0",
+//       "bz1": null,
+//       "bz2": null,
+//       "bz3": null,
+//       "record": null
+//     },
+//     {
+//       "id": "579586057083813888",
+//       "phone": "123456",
+//       "pwd": "4DA3BB20330A34F4",
+//       "payPwd": null,
+//       "userName": "18602714782",
+//       "source": "0",
+//       "lastTime": "2019-05-19 08:28:04.197",
+//       "lastImei": "358240051111110",
+//       "zt": "0",
+//       "regImei": "358240051111110",
+//       "hImg": null,
+//       "balance": "1998",
+//       "cjsj": "2019-05-19 08:28:04.197",
+//       "refCode": null,
+//       "score": "0",
+//       "zjcs": "0",
+//       "bz1": null,
+//       "bz2": null,
+//       "bz3": null,
+//       "record": null
+//     },
+//     {
+//       "id": "577608609014218752",
+//       "phone": "15827209983",
+//       "pwd": "4DA3BB20330A34F4",
+//       "payPwd": null,
+//       "userName": "1lll",
+//       "source": "0",
+//       "lastTime": "2019-05-13 21:30:23.838",
+//       "lastImei": "358240051111110",
+//       "zt": "0",
+//       "regImei": "358240051111110",
+//       "hImg": null,
+//       "balance": "2497",
+//       "cjsj": "2019-05-13 21:30:23.838",
+//       "refCode": null,
+//       "score": "0",
+//       "zjcs": "0",
+//       "bz1": null,
+//       "bz2": null,
+//       "bz3": null,
+//       "record": null
+//     },
+//     {
+//       "id": "577138526756274176",
+//       "phone": "15827209956",
+//       "pwd": "4DA3BB20330A34F4",
+//       "payPwd": null,
+//       "userName": "Lee",
+//       "source": "0",
+//       "lastTime": "2019-05-12 14:23:56.510",
+//       "lastImei": "358240051111110",
+//       "zt": "0",
+//       "regImei": "358240051111110",
+//       "hImg": null,
+//       "balance": "1489",
+//       "cjsj": "2019-05-12 14:22:27.494",
+//       "refCode": null,
+//       "score": "0",
+//       "zjcs": "1",
+//       "bz1": null,
+//       "bz2": null,
+//       "bz3": null,
+//       "record": null
+//     },
+//     {
+//       "id": "577112734735269888",
+//       "phone": "51",
+//       "pwd": "0BF5EEF14BCDF313",
+//       "payPwd": null,
+//       "userName": "slu1",
+//       "source": "0",
+//       "lastTime": "2019-05-12 12:40:03.338",
+//       "lastImei": "008796749369364",
+//       "zt": "0",
+//       "regImei": "008796749369364",
+//       "hImg": "userHead/91e3738c79484abf9541b9b3c269888d.JPG",
+//       "balance": "1990",
+//       "cjsj": "2019-05-12 12:39:58.197",
+//       "refCode": null,
+//       "score": "0",
+//       "zjcs": "0",
+//       "bz1": null,
+//       "bz2": null,
+//       "bz3": null,
+//       "record": null
+//     }
+//   ],
+//     "prePage": 0,
+//     "nextPage": 2,
+//     "isFirstPage": true,
+//     "isLastPage": false,
+//     "hasPreviousPage": false,
+//     "hasNextPage": true,
+//     "navigatePages": 8,
+//     "navigatepageNums": [
+//     1,
+//     2,
+//     3,
+//     4,
+//     5,
+//     6,
+//     7,
+//     8
+//   ],
+//     "navigateFirstPage": 1,
+//     "navigateLastPage": 8,
+//     "firstPage": 1,
+//     "lastPage": 8
+// },
+//   "success": true
+// }
+//
+// 4. 平台注册用户信息修改  (只能改部分字段)     ps:  用户信息不可删除 , 可修改状态为禁用来禁止用户登录
+//
+// POST: /api/user/update
+//
+//
+// 参数:  见分页接口字段
+//
+// 返回
+// {
+//   "code": 200,
+//   "message": "操作成功!",
+//   "success": true
+// }
+//
+// 5. 查询轮播图
+//
+// POST: /api/popularimgs/pager
+//
+// 参数:  见文档1中的分页查询参数传递方法
+//
+// 返回:
+// {
+//   "code": 200,
+//   "message": "操作成功!",
+//   "page": {
+//   "pageNum": 1,
+//     "pageSize": 8,
+//     "size": 3,
+//     "startRow": 1,
+//     "endRow": 3,
+//     "total": 3,
+//     "pages": 1,
+//     "list": [
+//     {
+//       "id": "570191500369985536",                                   // 轮播图id
+//       "proId": "577163915075518464",                                // 商品id
+//       "imgUrl": "http://m.360buyimg.com/babel/jfs/t1/30283/22/13082/92611/5cb98fb8E603ba7c3/5e2f2490c9bb08c7.jpg",   // 轮播图 url
+//       "imgLx": "2",                                                                                                  // 类型  1 商品推荐  2 活动页面
+//       "fwurl": "http://m.360buyimg.com/babel/jfs/t1/30283/22/13082/92611/5cb98fb8E603ba7c3/5e2f2490c9bb08c7.jpg",    // 图片访问地址
+//       "cjsj": "2019-04-23 10:17:27.334",
+//       "zt": "0",													// 状态 0 正常  1 禁用
+//       "bz1": null,
+//       "bz2": null,
+//       "bz3": null
+//     },
+//     {
+//       "id": "570191065584238592",
+//       "proId": "569836091092238336",
+//       "imgUrl": "http://img1.360buyimg.com/pop/jfs/t1/15734/1/6445/83238/5c530cb4Eb60af663/22c04b9dd609b45b.jpg",
+//       "imgLx": "1",
+//       "fwurl": "http://img1.360buyimg.com/pop/jfs/t1/15734/1/6445/83238/5c530cb4Eb60af663/22c04b9dd609b45b.jpg",
+//       "cjsj": "2019-04-23 10:15:43.674",
+//       "zt": "0",
+//       "bz1": null,
+//       "bz2": null,
+//       "bz3": null
+//     },
+//     {
+//       "id": "570190793843671040",
+//       "proId": "567752727216521216",
+//       "imgUrl": "http://img1.360buyimg.com/pop/jfs/t1/33955/15/3752/101391/5cb5ada0E62bf446d/13c64b400002587c.jpg",
+//       "imgLx": "1",
+//       "fwurl": "http://img1.360buyimg.com/pop/jfs/t1/33955/15/3752/101391/5cb5ada0E62bf446d/13c64b400002587c.jpg",
+//       "cjsj": "2019-04-23 10:14:38.885",
+//       "zt": "0",
+//       "bz1": null,
+//       "bz2": null,
+//       "bz3": null
+//     }
+//   ],
+//     "prePage": 0,
+//     "nextPage": 0,
+//     "isFirstPage": true,
+//     "isLastPage": true,
+//     "hasPreviousPage": false,
+//     "hasNextPage": false,
+//     "navigatePages": 8,
+//     "navigatepageNums": [
+//     1
+//   ],
+//     "navigateFirstPage": 1,
+//     "navigateLastPage": 1,
+//     "firstPage": 1,
+//     "lastPage": 1
+// },
+//   "success": true
+// }
+//
+//
+//
+//
+//
+// 5. 推荐 轮播图 添加
+//
+// POST: /api/popularimgs/save
+//
+//
+// 参数：  url 图片路径（必填）
+// 	lx  类型（必填）
+// 	proId 商品id(必填)
+// zt  状态 默认为0 正常
+// 返回：
+// {
+//   "code": 200,
+//   "message": "操作成功!",
+//   "success": true
+// }
+//
+//
+//
+// 6. 推荐图 ， 轮播图修改
+//
+// POST:  /api/popularimgs/update
+//
+// 参数：查询参数均可修改
+//
+// 返回：
+// {
+//   "code": 200,
+//   "message": "操作成功!",
+//   "success": true
+// }
+//
+// 7. 推荐 轮播图删除
+//
+// POST:  /api/popularimgs/remove/{pkId}
+//
+// 参数：  id 路径参数
+//
+// 返回
+// {
+//   "code": 200,
+//   "message": "操作成功!",
+//   "success": true
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

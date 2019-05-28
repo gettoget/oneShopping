@@ -65,14 +65,14 @@ httpInstance.interceptors.request.use((config) => {
 httpInstance.interceptors.response.use((response) => {
   var v = this;
   // 对响应数据做点什么
-  if (response.status === 404) {
-    router.push({name: 'error-404'});
-  }
   if (response.status === 200) {
     if (response.data.code === 999) {
       router.push({name: 'login'})
       iView.Message.info(response.data.message + ',请重新登录');
       return
+    }
+    if(response.data.code != 200){
+      iView.Message.error(response.data.message);
     }
     return response.data;
   } else {
@@ -86,6 +86,7 @@ httpInstance.interceptors.response.use((response) => {
   // } else if (Cookies.get('result')) {
   // 	router.push({name: 'errorpage_500'});
   // }
+  iView.Message.error('http-error');
   return Promise.reject(error);
 });
 export default httpInstance;

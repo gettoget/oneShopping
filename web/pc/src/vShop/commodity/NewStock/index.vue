@@ -10,7 +10,7 @@
     <div class="UpBox box_row">
       <div class="box_row_100 boxPadd_R">
         <Form ref="formValidate" :model="formValidate" :rules="ruleValidate">
-          <FormItem label="商品类型" prop="classify">
+          <FormItem label="商品类型" prop="proType">
             <Select v-model="formValidate.proType" placeholder="选择商品分类">
               <Option value="computer">电脑</Option>
               <Option value="phone">手机</Option>
@@ -20,21 +20,33 @@
               <Option value="other">其他</Option>
             </Select>
           </FormItem>
-          <FormItem label="商品名称" prop="name">
+          <FormItem label="商品名称" prop="proName">
             <Input v-model="formValidate.proName" placeholder="输入商品名称"></Input>
           </FormItem>
-          <FormItem label="商品单价" prop="price">
-            <Input v-model="formValidate.proPrice" placeholder="输入商品单价"></Input>
+          <FormItem label="商品单价" prop="proPrice">
+            <Input v-model="formValidate.proPrice" placeholder="输入商品单价"/>
           </FormItem>
-          <FormItem label="proStore" prop="amount">
-            <Input v-model="formValidate.proStore" placeholder="输入proStore"></Input>
+          <FormItem label="商品库存" prop="proStore">
+            <Input v-model="formValidate.proStore" placeholder="输入库存量"/>
           </FormItem>
-          <FormItem label="商品标签" prop="desc">
+          <FormItem label="商品标签" prop="proSign">
             <Input v-model="formValidate.proSign" type="textarea" :autosize="{minRows: 1,maxRows: 5}"
                    placeholder="输入商品标签"></Input>
           </FormItem>
-          <FormItem label="抢购类型" prop="amount">
-            <Input v-model="formValidate.rType" placeholder="输选择抢购类型"></Input>
+          <FormItem label="抢购类型" prop="rType">
+            <Select v-model="formValidate.rType" placeholder="输选择抢购类型">
+              <Option value="1">1</Option>
+              <Option value="2">2</Option>
+            </Select>
+          </FormItem>
+          <FormItem>
+            <div class="box_row rowRight">
+              <Button type="success" style="margin-right: 12px"
+                      @click="handleSubmit('formValidate')">提交
+              </Button>
+
+              <Button @click="handleReset">重置</Button>
+            </div>
           </FormItem>
         </Form>
       </div>
@@ -44,15 +56,14 @@
             <h2>封面图</h2>
 
             <div span="12" class="contentItemSty" v-if="formData.coverImg">
-              <img :src="formData.coverImg" alt="">
+              <img :src="getUrl+formData.coverImg" alt="">
               <div class="ingMask">
                 <Icon type="ios-trash" size="60" color="#fff" @click.native="formData.coverImg = ''"/>
               </div>
             </div>
             <div class="" v-else>
-              <up-file-img @handleSuccess="(url)=>{handleSuccess(url,'coverImg')}">
-                <img v-if="formData.coverImg" :src="formData.coverImg" alt="">
-                <Button v-else type="dashed">
+              <up-file-img upGroup="cover" @handleSuccess="(url)=>{handleSuccess(url,'coverImg')}">
+                <Button type="dashed">
                   <Icon type="md-cloud-upload" size="80"/>
                 </Button>
               </up-file-img>
@@ -62,15 +73,14 @@
             <h2>推荐图</h2>
 
             <div class="contentItemSty" v-if="formData.tuijianImg">
-              <img :src="formData.tuijianImg" alt="">
+              <img :src="getUrl+formData.tuijianImg" alt="">
               <div class="ingMask">
                 <Icon type="ios-trash" size="60" color="#fff" @click.native="formData.tuijianImg = ''"/>
               </div>
             </div>
             <div class="" v-else>
-              <up-file-img @handleSuccess="(url)=>{handleSuccess(url,'tuijianImg')}">
-                <img v-if="formData.tuijianImg" :src="formData.tuijianImg" alt="">
-                <Button v-else type="dashed">
+              <up-file-img upGroup="refUrl" @handleSuccess="(url)=>{handleSuccess(url,'tuijianImg')}">
+                <Button type="dashed">
                   <Icon type="md-cloud-upload" size="80"/>
                 </Button>
               </up-file-img>
@@ -81,17 +91,18 @@
           <h2>内容图</h2>
         </div>
         <Row>
-          <Col span="12" class-name="contentImgSty boxPadd_LR boxPadd_B" v-for="(it,index) in formData.content" :key="index">
+          <Col span="12" class-name="contentImgSty boxPadd_LR boxPadd_B" v-for="(it,index) in formData.content"
+               :key="index">
             <div class="contentItemSty">
-              <img :src="it" alt="">
+              <img :src="getUrl+it" alt="">
               <div class="ingMask">
                 <Icon type="ios-trash" size="60" color="#fff" @click.native="removeItem(index)"/>
               </div>
             </div>
           </Col>
-          <Col span="12"  class-name="boxPadd_LR boxPadd_B" v-if="formData.content.length<6">
+          <Col span="12" class-name="boxPadd_LR boxPadd_B" v-if="formData.content.length<6">
             <div class="">
-              <up-file-img @handleSuccess="contentImg">
+              <up-file-img upGroup="urls" @handleSuccess="contentImg">
                 <Button type="dashed">
                   <Icon type="md-cloud-upload" size="80"/>
                 </Button>
@@ -114,53 +125,56 @@
     },
     data() {
       return {
+        getUrl: this.apis.GETFILEURL,
         formValidate: {
-          proType: "",//商品类目(必填)
-          proName: "",//商品名称(必填)
-          proPrice: "",//商品单价(必填)
-          proStore: "",//商品库存(必填)
-          proSign: "",//商品标签(选填)  如 你搜索电脑的时候 搜 16G 这样的标签
-          rType: "",//商品抢购类型(必填 , 后期是可以改的)  1 为人类有可能中奖  2 为机器人必中奖
-          urls: "",//图片url , 用逗号隔开
-          coverUrl: "",//封面url
-          refUrl: "",
+          proType: "computer",//商品类目(必填)
+          proName: "商品",//商品名称(必填)
+          proPrice: "123",//商品单价(必填)
+          proStore: "123",//商品库存(必填)
+          proSign: "6666",//商品标签(选填)  如 你搜索电脑的时候 搜 16G 这样的标签
+          rType: "1",//商品抢购类型(必填 , 后期是可以改的)  1 为人类有可能中奖  2 为机器人必中奖
+          urls: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",//图片url , 用逗号隔开
+          coverUrl: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",//封面url
+          refUrl: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",
         },
         ruleValidate: {
-          name: [
-            {required: true, message: '商品名称不能为空', trigger: 'blur'}
+          proType: [
+            {required: true, message: '', trigger: 'change'}
           ],
-          price: [
-            {required: true, message: '售价不能为空', trigger: 'blur'},
-            {type: 'number', message: '售价需为数字', trigger: 'blur'}
+          proName: [
+            {required: true, message: '', trigger: 'blur'}
+            // {type: 'number', message: '售价需为数字', trigger: 'blur'}
           ],
-          classify: [
-            {required: true, message: '选择商品分类', trigger: 'change'}
+          proPrice: [
+            {required: true, message: '', trigger: 'blur'}
           ],
-          amount: [
-            {required: true, message: '销售份额不能为空', trigger: 'blur'},
-            {type: 'number', message: '销售份额需为数字', trigger: 'blur'}
+          proStore: [
+            {required: true, message: '', trigger: 'blur'}
           ],
-          peopleNum: [
-            {required: true, message: '中奖人数不能为空', trigger: 'blur'},
-            {type: 'number', message: '中奖人数需为数字', trigger: 'blur'}
+          proSign: [
+            {required: true, message: '', trigger: 'blur'}
           ],
-          uploaddate: [
-            {required: true, type: 'datetime', message: '选择上架时间', trigger: 'change'}
-          ],
-          downloaddate: [
-            {required: true, type: 'datetime', message: '选择下架时间', trigger: 'change'}
-          ],
-          desc: [
-            {required: true, type: 'string', message: '请填写商品详情', trigger: 'blur'}
+          rType: [
+            {required: true, message: '', trigger: 'change'}
           ]
         },
         formData: {
-          coverImg: "",//封面图片
-          tuijianImg: "",//推荐图
-          content: []
+          coverImg: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",//封面图片
+          tuijianImg: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",//推荐图
+          content: ['refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg']
         }
       }
-
+    },
+    watch: {
+      "formData.coverImg": function (n, o) {
+        this.formValidate.coverUrl = n
+      },
+      "formData.tuijianImg": function (n, o) {
+        this.formValidate.refUrl = n
+      },
+      "formData.content": function (n, o) {
+        this.formValidate.urls = n.join(',')
+      },
     },
     methods: {
       handleSuccess(url, key) {//封面图 推荐图
@@ -173,16 +187,59 @@
         this.formData.content.splice(index, 1)
       },
       handleSubmit(name) { //表单提交
-        this.$refs[name].validate((valid) => {
-          if (valid) {
-            this.$Message.success('Success!');
-          } else {
-            this.$Message.error('Fail!');
-          }
-        })
+        var v = this
+        if (this.formValidate.coverUrl == '' ||
+          this.formValidate.refUrl == '' ||
+          this.formValidate.urls == '') {
+          this.$Message.warning({
+            content: "请上传商品相关图片！",
+          });
+        } else {
+          this.$refs[name].validate((valid) => {
+            if (valid) {
+              v.$http.post("/api/probaseinfo/save", this.formValidate).then(res => {
+                if (res.code == 200) {
+                  v.shopUp()
+                }
+              }).catch(err => {
+              })
+            } else {
+            }
+          })
+        }
       },
-      handleReset(name) {
-        this.$refs[name].resetFields();
+      shopUp() {
+        var v = this
+        this.swal({
+          title: "商品上架？",
+          type: "warning",
+          showCancelButton: true,
+          confirmButtonText: "立即上架",
+          cancelButtonText: "稍后操作",
+        }).then((isConfirm) => {
+          if (isConfirm.value) {
+          }
+          v.handleReset()
+        });
+      },
+      handleReset() {
+        this.formValidate = {
+          proType: "",//商品类目(必填)
+          proName: "",//商品名称(必填)
+          proPrice: "",//商品单价(必填)
+          proStore: "",//商品库存(必填)
+          proSign: "",//商品标签(选填)  如 你搜索电脑的时候 搜 16G 这样的标签
+          rType: "",//商品抢购类型(必填 , 后期是可以改的)  1 为人类有可能中奖  2 为机器人必中奖
+          urls: "",//图片url , 用逗号隔开
+          coverUrl: "",//封面url
+          refUrl: "",
+        }
+
+        this.formData = {
+          coverImg: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",//封面图片
+          tuijianImg: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",//推荐图
+          content: ['refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg']
+        }
       }
     }
   }
