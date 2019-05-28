@@ -11,8 +11,6 @@
     name: "homeTab",
     data() {
       return {
-
-
         // 序号
         // 开奖商品
         // 名称
@@ -135,6 +133,14 @@
             time: '2016-10-03'
           }
         ]
+      }
+    },
+    created(){
+
+    },
+    methods:{
+      getData(){
+        this.$http.post('')
       }
     }
   }
