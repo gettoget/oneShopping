@@ -2,7 +2,9 @@
   <Card class="usercardSty usercard">
     <div slot="title" class="box_row">
       <div class="userTypBox">
-        <div class="state">state</div>
+        <div class="state">
+          {{mess.zt | userZT}}
+        </div>
       </div>
       <div class="" style="padding-right: 16px;">
         <img class="titleImg" :src="iph" alt="">
@@ -10,11 +12,11 @@
       <div class="box_row_100 userMess">
         <div class="messItem userName">
           <Icon type="md-person" size="22"/>
-          David James
+          {{mess.userName}}
         </div>
         <div class="messItem userPhone">
           <Icon type="ios-call" size="22"/>
-          (11) 191****1234
+          {{mess.phone}}
         </div>
       </div>
     </div>
@@ -41,6 +43,31 @@
 
   export default {
     name: "userCard",
+    props:{
+      inVal:{
+        type:Number,
+        default:0
+      },
+      mess:{
+        type:Object,
+        default:{}
+      }
+    },
+    filters:{
+      userZT:(val)=>{
+        switch (val) {
+          case "0":
+            return "正常"
+            break;
+          case "1":
+            return "禁用"
+            break;
+          default:
+            return "正常"
+            break;
+        }
+      }
+    },
     data() {
       return {
         iph: "https://i.loli.net/2017/08/21/599a521472424.jpg"
@@ -62,11 +89,13 @@
         border-style: solid;
         border-color: #ffa2d3 #fff0 #fff0 #ffa2d3;
         .state {
+          text-align: center;
+          width: 40px;
           position: absolute;
           left: -30px;
           top: -18px;
           color: #fff;
-          font-size: 18px;
+          font-size: 16px;
           font-weight: 900;
           transform: rotate(-45deg);
         }

@@ -34,7 +34,7 @@
                    placeholder="输入商品标签"></Input>
           </FormItem>
           <FormItem label="抢购类型" prop="rType">
-            <Select v-model="formValidate.rType" placeholder="输选择抢购类型">
+            <Select v-model="formValidate.rType" placeholder="选择抢购类型">
               <Option value="1">1</Option>
               <Option value="2">2</Option>
             </Select>
@@ -199,7 +199,7 @@
             if (valid) {
               v.$http.post("/api/probaseinfo/save", this.formValidate).then(res => {
                 if (res.code == 200) {
-                  v.shopUp()
+                  v.shopUp(res.result)
                 }
               }).catch(err => {
               })
@@ -208,7 +208,7 @@
           })
         }
       },
-      shopUp() {
+      shopUp(shopId) {
         var v = this
         this.swal({
           title: "商品上架？",
@@ -218,6 +218,16 @@
           cancelButtonText: "稍后操作",
         }).then((isConfirm) => {
           if (isConfirm.value) {
+            v.$http.post("/api/proinfo/saveOne",{id:shopId}).then(res=>{
+              if(res.code == 200){
+                v.$Message.success('商品上架成功')
+              }else {
+                v.$Message.error('商品上架失败')
+              }
+
+            }).catch(err=>{
+              v.$Message.error('商品上架失败')
+            })
           }
           v.handleReset()
         });
