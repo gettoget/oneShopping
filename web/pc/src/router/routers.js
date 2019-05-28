@@ -113,15 +113,15 @@ export default [
         },
         component: () => import('@/vShop/system/dictionaries')
       },
-      {
-        path: 'system-ShortMessage',
-        name: 'system-ShortMessage',
-        meta: {
-          icon: '_bear',
-          title: '短信管理'
-        },
-        component: () => import('@/vShop/system/system-ShortMessage')
-      }
+      // {
+      //   path: 'system-ShortMessage',
+      //   name: 'system-ShortMessage',
+      //   meta: {
+      //     icon: '_bear',
+      //     title: '短信管理'
+      //   },
+      //   component: () => import('@/vShop/system/system-ShortMessage')
+      // }
     ]
   },
   {
@@ -236,15 +236,15 @@ export default [
         },
         component: () => import('@/vShop/order/draw-order')
       },
-      {
-        path:'/draw-order-robot',
-        name:'draw-order-robot',
-        meta: {
-          icon: 'md-trending-up',
-          title: 'Robot中奖订单'
-        },
-        component: () => import('@/vShop/order/draw-order-robot')
-      },
+      // {
+      //   path:'/draw-order-robot',
+      //   name:'draw-order-robot',
+      //   meta: {
+      //     icon: 'md-trending-up',
+      //     title: 'Robot中奖订单'
+      //   },
+      //   component: () => import('@/vShop/order/draw-order-robot')
+      // },
       {
         path:'/shipment-order',
         name:'shipment-order',
