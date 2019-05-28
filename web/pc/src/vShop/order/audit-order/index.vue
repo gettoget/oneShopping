@@ -1,21 +1,20 @@
 <template>
    <div>
-     <pager-tit title="订单审核"></pager-tit>
+     <pager-tit title="订单查询"></pager-tit>
      <div class="box_row colCenter rowRight pageFindSty" style="border: none">
+       <div>
+         <!--<Icon type="ios-call" size="34"/>-->
+         <DatePicker v-model="param.cjsjLike" value='yyyy-MM-dd' @on-change="changTime" type="daterange" :options="options2" placement="bottom-end" placeholder="Select date" style="width: 200px"></DatePicker>
+<!--         <DatePicker  v-model="param.cjsjLike" format="yyyy-MM-dd" type="daterange" split-panels placeholder="Select date" style="width: 200px"></DatePicker>-->
+       </div>
        <div>
          <!--<Icon type="md-person" size="34"/>-->
          <Input
+           v-model="param.idLike"
            placeholder="请输入订单编号" style="width: 200px">
          </Input>
        </div>
-
-       <div>
-         <!--<Icon type="ios-call" size="34"/>-->
-         <Input
-           placeholder="请输入手机号码" style="width: 200px"
-         ></Input>
-       </div>
-       <Button type="primary">
+       <Button type="primary" @click="getPagerList">
          <Icon type="md-search"></Icon>
          <!--查询-->
        </Button>
@@ -27,6 +26,11 @@
          :columns="tableTiT"
          :data="tableData"></Table>
      </Row>
+     <div class="pagerBoxSty boxMar_T box_row rowRight">
+       <one-page :total="total" :size="param.pageSize"
+                 :opts="[4,8,12,16]"
+                 @chPager="getPagerList"></one-page>
+     </div>
      <component
        :is="compName"
        :usermes="usermes"
@@ -43,6 +47,7 @@
       },
       data(){
           return{
+            total:'',
             usermes: {},
             userMesType: true,
             compName:'',
@@ -55,39 +60,39 @@
               {
                 title: '订单编号',
                 align: 'center',
-                key: 'bh'
+                key: 'id'
               },
               {
                 title: '下单时间',
                 align: 'center',
-                key: 'sj'
+                key: 'cjsj'
               },
               {
-                title: '下单手机号',
+                title: '用户名',
                 align: 'center',
-                key: 'sjh'
+                key: 'userName'
               },
               {
-                title: '收货地址',
+                title: '商品名',
                 align: 'center',
-                key: 'dz',
+                key: 'proName',
               },
               {
                 title: '订单状态',
                 width: 120,
                 align: 'center',
-                key: 'zt'
-              },
-              {
-                title: '订单类别',
-                width: 120,
-                align: 'center',
                 key: 'ddzt'
               },
               {
-                title: '备注',
+                title: '支付金额',
+                width: 120,
                 align: 'center',
-                key: 'bz'
+                key: 'zfje'
+              },
+              {
+                title: '支付时间',
+                align: 'center',
+                key: 'zfsj'
               },
               {
                 title: '操作',
@@ -154,27 +159,65 @@
                 }
               }
             ],
-            tableData: [
-              {
-                bh:'20180909000123431',
-                sj:'2018-04-01',
-                sjh:'0908-1678-18766',
-                dz:'sjhfjsfkjdakd',
-                zt:'待审核',
-                bz:'赠品111',
-                ddzt:'直购'
-              },
-              {
-                bh:'20180909000123541',
-                sj:'2018-04-01',
-                sjh:'0908-1678-18766',
-                dz:'阿萨德',
-                zt:'待审核',
-                bz:'赠品211',
-                ddzt:'中奖'
-              }
-            ],
+            tableData: [],
+            param:{
+              idLike:'',
+              cjsjLike:'',
+              pageNum: 1,
+              pageSize: 8
+            },
+            options2: {
+              shortcuts: [
+                {
+                  text: '1 week',
+                  value () {
+                    const end = new Date();
+                    const start = new Date();
+                    start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                    return [start, end];
+                  }
+                },
+                {
+                  text: '1 month',
+                  value () {
+                    const end = new Date();
+                    const start = new Date();
+                    start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                    return [start, end];
+                  }
+                },
+                {
+                  text: '3 months',
+                  value () {
+                    const end = new Date();
+                    const start = new Date();
+                    start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                    return [start, end];
+                  }
+                }
+              ]
+            }
           }
+      },
+      created(){
+        this.getPagerList()
+      },
+      methods:{
+        changTime(value){
+          this.param.cjsjGte = value[0]
+          this.param.cjsjLte = value[1]
+          this.getPagerList()
+        },
+        getPagerList(){
+          this.$http.post(this.apis.ORDER.QUERY,this.param).then((res)=>{
+            if (res.code == 200){
+              this.tableData = res.page.list
+              this.param.pageNum = res.page.pageNum
+              this.param.pageSize = res.page.pageSize
+              this.total = res.page.total
+            }
+          })
+        },
       }
     }
 </script>

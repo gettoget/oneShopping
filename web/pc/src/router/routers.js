@@ -214,7 +214,7 @@ export default [
         name:'audit-order',
         meta: {
           icon: 'md-trending-up',
-          title: '订单审核'
+          title: '订单查询'
         },
         component: () => import('@/vShop/order/audit-order')
       },

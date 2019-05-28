@@ -16,4 +16,8 @@ export default {
     CHANGE: '/api/yh/update',//修改
     DELE: '/api/yh/remove',//  api/yh/remove/{pkid}  pkid为用户的id 例 :  /api/yh/remove/1   即可删除用户id 为 1 的用户信息
   },
+  ORDER:{
+    QUERY:'/api/order/pager',//订单查询
+
+  }
 }
