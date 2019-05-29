@@ -2,13 +2,13 @@
   <Card class="reserveCardSty">
     <div slot="title">
       <div class="reserveCardSty-selImg">
-        <img :src=" mess.imgUrls[selImg]" alt="">
+        <img :src="apis.GETFILEURL+mess.imgUrls[selImg]" alt="">
       </div>
       <div class="box_row rowAuto" style="height: 40px">
         <div :class="index==selImg?'selSty reserveCardSty-imgList':'reserveCardSty-imgList'"
              v-for="(it,index) in mess.imgUrls" @click="selImg = index"
             v-if="index<5">
-          <img :src="it" alt="" style="" style="width: 40px;height: 40px">
+          <img :src="apis.GETFILEURL+it" alt="" style="" style="width: 40px;height: 40px">
         </div>
       </div>
     </div>

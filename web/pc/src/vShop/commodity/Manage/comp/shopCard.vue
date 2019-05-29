@@ -4,7 +4,7 @@
       <div class="bqBox">
         售卖中
       </div>
-      <img :src="mess.coverUrls"  alt="">
+      <img :src="apis.GETFILEURL+mess.coverUrls"  alt="">
     </div>
     <div class="shopMoney">
       ￥{{mess.proPrice}}
@@ -59,9 +59,10 @@
     .ivu-card-head {
       text-align: center;
       position: relative;
-      height: 297px;
+      height: 268px;
       img{
-        width: 100%;
+        width: 240px;
+        height: 240px;
       }
       .bqBox {
         position: absolute;

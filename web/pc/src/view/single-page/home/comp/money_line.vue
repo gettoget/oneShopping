@@ -19,14 +19,35 @@
       echartTiT: {
         type: String,
         default: 'TiT'
+      },
+      time:{
+        type:String,
+        default:"7"
       }
     },
     data() {
       return {}
     },
+    watch:{
+      time:function (n,o) {
+        console.log(n);
+      }
+    },
     mounted() {
-      var v = this
       this.$nextTick(() => {
+        this.getData()
+        this.buildEchart()
+      })
+    },
+    methods: {
+      getData(){
+        this.$http.post("/api/statis/rechargeWater",{day:this.time}).then(res=>{
+          console.log(res);
+        }).catch(err=>{})
+      },
+
+      buildEchart(){
+        var v = this
         var myChart = echarts.init(document.getElementById(this.echartID));
 
         let option ={
@@ -126,9 +147,8 @@
           animation: false
         }
         myChart.setOption(option);
-      })
-    },
-    methods: {}
+      }
+    }
   }
 </script>
 

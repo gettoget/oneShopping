@@ -27,6 +27,11 @@
         :columns="tableTiT"
         :data="tableData"></Table>
     </Row>
+    <div class="pagerBoxSty boxMar_T box_row rowRight">
+      <one-page :total="total" :size="param.pageSize"
+                :opts="[4,8,12,16]"
+                @chPager="getPagerList"></one-page>
+    </div>
   </div>
 </template>
 
@@ -35,6 +40,14 @@
     name: "index",
     data(){
       return{
+        total:0,
+        param:{
+          orderType:2,
+          idLike:'',
+          cjsjLike:'',
+          pageNum: 1,
+          pageSize: 8
+        },
         tableTiT: [{
           title: "序号",
           width: 80,
@@ -44,67 +57,146 @@
           {
             title: '订单编号',
             align: 'center',
-            key: 'bh'
+            key: 'id'
           },
           {
-            title: '中奖时间',
+            title: '下单时间',
             align: 'center',
-            key: 'sj'
+            key: 'cjsj'
           },
           {
-            title: '中奖手机号',
+            title: '用户名',
             align: 'center',
-            key: 'sjh'
+            key: 'userName'
           },
           {
-            title: '收货地址',
+            title: '商品名',
             align: 'center',
-            key: 'dz',
+            key: 'proName',
           },
           {
             title: '订单状态',
             width: 120,
             align: 'center',
-            key: 'zt'
+            key: 'ddzt',
+            render: (h, p) => {
+              let str = p.row.ddzt;
+              if (str == 0) {
+                str = '待开奖';
+              } else if (str == 1) {
+                str = '已中奖';
+              } else if (str == 2) {
+                str = '未中奖';
+              } else if (str == 3) {
+                str = '待支付';
+              } else if (str == 4) {
+                str = '已支付';
+              }else if(str == 5){
+                str = '取消支付'
+              }
+              return h('Tag', {
+                style: {
+                  width: '90px'
+                },
+                props: {
+                  color: p.row.ddzt == 3 ? 'error' : 'success'
+                },
+              }, str);
+            }
           },
           {
-            title: '商品种类',
+            title: '支付金额',
             width: 120,
             align: 'center',
-            key: 'splb'
+            key: 'zfje'
           },
           {
-            title: '商品名',
-            width: 120,
+            title: '支付时间',
             align: 'center',
-            key: 'spm'
+            key: 'zfsj'
           },
           {
-            title: '商品数量',
-            width: 120,
+            title: '操作',
+            key: 'action',
+            width: 180,
             align: 'center',
-            key: 'spsl'
-          },
-          {
-            title: '备注',
-            align: 'center',
-            key: 'bz'
-          },
-        ],
-        tableData: [
-          {
-            bh:'20180909000123431',
-            sj:'2018-04-01',
-            sjh:'0908-1678-18766',
-            dz:'sjhfjsfkjdakd',
-            zt:'待审核',
-            bz:'赠品111',
-            spm:'huawei',
-            splb:'数码',
-            spsl:'1'
+            render: (h, params) => {
+              return h('div', [
+                h('Button', {
+                  props: {
+                    type: 'success',
+                    icon: 'md-checkmark',
+                    shape: 'circle',
+                    size: 'small'
+                  },
+                  style: {
+                    cursor: "pointer",
+                    margin: '0 8px 0 0'
+                  },
+                  on: {
+                    click: () => {
+                      this.compName = mess
+                    }
+                  }
+                }),
+                h('Button', {
+                  props: {
+                    type: 'primary',
+                    icon: 'md-menu',
+                    shape: 'circle',
+                    size: 'small'
+                  },
+                  style: {
+                    cursor: "pointer",
+                    margin: '0 8px 0 0'
+                  },
+                  on: {
+                    click: () => {
+                      this.compName = mess
+                    }
+                  }
+                }),
+                h('Button', {
+                  props: {
+                    type: 'error',
+                    icon: 'md-close',
+                    shape: 'circle',
+                    size: 'small'
+                  },
+                  style: {
+                    cursor: "pointer",
+                    margin: '0 8px 0 0'
+                  },
+                  on: {
+                    click: () => {
+                      this.$Modal.warning({
+                        title: '驳回订单',
+                        content: '确定驳回此订单?',
+                      });
+                    }
+                  }
+                })
+              ]);
+            }
           }
         ],
+        tableData: [],
       }
+    },
+    created(){
+      this.getPagerList()
+    },
+    methods:{
+      getPagerList(){
+        this.$http.post(this.apis.ORDER.QUERY,this.param).then((res)=>{
+          if (res.code == 200){
+            this.tableData = res.page.list
+            this.param.pageNum = res.page.pageNum
+            this.param.pageSize = res.page.pageSize
+            this.total = res.page.total
+          }
+        })
+      },
     }
   }
 </script>

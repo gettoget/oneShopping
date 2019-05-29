@@ -13,15 +13,15 @@
           <div class="box_col rowAuto" style="padding-left: 18px">
             <div class="box_row colCenter">
               <div class="count-tit-style">今日 :</div>
-              <count-to :end="803" count-class="count-style"/>
+              <count-to :end="statisUser.today" count-class="count-style"/>
             </div>
             <div class="box_row colCenter">
               <div class="count-tit-style">本月 :</div>
-              <count-to :end="803" count-class="count-style"/>
+              <count-to :end="statisUser.mon" count-class="count-style"/>
             </div>
             <div class="box_row colCenter">
               <div class="count-tit-style">累计 :</div>
-              <count-to :end="803" count-class="count-style"/>
+              <count-to :end="statisUser.total" count-class="count-style"/>
             </div>
           </div>
         </infor-card>
@@ -32,15 +32,15 @@
           <div class="box_col rowAuto" style="padding-left: 18px">
             <div class="box_row colCenter">
               <div class="count-tit-style">上架 :</div>
-              <count-to :end="803" count-class="count-style"/>
+              <count-to :end="statisPro.sj" count-class="count-style"/>
             </div>
             <div class="box_row colCenter">
               <div class="count-tit-style">开奖 :</div>
-              <count-to :end="803" count-class="count-style"/>
+              <count-to :end="statisPro.kj" count-class="count-style"/>
             </div>
             <div class="box_row colCenter">
               <div class="count-tit-style">参与 :</div>
-              <count-to :end="803" count-class="count-style"/>
+              <count-to :end="statisPro.cyyh" count-class="count-style"/>
             </div>
           </div>
         </infor-card>
@@ -51,15 +51,15 @@
           <div class="box_col rowAuto" style="padding-left: 18px">
             <div class="box_row colCenter">
               <div class="count-tit-style">今日 :</div>
-              <count-to :end="803" count-class="count-style"/>
+              <count-to :end="statisRecharge.today" count-class="count-style"/>
             </div>
             <div class="box_row colCenter">
               <div class="count-tit-style">本月 :</div>
-              <count-to :end="803" count-class="count-style"/>
+              <count-to :end="statisRecharge.mon" count-class="count-style"/>
             </div>
             <div class="box_row colCenter">
               <div class="count-tit-style">累计 :</div>
-              <count-to :end="803" count-class="count-style"/>
+              <count-to :end="statisRecharge.total" count-class="count-style"/>
             </div>
           </div>
         </infor-card>
@@ -70,15 +70,15 @@
           <div class="box_col rowAuto" style="padding-left: 18px">
             <div class="box_row colCenter">
               <div class="count-tit-style">今日 :</div>
-              <count-to :end="803" count-class="count-style"/>
+              <count-to :end="statisCharge.today" count-class="count-style"/>
             </div>
             <div class="box_row colCenter">
               <div class="count-tit-style">本月 :</div>
-              <count-to :end="803" count-class="count-style"/>
+              <count-to :end="statisCharge.mon" count-class="count-style"/>
             </div>
             <div class="box_row colCenter">
               <div class="count-tit-style">累计 :</div>
-              <count-to :end="803" count-class="count-style"/>
+              <count-to :end="statisCharge.total" count-class="count-style"/>
             </div>
           </div>
         </infor-card>
@@ -92,16 +92,19 @@
             <div class="box_row rowRight" style="float: right">
               <ButtonGroup>
                 <Button :type="ButtonGroupVal=='7'?'primary':'default'"
-                        @click="ButtonGroupVal='7'">7天</Button>
+                        @click="ButtonGroupVal='7'">7天
+                </Button>
                 <Button :type="ButtonGroupVal=='15'?'primary':'default'"
-                        @click="ButtonGroupVal='15'">15天</Button>
+                        @click="ButtonGroupVal='15'">15天
+                </Button>
                 <Button :type="ButtonGroupVal=='30'?'primary':'default'"
-                        @click="ButtonGroupVal='30'">30天</Button>
+                        @click="ButtonGroupVal='30'">30天
+                </Button>
               </ButtonGroup>
             </div>
           </div>
           <div style="height: 430px">
-            <money-line></money-line>
+            <money-line :time="ButtonGroupVal"></money-line>
           </div>
 
         </Card>
@@ -140,18 +143,69 @@
     },
     data() {
       return {
-        ButtonGroupVal:'7',
-        inforCardData: [
-          { title: '新增用户', icon: 'md-person-add', count: 803, color: '#2d8cf0' },
-          { title: '累计点击', icon: 'md-locate', count: 232, color: '#19be6b' },
-          { title: '新增问答', icon: 'md-help-circle', count: 142, color: '#ff9900' },
-          { title: '分享统计', icon: 'md-share', count: 657, color: '#ed3f14' },
-          { title: '新增互动', icon: 'md-chatbubbles', count: 12, color: '#E46CBB' },
-          { title: '新增页面', icon: 'md-map', count: 14, color: '#9A66E4' }
-        ],
+        ButtonGroupVal: '7',
+        statisUser: {
+          mon: 0,
+          today: 0,
+          total: 0
+        },
+        statisPro: {
+          sj: 0,            // 上架
+          cyyh: 0,         // 参与
+          kj: 0             // 开奖
+        },
+        statisRecharge: {
+          total: 0,      // 总计
+          today: 0,           // 当天
+          mon: 0          // 当月
+        },
+        statisCharge:{
+          total: 0,       // 总计
+          today: 0,       // 当天
+          mon: 0          // 当月
+        }
       }
     },
+    created() {
+      this.getUtatisUser()
+      this.getStatisPro()
+      this.getStatisRecharge()
+    },
     mounted() {
+    },
+    methods: {
+      getUtatisUser() {
+        this.$http.post('/api/statis/statisUser').then(res => {
+          if (res.code == 200) {
+            this.statisUser = res.result
+          }
+        }).catch(err => {
+        })
+      },
+      getStatisPro() {
+        this.$http.post('/api/statis/statisPro').then(res => {
+          if (res.code == 200) {
+            this.statisPro = res.result
+          }
+        }).catch(err => {
+        })
+      },
+      getStatisRecharge() {
+        this.$http.post('/api/statis/statisRecharge').then(res => {
+          if (res.code == 200) {
+            this.statisRecharge = res.result
+          }
+        }).catch(err => {
+        })
+      },
+      getSstatisCharge() {
+        this.$http.post('/api/statis/statisCharge').then(res => {
+          if (res.code == 200) {
+            this.statisCharge = res.result
+          }
+        }).catch(err => {
+        })
+      }
     }
   }
 </script>

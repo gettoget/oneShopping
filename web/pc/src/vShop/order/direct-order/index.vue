@@ -2,7 +2,7 @@
   <div class="box_col" style="background-color:#fff">
     <pager-tit title="直购订单"></pager-tit>
     <div style="width: 1000px;margin:0 auto">
-      <order-card></order-card>
+      <order-card v-for="item in tableData" :mess="item"></order-card>
     </div>
     <!--<div class="box_row colCenter rowRight pageFindSty" style="border: none">-->
       <!--<div>-->
@@ -39,6 +39,14 @@
     },
     data() {
       return {
+        param:{
+          // orderType:1,
+          idLike:'',
+          cjsjLike:'',
+          pageNum: 1,
+          pageSize: 8
+        },
+        total:0,
         tableTiT: [{
           title: "序号",
           width: 80,
@@ -96,20 +104,23 @@
             key: 'bz'
           },
         ],
-        tableData: [
-          {
-            bh: '20180909000123431',
-            sj: '2018-04-01',
-            sjh: '0908-1678-18766',
-            dz: 'sjhfjsfkjdakd',
-            zt: '待审核',
-            bz: '赠品111',
-            spm: 'iphone',
-            splb: '数码',
-            spsl: '2'
-          }
-        ],
+        tableData: [],
       }
+    },
+    created(){
+      this.getPagerList()
+    },
+    methods:{
+      getPagerList(){
+        this.$http.post(this.apis.ORDER.QUERY,this.param).then((res)=>{
+          if (res.code == 200){
+            this.tableData = res.page.list
+            this.param.pageNum = res.page.pageNum
+            this.param.pageSize = res.page.pageSize
+            this.total = res.page.total
+          }
+        })
+      },
     }
   }
 </script>

@@ -47,7 +47,7 @@
       },
       data(){
           return{
-            total:'',
+            total:0,
             usermes: {},
             userMesType: true,
             compName:'',
@@ -81,7 +81,31 @@
                 title: '订单状态',
                 width: 120,
                 align: 'center',
-                key: 'ddzt'
+                key: 'ddzt',
+                render: (h, p) => {
+                  let str = p.row.ddzt;
+                  if (str == 0) {
+                    str = '待开奖';
+                  } else if (str == 1) {
+                    str = '已中奖';
+                  } else if (str == 2) {
+                    str = '未中奖';
+                  } else if (str == 3) {
+                    str = '待支付';
+                  } else if (str == 4) {
+                    str = '已支付';
+                  }else if(str == 5){
+                    str = '取消支付'
+                  }
+                  return h('Tag', {
+                    style: {
+                      width: '90px'
+                    },
+                    props: {
+                      color: p.row.ddzt == 3 ? 'error' : 'success'
+                    },
+                  }, str);
+                }
               },
               {
                 title: '支付金额',
