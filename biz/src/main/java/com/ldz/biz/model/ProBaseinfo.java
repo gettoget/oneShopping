@@ -88,6 +88,19 @@ public class ProBaseinfo implements Serializable {
     private List<String> coverUrls;
     @Transient
     private List<String> refUrls;
+    /**
+     * 已开奖数
+     */
+    @Transient
+    private int kjs;
+
+    public int getKjs() {
+        return kjs;
+    }
+
+    public void setKjs(int kjs) {
+        this.kjs = kjs;
+    }
 
     public List<String> getImgUrls() {
         return imgUrls;

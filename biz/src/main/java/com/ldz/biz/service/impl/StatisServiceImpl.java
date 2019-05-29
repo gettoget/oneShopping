@@ -118,4 +118,23 @@ public class StatisServiceImpl implements StatisService {
         }
         return ApiResponse.success(list);
     }
+
+    @Override
+    public ApiResponse<List<String>> paymentWater(String day) {
+        if(StringUtils.isBlank(day)){
+            day = "7";
+        }
+        DateTime now = DateTime.now();
+        List<String> list = new ArrayList<>();
+        int num = Integer.parseInt(day);
+        for (int i = num-1; i >= 0; i--) {
+            String s = now.minusDays(i).toString("yyyy-MM-dd");
+            long amount = rechargeMapper.sumAmount(s);
+            long sumAmount = exchangeMapper.sumAmount(s);
+
+            String data = s + "|" + amount + "|" + sumAmount;
+            list.add(data);
+        }
+        return ApiResponse.success(list);
+    }
 }

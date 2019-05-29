@@ -69,6 +69,15 @@ public class StatisContrl {
         return service.exchargeWater(day);
     }
 
+    /**
+     * 按时间  充值流水 和 消费流水
+     */
+    @PostMapping("/paymentWater")
+    public ApiResponse<List<String>> paymentWater(String day){
+        return service.paymentWater(day);
+    }
+
+
 
 
 

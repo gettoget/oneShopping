@@ -17,4 +17,6 @@ public interface StatisService {
     ApiResponse<List<String>> rechargeWater(String day);
 
     ApiResponse<List<String>> exchargeWater(String day);
+
+    ApiResponse<List<String>> paymentWater(String day);
 }

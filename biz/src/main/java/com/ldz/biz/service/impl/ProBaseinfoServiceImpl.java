@@ -1,10 +1,13 @@
 package com.ldz.biz.service.impl;
 
 import com.github.pagehelper.PageInfo;
+import com.ldz.biz.model.ProInfo;
 import com.ldz.biz.model.WinRecord;
+import com.ldz.biz.service.ProInfoService;
 import com.ldz.biz.service.WinRecordService;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.util.bean.ApiResponse;
+import com.ldz.util.bean.SimpleCondition;
 import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
@@ -35,6 +38,9 @@ public class ProBaseinfoServiceImpl extends BaseServiceImpl<ProBaseinfo, String>
 
 	@Value("${filePath}")
 	private String filePath;
+
+	@Autowired
+	private ProInfoService infoService;
 
 	@Override
 	protected Mapper<ProBaseinfo> getBaseMapper() {
@@ -77,7 +83,13 @@ public class ProBaseinfoServiceImpl extends BaseServiceImpl<ProBaseinfo, String>
 		if(CollectionUtils.isEmpty(list)){
 			return;
 		}
+		SimpleCondition condition;
 		for (ProBaseinfo proBaseinfo : list) {
+			condition = new SimpleCondition(ProInfo.class);
+			condition.eq(ProInfo.InnerColumn.proBaseid, proBaseinfo.getId());
+			condition.eq(ProInfo.InnerColumn.proZt, "4");
+			Integer count = infoService.countByCondition(condition);
+			proBaseinfo.setKjs(count);
 			setImgUrl(proBaseinfo);
 		}
 	}
