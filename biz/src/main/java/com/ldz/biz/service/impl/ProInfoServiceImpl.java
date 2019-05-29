@@ -613,13 +613,14 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         String id = entity.getId();
         ProInfo proInfo = findById(id);
         String proLx = proInfo.getProLx();
+        RuntimeCheck.ifNull(proInfo, MessageUtils.get("pro.isNull"));
         boolean flag = false;
         if (StringUtils.containsNone(proLx, "3") && StringUtils.contains(entity.getProLx(), "3")) {
             // 代表当前产品的类型变成了热门商品
             flag = true;
         }
-        RuntimeCheck.ifNull(proInfo, MessageUtils.get("pro.isNull"));
-        BeanUtil.copyProperties(entity, proInfo, CopyOptions.create().setIgnoreNullValue(true).setIgnoreError(true).setIgnoreProperties("id"));
+
+        BeanUtil.copyProperties(entity, proInfo, CopyOptions.create().setIgnoreNullValue(true).setIgnoreError(true).setIgnoreProperties("id","proPrice","proStore","proZt","rePrice","cjsj","kjsj","cyyhs"));
         update(proInfo);
         // 如果由非热门商品 转换为 热门商品 推送消息给前台
         if (flag) {
