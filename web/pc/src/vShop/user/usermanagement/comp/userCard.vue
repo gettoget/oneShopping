@@ -10,7 +10,7 @@
         <img class="titleImg" :src="iph" alt="">
       </div>
       <div class="box_row_100 userMess">
-        <div class="messItem userName">
+        <div class="messItem userName box_row">
           <Icon type="md-person" size="22"/>
           {{mess.userName}}
         </div>

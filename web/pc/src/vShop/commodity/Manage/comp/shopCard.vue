@@ -13,7 +13,7 @@
       {{mess.proName}}
     </div>
     <div class="lineBox">
-      <div class="lineVal">已售:5000份/剩余{{mess.proStore}}份</div>
+      <div class="lineVal">已售:{{(mess.proPrice-mess.proStore)}}份/剩余{{mess.proStore}}份</div>
       <div class="lineback">
         <div class="line"></div>
       </div>

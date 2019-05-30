@@ -26,23 +26,43 @@
       }
     },
     data() {
-      return {}
+      return {
+        times:[],
+        data1:[],//充值
+        data2:[],//消费
+      }
     },
     watch:{
       time:function (n,o) {
         console.log(n);
+        this.getData()
       }
     },
     mounted() {
       this.$nextTick(() => {
         this.getData()
-        this.buildEchart()
       })
     },
     methods: {
       getData(){
-        this.$http.post("/api/statis/rechargeWater",{day:this.time}).then(res=>{
-          console.log(res);
+        this.times=[]
+        this.data1=[]
+        this.data2=[]
+
+        this.$http.post("/api/statis/paymentWater",{day:this.time}).then(res=>{
+          if(res.code == 200){
+            res.result.forEach((it,index)=>{
+              let a = it.split('|')
+              console.log(a);
+              this.times.push(a[0])
+              this.data1.push(a[1])
+              this.data2.push(a[2])
+
+              if(index == res.result.length-1){
+                this.buildEchart()
+              }
+            })
+          }
         }).catch(err=>{})
       },
 
@@ -97,7 +117,7 @@
             {
               type: "category",
               boundaryGap: false,
-              data: ["07.01", "07.02", "07.03", "07.04", "07.05", "07.06", "07.06"],
+              data: v.times,
               axisLine: {
                 show: false
               },
@@ -123,12 +143,12 @@
             {
               name: "充值",
               type: "line",
-              data: [11, 11, 15, 13, 12, 13, 10]
+              data: v.data1
             },
             {
               name: "消费",
               type: "line",
-              data: [1, 6, 2, 5, 3, 2, 0]
+              data: v.data2
             }
           ],
           color: [
