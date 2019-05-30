@@ -256,26 +256,6 @@ export default [
       }
     ]
   },
-  // {
-  //   path:'/statistical',
-  //   name:'statistical',
-  //   meta: {
-  //     icon: 'md-trending-up',
-  //     title: '统计分析',
-  //   },
-  //   component:Main,
-  //   children:[
-  //     {
-  //       path: '/statistical-cz',
-  //       name: 'statistical-cz',
-  //       meta: {
-  //         icon: 'md-trending-up',
-  //         title: '充值统计'
-  //       },
-  //       component: () => import('@/vShop/statistical/statistical-cz')
-  //     }
-  //   ]
-  // },
   {
     path: '/iview',
     name: 'iview',

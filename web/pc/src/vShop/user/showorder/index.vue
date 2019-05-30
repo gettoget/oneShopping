@@ -1,12 +1,16 @@
 <template>
-  <div>
+  <div class="box_col">
     <pager-tit title="晒单审核"></pager-tit>
-    <Row :gutter="16">
-      <Col :span="4" :xxl="4" :xl="6" :lg="8" :md="12" :sm="24" :xs="24"
-           v-for="(it,index) in dataList" :key="index">
+    <div class="box_col_auto">
+      <div v-if="dataList.length >0" v-for="(it,index) in dataList" :key="index">
         <shaidan :mess="it"></shaidan>
-      </Col>
-    </Row>
+      </div>
+    </div>
+    <div class="pagerBoxSty boxMar_T box_row rowRight">
+      <one-page :total="total" :size="param.pageSize"
+                :opts="[12,24]"
+                @chPager="chPager"></one-page>
+    </div>
   </div>
 </template>
 
@@ -21,18 +25,30 @@
     data() {
       return {
         value2: 0,
-        dataList: []
+        dataList: [],
+        total:0,
+        param: {
+          userName:"",
+          phone:"",
+          pageNum: 1,
+          pageSize: 12
+        }
       }
     },
     created(){
       this.getDataList()
     },
     methods: {
+      chPager(p) {
+        this.param.pageNum = p.pageNum
+        this.param.pageSize = p.pageSize
+        this.getDataList()
+      },
       getDataList(){
         this.$http.post("/api/proeval/pager").then(res=>{
           if(res.code == 200){
-            console.log(res);
             this.dataList = res.page.list
+            this.total = res.page.total
           }
         }).catch(err=>{})
       }

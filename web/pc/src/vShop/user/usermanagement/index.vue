@@ -22,7 +22,8 @@
     </div>
     <div class="box_col_auto">
       <div class="box_row_list" :style="{width: 356*4+'px',margin:'0 auto'}">
-        <div v-for="(it,index) in tableData" :key="index" style="padding: 18px">
+        <div v-for="(it,index) in tableData" :key="index" @click="showMess(it)"
+             style="padding: 18px;cursor: pointer">
           <user-card :inVal="index" :mess="it"></user-card>
         </div>
       </div>
@@ -32,20 +33,25 @@
                 :opts="[12,24]"
                 @chPager="chPager"></one-page>
     </div>
+    <component :is="compName"
+               :itMess="itMess"
+               @closeMod="closeMod"></component>
   </div>
 </template>
 
 <script>
   import userCard from './comp/userCard'
-
+  import messMod from './comp/messMod'
   export default {
     name: "index",
     components: {
-      userCard
+      userCard,messMod
     },
     data() {
       return {
+        compName:"",
         tableData: [],
+        itMess:{},
         total:0,
         param: {
           userName:"",
@@ -59,6 +65,14 @@
       this.getDataList()
     },
     methods:{
+      showMess(it){
+        this.itMess = it
+        this.compName = "messMod"
+      },
+      closeMod(){
+        this.compName = ""
+        this.itMess = {}
+      },
       chPager(p) {
         this.param.pageNum = p.pageNum
         this.param.pageSize = p.pageSize

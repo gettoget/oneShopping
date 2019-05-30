@@ -24,16 +24,16 @@
     <!--ivu-card-body-->
     <div class="box_row rowBetween">
       <div>
-        余 : 800
+        余 : {{mess.balance}}
       </div>
       <div>
-        充 : 1000
+        充 : {{mess.cz}}
       </div>
       <div>
-        参 : 200
+        参 : {{mess.cy }}
       </div>
       <div>
-        中 : 0
+        中 : {{mess.zjcs}}
       </div>
     </div>
   </Card>
