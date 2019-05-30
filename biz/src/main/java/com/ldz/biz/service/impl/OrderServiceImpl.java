@@ -83,7 +83,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 
     @Override
     public boolean fillPagerCondition(LimitedCondition condition) {
-
+        condition.and().andIsNotNull(Order.InnerColumn.receId.name());
         return true;
     }
 
@@ -126,11 +126,12 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                     }
                     if (map.containsKey(order.getProId())) {
                         ProInfo info = map.get(order.getProId());
-                        order.setRate((Integer.parseInt(info.getProPrice()) - Integer.parseInt(info.getRePrice()) ) * 100 / Integer.parseInt(info.getProPrice()));
+                        order.setRate((Integer.parseInt(info.getProPrice()) - Integer.parseInt(info.getRePrice())) * 100 / Integer.parseInt(info.getProPrice()));
                     }
                     if (userMap.containsKey(order.getUserId())) {
                         User user = userMap.get(order.getUserId());
                         order.setUserName(user.getUserName());
+                        order.setPhone(user.getPhone());
                     }
                     if (finalAddrMap.containsKey(order.getReceId())) {
                         ReceiveAddr addr = finalAddrMap.get(order.getReceId());
