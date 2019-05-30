@@ -30,16 +30,27 @@
     <div class="pagerBoxSty boxMar_T box_row rowRight">
       <one-page :total="total" :size="param.pageSize"
                 :opts="[4,8,12,16]"
-                @chPager="getPagerList"></one-page>
+                @chPager="chPager"></one-page>
     </div>
+    <component
+      :is="compName"
+      :usermes="usermes"
+    ></component>
   </div>
 </template>
 
 <script>
+  import mess from './comp/mess'
   export default {
     name: "index",
+    components:{
+      mess
+    },
     data(){
       return{
+        compName:'',
+        usermes: {},
+        userMesType: true,
         total:0,
         param:{
           orderType:2,
@@ -120,25 +131,8 @@
             key: 'action',
             width: 180,
             align: 'center',
-            render: (h, params) => {
+            render: (h, p) => {
               return h('div', [
-                h('Button', {
-                  props: {
-                    type: 'success',
-                    icon: 'md-checkmark',
-                    shape: 'circle',
-                    size: 'small'
-                  },
-                  style: {
-                    cursor: "pointer",
-                    margin: '0 8px 0 0'
-                  },
-                  on: {
-                    click: () => {
-                      this.compName = mess
-                    }
-                  }
-                }),
                 h('Button', {
                   props: {
                     type: 'primary',
@@ -152,30 +146,11 @@
                   },
                   on: {
                     click: () => {
+                      this.usermes = p.row
                       this.compName = mess
                     }
                   }
                 }),
-                h('Button', {
-                  props: {
-                    type: 'error',
-                    icon: 'md-close',
-                    shape: 'circle',
-                    size: 'small'
-                  },
-                  style: {
-                    cursor: "pointer",
-                    margin: '0 8px 0 0'
-                  },
-                  on: {
-                    click: () => {
-                      this.$Modal.warning({
-                        title: '驳回订单',
-                        content: '确定驳回此订单?',
-                      });
-                    }
-                  }
-                })
               ]);
             }
           }
@@ -187,6 +162,11 @@
       this.getPagerList()
     },
     methods:{
+      chPager(p){
+        this.param.pageNum = p.pageNum
+        this.param.pageSize = p.pageSize
+        this.getPagerList()
+      },
       getPagerList(){
         this.$http.post(this.apis.ORDER.QUERY,this.param).then((res)=>{
           if (res.code == 200){

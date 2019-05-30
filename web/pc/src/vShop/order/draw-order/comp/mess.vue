@@ -65,13 +65,13 @@
         </Row>
         <Row>
           <Col span="12">
-            <Form-item label="商品数量">
+            <Form-item label="购买份数">
               <i-input disabled :value.sync="formItem.input" v-model="usermes.gmfs" placeholder="">123</i-input>
             </Form-item>
           </Col>
           <Col span="12">
-            <Form-item label="商品规格">
-              <i-input disabled :value.sync="formItem.input" v-model="usermes.spgg" placeholder=""></i-input>
+            <Form-item label="中奖号码">
+              <i-input disabled :value.sync="formItem.input" v-model="usermes.zjhm" placeholder=""></i-input>
             </Form-item>
           </Col>
         </Row>

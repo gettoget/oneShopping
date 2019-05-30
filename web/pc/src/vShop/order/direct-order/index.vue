@@ -1,23 +1,47 @@
 <template>
-  <div class="box_col" style="background-color:#fff">
+  <div class="box_col">
     <pager-tit title="直购订单"></pager-tit>
-    <div style="width: 1000px;margin:0 auto">
+    <div class="box_row colCenter rowRight pageFindSty" style="border: none">
+      <div>
+        <Input
+          placeholder="order id" style="width: 200px"/>
+      </div>
+      <div>
+        <Input
+          placeholder="phone number" style="width: 200px"/>
+      </div>
+      <Button type="primary">
+        <Icon type="md-search"></Icon>
+        <!--查询-->
+      </Button>
+    </div>
+    <div style="height: 670px">
       <order-card v-for="item in tableData" :mess="item"></order-card>
     </div>
-    <!--<div class="box_row colCenter rowRight pageFindSty" style="border: none">-->
-      <!--<div>-->
-        <!--<Input-->
-          <!--placeholder="请输入订单编号" style="width: 200px"/>-->
-      <!--</div>-->
-      <!--<div>-->
-        <!--<Input-->
-          <!--placeholder="请输入手机号码" style="width: 200px"/>-->
-      <!--</div>-->
-      <!--<Button type="primary">-->
-        <!--<Icon type="md-search"></Icon>-->
-        <!--&lt;!&ndash;查询&ndash;&gt;-->
-      <!--</Button>-->
-    <!--</div>-->
+    <div class="pagerBoxSty boxMar_T box_row rowRight">
+      <one-page :total="total" :size="param.pageSize"
+                :opts="[4,8,12,16]"
+                @chPager="chPager"></one-page>
+    </div>
+<!--    <div>-->
+<!--      <Card style="width:320px">-->
+<!--        <div>-->
+<!--          <img src="">-->
+<!--          <div>-->
+<!--            <CellGroup>-->
+<!--              <Cell title="商品名称"/>-->
+<!--              <Cell title="下单日期" extra="2017-08-12"/>-->
+<!--              <Cell title="支付金额" extra="2895"/>-->
+<!--              <Cell title="购买数量" extra="125"/>-->
+<!--              <Cell title="支付时间" extra="3596"/>-->
+<!--              <Cell title="用户名" extra="3"/>-->
+<!--              <Cell title="手机号" extra="8"/>-->
+<!--              <Cell title="收货地址" extra="1"/>-->
+<!--            </CellGroup>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </Card>-->
+<!--    </div>-->
     <!--<div>-->
       <!--<Table-->
         <!--size='large' stripe-->
@@ -44,7 +68,7 @@
           idLike:'',
           cjsjLike:'',
           pageNum: 1,
-          pageSize: 8
+          pageSize: 4
         },
         total:0,
         tableTiT: [{
@@ -111,6 +135,11 @@
       this.getPagerList()
     },
     methods:{
+      chPager(p){
+        this.param.pageNum = p.pageNum
+        this.param.pageSize = p.pageSize
+        this.getPagerList()
+      },
       getPagerList(){
         this.$http.post(this.apis.ORDER.QUERY,this.param).then((res)=>{
           if (res.code == 200){

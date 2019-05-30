@@ -1,9 +1,9 @@
 <template>
   <div class="orderCardSty">
     <div class="orderCardSty-tit">
-      <span>{{mess.cjsj}}</span>
+      <span>购买日期:{{mess.cjsj}}</span>
       <span style="margin-left: 30px">订单号:</span>
-      <span class="orderNum"> {{mess.id}}</span>
+      <span class="orderNum">{{mess.id}}</span>
     </div>
     <div class="orderCardSty-center box_row colCenter">
       <img :src="iphone" alt="">
@@ -11,20 +11,20 @@
         {{mess.proName}}
       </div>
       <div class="shopNum">
-        X 1
+        x1
       </div>
       <div class="buyer">
         <div class="buyer-name">
-          {{mess.userName}}
-          <span class="buyer-phone">121****9876</span>
+          user:{{mess.userName}}
+          <span class="buyer-phone">phone:{{mess.phone}}</span>
         </div>
         <div class="buyer-address">
-          {{mess.addr}}
+          address:{{mess.addr.address}}
         </div>
       </div>
       <div class="orderTyp">
         <div class="TypBox">
-          {{mess.ddzt}}
+          已支付 ${{mess.zfje}}
         </div>
       </div>
     </div>
