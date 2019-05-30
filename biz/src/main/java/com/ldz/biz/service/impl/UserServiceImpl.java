@@ -64,14 +64,18 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     }
 
     @Override
-    public void afterPager(PageInfo<User> info){
+    public void afterPager(PageInfo<User> info) {
         List<User> list = info.getList();
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
         list.forEach(user -> {
+            Map<String, Integer> map = baseMapper.sumCharge(user.getId());
             user.setPayPwd("");
             user.setPwd("");
+            user.setCy(map.get("cys") + "");
+            user.setCz(map.get("cz") + "");
+            user.setXf(map.get("xf") + "");
             if (!StringUtils.startsWith(user.gethImg(), "http")) {
                 user.sethImg(filePath + "s");
             }
@@ -125,14 +129,14 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         save(user);
         String token = JwtUtil.createToken(user.getId(), System.currentTimeMillis() + "");
         redisDao.boundValueOps(user.getId()).set(token, 30, TimeUnit.DAYS);
-        ApiResponse<Map<String,Object>> response = new ApiResponse<>();
+        ApiResponse<Map<String, Object>> response = new ApiResponse<>();
         response.setMessage(MessageUtils.get("user.regSuccess"));
         UserModel model = new UserModel(user);
         model.setToken(token);
         redis.boundValueOps(user.getId() + "_userInfo").set(JSON.toJSON(model), 30, TimeUnit.DAYS);
-        Map<String,Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("token", token);
-        map.put("userInfo",model);
+        map.put("userInfo", model);
         response.setResult(map);
         return response;
     }
@@ -158,7 +162,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         String token = JwtUtil.createToken(user.getId(), System.currentTimeMillis() + "");
         redisDao.boundValueOps(user.getId()).set(token, 30, TimeUnit.DAYS);
 
-        ApiResponse<Map<String,Object>> res = new ApiResponse<>();
+        ApiResponse<Map<String, Object>> res = new ApiResponse<>();
         res.setMessage(MessageUtils.get("user.loginSuccess"));
         user.setLastImei(imei);
         user.setLastTime(DateUtils.getNowTime());
@@ -166,9 +170,9 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         UserModel model = new UserModel(user);
         model.setToken(token);
         redis.boundValueOps(user.getId() + "_userInfo").set(JSON.toJSON(model), 30, TimeUnit.DAYS);
-        Map<String,Object> tokenMap = new HashMap<>();
+        Map<String, Object> tokenMap = new HashMap<>();
         tokenMap.put("token", token);
-        tokenMap.put("userInfo",model);
+        tokenMap.put("userInfo", model);
         res.setResult(tokenMap);
         return res;
     }
@@ -186,10 +190,10 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 
 
         RuntimeCheck.ifFalse(StringUtils.equals(newPwd, newPwd1), MessageUtils.get("user.pwdnotsame"));
-        RuntimeCheck.ifTrue(StringUtils.equals(newPwd,pwd), MessageUtils.get("user.pwdSameToNew"));
+        RuntimeCheck.ifTrue(StringUtils.equals(newPwd, pwd), MessageUtils.get("user.pwdSameToNew"));
         String userId = getAttributeAsString("userId");
         User u = findById(userId);
-        RuntimeCheck.ifTrue(u == null , MessageUtils.get("user.notregister"));
+        RuntimeCheck.ifTrue(u == null, MessageUtils.get("user.notregister"));
 
         String userPwd = EncryptUtil.encryptUserPwd(pwd);
         RuntimeCheck.ifFalse(StringUtils.equals(userPwd, u.getPwd()), MessageUtils.get("user.pwderror"));
@@ -257,7 +261,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     }
 
     @Override
-    public ApiResponse<String> sendMsg(String phone, String type ) {
+    public ApiResponse<String> sendMsg(String phone, String type) {
 
 
         if (StringUtils.equals(type, "1")) {
@@ -316,7 +320,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
         ProInfo proInfo = proInfoService.findById(id);
         RuntimeCheck.ifNull(proInfo, MessageUtils.get("pro.isNull"));
-        if(StringUtils.isNotBlank(userId)){
+        if (StringUtils.isNotBlank(userId)) {
             SimpleCondition condition = new SimpleCondition(OrderList.class);
             condition.eq(OrderList.InnerColumn.userid, userId);
             condition.eq(OrderList.InnerColumn.proId, id);
@@ -337,7 +341,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         String userId = (String) getAttribute("userId");
         RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
         User user = findById(userId);
-        RuntimeCheck.ifTrue( StringUtils.isNotBlank(user.getPayPwd()), MessageUtils.get("user.paypwdIsNotNull"));
+        RuntimeCheck.ifTrue(StringUtils.isNotBlank(user.getPayPwd()), MessageUtils.get("user.paypwdIsNotNull"));
         String userPwd = EncryptUtil.encryptUserPwd(pwd);
         user.setPayPwd(userPwd);
         update(user);
@@ -346,14 +350,14 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 
     @Override
     public ApiResponse<String> findPayPwd(String newPwd, String newPwd1, String code) {
-        RuntimeCheck.ifBlank(newPwd,MessageUtils.get("user.pwdblank"));
-        RuntimeCheck.ifFalse(StringUtils.equals(newPwd1,newPwd), MessageUtils.get("user.pwdnotsame"));
+        RuntimeCheck.ifBlank(newPwd, MessageUtils.get("user.pwdblank"));
+        RuntimeCheck.ifFalse(StringUtils.equals(newPwd1, newPwd), MessageUtils.get("user.pwdnotsame"));
         String userId = (String) getAttribute("userId");
         RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
         User user = findById(userId);
         String code1 = (String) redis.boundValueOps(user.getPhone() + "_find_pay_pwd").get();
         RuntimeCheck.ifBlank(code1, MessageUtils.get("user.regCodeBlank"));
-        RuntimeCheck.ifFalse(StringUtils.equals(code,code1), MessageUtils.get("user.regCodeError"));
+        RuntimeCheck.ifFalse(StringUtils.equals(code, code1), MessageUtils.get("user.regCodeError"));
         String userPwd = EncryptUtil.encryptUserPwd(newPwd);
         user.setPayPwd(userPwd);
         update(user);
@@ -365,7 +369,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         String userId = (String) getAttribute("userId");
         RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
         User user = findById(userId);
-        if(StringUtils.isBlank(user.getRefCode())){
+        if (StringUtils.isBlank(user.getRefCode())) {
             long id = Long.parseLong(user.getId());
             long l = id / (32 * 32 * 32 * 32);
             String refferCode = Long.toHexString(l).toUpperCase();
@@ -400,26 +404,26 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         RuntimeCheck.ifBlank(entity.getId(), MessageUtils.get("user.idIsnull"));
         User user = findById(entity.getId());
         RuntimeCheck.ifNull(user, MessageUtils.get("user.notFind"));
-        BeanUtil.copyProperties(entity, user, CopyOptions.create().setIgnoreNullValue(true).setIgnoreProperties("id","payPwd","pwd","zjcs","score","balance"));
+        BeanUtil.copyProperties(entity, user, CopyOptions.create().setIgnoreNullValue(true).setIgnoreProperties("id", "payPwd", "pwd", "zjcs", "score", "balance"));
         update(user);
         return ApiResponse.success();
     }
 
 
-    private String checkPer(String secret){
+    private String checkPer(String secret) {
         String s;
         try {
             s = RSAUtils.decryptWithRSA(secret);
             String[] split = s.split(";");
-            RuntimeCheck.ifTrue( split.length != 2, MessageUtils.get("user.timeError"));
+            RuntimeCheck.ifTrue(split.length != 2, MessageUtils.get("user.timeError"));
             String[] times = split[1].split(":");
-            RuntimeCheck.ifTrue(times.length != 2 , MessageUtils.get("user.timeError"));
+            RuntimeCheck.ifTrue(times.length != 2, MessageUtils.get("user.timeError"));
             long time = Long.parseLong(times[1]);
             DateTime dateTime = new DateTime(time);
-            RuntimeCheck.ifTrue(dateTime.plusMinutes(10).compareTo(DateTime.now()) < 0,MessageUtils.get("user.timeError"));
+            RuntimeCheck.ifTrue(dateTime.plusMinutes(10).compareTo(DateTime.now()) < 0, MessageUtils.get("user.timeError"));
             return split[0];
         } catch (Exception e) {
-            RuntimeCheck.ifTrue(true, MessageUtils.get("user.timeError") );
+            RuntimeCheck.ifTrue(true, MessageUtils.get("user.timeError"));
         }
         return "";
     }

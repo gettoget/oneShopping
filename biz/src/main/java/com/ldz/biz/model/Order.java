@@ -117,6 +117,16 @@ public class Order implements Serializable {
     @Transient
     private List<String> nums;
 
+    @Transient
+    private String phone;
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
     public List<String> getNums() {
         return nums;

@@ -21,4 +21,6 @@ public interface UserMapper extends Mapper<User> {
     @Select("SELECT * from  ((select count(1) today from user where cjsj LIKE '${today}%'  and source = '0') a , (SELECT count(1) mon from user where cjsj like '${mon}%' and source = '0') b , (SELECT count(1) total from user where source = '0') c ) ")
     Map<String,Integer> statisUser(@Param("today") String today,@Param("mon") String mon);
 
+    @Select(" select * from  ( (select ifnull(count(distinct(pro_id)),0) cys from order_form where user_id = #{id} ) a , (select ifnull(sum(CAST(ifnull(amonut,'0') as unsigned )),0) cz from recharge where user_id = #{id}) b , (select ifnull(sum(CAST(ifnull(xfjb,'0') as unsigned )),0) xf from exchange where userid = #{id}) c)")
+    Map<String,Integer> sumCharge(@Param("id") String id);
 }
