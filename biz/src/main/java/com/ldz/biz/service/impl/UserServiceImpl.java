@@ -76,9 +76,6 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
             user.setCy(map.get("cys") + "");
             user.setCz(map.get("cz") + "");
             user.setXf(map.get("xf") + "");
-            if (!StringUtils.startsWith(user.gethImg(), "http")) {
-                user.sethImg(filePath + "s");
-            }
         });
     }
 
