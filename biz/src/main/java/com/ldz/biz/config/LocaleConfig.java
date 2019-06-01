@@ -1,5 +1,7 @@
 package com.ldz.biz.config;
 
+import com.ldz.biz.intercepter.AllInterceptor;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.LocaleResolver;
@@ -8,6 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
+import javax.servlet.Filter;
 import java.util.Locale;
 
 /**
@@ -41,4 +44,25 @@ public class LocaleConfig {
             }
         };
     }
+
+    @Bean
+    public FilterRegistrationBean someFilterRegistration() {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(commonDataFilter());
+        registration.addUrlPatterns("/*");
+        registration.setName("commonDataFilter");
+        registration.setOrder(1);
+        return registration;
+    }
+
+    /**
+     * 创建一个bean
+     * @return
+     */
+    @Bean(name = "commonDataFilter")
+    public Filter commonDataFilter() {
+        return new AllInterceptor();
+    }
+
+
 }

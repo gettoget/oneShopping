@@ -1,28 +1,19 @@
 package com.ldz.biz.intercepter;
 
-import com.ldz.biz.model.User;
-import com.ldz.biz.service.UserService;
 import com.ldz.sys.constant.Dict;
 import com.ldz.sys.mapper.SysYhJsMapper;
-import com.ldz.sys.model.SysGn;
 import com.ldz.sys.model.SysYh;
 import com.ldz.sys.service.GnService;
 import com.ldz.sys.service.YhService;
 import com.ldz.util.commonUtil.JwtUtil;
 import com.ldz.util.spring.SpringContextUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * 访问接口控制
