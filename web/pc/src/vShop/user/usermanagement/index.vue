@@ -5,12 +5,12 @@
       <div class="box_row_100">
         <div class="box_row colCenter rowRight pageFindSty" style="border: none">
           <div>
-            <Input v-model="param.userName" @on-change="param.pageNum = 1,getDataList()"
+            <Input v-model="param.userNameLike" @on-change="param.pageNum = 1,getDataList()"
                    clearable placeholder="请输入用户名" style="width: 200px"/>
           </div>
 
           <div>
-            <Input v-model="param.phone" @on-change="param.pageNum = 1,getDataList()"
+            <Input v-model="param.Like" @on-change="param.pageNum = 1,getDataList()"
                    placeholder="请输入手机号码" style="width: 200px;margin: 0 12px"/>
           </div>
           <Button type="primary" @click="param.pageNum = 1,getDataList()">
@@ -57,8 +57,8 @@
         itMess: {},
         total: 0,
         param: {
-          userName: "",
-          phone: "",
+          userNameLike: "",
+          phoneLike: "",
           pageNum: 1,
           pageSize: 12
         }
