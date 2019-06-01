@@ -11,7 +11,7 @@
 
           <div>
             <Input v-model="param.phone" @on-change="param.pageNum = 1,getDataList()"
-              placeholder="请输入手机号码" style="width: 200px;margin: 0 12px"/>
+                   placeholder="请输入手机号码" style="width: 200px;margin: 0 12px"/>
           </div>
           <Button type="primary" @click="param.pageNum = 1,getDataList()">
             <Icon type="md-search"></Icon>
@@ -21,10 +21,12 @@
       </div>
     </div>
     <div class="box_col_auto">
-      <div class="box_row_list" :style="{width: 356*4+'px',margin:'0 auto'}">
-        <div v-for="(it,index) in tableData" :key="index" @click="showMess(it)"
-             style="padding: 18px;cursor: pointer">
-          <user-card :inVal="index" :mess="it"></user-card>
+      <div class="box_row_list" :style="{width:'1460px',margin:'0 auto'}">
+        <div v-for="(it,index) in tableData" :key="index"
+             style="padding: 18px">
+          <user-card :inVal="index" :mess="it"
+                     @GoMess="()=>{showMess(it)}"
+          ></user-card>
         </div>
       </div>
     </div>
@@ -42,34 +44,35 @@
 <script>
   import userCard from './comp/userCard'
   import messMod from './comp/messMod'
+
   export default {
     name: "index",
     components: {
-      userCard,messMod
+      userCard, messMod
     },
     data() {
       return {
-        compName:"",
+        compName: "",
         tableData: [],
-        itMess:{},
-        total:0,
+        itMess: {},
+        total: 0,
         param: {
-          userName:"",
-          phone:"",
+          userName: "",
+          phone: "",
           pageNum: 1,
           pageSize: 12
         }
       }
     },
-    created(){
+    created() {
       this.getDataList()
     },
-    methods:{
-      showMess(it){
+    methods: {
+      showMess(it) {
         this.itMess = it
         this.compName = "messMod"
       },
-      closeMod(){
+      closeMod() {
         this.compName = ""
         this.itMess = {}
       },
@@ -78,13 +81,13 @@
         this.param.pageSize = p.pageSize
         this.getDataList()
       },
-      getDataList(){
-        this.$http.post("/api/user/pager",this.param).then(res=>{
-          if(res.code == 200){
+      getDataList() {
+        this.$http.post("/api/user/pager", this.param).then(res => {
+          if (res.code == 200) {
             this.tableData = res.page.list
             this.total = res.page.total
           }
-        }).catch(err=>{
+        }).catch(err => {
         })
       }
     }

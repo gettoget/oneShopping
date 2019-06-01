@@ -26,13 +26,22 @@
     },
     data() {
       return {
-        showModal: true
+        showModal: true,
+        orderList:[]
       }
+    },
+    created(){
+      this.getUserOrderList()
     },
     methods: {
       visible(val) {
         console.log(val);
         this.$emit("closeMod")
+      },
+      getUserOrderList(){
+        this.$http.post("/api/order/pager",{userId:this.itMess.id}).then(res=>{
+
+        }).catch(err=>{})
       }
     }
   }

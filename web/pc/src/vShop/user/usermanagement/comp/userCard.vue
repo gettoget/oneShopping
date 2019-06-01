@@ -6,13 +6,25 @@
           {{mess.zt | userZT}}
         </div>
       </div>
+      <div class="goMessIcon">
+        <Tooltip content="Go user message" placement="top" :transfer="true">
+          <Icon type="md-exit" size="22"
+                color="#fe5722" @click.native="GoMess"/>
+        </Tooltip>
+      </div>
       <div class="" style="padding-right: 16px;">
         <img class="titleImg" :src="iph" alt="">
       </div>
       <div class="box_row_100 userMess">
         <div class="messItem userName box_row">
           <Icon type="md-person" size="22"/>
-          {{mess.userName}}
+
+          <Tooltip :content="mess.userName" placement="top-start">
+            <div style="width: 150px;overflow:hidden;
+            text-overflow:ellipsis;white-space:nowrap">
+              {{mess.userName}}
+            </div>
+          </Tooltip>
         </div>
         <div class="messItem userPhone">
           <Icon type="ios-call" size="22"/>
@@ -21,7 +33,6 @@
       </div>
     </div>
 
-    <!--ivu-card-body-->
     <div class="box_row rowBetween">
       <div>
         余 : {{mess.balance}}
@@ -72,6 +83,11 @@
       return {
         iph: "https://i.loli.net/2017/08/21/599a521472424.jpg"
       }
+    },
+    methods:{
+      GoMess(){
+        this.$emit("GoMess")
+      }
     }
   }
 </script>
@@ -99,6 +115,12 @@
           font-weight: 900;
           transform: rotate(-45deg);
         }
+      }
+      .goMessIcon{
+        position: absolute;
+        right: 6px;
+        top: 3px;
+        cursor: pointer;
       }
       .titleImg {
         width: 90px;
