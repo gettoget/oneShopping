@@ -1408,7 +1408,8 @@ POST: /api/order/pager
 // POST: /api/popularimgs/save
 //
 //
-// 参数：  url 图片路径（必填）
+// 参数：
+// url 图片路径（必填）
 // 	lx  类型（必填）
 // 	proId 商品id(必填)
 // zt  状态 默认为0 正常

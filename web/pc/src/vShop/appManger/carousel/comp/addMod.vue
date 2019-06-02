@@ -12,10 +12,10 @@
       <div class="box_row">
         <div style="width: 200px;margin-right: 18px">
           <div>
-            <div span="12" class="contentItemSty" v-if="formData.url">
-              <img :src="apis.GETFILEURL+formData.url" alt="">
+            <div span="12" class="contentItemSty" v-if="formData.imgUrl">
+              <img :src="apis.GETFILEURL+formData.imgUrl" alt="">
               <div class="ingMask">
-                <Icon type="ios-trash" size="60" color="#fff" @click.native="formData.url = ''"/>
+                <Icon type="ios-trash" size="60" color="#fff" @click.native="formData.imgUrl = ''"/>
               </div>
             </div>
             <div class="" v-else>
@@ -27,6 +27,12 @@
                 </up-file-img>
               </Tooltip>
             </div>
+          </div>
+          <div>
+            <Select v-model="formData.imgLx" style="width:200px">
+              <Option value="1">商品推荐</Option>
+              <Option value="2">活动页面</Option>
+            </Select>
           </div>
         </div>
         <div class="box_row_100">
@@ -72,9 +78,10 @@
         showModal: true,
         ShopList: [],
         formData: {
-          url: "",
+          imgUrl: "",
           proId: "",
-          zt: "0"
+          zt: "0",
+          imgLx:"1"
         },
         param: {
           proNameLike: "",
@@ -102,7 +109,7 @@
     methods: {
       save(){
         console.log(this.formData);
-        if(this.formData.url == ""){
+        if(this.formData.imgUrl == ""){
           this.$Message.warning("请上传商品图片！！！")
         }else if(this.formData.proId == ""){
           this.$Message.warning("请绑定商品！！！")
@@ -115,7 +122,7 @@
         }
       },
       handleSuccess(url) {
-        this.formData.url = url
+        this.formData.imgUrl = url
       },
       visible(val) {
         this.$emit('closeMod')
