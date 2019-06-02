@@ -127,15 +127,25 @@
       return {
         getUrl: this.apis.GETFILEURL,
         formValidate: {
-          proType: "computer",//商品类目(必填)
-          proName: "商品",//商品名称(必填)
-          proPrice: "123",//商品单价(必填)
-          proStore: "123",//商品库存(必填)
-          proSign: "6666",//商品标签(选填)  如 你搜索电脑的时候 搜 16G 这样的标签
-          rType: "1",//商品抢购类型(必填 , 后期是可以改的)  1 为人类有可能中奖  2 为机器人必中奖
-          urls: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",//图片url , 用逗号隔开
-          coverUrl: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",//封面url
-          refUrl: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",
+          // proType: "computer",//商品类目(必填)
+          // proName: "商品",//商品名称(必填)
+          // proPrice: "123",//商品单价(必填)
+          // proStore: "123",//商品库存(必填)
+          // proSign: "6666",//商品标签(选填)  如 你搜索电脑的时候 搜 16G 这样的标签
+          // rType: "1",//商品抢购类型(必填 , 后期是可以改的)  1 为人类有可能中奖  2 为机器人必中奖
+          // urls: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",//图片url , 用逗号隔开
+          // coverUrl: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",//封面url
+          // refUrl: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",
+
+          proType: "",//商品类目(必填)
+          proName: "",//商品名称(必填)
+          proPrice: "",//商品单价(必填)
+          proStore: "",//商品库存(必填)
+          proSign: "",//商品标签(选填)  如 你搜索电脑的时候 搜 16G 这样的标签
+          rType: "",//商品抢购类型(必填 , 后期是可以改的)  1 为人类有可能中奖  2 为机器人必中奖
+          urls: "",//图片url , 用逗号隔开
+          coverUrl: "",//封面url
+          refUrl: "",
         },
         ruleValidate: {
           proType: [
@@ -159,9 +169,9 @@
           ]
         },
         formData: {
-          coverImg: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",//封面图片
-          tuijianImg: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",//推荐图
-          content: ['refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg']
+          coverImg: "",//封面图片refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg
+          tuijianImg: "",//推荐图
+          content: ['']
         }
       }
     },
