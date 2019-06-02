@@ -63,7 +63,7 @@
             </div>
             <div class="" v-else>
               <up-file-img upGroup="cover" @handleSuccess="(url)=>{handleSuccess(url,'coverImg')}">
-                <Button type="dashed">
+                <Button type="text">
                   <Icon type="md-cloud-upload" size="80"/>
                 </Button>
               </up-file-img>
@@ -80,7 +80,7 @@
             </div>
             <div class="" v-else>
               <up-file-img upGroup="refUrl" @handleSuccess="(url)=>{handleSuccess(url,'tuijianImg')}">
-                <Button type="dashed">
+                <Button type="text">
                   <Icon type="md-cloud-upload" size="80"/>
                 </Button>
               </up-file-img>
@@ -103,7 +103,7 @@
           <Col span="12" class-name="boxPadd_LR boxPadd_B" v-if="formData.content.length<6">
             <div class="">
               <up-file-img upGroup="urls" @handleSuccess="contentImg">
-                <Button type="dashed">
+                <Button type="text">
                   <Icon type="md-cloud-upload" size="80"/>
                 </Button>
               </up-file-img>

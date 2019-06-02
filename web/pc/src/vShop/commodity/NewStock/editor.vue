@@ -46,7 +46,7 @@
             </div>
             <div class="" v-else>
               <up-file-img upGroup="cover" @handleSuccess="(url)=>{handleSuccess(url,'coverImg')}">
-                <Button type="dashed">
+                <Button type="text">
                   <Icon type="md-cloud-upload" size="80"/>
                 </Button>
               </up-file-img>
@@ -59,7 +59,7 @@
               <img v-if="formData.tuijianImg.substring(0,4)==='http'" :src="formData.tuijianImg" alt="">
               <img v-else :src="getUrl+formData.tuijianImg" alt="">
 
-              <div class="ingMask">
+              <div class="text">
                 <Icon type="ios-trash" size="60" color="#fff" @click.native="formData.tuijianImg = ''"/>
               </div>
             </div>
@@ -89,7 +89,7 @@
           <Col span="12" class-name="boxPadd_LR boxPadd_B" v-if="formData.content.length<6">
             <div class="">
               <up-file-img upGroup="urls" @handleSuccess="contentImg">
-                <Button type="dashed">
+                <Button type="text">
                   <Icon type="md-cloud-upload" size="80"/>
                 </Button>
               </up-file-img>

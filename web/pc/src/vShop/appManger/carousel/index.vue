@@ -23,7 +23,7 @@
         </Col>
       </Row>
     </div>
-    <component :is="compName"></component>
+    <component :is="compName" @closeMod="closeMod" @saveOK="saveOK"></component>
   </Card>
 </template>
 
@@ -36,7 +36,7 @@
     },
     data() {
       return {
-        compName:"addFile",
+        compName:"",
         dataList: [],
         param: {
           pageNum: 1,
@@ -48,8 +48,15 @@
       this.getDataList()
     },
     methods: {
+      closeMod(){
+        this.compName = ""
+      },
+      saveOK(){
+        this.getDataList()
+        this.closeMod()
+      },
       addCarouse(){
-        alert(1)
+        this.compName = "addFile"
       },
       getDataList() {
         this.$http.post('/api/popularimgs/pager', this.param).then(res => {
