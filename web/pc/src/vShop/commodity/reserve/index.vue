@@ -10,8 +10,11 @@
     <div class="box_col">
       <div class="box_col_auto">
         <div class="box_row_list" style="width: 1186px;margin: auto">
-          <reserve-card  :inVal="index" :mess="it"
-                         v-for="(it,index) in shopList" :key="index"></reserve-card>
+          <reserve-card :inVal="index" :mess="it"
+                        v-for="(it,index) in shopList" :key="index"
+                        @upSuccess="getDataList"
+                        @edit="()=>{edit(it)}"
+          ></reserve-card>
         </div>
       </div>
 
@@ -21,19 +24,28 @@
                   @chPager="chPager"></one-page>
       </div>
     </div>
+
+    <component :is="compName"
+               :itMess="itMess"
+               @closeMod="closeMod"
+               @upSuccess="upSuccess"
+    ></component>
   </Card>
 </template>
 
 <script>
   import reserveCard from './comp/reserveCard'
+  import editMod from './comp/editorMod'
 
   export default {
     name: "index",
     components: {
-      reserveCard
+      reserveCard, editMod
     },
     data() {
       return {
+        compName: "",
+        itMess: {},
         shopList: [],
         total: 0,
         param: {
@@ -47,6 +59,18 @@
       this.getDataList()
     },
     methods: {
+      closeMod() {
+        this.compName = ""
+        this.itMess = {}
+      },
+      edit(it) {
+        this.itMess = it
+        this.compName = "editMod"
+      },
+      upSuccess(){
+        this.closeMod()
+        this.getDataList()
+      },
       chPager(p) {
         this.param.pageNum = p.pageNum
         this.param.pageSize = p.pageSize
@@ -67,9 +91,9 @@
 </script>
 
 <!--<style lang="less">-->
-  <!--.reserveCardBox{-->
-    <!--width: 1184px;-->
-    <!--background-color: #fff;-->
-    <!--margin:0 auto;-->
-  <!--}-->
+<!--.reserveCardBox{-->
+<!--width: 1184px;-->
+<!--background-color: #fff;-->
+<!--margin:0 auto;-->
+<!--}-->
 <!--</style>-->

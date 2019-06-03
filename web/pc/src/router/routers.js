@@ -257,6 +257,26 @@ export default [
     ]
   },
   {
+    path:'/appmanger',
+    name:'appmanger',
+    meta: {
+      icon: 'md-trending-up',
+      title: 'app管理'
+    },
+    component: Main,
+    children:[
+      {
+        path: '/carousel',
+        name: 'carousel',
+        meta: {
+          icon: 'logo-buffer',
+          title:"轮播图"
+        },
+        component: () => import('@/vShop/appManger/carousel')
+      }
+    ]
+  },
+  {
     path: '/iview',
     name: 'iview',
     component: Main,

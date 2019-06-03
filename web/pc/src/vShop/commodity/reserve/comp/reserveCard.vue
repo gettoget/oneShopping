@@ -1,21 +1,33 @@
 <template>
   <Card class="reserveCardSty">
     <div slot="title">
+      <div class="sj" @click="edit">
+        <Icon type="ios-brush" color="#fe5722" size="28"/>
+      </div>
       <div class="reserveCardSty-selImg">
-        <img :src="apis.GETFILEURL+mess.imgUrls[selImg]" alt="">
+        <img  v-if='mess.imgUrls[selImg].substring(0,4)==="http"'
+          :src="mess.imgUrls[selImg]" alt="">
+        <img v-else :src="apis.GETFILEURL+mess.imgUrls[selImg]" alt="">
+
       </div>
       <div class="box_row rowAuto" style="height: 40px">
         <div :class="index==selImg?'selSty reserveCardSty-imgList':'reserveCardSty-imgList'"
              v-for="(it,index) in mess.imgUrls" @click="selImg = index"
             v-if="index<5">
-          <img :src="apis.GETFILEURL+it" alt="" style="" style="width: 40px;height: 40px">
+          <img v-if='it.substring(0,4)==="http"' :src="it" alt="" style="width: 40px;height: 40px">
+          <img v-else :src="apis.GETFILEURL+it" alt="" style="" style="width: 40px;height: 40px">
         </div>
       </div>
     </div>
 
-    <div class="shopTit">
-      {{mess.proName}}
-    </div>
+    <Poptip trigger="hover">
+      <div class="shopTit">
+        {{mess.proName}}
+      </div>
+      <div slot="content" style="width: 240px;white-space:normal;font-size: 18px">
+        {{mess.proName}}
+      </div>
+    </Poptip>
 
     <div class="box_row rowBetween colCenter">
       <div class="shopMoney">
@@ -26,7 +38,7 @@
 
     <div class="box_row rowBetween colCenter">
       <div class="lineVal">库存:{{mess.proStore}}</div>
-      <Button type="info" size="small">上架</Button>
+      <Button type="info" size="small" @click="upShop">上架</Button>
     </div>
 
 
@@ -34,7 +46,6 @@
 </template>
 
 <script>
-  import iphone from '@/assets/img/iphone.jpg'
 
   export default {
     name: "reserveCard",
@@ -51,15 +62,24 @@
     data() {
       return {
         selImg: 0,
-        imgList: [
-          {img: iphone},
-          {img: iphone},
-          {img: iphone},
-          {img: iphone},
-          {img: iphone},
-        ]
+      }
+    },
+    created(){
+    },
+    methods:{
+      edit(){
+        this.$emit("edit")
+      },
+      upShop(){
+        this.$http.post("/api/proinfo/saveOne",{id:this.mess.id}).then(res=>{
+          if(res.success){
+            this.$Message.success("Data updated successfully")
+            this.$emit("upSuccess")
+          }
+        })
       }
     }
+
   }
 </script>
 
@@ -67,6 +87,30 @@
   .reserveCardSty {
     width: 280px;
     margin: 8px;
+    .ivu-card-head{
+      position: relative;
+      .sj{
+        cursor: pointer;
+        position: absolute;
+        top: -7px;
+        right: -27px;
+        border-bottom: 40px solid rgba(255,69,0,0.1);
+        border-left: 40px solid transparent;
+        border-right: 40px solid transparent;
+        width: 80px;
+        height: 40px;
+        transform: rotate(45deg);
+        i{
+          cursor: pointer;
+          position: absolute;
+          left: 50%;
+          top: 20px;
+          transform: translate(-50%,-50%) rotate(-45deg);
+        }
+      }
+    }
+
+
     &-selImg {
       text-align: center;
       height: 160px;

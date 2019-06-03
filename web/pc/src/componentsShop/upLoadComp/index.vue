@@ -13,10 +13,12 @@
       multiple
       type="drag"
       style="">
+      <slot>
         <div style="display: inline-block;text-align: center;
         width: 58px;height:58px;line-height: 58px;">
         <Icon type="ios-cloud-upload" size="40"></Icon>
         </div>
+      </slot>
     </Upload>
   </div>
 </template>

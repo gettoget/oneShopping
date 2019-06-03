@@ -4,25 +4,38 @@
       <div class="bqBox">
         售卖中
       </div>
-      <img :src="apis.GETFILEURL+mess.coverUrls"  alt="">
+      <img v-if='mess.coverUrls[0].substring(0,4)==="http"'
+           :src="mess.coverUrls" alt="">
+
+      <img v-else :src="apis.GETFILEURL+mess.coverUrls" alt="">
+
     </div>
     <div class="shopMoney">
       ￥{{mess.proPrice}}
     </div>
-    <div class="shopTit">
-      {{mess.proName}}
-    </div>
+    <Poptip trigger="hover">
+      <div class="shopTit">
+        {{mess.proName}}
+      </div>
+      <div slot="content" style="width: 240px;white-space:normal;font-size: 18px">
+        {{mess.proName}}
+      </div>
+    </Poptip>
     <div class="lineBox">
       <div class="lineVal">已售:{{(mess.proPrice-mess.proStore)}}份/剩余{{mess.proStore}}份</div>
-      <div class="lineback">
-        <div class="line"></div>
+      <div class="lineback box_row">
+        <div class="line" :style="{width:((mess.proPrice-mess.proStore)/mess.proPrice)*100+'%'}">
+        </div>
+        <div class="box_row_100">
+        </div>
       </div>
     </div>
     <div class="shopBq">
       <!--新品、热门、喜欢，-->
-      <Tag :color="index==tagVal?'red':'default'"
-           v-for="(it,index) in ['新品','热门','喜欢']"
-           @click.native="tagVal = index">{{it}}
+      <Tag :color="'red'"
+           v-for="(it,index) in mess.proLx.split(',')"
+           @click.native="tagVal = index">
+        {{it | TagVal}}
       </Tag>
     </div>
   </Card>
@@ -33,14 +46,32 @@
 
   export default {
     name: "shopCard",
-    props:{
-      inVal:{
-        type:Number,
-        default:0
+    props: {
+      inVal: {
+        type: Number,
+        default: 0
       },
-      mess:{
-        type:Object,
-        default:{}
+      mess: {
+        type: Object,
+        default: {}
+      }
+    },
+    filters: {
+      TagVal: (val) => {
+        switch (val) {
+          case "1":
+            return "推荐"
+            break;
+          case "2":
+            return "新品"
+            break;
+          case "3":
+            return "热门"
+            break;
+          default:
+            return "新品"
+            break;
+        }
       }
     },
     data() {
@@ -60,7 +91,7 @@
       text-align: center;
       position: relative;
       height: 268px;
-      img{
+      img {
         width: 240px;
         height: 240px;
       }
@@ -91,7 +122,7 @@
         display: -webkit-box; /** 对象作为伸缩盒子模型显示 **/
         -webkit-box-orient: vertical; /** 设置或检索伸缩盒对象的子元素的排列方式 **/
         -webkit-line-clamp: 2; /** 显示的行数 **/
-        overflow: hidden;  /** 隐藏超出的内容 **/
+        overflow: hidden; /** 隐藏超出的内容 **/
       }
       .shopTyp {
         text-align: right;
@@ -100,14 +131,14 @@
         margin-top: 12px;
         .lineback {
           width: 200px;
-          height: 12px;
+          height: 14px;
           border-radius: 6px;
           background-color: #a5a5a57d;
           .line {
             width: 30%;
-            height: 12px;
+            height: 14px;
             border-radius: 6px;
-            background-color: #2db7f5;
+            background-color: #fe5722;
             text-align: center;
             line-height: 16px;
             color: #fff;
@@ -120,7 +151,7 @@
           width: 200px;
         }
       }
-      .shopBq{
+      .shopBq {
         margin: 12px 0 0 0;
       }
     }

@@ -3,22 +3,12 @@
 </style>
 <template>
   <Card class="NewStockSty box_col">
-    <div slot="title">
-      <pager-tit title="商品上架"></pager-tit>
-    </div>
 
     <div class="UpBox box_row">
       <div class="box_row_100 boxPadd_R">
         <Form ref="formValidate" :model="formValidate" :rules="ruleValidate">
           <FormItem label="商品类型" prop="proType">
-            <Select v-model="formValidate.proType" placeholder="选择商品分类">
-              <Option value="computer">电脑</Option>
-              <Option value="phone">手机</Option>
-              <Option value="pad">平板电脑</Option>
-              <Option value="camero">相机</Option>
-              <Option value="accessories">数码配件</Option>
-              <Option value="other">其他</Option>
-            </Select>
+            <Input v-model="formValidate.proType" placeholder="商品类型"></Input>
           </FormItem>
           <FormItem label="商品名称" prop="proName">
             <Input v-model="formValidate.proName" placeholder="输入商品名称"></Input>
@@ -35,18 +25,9 @@
           </FormItem>
           <FormItem label="抢购类型" prop="rType">
             <Select v-model="formValidate.rType" placeholder="选择抢购类型">
-              <Option value="1">1</Option>
-              <Option value="2">2</Option>
+              <Option value="1">人类有可能中奖</Option>
+              <Option value="2">机器人必中奖</Option>
             </Select>
-          </FormItem>
-          <FormItem>
-            <div class="box_row rowRight">
-              <Button type="success" style="margin-right: 12px"
-                      @click="handleSubmit('formValidate')">提交
-              </Button>
-
-              <Button @click="handleReset">重置</Button>
-            </div>
           </FormItem>
         </Form>
       </div>
@@ -56,7 +37,9 @@
             <h2>封面图</h2>
 
             <div span="12" class="contentItemSty" v-if="formData.coverImg">
-              <img :src="getUrl+formData.coverImg" alt="">
+              <img v-if="formData.coverImg.substring(0,4)==='http'" :src="formData.coverImg" alt="">
+              <img v-else :src="getUrl+formData.coverImg" alt="">
+
               <div class="ingMask">
                 <Icon type="ios-trash" size="60" color="#fff" @click.native="formData.coverImg = ''"/>
               </div>
@@ -73,14 +56,16 @@
             <h2>推荐图</h2>
 
             <div class="contentItemSty" v-if="formData.tuijianImg">
-              <img :src="getUrl+formData.tuijianImg" alt="">
-              <div class="ingMask">
+              <img v-if="formData.tuijianImg.substring(0,4)==='http'" :src="formData.tuijianImg" alt="">
+              <img v-else :src="getUrl+formData.tuijianImg" alt="">
+
+              <div class="text">
                 <Icon type="ios-trash" size="60" color="#fff" @click.native="formData.tuijianImg = ''"/>
               </div>
             </div>
             <div class="" v-else>
               <up-file-img upGroup="refUrl" @handleSuccess="(url)=>{handleSuccess(url,'tuijianImg')}">
-                <Button type="text">
+                <Button type="dashed">
                   <Icon type="md-cloud-upload" size="80"/>
                 </Button>
               </up-file-img>
@@ -94,7 +79,8 @@
           <Col span="12" class-name="contentImgSty boxPadd_LR boxPadd_B" v-for="(it,index) in formData.content"
                :key="index">
             <div class="contentItemSty">
-              <img :src="getUrl+it" alt="">
+              <img v-if="it.substring(0,4)==='http'" :src="it" alt="">
+              <img v-else :src="getUrl+it" alt="">
               <div class="ingMask">
                 <Icon type="ios-trash" size="60" color="#fff" @click.native="removeItem(index)"/>
               </div>
@@ -112,6 +98,11 @@
         </Row>
       </div>
     </div>
+    <div>
+      <Button type="success" style="margin-right: 12px;width:100%"
+              @click="handleSubmit('formValidate')">save
+      </Button>
+    </div>
   </Card>
 </template>
 
@@ -123,29 +114,26 @@
     components: {
       upFileImg
     },
+    props:{
+      itMess:{
+        type:Object,
+        default:{}
+      }
+    },
     data() {
       return {
         getUrl: this.apis.GETFILEURL,
         formValidate: {
-          // proType: "computer",//商品类目(必填)
-          // proName: "商品",//商品名称(必填)
-          // proPrice: "123",//商品单价(必填)
-          // proStore: "123",//商品库存(必填)
-          // proSign: "6666",//商品标签(选填)  如 你搜索电脑的时候 搜 16G 这样的标签
-          // rType: "1",//商品抢购类型(必填 , 后期是可以改的)  1 为人类有可能中奖  2 为机器人必中奖
-          // urls: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",//图片url , 用逗号隔开
-          // coverUrl: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",//封面url
-          // refUrl: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",
-
-          proType: "",//商品类目(必填)
-          proName: "",//商品名称(必填)
-          proPrice: "",//商品单价(必填)
-          proStore: "",//商品库存(必填)
-          proSign: "",//商品标签(选填)  如 你搜索电脑的时候 搜 16G 这样的标签
-          rType: "",//商品抢购类型(必填 , 后期是可以改的)  1 为人类有可能中奖  2 为机器人必中奖
-          urls: "",//图片url , 用逗号隔开
-          coverUrl: "",//封面url
-          refUrl: "",
+          id:"",
+          proType: "computer",//商品类目(必填)
+          proName: "商品",//商品名称(必填)
+          proPrice: "123",//商品单价(必填)
+          proStore: "123",//商品库存(必填)
+          proSign: "6666",//商品标签(选填)  如 你搜索电脑的时候 搜 16G 这样的标签
+          rType: "1",//商品抢购类型(必填 , 后期是可以改的)  1 为人类有可能中奖  2 为机器人必中奖
+          coverUrl: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",//封面url
+          refUrl: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",//推荐
+          urls: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",//图片url , 用逗号隔开
         },
         ruleValidate: {
           proType: [
@@ -169,9 +157,9 @@
           ]
         },
         formData: {
-          coverImg: "",//封面图片refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg
-          tuijianImg: "",//推荐图
-          content: ['']
+          coverImg: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",//封面图片
+          tuijianImg: "refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg",//推荐图
+          content: ['refUrl/77f473cf06bf4ecd9e4c8ed769cfee31.jpg']
         }
       }
     },
@@ -185,6 +173,19 @@
       "formData.content": function (n, o) {
         this.formValidate.urls = n.join(',')
       },
+    },
+    created(){
+      this.formValidate.id = JSON.parse(JSON.stringify(this.itMess)).id
+      this.formValidate.proType = JSON.parse(JSON.stringify(this.itMess)).proType
+      this.formValidate.proName = JSON.parse(JSON.stringify(this.itMess)).proName
+      this.formValidate.proPrice = JSON.parse(JSON.stringify(this.itMess)).proPrice
+      this.formValidate.proStore = JSON.parse(JSON.stringify(this.itMess)).proStore
+      this.formValidate.proSign = JSON.parse(JSON.stringify(this.itMess)).proSign
+      this.formValidate.rType = JSON.parse(JSON.stringify(this.itMess)).rType
+
+      this.formData.coverImg = JSON.parse(JSON.stringify(this.itMess)).coverUrl
+      this.formData.tuijianImg = JSON.parse(JSON.stringify(this.itMess)).refUrl
+      this.formData.content = JSON.parse(JSON.stringify(this.itMess)).urls.split(',')
     },
     methods: {
       handleSuccess(url, key) {//封面图 推荐图
@@ -207,9 +208,10 @@
         } else {
           this.$refs[name].validate((valid) => {
             if (valid) {
-              v.$http.post("/api/probaseinfo/save", this.formValidate).then(res => {
+              v.$http.post("/api/probaseinfo/update", this.formValidate).then(res => {
                 if (res.code == 200) {
-                  v.shopUp(res.result)
+                  this.$Message.success("Information modified successfully")
+                  this.$emit("upSuccess")
                 }
               }).catch(err => {
               })
@@ -217,30 +219,6 @@
             }
           })
         }
-      },
-      shopUp(shopId) {
-        var v = this
-        this.swal({
-          title: "商品上架？",
-          type: "warning",
-          showCancelButton: true,
-          confirmButtonText: "立即上架",
-          cancelButtonText: "稍后操作",
-        }).then((isConfirm) => {
-          if (isConfirm.value) {
-            v.$http.post("/api/proinfo/saveOne",{id:shopId}).then(res=>{
-              if(res.code == 200){
-                v.$Message.success('商品上架成功')
-              }else {
-                v.$Message.error('商品上架失败')
-              }
-
-            }).catch(err=>{
-              v.$Message.error('商品上架失败')
-            })
-          }
-          v.handleReset()
-        });
       },
       handleReset() {
         this.formValidate = {
