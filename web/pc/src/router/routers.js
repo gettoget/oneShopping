@@ -180,15 +180,15 @@ export default [
         },
         component: () => import('@/vShop/user/usermanagement')
       },
-      {
-        path:'/usermess',
-        name:'usermess',
-        meta: {
-          icon: 'md-trending-up',
-          title: '用户查询'
-        },
-        component: () => import('@/vShop/user/usermess')
-      },
+      // {
+      //   path:'/usermess',
+      //   name:'usermess',
+      //   meta: {
+      //     icon: 'md-trending-up',
+      //     title: '用户查询'
+      //   },
+      //   component: () => import('@/vShop/user/usermess')
+      // },
       {
         path:'/showorder',
         name:'showorder',

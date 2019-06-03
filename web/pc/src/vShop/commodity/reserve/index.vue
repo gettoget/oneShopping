@@ -3,8 +3,26 @@
 </style>
 <template>
   <Card class="KcPageBox box_col">
-    <div slot="title">
-      <pager-tit title="库存"></pager-tit>
+    <div slot="title" class="box_row">
+      <div class="box_row_100">
+        <pager-tit title="库存"></pager-tit>
+      </div>
+      <Input v-model="param.proNameLike" placeholder="商品名称"
+             style="width: 200px;margin-right: 20px"
+             @on-clear="getDataList()"
+             @on-change="getDataList()" clearable/>
+      <Input v-model="param.proPriceGte" type="number" :number="true"
+             style="width: 200px" @on-change="getDataList()">
+      <span slot="prepend">最低价</span>
+      </Input>
+      <Input v-model="param.proPriceLte" type="number" :number="true"
+             style="width: 200px;margin-right: 20px" @on-change="getDataList()">
+      <span slot="prepend">最高价</span>
+      </Input>
+      <Button type="primary" icon="ios-search" style=";margin-right: 20px"
+              @click="getDataList()"></Button>
+      <Button type="primary" icon="md-refresh"
+              @click="reset"></Button>
     </div>
 
     <div class="box_col">
@@ -49,6 +67,9 @@
         shopList: [],
         total: 0,
         param: {
+          proNameLike: "",
+          proPriceGte: null,
+          proPriceLte: null,
           pageNum: 1,
           pageSize: 8
         }
@@ -59,6 +80,12 @@
       this.getDataList()
     },
     methods: {
+      reset() {
+        this.param.proNameLike = ""
+        this.param.proPriceGte = null
+        this.param.proPriceLte = null
+        this.getDataList()
+      },
       closeMod() {
         this.compName = ""
         this.itMess = {}
@@ -67,7 +94,7 @@
         this.itMess = it
         this.compName = "editMod"
       },
-      upSuccess(){
+      upSuccess() {
         this.closeMod()
         this.getDataList()
       },

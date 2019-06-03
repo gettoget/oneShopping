@@ -22,9 +22,11 @@
       </div>
     </Poptip>
     <div class="lineBox">
-      <div class="lineVal">已售:{{(mess.proPrice-mess.proStore)}}份/剩余{{mess.proStore}}份</div>
+      <div class="lineVal">
+        已售:{{(parseInt(mess.proPrice)-parseInt(mess.rePrice))}}
+        份/剩余{{mess.rePrice}}份</div>
       <div class="lineback box_row">
-        <div class="line" :style="{width:((mess.proPrice-mess.proStore)/mess.proPrice)*100+'%'}">
+        <div class="line" :style="{width:((parseInt(mess.proPrice)-parseInt(mess.rePrice))/parseInt(mess.rePrice))*100+'%'}">
         </div>
         <div class="box_row_100">
         </div>
@@ -32,11 +34,17 @@
     </div>
     <div class="shopBq">
       <!--新品、热门、喜欢，-->
-      <Tag :color="'red'"
-           v-for="(it,index) in mess.proLx.split(',')"
-           @click.native="tagVal = index">
-        {{it | TagVal}}
+      <Tag :color="it.bol==tagVal?'red':'default'"
+           v-for="(it,index) in tegList"
+           @click.native="tagEvent(it,index)">
+        {{it.text}}
       </Tag>
+
+      <!--<Tag :color="'red'"-->
+           <!--v-for="(it,index) in mess.proLx.split(',')"-->
+           <!--@click.native="tagVal = index">-->
+        <!--{{it | TagVal}}-->
+      <!--</Tag>-->
     </div>
   </Card>
 </template>
@@ -77,7 +85,49 @@
     data() {
       return {
         iphone,
-        tagVal: 1
+        tagVal: 1,
+        tegList:[
+          {
+            bol:false,
+            text:"推荐",
+            key:"1"
+          },
+          {
+            bol:false,
+            text:"上新",
+            key:"2"
+          },
+          {
+            bol:false,
+            text:"热门",
+            key:"3"
+          },
+        ]
+      }
+    },
+    created(){
+      let a = this.mess.proLx.split(',')
+      a.forEach((it,index)=>{
+        this.tegList[parseInt(it)-1].bol = true
+      })
+    },
+    methods:{
+      tagEvent(it,index){
+        it.bol = !it.bol
+        let b = []
+        this.tegList.forEach((it,index)=>{
+          if(it.bol){
+            b.push(it.key)
+          }
+          if(index == this.tegList.length-1){
+            this.upShopMess(b.join(','))
+          }
+        })
+      },
+      upShopMess(mes){
+        this.$http.post("/api/proinfo/update",{id:this.mess.id,proLx:mes}).then(res=>{
+
+        }).catch(err=>{})
       }
     }
   }

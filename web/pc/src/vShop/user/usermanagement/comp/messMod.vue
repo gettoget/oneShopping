@@ -19,6 +19,9 @@
         <div style="font-weight: 600;font-size: 20px;margin-left: 12px">
           {{itMess.userName}}
         </div>
+        <div style="font-weight: 600;font-size: 18px;margin-left: 22px">
+          用户类型：{{itMess.source=="0"?"人":"电脑"}}
+        </div>
       </div>
 
       <div class="box_row">
@@ -64,16 +67,46 @@
           </Card>
         </div>
 
-        <div class="box_row_100">
+        <div class="box_row_1auto">
           <Card>
-            <div slot="title">
-              <pager-tit title="历史订单"></pager-tit>
+            <div slot="title" class="box_row">
+              <div class="box_row_100">
+                <pager-tit title="历史订单"></pager-tit>
+              </div>
+              <div>
+                <Input v-model="param.proNameLike" placeholder="商品名称"
+                       style="width: 200px;margin-right: 20px"
+                       @on-clear="getPagerList()"
+                       @on-change="getPagerList()" clearable />
+                <DatePicker type="daterange" split-panels placement="bottom-end"
+                            format="yyyy-MM-dd" placeholder="下单时间"
+                            style="width: 200px" @on-change="PickerChange"
+                ></DatePicker>
+              </div>
             </div>
             <Table
               size='small' stripe
               height="458px"
               :columns="tableTiT"
-              :data="tableData"></Table>
+              :data="tableData">
+              <div slot="shopName" slot-scope="{ row, index }">
+                <Poptip  trigger="hover" >
+                  <div slot="content">
+                    {{row.proName}}
+                  </div>
+                  <div style="word-break: break-all;text-overflow: ellipsis;display: -webkit-box;
+                    -webkit-box-orient: vertical;-webkit-line-clamp: 3;overflow: hidden;">
+                    {{row.proName}}
+                  </div>
+                </Poptip>
+              </div>
+
+              <div slot="numList" slot-scope="{ row, index }">
+                <div style="height:80px;overflow: auto">
+                  <Tag color="cyan" v-for="(it,index) in row.orderLists">{{it.num}}</Tag>
+                </div>
+              </div>
+            </Table>
             <div class="pagerBoxSty boxMar_T box_row rowRight">
               <one-page :total="total" :size="param.pageSize"
                         :opts="[4,8,12,16]"
@@ -108,69 +141,109 @@
             }
           },
           {
-            title: '订单编号',
-            align: 'center',
-            key: 'id'
+            title: "中奖号码",
+            align: 'left',
+            width: 140,
+            key: 'zjhm',
+            render: (h, p) => {
+              let orderZt = {}
+              let str = p.row.ddzt;
+              if (str == 0) {
+                orderZt = {
+                  zt: '待开奖',
+                  col: 'magenta'
+                };
+              } else if (str == 1) {
+                orderZt = {
+                  zt: '已中奖',
+                  col: 'green'
+                };
+              } else if (str == 2) {
+                orderZt = {
+                  zt: '未中奖',
+                  col: 'volcano'
+                };
+              } else if (str == 3) {
+                orderZt = {
+                  zt: '待支付',
+                  col: 'cyan'
+                };
+              } else if (str == 4) {
+                orderZt = {
+                  zt: '已支付',
+                  col: 'gold'
+                };
+              } else if (str == 5) {
+                orderZt = {
+                  zt: '取消支付',
+                  col: 'default'
+                }
+              }
+              return h('div', [
+                h('div', [
+                  h('Tag', {
+                    props: {
+                      color: orderZt.col
+                    }
+                  }, orderZt.zt)
+                ]),
+                h('div', {
+                  style: {
+                    padding: "4px 0"
+                  }
+                }, [
+                  h('Tag', {
+                    props: {
+                      color: '#FFA2D3'
+                    }
+                  }, p.row.zjhm)
+                ])
+              ])
+            }
           },
           {
-            title: '下单时间',
-            align: 'center',
+            title: '时间',
+            align: 'left',
+            width: 220,
             key: 'cjsj',
-            render:(h,p)=>{
-
+            render: (h, p) => {
+              let kjTime = p.row.kjsj ? p.row.kjsj : '------------------'
+              return h("div", [
+                h('div', {style: {padding: "4px 0"}}, '下单：' + p.row.cjsj),
+                h('div', {style: {padding: "4px 0"}}, '支付：' + p.row.zfsj),
+                h('div', {style: {padding: "4px 0"}}, '开奖：' + kjTime)
+              ])
             }
           },
           {
             title: '商品名',
-            align: 'center',
+            align: 'left',
             key: 'proName',
+            slot: 'shopName',
+            width: 200,
           },
           {
-            title: '订单状态',
-            width: 120,
+            title: '份数 / 金额',
+            width: 100,
             align: 'center',
-            key: 'ddzt',
+            key: 'gmfs',
             render: (h, p) => {
-              let str = p.row.ddzt;
-              if (str == 0) {
-                str = '待开奖';
-              } else if (str == 1) {
-                str = '已中奖';
-              } else if (str == 2) {
-                str = '未中奖';
-              } else if (str == 3) {
-                str = '待支付';
-              } else if (str == 4) {
-                str = '已支付';
-              } else if (str == 5) {
-                str = '取消支付'
-              }
-              return h('Tag', {
-                style: {
-                  width: '90px'
-                },
-                props: {
-                  color: p.row.ddzt == 3 ? 'error' : 'success'
-                },
-              }, str);
+              return h('div', p.row.gmfs + ' / ' + p.row.zfje)
             }
           },
           {
-            title: '支付金额',
-            width: 120,
-            align: 'center',
-            key: 'zfje'
-          },
-          {
-            title: '支付时间',
-            align: 'center',
-            key: 'zfsj'
+            title: '购买号码',
+            slot: 'numList',
+            minWidth: 200
           }
         ],
         tableData: [],
         total: 0,
         param: {
+          proNameLike:"",
           userId: "",
+          cjsjGte:"",
+          cjsjLte:"",
           pageNum: 1,
           pageSize: 10
         },
@@ -181,6 +254,11 @@
       this.getPagerList()
     },
     methods: {
+      PickerChange(t){
+        this.param.cjsjGte = t[0]
+        this.param.cjsjLte = t[1]
+        this.getPagerList()
+      },
       visible(val) {
         console.log(val);
         this.$emit("closeMod")

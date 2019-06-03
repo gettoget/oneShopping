@@ -1,6 +1,7 @@
 <template>
   <div class="onePagerSty">
     <Page :total="total" :page-size="size"
+          :transfer="true"
           :page-size-opts="opts"
           show-total show-elevator show-sizer
           @on-change="pageNum"

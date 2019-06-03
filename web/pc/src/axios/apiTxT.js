@@ -545,7 +545,7 @@ POST: /api/probaseinfo/pager
 **/
 // 8.商品基本信息修改
 /**
-POST:  /api/probaseinfo/update
+POST:  /api/probaseinfo/updatew
 
 参数:  参数为你查询出来的那些个参数 , 都可以改 , 但是尽量不要随便都改
 
