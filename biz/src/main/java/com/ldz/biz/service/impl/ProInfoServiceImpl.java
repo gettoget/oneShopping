@@ -37,6 +37,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -645,6 +646,52 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         msgBean.setType("5");
         msgBean.setJson(JsonUtil.toJson(info));
         BaiduPushUtils.pushAllMsg(0, JsonUtil.toJson(msgBean), 3, 0);
+        return ApiResponse.success();
+    }
+
+    @Override
+    public ApiResponse<String> complete(String proId) {
+        // 查询redis中所有的proId
+        Set<Object> keys;
+        if(StringUtils.isNotBlank(proId)){
+            keys =  redis.keys(proId + "_nums");
+        }else{
+            keys = redis.keys("*_nums");
+        }
+        Set<String> set = keys.stream().map(o -> ((String) o).split("_")[0]).collect(Collectors.toSet());
+        // 将现有id 与数据库中的所有在售id进行对比  找到redis没有的id ,
+        SimpleCondition condition = new SimpleCondition(ProInfo.class);
+        condition.eq(ProInfo.InnerColumn.proZt, "1");
+        condition.notIn(ProInfo.InnerColumn.id, set);
+        List<ProInfo> infos = findByCondition(condition);
+        Map<String, ProInfo> infoMap = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
+        // 查询对应商品已经出售的号码 生成未出售的号码
+        Set<String> collect = infos.stream().map(ProInfo::getId).collect(Collectors.toSet());
+        List<OrderList> lists = orderListService.findIn(OrderList.InnerColumn.proId, collect);
+        // 根据 id 分组号码
+        Map<String, List<OrderList>> listMap = lists.stream().collect(Collectors.groupingBy(OrderList::getProId));
+        for (Map.Entry<String, List<OrderList>> listEntry : listMap.entrySet()) {
+            List<OrderList> orderLists = listEntry.getValue();
+            Set<String> nums = orderLists.stream().map(OrderList::getNum).collect(Collectors.toSet());
+            ProInfo info = infoMap.get(listEntry.getKey());
+            List<String> nu = new ArrayList<>();
+            for(int i = 0; i < Integer.parseInt(info.getProPrice()); i++){
+                String num =  10000001 + i + "";
+                if(!nums.contains(num)){
+                    nu.add(num);
+                }
+            }
+            Collections.shuffle(nu);
+            for (String s : nu) {
+                ProInfoLuckNumBean numBean = new ProInfoLuckNumBean();
+                numBean.setProId(info.getId());
+                numBean.setProName(info.getProName());
+                numBean.setLuckNum(s);
+                redis.boundSetOps(info.getId() + "_nums").add(numBean);
+            }
+        }
+
+
         return ApiResponse.success();
     }
 

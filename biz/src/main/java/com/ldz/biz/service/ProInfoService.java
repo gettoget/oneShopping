@@ -74,4 +74,6 @@ public interface ProInfoService extends BaseService<ProInfo, String> {
     ApiResponse<String> updateEntity(ProInfo entity);
 
     ApiResponse<String> updateUnder(String id);
+
+    ApiResponse<String> complete(String proId);
 }

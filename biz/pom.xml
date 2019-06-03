@@ -87,6 +87,9 @@
             <artifactId>bccs.api</artifactId>
             <version>3.0.1</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.mob.sdk/MobSDK-Impl -->
+
+
     </dependencies>
 
     <build>

@@ -69,13 +69,24 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
+        Set<String> collect = list.stream().map(User::getId).collect(Collectors.toSet());
+        List<UserInModel> map = baseMapper.sumCharge(collect);
+
+        Map<String, UserInModel> modelMap = map.stream().collect(Collectors.toMap(UserInModel::getUserId, p -> p));
         list.forEach(user -> {
-            Map<String, Integer> map = baseMapper.sumCharge(user.getId());
+            if(modelMap.containsKey(user.getId())){
+                UserInModel inModel = modelMap.get(user.getId());
+                user.setCy(inModel.getCys());
+                user.setCz(inModel.getCz());
+                user.setXf(inModel.getXf());
+            }else{
+                user.setXf("0");
+                user.setCy("0");
+                user.setCz("0");
+            }
             user.setPayPwd("");
             user.setPwd("");
-            user.setCy(map.get("cys") + "");
-            user.setCz(map.get("cz") + "");
-            user.setXf(map.get("xf") + "");
+
         });
     }
 

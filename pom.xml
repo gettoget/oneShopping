@@ -197,6 +197,13 @@
             <artifactId>guava</artifactId>
             <version>23.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.mob.sdk</groupId>
+            <artifactId>MobSDK-Impl</artifactId>
+            <version>2019.0516.1558</version>
+        </dependency>
+       
+
     </dependencies>
 
     <build>

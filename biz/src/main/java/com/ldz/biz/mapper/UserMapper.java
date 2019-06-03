@@ -2,12 +2,14 @@ package com.ldz.biz.mapper;
 
 import com.ldz.biz.model.PaymentBean;
 import com.ldz.biz.model.User;
+import com.ldz.biz.model.UserInModel;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import tk.mybatis.mapper.common.Mapper;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface UserMapper extends Mapper<User> {
     /**
@@ -21,6 +23,10 @@ public interface UserMapper extends Mapper<User> {
     @Select("SELECT * from  ((select count(1) today from user where cjsj LIKE '${today}%'  and source = '0') a , (SELECT count(1) mon from user where cjsj like '${mon}%' and source = '0') b , (SELECT count(1) total from user where source = '0') c ) ")
     Map<String,Integer> statisUser(@Param("today") String today,@Param("mon") String mon);
 
-    @Select(" select * from  ( (select ifnull(count(distinct(pro_id)),0) cys from order_form where user_id = #{id} ) a , (select ifnull(sum(CAST(ifnull(amonut,'0') as unsigned )),0) cz from recharge where user_id = #{id}) b , (select ifnull(sum(CAST(ifnull(xfjb,'0') as unsigned )),0) xf from exchange where userid = #{id}) c)")
-    Map<String,Integer> sumCharge(@Param("id") String id);
+    @Select("<script> select a.userId, a.cys,b.cz,c.xf from " +
+            " ( (select ifnull(count(distinct(pro_id)),0) cys ,user_id userId from order_form where user_id in <foreach collection='idList' item='id' index='index' open='('  close=')' separator=','> #{id}</foreach>  group by user_id) a " +
+            ", (select ifnull(sum(CAST(ifnull(amonut,'0') as unsigned )),0) cz,user_id userId from recharge where user_id in <foreach collection='idList' item='id' index='index' open='('  close=')' separator=','> #{id}</foreach> group by user_id) b " +
+            ", (select ifnull(sum(CAST(ifnull(xfjb,'0') as unsigned )),0) xf,userid userId from exchange where userid in <foreach collection='idList' item='id' index='index' open='('  close=')' separator=','> #{id}</foreach> group by userid) c) WHERE a.userId = b.userId and b.userId = c.userId and c.userId = a.userId" +
+            "</script>")
+    List<UserInModel> sumCharge(@Param("idList") Set<String> id);
 }
