@@ -81,7 +81,18 @@
     },
     data() {
       return {
+        getUrl: this.apis.GETFILEURL,
         iph: "https://i.loli.net/2017/08/21/599a521472424.jpg"
+      }
+    },
+    created(){
+      if(this.mess.hImg !=  null){
+        if(!this.mess.hImg.startsWith('http')){
+          this.iph = this.getUrl + this.mess.hImg;
+        }else{
+
+          this.iph = this.mess.hImg;
+        }
       }
     },
     methods:{
