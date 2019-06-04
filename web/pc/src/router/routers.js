@@ -156,7 +156,7 @@ export default [
         name:'manage',
         meta: {
           icon: 'md-trending-up',
-          title: '上架商品'
+          title: '商品浏览'
         },
         component: () => import('@/vShop/commodity/Manage')
       }

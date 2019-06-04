@@ -13,11 +13,10 @@
              @on-change="getDataList()" clearable/>
       <Input v-model="param.proPriceGte" type="number" :number="true"
              style="width: 200px" @on-change="getDataList()">
-      <span slot="prepend">最低价</span>
+      <span slot="prepend">价格</span>
       </Input>
       <Input v-model="param.proPriceLte" type="number" :number="true"
              style="width: 200px;margin-right: 20px" @on-change="getDataList()">
-      <span slot="prepend">最高价</span>
       </Input>
       <Button type="primary" icon="ios-search" style=";margin-right: 20px"
               @click="getDataList()"></Button>

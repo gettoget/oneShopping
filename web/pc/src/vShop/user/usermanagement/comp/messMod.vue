@@ -13,14 +13,11 @@
           itMess.hImg:apis.GETFILEURL+itMess.hImg"/>
         </div>
         <div v-else>
-          <Avatar src="https://i.loli.net/2017/08/21/599a521472424.jpg"/>
+          <Avatar :src="defAva"/>
         </div>
 
         <div style="font-weight: 600;font-size: 20px;margin-left: 12px">
           {{itMess.userName}}
-        </div>
-        <div style="font-weight: 600;font-size: 18px;margin-left: 22px">
-          用户类型：{{itMess.source=="0"?"人":"电脑"}}
         </div>
       </div>
 
@@ -43,7 +40,6 @@
                 <Cell title="登录密码" extra="********"/>
                 <!--payPwd-->
                 <Cell title="支付密码" extra="********"/>
-                <Cell title="用户类型" :extra="itMess.source=='0'?'人类':'电脑'"/>
                 <Cell title="注册日期" :extra="moment(itMess.cjsj).format('YYYY-MM-DD HH:mm:ss')"/>
                 <Cell title="账户余额" :extra="itMess.balance"/>
                 <Cell title="累计充值" :extra="itMess.cz"/>
@@ -69,48 +65,83 @@
 
         <div class="box_row_1auto">
           <Card>
-            <div slot="title" class="box_row">
-              <div class="box_row_100">
-                <pager-tit title="历史订单"></pager-tit>
+            <div slot="title" class="box_row rowRight">
+              <div style="width: 188px">
+                <Tabs v-model="TabsVal" type="card">
+                  <TabPane name="1" label="消费记录"></TabPane>
+                  <TabPane name="2" label="充值记录"></TabPane>
+                </Tabs>
               </div>
-              <div>
+              <div class="box_row_100">
+
+              </div>
+              <div v-if="TabsVal=='1'">
                 <Input v-model="param.proNameLike" placeholder="商品名称"
                        style="width: 200px;margin-right: 20px"
                        @on-clear="getPagerList()"
-                       @on-change="getPagerList()" clearable />
+                       @on-change="getPagerList()" clearable/>
                 <DatePicker type="daterange" split-panels placement="bottom-end"
                             format="yyyy-MM-dd" placeholder="下单时间"
                             style="width: 200px" @on-change="PickerChange"
                 ></DatePicker>
               </div>
+              <div v-else-if="TabsVal=='2'">
+                <DatePicker type="daterange" split-panels placement="bottom-end"
+                            format="yyyy-MM-dd" placeholder="充值时间"
+                            style="width: 200px" @on-change="PickerChange2"
+                ></DatePicker>
+              </div>
             </div>
-            <Table
-              size='small' stripe
-              height="458px"
-              :columns="tableTiT"
-              :data="tableData">
-              <div slot="shopName" slot-scope="{ row, index }">
-                <Poptip  trigger="hover" >
-                  <div slot="content">
-                    {{row.proName}}
-                  </div>
-                  <div style="word-break: break-all;text-overflow: ellipsis;display: -webkit-box;
-                    -webkit-box-orient: vertical;-webkit-line-clamp: 3;overflow: hidden;">
-                    {{row.proName}}
-                  </div>
-                </Poptip>
-              </div>
-
-              <div slot="numList" slot-scope="{ row, index }">
-                <div style="height:80px;overflow: auto">
-                  <Tag color="cyan" v-for="(it,index) in row.orderLists">{{it.num}}</Tag>
+            <div v-if="TabsVal=='1'">
+              <Table
+                size='small' stripe
+                height="458px"
+                :columns="tableTiT"
+                :data="tableData">
+                <div slot="shopName" slot-scope="{ row, index }">
+                  <Poptip trigger="hover">
+                    <div slot="content">
+                      {{row.proName}}
+                    </div>
+                    <div style="word-break: break-all;text-overflow: ellipsis;display: -webkit-box;
+                      -webkit-box-orient: vertical;-webkit-line-clamp: 3;overflow: hidden;">
+                      {{row.proName}}
+                    </div>
+                  </Poptip>
                 </div>
+
+                <div slot="numList" slot-scope="{ row, index }">
+                  <Poptip trigger="hover" :transfer="true">
+                    <div style="height:60px;overflow: auto">
+                      <Tag color="cyan" v-if="index<6" v-for="(it,index) in row.orderLists" :key="index">{{it.num}}
+                      </Tag>
+                    </div>
+                    <div slot="content">
+                      <div class="box_row_list" style="width:240px">
+                        <Tag color="cyan" v-for="(it,index) in row.orderLists" :key="index">{{it.num}}</Tag>
+                      </div>
+                    </div>
+                  </Poptip>
+                </div>
+              </Table>
+              <div class="pagerBoxSty boxMar_T box_row rowRight">
+                <one-page :total="total" :size="param.pageSize"
+                          :opts="[4,8,12,16]"
+                          @chPager="chPager"></one-page>
               </div>
-            </Table>
-            <div class="pagerBoxSty boxMar_T box_row rowRight">
-              <one-page :total="total" :size="param.pageSize"
-                        :opts="[4,8,12,16]"
-                        @chPager="chPager"></one-page>
+            </div>
+            <div v-else-if="TabsVal=='2'">
+              <Table
+                size='small' stripe
+                height="458px"
+                :columns="tableTiT2"
+                :data="tableData2">
+              </Table>
+              <div class="pagerBoxSty boxMar_T box_row rowRight">
+                <one-page :total="total2" :size="param2.pageSize"
+                          :opts="[4,8,12,16]"
+                          @chPager="chPager"></one-page>
+              </div>
             </div>
           </Card>
         </div>
@@ -120,6 +151,8 @@
 </template>
 
 <script>
+  import defAva from './007.png'
+
   export default {
     name: "messMod",
     props: {
@@ -130,7 +163,9 @@
     },
     data() {
       return {
+        defAva,
         showModal: true,
+        TabsVal: "2",
         tableTiT: [
           {
             title: "序号",
@@ -141,10 +176,18 @@
             }
           },
           {
-            title: "中奖号码",
+            title: '商品名',
             align: 'left',
-            width: 140,
-            key: 'zjhm',
+            key: 'proName',
+            slot: 'shopName',
+            width: 200,
+          },
+          {
+            title: '订单状态',
+            align: 'left',
+            key: 'proName',
+            slot: 'shopName',
+            minWidth: 100,
             render: (h, p) => {
               let orderZt = {}
               let str = p.row.ddzt;
@@ -186,41 +229,42 @@
                       color: orderZt.col
                     }
                   }, orderZt.zt)
-                ]),
-                h('div', {
-                  style: {
-                    padding: "4px 0"
-                  }
-                }, [
-                  h('Tag', {
-                    props: {
-                      color: '#FFA2D3'
-                    }
-                  }, p.row.zjhm)
                 ])
               ])
             }
           },
           {
-            title: '时间',
-            align: 'left',
-            width: 220,
-            key: 'cjsj',
+            title: "中奖号码",
+            align: 'center',
+            width: 140,
+            key: 'zjhm',
             render: (h, p) => {
-              let kjTime = p.row.kjsj ? p.row.kjsj : '------------------'
-              return h("div", [
-                h('div', {style: {padding: "4px 0"}}, '下单：' + p.row.cjsj),
-                h('div', {style: {padding: "4px 0"}}, '支付：' + p.row.zfsj),
-                h('div', {style: {padding: "4px 0"}}, '开奖：' + kjTime)
-              ])
+              let a = []
+              if (p.row.ddzt == '1') {
+                a = [
+                  h('Tag', {
+                    props: {
+                      color: '#FFA2D3'
+                    }
+                  }, p.row.zjhm)
+                ]
+              }
+              return h('div', {
+                style: {
+                  padding: "4px 0"
+                }
+              }, a)
             }
           },
+
           {
-            title: '商品名',
+            title: '支付时间',
             align: 'left',
-            key: 'proName',
-            slot: 'shopName',
-            width: 200,
+            width: 120,
+            key: 'cjsj',
+            render: (h, p) => {
+              return h("div", this.moment(p.row.zfsj).format('YYYY-MM-DD'))
+            }
           },
           {
             title: '份数 / 金额',
@@ -234,30 +278,67 @@
           {
             title: '购买号码',
             slot: 'numList',
-            minWidth: 200
+            minWidth: 280
           }
         ],
         tableData: [],
         total: 0,
         param: {
-          proNameLike:"",
+          proNameLike: "",
+          userId: "",
+          cjsjGte: "",
+          cjsjLte: "",
+          pageNum: 1,
+          pageSize: 10
+        },
+        total2: 0,
+        tableTiT2: [
+          {
+            title: "充值时间",
+            key:"cjsj",
+            render: (h, p) => {
+              return h("div", this.moment(p.row.cjsj).format('YYYY-MM-DD HH:mm:ss'))
+            }
+          },
+          {
+            title:"充值金额",
+            key:"amonut"
+          },
+          {
+            title:"充值数量",
+            key:"amonut"
+          },
+          {
+            title:"金币余额",
+            key:"czhjbs"
+          }
+        ],
+        tableData2: [],
+        param2: {
           userId: "",
           cjsjGte:"",
           cjsjLte:"",
           pageNum: 1,
           pageSize: 10
-        },
+        }
       }
     },
     created() {
       this.param.userId = this.itMess.id
+      this.param2.userId = this.itMess.id
       this.getPagerList()
+      this.getCZlist()
     },
     methods: {
-      PickerChange(t){
+      PickerChange(t) {
         this.param.cjsjGte = t[0]
         this.param.cjsjLte = t[1]
         this.getPagerList()
+      },
+      PickerChange2(t){
+        this.param2.cjsjGte = t[0]
+        this.param2.cjsjLte = t[1]
+        this.getCZlist()
       },
       visible(val) {
         console.log(val);
@@ -273,6 +354,15 @@
           if (res.code == 200) {
             this.tableData = res.page.list
             this.total = res.page.total
+          }
+        }).catch(err => {
+        })
+      },
+      getCZlist() {
+        this.$http.post("/api/recharge/pager", this.param2).then(res => {
+          if (res.code == 200) {
+            this.tableData2 = res.page.list
+            this.total2 = res.page.total
           }
         }).catch(err => {
         })

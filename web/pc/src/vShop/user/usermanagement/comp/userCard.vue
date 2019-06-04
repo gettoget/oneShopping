@@ -51,7 +51,7 @@
 </template>
 
 <script>
-
+  import defAva from './007.png'
   export default {
     name: "userCard",
     props:{
@@ -82,7 +82,7 @@
     data() {
       return {
         getUrl: this.apis.GETFILEURL,
-        iph: "https://i.loli.net/2017/08/21/599a521472424.jpg"
+        iph: defAva
       }
     },
     created(){

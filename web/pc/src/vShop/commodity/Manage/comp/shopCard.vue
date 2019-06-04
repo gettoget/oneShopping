@@ -1,8 +1,8 @@
 <template>
   <Card class="shopCardSty">
-    <div slot="title">
+    <div slot="title" @click="getMess" style="cursor: pointer">
       <div class="bqBox">
-        售卖中
+        {{mess.proZt | proZt}}
       </div>
       <img v-if='mess.coverUrls[0].substring(0,4)==="http"'
            :src="mess.coverUrls" alt="">
@@ -14,7 +14,7 @@
       ￥{{mess.proPrice}}
     </div>
     <Poptip trigger="hover">
-      <div class="shopTit">
+      <div class="shopTit"  @click="getMess">
         {{mess.proName}}
       </div>
       <div slot="content" style="width: 240px;white-space:normal;font-size: 18px">
@@ -34,7 +34,7 @@
     </div>
     <div class="shopBq">
       <!--新品、热门、喜欢，-->
-      <Tag :color="it.bol==tagVal?'red':'default'"
+      <Tag :color="it.bol?'red':'default'"
            v-for="(it,index) in tegList"
            @click.native="tagEvent(it,index)">
         {{it.text}}
@@ -65,6 +65,25 @@
       }
     },
     filters: {
+      proZt:(val)=>{
+        switch (val) {
+          case "1":
+            return "售卖中"
+            break;
+          case "2":
+            return "----"
+            break;
+          case "3":
+            return "待开奖"
+            break;
+          case "4":
+            return "已开奖"
+            break;
+          default:
+            return "售卖中"
+            break;
+        }
+      },
       TagVal: (val) => {
         switch (val) {
           case "1":
@@ -112,6 +131,9 @@
       })
     },
     methods:{
+      getMess(){
+        this.$emit("getMess")
+      },
       tagEvent(it,index){
         it.bol = !it.bol
         let b = []
