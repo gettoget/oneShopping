@@ -63,6 +63,15 @@ public class ProInfoContrl extends BaseController<ProInfo, String> {
     }
 
 
+    /**
+     * 获取上架商品的往期中奖记录
+     */
+    @PostMapping("/getWinRecord")
+    public ApiResponse<String> getWinRecordById(String id,@RequestParam(defaultValue = "1") int pageNum ,@RequestParam(defaultValue = "8") int pageSize){
+        return service.getWinRecordById(id,pageNum,pageSize);
+    }
+
+
 
 
 

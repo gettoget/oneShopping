@@ -2,8 +2,6 @@ package com.ldz.biz.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
-import com.baidu.yun.push.exception.PushClientException;
-import com.baidu.yun.push.exception.PushServerException;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -37,7 +35,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -693,6 +690,46 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
 
         return ApiResponse.success();
+    }
+
+    @Override
+    public ApiResponse<String> getWinRecordById(String id, int pageNum, int pageSize) {
+
+        ProInfo proInfo = findById(id);
+        RuntimeCheck.ifNull(proInfo, MessageUtils.get("pro.isNull"));
+        SimpleCondition condition = new SimpleCondition(ProInfo.class);
+        condition.eq(ProInfo.InnerColumn.proBaseid, proInfo.getProBaseid());
+        condition.eq(ProInfo.InnerColumn.proZt, "4");
+        condition.setOrderByClause(" kjsj desc ");
+        PageInfo<ProInfo> info = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> {
+            findByCondition(condition);
+        });
+        List<ProInfo> list = info.getList();
+        List<String> ids = list.stream().map(ProInfo::getId).collect(Collectors.toList());
+
+        List<WinRecord> records= new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(ids)) {
+            SimpleCondition wincon = new SimpleCondition(WinRecord.class);
+            wincon.in(WinRecord.InnerColumn.proId, ids);
+            wincon.setOrderByClause(" cjsj desc ");
+            records = winRecordService.findByCondition(wincon);
+            if (CollectionUtils.isNotEmpty(records)) {
+                records.forEach(
+                        winRecord -> {
+                            ProInfo info1 = proInfoService.findById(winRecord.getProId());
+                            winRecord.setProName(info1.getProName());
+                            User user = userService.findById(winRecord.getUserId());
+                            winRecord.setHimg(user.gethImg());
+                        }
+                );
+            }
+        }
+        PageInfo<WinRecord> page = new PageInfo<>();
+        BeanUtil.copyProperties(info,page,CopyOptions.create().setIgnoreError(true).setIgnoreProperties("list"));
+        page.setList(records);
+        ApiResponse<String> res = new ApiResponse<>();
+        res.setPage(page);
+        return res;
     }
 
 
