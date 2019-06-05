@@ -590,8 +590,8 @@ POST:  /api/proinfo/pager
       "rePrice": "110",									// 商品剩余名额   原价150 已经卖出去40个号码 剩余 110 个
       "rType": "2",   // 商品类型  1 为人类有可能中奖  2 为机器人必中奖
       "cjsj": "2019-05-21 14:10:02.100",							// 上架时间
-      "kjsj": null,                                                                           // 开奖时间  当号码卖完时 , 开奖时间自动出现
-      "gxsj": "2019-05-21 15:10:00.007",						        // 上一次更新时间
+      "kjsj": null,                   // 开奖时间  当号码卖完时 , 开奖时间自动出现
+      "gxsj": "2019-05-21 15:10:00.007",  // 上一次更新时间
       "urls": "http://img10.360buyimg.com/n1/s450x450_jfs/t1/2733/38/3470/138660/5b997bf2E48637bd7/d52740dde6d04976.jpg,http://img10.360buyimg.com/n1/s450x450_jfs/t1/4718/29/3495/118997/5b997bf2E096d1aa1/ea66eebb78fd89f5.jpg",  //
       "coverUrl": "http://img10.360buyimg.com/n1/s450x450_jfs/t1/2733/38/3470/138660/5b997bf2E48637bd7/d52740dde6d04976.jpg",
       "refUrl": "http://img10.360buyimg.com/n1/s450x450_jfs/t1/2733/38/3470/138660/5b997bf2E48637bd7/d52740dde6d04976.jpg",
