@@ -69,7 +69,8 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
     @Autowired
     private OrderMapper orderMapper;
 
-
+    @Autowired
+    private StoreService storeService;
     @Value("${robot.point}")
     private double point;
     @Value("${robot.people}")
@@ -165,6 +166,19 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 proInfo.setNums(nums);
                 proInfo.setCycs(nums.size());
             }
+            // 查询此商品你时候有收藏
+            condition = new SimpleCondition(Store.class);
+            condition.eq(Store.InnerColumn.userId, userId);
+            condition.eq(Store.InnerColumn.proId, id);
+            List<Store> stores = storeService.findByCondition(condition);
+            if(CollectionUtils.isNotEmpty(stores)){
+                proInfo.setStore("1");
+            }
+
+
+        }
+        if(StringUtils.isBlank(proInfo.getStore())){
+            proInfo.setStore("0");
         }
         proInfo.setCycs(nums.size());
         setImgUrl(proInfo);
@@ -180,6 +194,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 proInfo.setWinRecord(record);
             }
         }
+
 
         return ApiResponse.success(proInfo);
     }
@@ -742,10 +757,20 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         Set<String> userIds = list.stream().map(ProInfo::getUserId).collect(Collectors.toSet());
         List<User> users = userService.findByIds(userIds);
         Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
+        SimpleCondition condition = new SimpleCondition(Order.class);
+        condition.in(Order.InnerColumn.userId,userIds);
+        List<String> proIds = list.stream().map(ProInfo::getId).collect(Collectors.toList());
+        condition.in(Order.InnerColumn.proId,proIds);
+        condition.eq(Order.InnerColumn.ddzt,"1");
+        List<Order> orders = orderService.findByCondition(condition);
+        Map<String, String> map = orders.stream().collect(Collectors.toMap(Order::getProId, p -> p.getGmfs()));
         for (ProInfo proBaseinfo : list) {
             if (userMap.containsKey(proBaseinfo.getUserId())) {
                 User user = userMap.get(proBaseinfo.getUserId());
                 proBaseinfo.setUserName(user.getUserName());
+            }
+            if(map.containsKey(proBaseinfo.getId())){
+                proBaseinfo.setZjfs(map.get(proBaseinfo.getId()));
             }
             setImgUrl(proBaseinfo);
         }
