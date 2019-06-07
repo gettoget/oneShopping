@@ -1,0 +1,110 @@
+.ShopDrawer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0);
+  z-index: 2000;
+  .modalMessBox {
+    background: #fff;
+    width: 700px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    padding: 22px;
+    box-shadow: -5px 1px 6px rgba(0, 0, 0, .2);
+  }
+  .userListBox{
+    position: absolute;
+    top: 0;
+    right: 700px;
+    left: 0;
+    bottom: 0;
+    background-color:rgba(0,0,0,0);
+  }
+  .shopImgBox {
+    position: relative;
+  }
+  .swiperItemBox {
+    height: 100%;
+    width: 100%;
+    border: sandybrown 1px solid;
+    img {
+      width: 100%;
+    }
+  }
+  .closeMod{
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    cursor: pointer;
+  }
+  .proZtBoxSty {
+    position: absolute;
+    left: -56px;
+    top: 20px;
+    border-bottom: 60px solid orangered;
+    border-left: 60px solid transparent;
+    border-right: 60px solid transparent;
+    width: 240px;
+    height: 60px;
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+    line-height: 60px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .shopTitBox {
+    margin-top: 12px;
+    background-color: #dedede42;
+    border-radius: 5px;
+    padding: 9px 18px 18px;
+  }
+  .shopTit {
+    font-size: 20px;
+    font-weight: 600;
+  }
+  .proPriceSty {
+    font-size: 28px;
+    font-weight: 700;
+    color: orangered;
+    line-height: 65px;
+    margin-right: 22px;
+  }
+  .lineBox {
+    .lineVal{
+      font-size: 16px;
+      color: #c3c3c3;
+      margin: 12px 0;
+    }
+    .lineback {
+      width: 100%;
+      height: 20px;
+      border-radius: 4px;
+      background-color: #a5a5a57d;
+      .line {
+        width: 30%;
+        height: 20px;
+        border-radius: 4px;
+        background-color: #fe5722;
+        text-align: center;
+        line-height: 16px;
+        color: #fff;
+      }
+    }
+  }
+
+  .winUserItemSty{
+    padding: 2px 0;
+  }
+
+  .purchaserListBox{
+    width: 500px;
+    height: 500px;
+  }
+}

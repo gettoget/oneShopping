@@ -94,11 +94,12 @@ public class StoreServiceImpl extends BaseServiceImpl<Store, String> implements 
 
     @Override
     public ApiResponse<String> updateStoreCancel(String id) {
-        String userId = getAttributeAsString("userId");
+        String userId = getHeader("userId");
         RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
         SimpleCondition condition = new SimpleCondition(Store.class);
         condition.eq(Store.InnerColumn.userId, userId);
-        condition.eq(Store.InnerColumn.id, id);
+        condition.and().andCondition(" id = " + id + " or pro_id = " + id );
+//        condition.eq(Store.InnerColumn.id, id);
         List<Store> stores = findByCondition(condition);
         if(CollectionUtils.isNotEmpty(stores)){
             List<String> ids = stores.stream().map(Store::getId).collect(Collectors.toList());

@@ -1,79 +1,169 @@
 <template>
-  <div>
-    <Drawer
-      v-model="showModal"
-      width="600"
-      class-name="ShopDrawer"
-      @on-visible-change="visible">
-      <div style="overflow: auto">
-        <div class="box_row_z">
-          <div v-for="(it,index) in mess.imgUrls" :key="index">
-            <img :src="it" style="width:180px;height: 180px " alt="">
-          </div>
+  <div class="ShopDrawer">
+    <div class="modalMessBox box_col">
+      <div class="shopImgBox">
+        <div style="width: 240px;margin: auto">
+          <swiper :globalOptions="globalOptions">
+            <swiper-slide v-for="(it,index) in mess.imgUrls" :key="index">
+              <div class="swiperItemBox">
+                <img :src="it" alt="">
+              </div>
+            </swiper-slide>
+          </swiper>
         </div>
       </div>
-
-      <div style="background: orangered;color: #fff;width:100px;text-align: center;padding: 12px 0;font-weight: 600;font-size: 17px;border-radius: 5px">
+      <div class="closeMod">
+        <Icon type="md-close" size="26" @click.native="close"/>
+      </div>
+      <div class="proZtBoxSty">
         {{mess.proZt | proZt}}
       </div>
 
-      <div class="shopTit">
-        {{mess.proName}}
-      </div>
-      <div class="box_row">
-        <div class="proPriceSty">
-          ￥{{mess.proPrice}}
+      <div class="shopTitBox">
+        <div class="box_row colCenter">
+          <div class="proPriceSty">
+            ￥{{mess.proPrice}}
+          </div>
+          <div>
+            <Tag :color="'red'"
+                 v-for="(it,index) in mess.proLx.split(',')"
+                 @click.native="tagVal = index">
+              {{it | TagVal}}
+            </Tag>
+          </div>
+          <div class="box_row_100" style="text-align: right;font-size: 18px;font-weight: 500;color: orangered">
+            上架时间：{{moment(mess.cjsj).format('YYYY-MM-DD')}}
+          </div>
         </div>
 
-        <div style="padding-top: 22px;margin-right: 22px">
-          <Tag :color="'red'"
-               v-for="(it,index) in mess.proLx.split(',')"
-               @click.native="tagVal = index">
-            {{it | TagVal}}
-          </Tag>
+        <div class="shopTit">
+          {{mess.proName}}
         </div>
+      </div>
+      <div class="">
 
         <div class="lineBox">
-          <div class="lineVal">
-            已售:{{(parseInt(mess.proPrice)-parseInt(mess.rePrice))}}
-            份/剩余{{mess.rePrice}}份</div>
-          <div class="lineback box_row">
-            <div class="line" :style="{width:((parseInt(mess.proPrice)-parseInt(mess.rePrice))/parseInt(mess.rePrice))*100+'%'}">
+          <div class="lineVal box_row colCenter">
+            <div class="box_row_100" style="cursor: pointer">
+              <Poptip placement="left" :transfer="false">
+                <Icon type="md-menu" size="24"/>
+                参与人数：{{mess.cyyhs}}
+                <div slot="content" class="purchaserListBox">
+                  <Table
+                    size='small' stripe
+                    :height="500"
+                    :columns="tableTiT"
+                    :data="tableData"></Table>
+                </div>
+              </Poptip>
             </div>
-            <div class="box_row_100">
+            <div>
+              已售:{{(parseInt(mess.proPrice)-parseInt(mess.rePrice))}}份 / 剩余
+              <span style="color: orangered;font-weight: 700">{{mess.rePrice}}</span>份
+            </div>
+          </div>
+          <div class="lineback box_row">
+            <div class="line"
+                 :style="{width:((parseInt(mess.proPrice)-parseInt(mess.rePrice))/parseInt(mess.rePrice))*100+'%'}">
             </div>
           </div>
         </div>
 
       </div>
-
-      <div style="font-size: 18px;font-weight: 500">
-        上架时间：{{moment(mess.cjsj).format('YYYY-MM-DD')}}
-      </div>
-      <div>
-        参与人数：{{mess.cyyhs}}
-      </div>
-
-      <div v-if="mess.proZt == '4'">
-        <div>
-          中奖人：{{mess.userName}}
+      <Card style="width:100%;margin-top: 12px">
+        <div slot="title" class="box_row">
+          <div>
+            <h4>
+              <Icon type="ios-film-outline"></Icon>
+              上期获奖者
+            </h4>
+          </div>
+          <div class="box_row_100" style="text-align: right">
+            <h3>中奖号码:{{winList.num}}</h3>
+          </div>
         </div>
-        <div>
-          中奖号码：{{mess.zjhm}}
-        </div>
+        <div class="box_row colCenter">
+          <Avatar v-if="winList.himg"
+                  :src="winList.himg.substring(0,4)==='http'?winList.himg:apis.GETFILEURL+winList.himg"/>
+          <Avatar v-else :src="defAva"/>
+          <div style="margin-left: 22px">
+            <div class="winUserItemSty">
+              获奖者：<span style="color: orangered">{{winList.userName}}</span>
+            </div>
+            <div class="winUserItemSty">
+              参与数量：{{winList.zjfs}}
+            </div>
+            <div class="winUserItemSty">
+              参与时间：{{moment(winList.cjsj).format('YYYY-MM-DD')}}
+            </div>
+          </div>
 
-      </div>
-    </Drawer>
+        </div>
+      </Card>
+    </div>
+    <div class="userListBox" @click="close">
+
+    </div>
+
   </div>
 </template>
 
 <script>
+  import 'swiper/dist/css/swiper.css'
+  import {swiper, swiperSlide} from 'vue-awesome-swiper'
+  import defAva from '@/assets/images/007.png'
+
   export default {
     name: "DrawerMod",
+    components: {
+      swiper,
+      swiperSlide
+    },
     data() {
       return {
+        defAva,
         showModal: true,
-        value1: 0
+        globalOptions: {
+          loop: true,
+          slidesPerView: 1,
+          centeredSlides: true,
+          autoplay: {
+            delay: 4000,
+            stopOnLastSlide: false,//如果设置为true，当切换到最后一个slide时停止自动切换。
+            disableOnInteraction: true,//拖拽后自动轮播停止
+            reverseDirection: false,//反向轮播
+          }
+        },
+        tabBox: "tabBox",
+        tab_H: 0,
+        winList: {
+          cjsj: "2019-06-05 22:20:13.394",
+          himg: "http://cdnoss.luno.id/cashcash/users/header/2018-09-26/c470e962cd86d5cef9e11b510a684092.png",
+          id: "585956069029707776",
+          num: "10004808",
+          nums: null,
+          proId: "585410180749983744",
+          proName: "惠普（HP）战66 二代",
+          userId: "567293823873449984",
+          userName: "maryono",
+          zjfs: "19",
+          zjlx: "0",
+        },
+        tableTiT: [
+          {
+            title: "用户姓名",
+            ley:"userName"
+          },
+          {
+            title: "手机号码",
+            ley:"phone"
+          },
+          {
+            title: "购买数量",
+            ley:"gmfs"
+          }
+        ],
+        tableData:[],
       }
     },
     props: {
@@ -82,8 +172,8 @@
         default: {}
       }
     },
-    filters:{
-      proZt:(val)=>{
+    filters: {
+      proZt: (val) => {
         switch (val) {
           case "1":
             return "售卖中"
@@ -119,50 +209,42 @@
         }
       }
     },
+    mounted() {
+      this.getUserList()
+      this.getWinList()
+      this.$nextTick(() => {
+        try {
+          this.tab_H = this.AF.getDom_H(this.tabBox)
+        } catch (e) {
+        }
+      })
+    },
     methods: {
+      close(){
+        this.$emit("close")
+      },
       visible(val) {
         setTimeout(() => {
           this.$emit("close")
-        }, 70)
+        }, 200)
+      },
+      getWinList() {
+        this.$http.post("/api/proinfo/getWinRecord", {id: this.mess.id, pageNum: 1, pageSize: 1}).then(res => {
+          if (res.success) {
+            this.winList = res.page.list[0]
+          }
+        }).catch(err => {
+        })
+      },
+      getUserList(){
+        this.$http.post("/api/order/pager",{proId:this.mess.id,pageNum: 1,
+          pageSize: this.mess.proPrice}).then(res=>{
+
+        }).catch(err=>{})
       }
     }
   }
 </script>
 <style lang="less">
-  .ShopDrawer{
-    .shopTit{
-      font-size: 20px;
-      font-weight: 600;
-    }
-    .proPriceSty{
-      font-size: 28px;
-      font-weight: 700;
-      color: orangered;
-      line-height: 65px;
-      margin-right: 22px;
-    }
-    .lineBox {
-      .lineback {
-        width: 200px;
-        height: 14px;
-        border-radius: 6px;
-        background-color: #a5a5a57d;
-        .line {
-          width: 30%;
-          height: 14px;
-          border-radius: 6px;
-          background-color: #fe5722;
-          text-align: center;
-          line-height: 16px;
-          color: #fff;
-        }
-      }
-      .lineVal {
-        font-size: 12px;
-        color: #c3c3c3;
-        margin: 12px 0;
-        width: 200px;
-      }
-    }
-  }
+  @import "./DrawerMod.less";
 </style>

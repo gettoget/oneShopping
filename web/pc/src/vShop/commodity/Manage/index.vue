@@ -64,7 +64,7 @@
     },
     data() {
       return {
-        compName:"dr",
+        compName:"",
         itmess:{},
         tegList:[
           {

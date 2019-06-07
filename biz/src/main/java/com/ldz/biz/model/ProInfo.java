@@ -168,6 +168,19 @@ public class ProInfo implements Serializable {
     private List<String> refUrls;
     @Transient
     private String zjfs;
+    /**
+     * 是否收藏  0 为未收藏   1为已收藏
+     */
+    @Transient
+    private String store;
+
+    public String getStore() {
+        return store;
+    }
+
+    public void setStore(String store) {
+        this.store = store;
+    }
 
     public String getZjfs() {
         return zjfs;
