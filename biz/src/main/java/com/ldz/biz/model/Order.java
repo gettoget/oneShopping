@@ -1,8 +1,11 @@
 package com.ldz.biz.model;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.List;
-import javax.persistence.*;
 
 @Table(name = "order_form")
 public class Order implements Serializable {
@@ -119,6 +122,27 @@ public class Order implements Serializable {
 
     @Transient
     private String phone;
+    @Transient
+    private String imgUrl;
+
+    @Transient
+    private String singlePrice;
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
+    public String getSinglePrice() {
+        return singlePrice;
+    }
+
+    public void setSinglePrice(String singlePrice) {
+        this.singlePrice = singlePrice;
+    }
 
     public String getPhone() {
         return phone;
