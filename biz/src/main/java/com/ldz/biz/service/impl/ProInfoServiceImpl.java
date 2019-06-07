@@ -152,7 +152,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         RuntimeCheck.ifBlank(id, MessageUtils.get("pro.idBlank"));
         ProInfo proInfo = findById(id);
         RuntimeCheck.ifNull(proInfo, MessageUtils.get("pro.isNull"));
-        String userId = (String) getAttribute("userId");
+        String userId = getHeader("userId");
         List<String> nums = new ArrayList<>();
         if (StringUtils.isNotBlank(userId)) {
             SimpleCondition condition = new SimpleCondition(OrderList.class);
