@@ -431,8 +431,18 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         if (StringUtils.equals(info.getrType(), "2")) {
             //获取最后一个机器人参与的订单号码
             OrderList lastOrder = baseMapper.findLatestRobot(info.getId());
+            // 判断当前价格是否高于 2000 及以上
+            List<String> orderIds = null;
+            if(Integer.parseInt(info.getProPrice()) >= 2000){
+                SimpleCondition simpleCondition= new SimpleCondition(Order.class);
+                simpleCondition.and().andCondition(" gmfs >= '5' or gmfs >= 10 ");
+                List<Order> orders = findByCondition(simpleCondition);
+                if(CollectionUtils.isNotEmpty(orders)){
+                    orderIds = orders.stream().map(Order::getId).collect(Collectors.toList());
+                }
+            }
             //从最后一个购买订单的抽取一个中间号码
-            OrderList orderList = baseMapper.getOrderByRobotZjhm(id);
+            OrderList orderList = baseMapper.getOrderByRobotZjhm(id,orderIds);
 
             if (orderList != null && StringUtils.isNotBlank(lastOrder.getId())) {
                 List<String> strings = lastFifty.stream().map(OrderList::getId).collect(Collectors.toList());

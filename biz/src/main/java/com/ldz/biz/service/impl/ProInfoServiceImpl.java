@@ -817,6 +817,11 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
     @Override
     public void saveRobot(String redisProInfoKey) {
+        // 查看购买时间 ， 在 6 ：00 - 11 :00 之间
+        String hhmmss = DateTime.now().toString("HH:mm:ss");
+        if(hhmmss.compareTo( "06:00:00") <= 0 || hhmmss.compareTo( "23:00:00") >= 0 ){
+            return;
+        }
         String proId = redisProInfoKey.toString().split("_")[0];
         //1.生成本次多少个用户参与
         int randomMaxUserNum = RandomUtils.nextInt(people);

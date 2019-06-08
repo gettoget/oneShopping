@@ -23,8 +23,11 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
      * 从待开奖商品中查询一个分配的中奖号码
      * @return
      */
-    @Select("SELECT *,Rand() r FROM order_list where yhlx='1' and pro_id = #{id} order by r desc LIMIT 1")
-    OrderList getOrderByRobotZjhm(@Param("id") String id);
+    @Select(" <script> SELECT *,Rand() r FROM order_list where yhlx='1' and pro_id = #{id} <if test='orderIds != null'>" +
+            " and order_id in   <foreach item='item' index='index' collection='orderIds' open='(' separator=',' close=')'>" +
+            " #{item} </foreach>" +
+            "</if> order by r desc LIMIT 1 </script>")
+    OrderList getOrderByRobotZjhm(@Param("id") String id, List<String> orderIds);
 
     /**
      * 充值所有未中奖状态
