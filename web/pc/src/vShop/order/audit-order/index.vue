@@ -1,44 +1,57 @@
 <template>
   <Card class="box_col findOrderBox">
     <div slot="title" class="box_row colCenter">
-      <div class="box_row_100">
+      <div class="">
         <pager-tit title="订单查询"></pager-tit>
+        <!--<div>-->
+          <!--<RadioGroup v-model="param.orderType" type="button"-->
+                      <!--@on-change="getPagerList()" style="margin-right: 20px">-->
+            <!--<Radio label="2">参与抽奖</Radio>-->
+            <!--<Radio label="1">直接购买</Radio>-->
+          <!--</RadioGroup>-->
+        <!--</div>-->
       </div>
-      <div>
-        <!--<DatePicker value='yyyy-MM-dd' @on-change="changTime" type="daterange" :options="options2"-->
-                    <!--placement="bottom-end" placeholder="Select date" style="width: 200px"></DatePicker>-->
+      <div class="box_row_100">
+        <div class="box_row rowRight">
+          <div v-if="param.orderType == '2'">
+            <RadioGroup v-model="param.ddzt" type="button"
+                        @on-change="getPagerList()" style="margin-right: 20px">
+              <Radio label="00">全部</Radio>
+              <Radio label="0">待开奖</Radio>
+              <Radio label="1">已中奖</Radio>
+              <Radio label="2">未中奖</Radio>
+              <Radio label="3">待支付</Radio>
+              <Radio label="4">已支付</Radio>
+              <Radio label="5">取消支付</Radio>
+            </RadioGroup>
+          </div>
+          <div>
+            <!--<DatePicker value='yyyy-MM-dd' @on-change="changTime" type="daterange" :options="options2"-->
+                        <!--placement="bottom-end" placeholder="Select date" style="width: 200px"></DatePicker>-->
+          </div>
+          <div>
+            <Input
+              v-model="param.idLike"
+              placeholder="order id" style="width: 200px"/>
+          </div>
+          <Button type="primary" @click="getPagerList">
+            <Icon type="md-search"></Icon>
+            <!--查询-->
+          </Button>
+        </div>
+
+        </div>
       </div>
-      <div>
-        <Input
-          v-model="param.idLike"
-          placeholder="order id" style="width: 200px"/>
-      </div>
-      <Button type="primary" @click="getPagerList">
-        <Icon type="md-search"></Icon>
-        <!--查询-->
-      </Button>
-    </div>
     <div class="box_col">
       <div :id="tabBox" class="box_col_auto">
-        <Table
-        size='large' stripe
-        v-if="tab_H>0"
-        :height="tab_H"
-        :columns="tableTiT"
-        :data="tableData">
-          <!--<div slot="shopName" slot-scope="{ row, index }">-->
-            <!--<Poptip  trigger="hover" :transfer="true">-->
-              <!--<div slot="content" style="width: 200px;white-space:normal;">-->
-                <!--{{row.proName}}-->
-              <!--</div>-->
-              <!--<div style="word-break: break-all;text-overflow: ellipsis;display: -webkit-box;-->
-                    <!-- -webkit-box-orient: vertical;-webkit-line-clamp: 3;overflow: hidden;">-->
-                <!--{{row.proName}}-->
-              <!--</div>-->
-            <!--</Poptip>-->
-          <!--</div>-->
-
-        </Table>
+        <!--<Table-->
+        <!--size='large' stripe-->
+        <!--v-if="tab_H>0"-->
+        <!--:height="tab_H"-->
+        <!--:columns="tableTiT"-->
+        <!--:data="tableData">-->
+        <!--</Table>-->
+        <find-order-card-box v-for="(it,index) in tableData" :mess="it" :key="index"></find-order-card-box>
       </div>
       <div class="pagerBoxSty boxMar_T box_row rowRight">
         <one-page :total="total" :size="param.pageSize"
@@ -56,10 +69,12 @@
 
 <script>
   // import mess from './comp/mess'
+  import findOrderCardBox from '../comp/findOrderCardBox'
 
   export default {
     name: "index",
     components: {
+      findOrderCardBox
       // mess
     },
     data() {
@@ -172,6 +187,8 @@
         ],
         tableData: [],
         param: {
+          orderType:"2",// 订单类型   1 直接购买  2 参与抽奖
+          ddzt:"00",
           idLike: '',
           cjsjLike: '',
           pageNum: 1,
@@ -202,7 +219,11 @@
         this.getPagerList()
       },
       getPagerList() {
-        this.$http.post(this.apis.ORDER.QUERY, this.param).then((res) => {
+        let a = JSON.parse(JSON.stringify(this.param))
+        if(a.ddzt == "00"){
+          a.ddzt = ""
+        }
+        this.$http.post(this.apis.ORDER.QUERY, a).then((res) => {
           if (res.code == 200) {
             this.tableData = res.page.list
             this.total = res.page.total

@@ -19,7 +19,7 @@
     </div>
     <div class="box_col">
       <div class="box_col_auto">
-        <order-card v-for="(it,index) in tableData" :mess="it" v-if="index == 0"></order-card>
+        <!--<order-card v-for="(it,index) in tableData" :mess="it" v-if="index == 0"></order-card>-->
 
         <order-card-box v-for="(it,index) in tableData" :mess="it" :key="index"></order-card-box>
       </div>
@@ -30,35 +30,6 @@
     </div>
 
   </Card>
-
-
-  <!--<div class="box_col">-->
-  <!--<div class="box_row colCenter pageFindSty" style="border: none">-->
-  <!--<div class="box_row_100">-->
-  <!--<pager-tit title="直购订单"></pager-tit>-->
-  <!--</div>-->
-  <!--<div>-->
-  <!--<Input-->
-  <!--placeholder="order id" style="width: 200px"/>-->
-  <!--</div>-->
-  <!--<div>-->
-  <!--<Input-->
-  <!--placeholder="phone number" style="width: 200px"/>-->
-  <!--</div>-->
-  <!--<Button type="primary">-->
-  <!--<Icon type="md-search"></Icon>-->
-  <!--&lt;!&ndash;查询&ndash;&gt;-->
-  <!--</Button>-->
-  <!--</div>-->
-  <!--<div style="height: 670px">-->
-  <!--<order-card v-for="item in tableData" :mess="item"></order-card>-->
-  <!--</div>-->
-  <!--<div class="pagerBoxSty boxMar_T box_row rowRight">-->
-  <!--<one-page :total="total" :size="param.pageSize"-->
-  <!--:opts="[4,8,12,16]"-->
-  <!--@chPager="chPager"></one-page>-->
-  <!--</div>-->
-  <!--</div>-->
 </template>
 
 <script>

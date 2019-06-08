@@ -165,7 +165,7 @@
       return {
         defAva,
         showModal: true,
-        TabsVal: "2",
+        TabsVal: "1",
         tableTiT: [
           {
             title: "序号",
