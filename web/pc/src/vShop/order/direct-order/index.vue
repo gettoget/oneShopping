@@ -1,12 +1,14 @@
 <template>
-  <div class="box_col">
-    <pager-tit title="直购订单"></pager-tit>
-    <div class="box_row colCenter rowRight pageFindSty" style="border: none">
-      <div>
+  <Card class="directIndexBox box_col">
+    <div slot="title" class="box_row colCenter">
+      <div class="box_row_100">
+        <pager-tit title="直购订单"></pager-tit>
+      </div>
+      <div style="margin-right: 20px">
         <Input
           placeholder="order id" style="width: 200px"/>
       </div>
-      <div>
+      <div style="margin-right: 20px">
         <Input
           placeholder="phone number" style="width: 200px"/>
       </div>
@@ -15,68 +17,39 @@
         <!--查询-->
       </Button>
     </div>
-    <div style="height: 670px">
-      <order-card v-for="item in tableData" :mess="item"></order-card>
-    </div>
-    <div class="pagerBoxSty boxMar_T box_row rowRight">
-      <one-page :total="total" :size="param.pageSize"
-                :opts="[4,8,12,16]"
-                @chPager="chPager"></one-page>
-    </div>
-<!--    <div>-->
-<!--      <Card style="width:320px">-->
-<!--        <div>-->
-<!--          <img src="">-->
-<!--          <div>-->
-<!--            <CellGroup>-->
-<!--              <Cell title="商品名称"/>-->
-<!--              <Cell title="下单日期" extra="2017-08-12"/>-->
-<!--              <Cell title="支付金额" extra="2895"/>-->
-<!--              <Cell title="购买数量" extra="125"/>-->
-<!--              <Cell title="支付时间" extra="3596"/>-->
-<!--              <Cell title="用户名" extra="3"/>-->
-<!--              <Cell title="手机号" extra="8"/>-->
-<!--              <Cell title="收货地址" extra="1"/>-->
-<!--            </CellGroup>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </Card>-->
-<!--    </div>-->
-    <!--<div>-->
-      <!--<Table-->
-        <!--size='large' stripe-->
-        <!--:height="AF.getPageHeight()-320"-->
-        <!--:columns="tableTiT"-->
-        <!--:data="tableData"></Table>-->
-    <!--</div>-->
+    <div class="box_col">
+      <div class="box_col_auto">
+        <!--<order-card v-for="(it,index) in tableData" :mess="it" v-if="index == 0"></order-card>-->
 
-  </div>
+        <order-card-box v-for="(it,index) in tableData" :mess="it" :key="index"></order-card-box>
+      </div>
+      <div class="pagerBoxSty boxMar_T box_row rowRight">
+        <one-page :total="total" :size="param.pageSize"
+                  :opts="[4,8,12,16]" @chPager="chPager"></one-page>
+      </div>
+    </div>
+
+  </Card>
 </template>
 
 <script>
   import orderCard from '../comp/orderCard'
+  import orderCardBox from '../comp/orderCardBox'
 
   export default {
     name: "index",
     components: {
-      orderCard
+      orderCard, orderCardBox
     },
     data() {
       return {
-        param:{
-          // orderType:1,
-          idLike:'',
-          cjsjLike:'',
-          pageNum: 1,
-          pageSize: 4
-        },
-        total:0,
-        tableTiT: [{
-          title: "序号",
-          width: 80,
-          align: 'center',
-          type: 'index'
-        },
+        tableTiT: [
+          {
+            title: "序号",
+            width: 80,
+            align: 'center',
+            type: 'index'
+          },
           {
             title: '订单编号',
             align: 'center',
@@ -129,23 +102,29 @@
           },
         ],
         tableData: [],
+        param: {
+          // orderType:1,
+          idLike: '',
+          cjsjLike: '',
+          pageNum: 1,
+          pageSize: 4
+        },
+        total: 0,
       }
     },
-    created(){
+    created() {
       this.getPagerList()
     },
-    methods:{
-      chPager(p){
+    methods: {
+      chPager(p) {
         this.param.pageNum = p.pageNum
         this.param.pageSize = p.pageSize
         this.getPagerList()
       },
-      getPagerList(){
-        this.$http.post(this.apis.ORDER.QUERY,this.param).then((res)=>{
-          if (res.code == 200){
+      getPagerList() {
+        this.$http.post(this.apis.ORDER.QUERY, this.param).then((res) => {
+          if (res.code == 200) {
             this.tableData = res.page.list
-            this.param.pageNum = res.page.pageNum
-            this.param.pageSize = res.page.pageSize
             this.total = res.page.total
           }
         })
@@ -154,6 +133,6 @@
   }
 </script>
 
-<style scoped>
-
+<style lang="less">
+  @import "./index.less";
 </style>

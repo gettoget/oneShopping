@@ -68,24 +68,24 @@ export default [
         },
         component: () => import('@/vShop/system/system-user')
       },
-      {
-        path: 'system-role',
-        name: 'system-role',
-        meta: {
-          icon: '_bear',
-          title: '角色管理'
-        },
-        component: () => import('@/vShop/system/system-root')
-      },
-      {
-        path: 'system-function',
-        name: 'system-function',
-        meta: {
-          icon: '_bear',
-          title: '功能管理'
-        },
-        component: () => import('@/vShop/system/system-function')
-      },
+      // {
+      //   path: 'system-role',
+      //   name: 'system-role',
+      //   meta: {
+      //     icon: '_bear',
+      //     title: '角色管理'
+      //   },
+      //   component: () => import('@/vShop/system/system-root')
+      // },
+      // {
+      //   path: 'system-function',
+      //   name: 'system-function',
+      //   meta: {
+      //     icon: '_bear',
+      //     title: '功能管理'
+      //   },
+      //   component: () => import('@/vShop/system/system-function')
+      // },
       // {
       //   path: 'system_Jurisdiction',
       //   name: 'system_Jurisdiction',
@@ -95,24 +95,24 @@ export default [
       //   },
       //   component: () => import('@/vShop/system/system-Jurisdiction')
       // },
-      {
-        path: 'system-daily',
-        name: 'system-daily',
-        meta: {
-          icon: '_bear',
-          title: '日志管理'
-        },
-        component: () => import('@/vShop/system/system-daily')
-      },
-      {
-        path: 'dictionaries',
-        name: 'dictionaries',
-        meta: {
-          icon: '_bear',
-          title: '字典管理'
-        },
-        component: () => import('@/vShop/system/dictionaries')
-      },
+      // {
+      //   path: 'system-daily',
+      //   name: 'system-daily',
+      //   meta: {
+      //     icon: '_bear',
+      //     title: '日志管理'
+      //   },
+      //   component: () => import('@/vShop/system/system-daily')
+      // },
+      // {
+      //   path: 'dictionaries',
+      //   name: 'dictionaries',
+      //   meta: {
+      //     icon: '_bear',
+      //     title: '字典管理'
+      //   },
+      //   component: () => import('@/vShop/system/dictionaries')
+      // },
       // {
       //   path: 'system-ShortMessage',
       //   name: 'system-ShortMessage',
@@ -227,15 +227,15 @@ export default [
         },
         component: () => import('@/vShop/order/direct-order')
       },
-      {
-        path:'/draw-order',
-        name:'draw-order',
-        meta: {
-          icon: 'md-trending-up',
-          title: '中奖订单'
-        },
-        component: () => import('@/vShop/order/draw-order')
-      },
+      // {
+      //   path:'/draw-order',
+      //   name:'draw-order',
+      //   meta: {
+      //     icon: 'md-trending-up',
+      //     title: '中奖订单'
+      //   },
+      //   component: () => import('@/vShop/order/draw-order')
+      // },
       // {
       //   path:'/draw-order-robot',
       //   name:'draw-order-robot',

@@ -1,220 +1,244 @@
 <template>
-   <div>
-     <pager-tit title="订单查询"></pager-tit>
-     <div class="box_row colCenter rowRight pageFindSty" style="border: none">
-       <div>
-         <!--<Icon type="ios-call" size="34"/>-->
-         <DatePicker v-model="param.cjsjLike" value='yyyy-MM-dd' @on-change="changTime" type="daterange" :options="options2" placement="bottom-end" placeholder="Select date" style="width: 200px"></DatePicker>
-<!--         <DatePicker  v-model="param.cjsjLike" format="yyyy-MM-dd" type="daterange" split-panels placeholder="Select date" style="width: 200px"></DatePicker>-->
-       </div>
-       <div>
-         <!--<Icon type="md-person" size="34"/>-->
-         <Input
-           v-model="param.idLike"
-           placeholder="order id" style="width: 200px">
-         </Input>
-       </div>
-       <Button type="primary" @click="getPagerList">
-         <Icon type="md-search"></Icon>
-         <!--查询-->
-       </Button>
-     </div>
-     <Row style="position: relative;padding: 5px">
-       <Table
-         size='large' stripe
-         :height="AF.getPageHeight()-320"
-         :columns="tableTiT"
-         :data="tableData"></Table>
-     </Row>
-     <div class="pagerBoxSty boxMar_T box_row rowRight">
-       <one-page :total="total" :size="param.pageSize"
-                 :opts="[4,8,12,16]"
-                 @chPager="chPager"></one-page>
-     </div>
-     <component
-       :is="compName"
-       :usermes="usermes"
-       ></component>
-   </div>
+  <Card class="box_col findOrderBox">
+    <div slot="title" class="box_row colCenter">
+      <div class="">
+        <pager-tit title="订单查询"></pager-tit>
+        <!--<div>-->
+          <!--<RadioGroup v-model="param.orderType" type="button"-->
+                      <!--@on-change="getPagerList()" style="margin-right: 20px">-->
+            <!--<Radio label="2">参与抽奖</Radio>-->
+            <!--<Radio label="1">直接购买</Radio>-->
+          <!--</RadioGroup>-->
+        <!--</div>-->
+      </div>
+      <div class="box_row_100">
+        <div class="box_row rowRight">
+          <div v-if="param.orderType == '2'">
+            <RadioGroup v-model="param.ddzt" type="button"
+                        @on-change="getPagerList()" style="margin-right: 20px">
+              <Radio label="00">全部</Radio>
+              <Radio label="0">待开奖</Radio>
+              <Radio label="1">已中奖</Radio>
+              <Radio label="2">未中奖</Radio>
+              <Radio label="3">待支付</Radio>
+              <Radio label="4">已支付</Radio>
+              <Radio label="5">取消支付</Radio>
+            </RadioGroup>
+          </div>
+          <div>
+            <!--<DatePicker value='yyyy-MM-dd' @on-change="changTime" type="daterange" :options="options2"-->
+                        <!--placement="bottom-end" placeholder="Select date" style="width: 200px"></DatePicker>-->
+          </div>
+          <div>
+            <Input
+              v-model="param.idLike"
+              placeholder="order id" style="width: 200px"/>
+          </div>
+          <Button type="primary" @click="getPagerList">
+            <Icon type="md-search"></Icon>
+            <!--查询-->
+          </Button>
+        </div>
+
+        </div>
+      </div>
+    <div class="box_col">
+      <div :id="tabBox" class="box_col_auto">
+        <!--<Table-->
+        <!--size='large' stripe-->
+        <!--v-if="tab_H>0"-->
+        <!--:height="tab_H"-->
+        <!--:columns="tableTiT"-->
+        <!--:data="tableData">-->
+        <!--</Table>-->
+        <find-order-card-box v-for="(it,index) in tableData" :mess="it" :key="index"></find-order-card-box>
+      </div>
+      <div class="pagerBoxSty boxMar_T box_row rowRight">
+        <one-page :total="total" :size="param.pageSize"
+                  :opts="[4,8,12,16]"
+                  @chPager="chPager"></one-page>
+      </div>
+    </div>
+
+    <component
+      :is="compName"
+      :usermes="usermes"
+    ></component>
+  </Card>
 </template>
 
 <script>
-  import mess from './comp/mess'
-    export default {
-      name: "index",
-      components:{
-        mess
-      },
-      data(){
-          return{
-            total:0,
-            usermes: {},
-            userMesType: true,
-            compName:'',
-            tableTiT: [{
-              title: "序号",
-              width: 80,
-              align: 'center',
-              type: 'index'
-            },
-              {
-                title: '订单编号',
-                align: 'center',
-                key: 'id'
-              },
-              {
-                title: '下单时间',
-                align: 'center',
-                key: 'cjsj'
-              },
-              {
-                title: '用户名',
-                align: 'center',
-                key: 'userName'
-              },
-              {
-                title: '商品名',
-                align: 'center',
-                key: 'proName',
-              },
-              {
-                title: '订单状态',
-                width: 120,
-                align: 'center',
-                key: 'ddzt',
-                render: (h, p) => {
-                  let str = p.row.ddzt;
-                  if (str == 0) {
-                    str = '待开奖';
-                  } else if (str == 1) {
-                    str = '已中奖';
-                  } else if (str == 2) {
-                    str = '未中奖';
-                  } else if (str == 3) {
-                    str = '待支付';
-                  } else if (str == 4) {
-                    str = '已支付';
-                  }else if(str == 5){
-                    str = '取消支付'
-                  }
-                  return h('Tag', {
-                    style: {
-                      width: '90px'
-                    },
-                    props: {
-                      color: p.row.ddzt == 3 ? 'error' : 'success'
-                    },
-                  }, str);
-                }
-              },
-              {
-                title: '支付金额',
-                width: 120,
-                align: 'center',
-                key: 'zfje'
-              },
-              {
-                title: '支付时间',
-                align: 'center',
-                key: 'zfsj'
-              },
-              {
-                title: '详情',
-                key: 'action',
-                width: 180,
-                align: 'center',
-                render: (h, p) => {
-                  return h('div', [
-                    h('Button', {
-                      props: {
-                        type: 'primary',
-                        icon: 'md-menu',
-                        shape: 'circle',
-                        size: 'small'
-                      },
-                      style: {
-                        cursor: "pointer",
-                        margin: '0 8px 0 0'
-                      },
-                      on: {
-                        click: () => {
-                          this.usermes = p.row
-                            this.compName = mess
-                        }
-                      }
-                    })
-                  ]);
-                }
+  // import mess from './comp/mess'
+  import findOrderCardBox from '../comp/findOrderCardBox'
+
+  export default {
+    name: "index",
+    components: {
+      findOrderCardBox
+      // mess
+    },
+    data() {
+      return {
+        total: 0,
+        usermes: {},
+        userMesType: true,
+        compName: '',
+        tabBox:"tabBox",
+        tab_H:0,
+        tableTiT: [
+          {
+            title: "序号",
+            width: 80,
+            align: 'center',
+            render:(h,p)=>{
+              return h("div",p.index+1+((this.param.pageNum-1)*this.param.pageSize))
+            }
+          },
+          {
+            title: '订单编号',
+            key: 'id',
+            width:110
+          },
+          {
+            title: '商品名',
+            key: 'proName',
+          },
+          {
+            title: '订单状态',
+            width: 120,
+            key: 'ddzt',
+            render: (h, p) => {
+              let str = p.row.ddzt;
+              if (str == 0) {
+                str = '待开奖';
+              } else if (str == 1) {
+                str = '已中奖';
+              } else if (str == 2) {
+                str = '未中奖';
+              } else if (str == 3) {
+                str = '待支付';
+              } else if (str == 4) {
+                str = '已支付';
+              } else if (str == 5) {
+                str = '取消支付'
               }
-            ],
-            tableData: [],
-            param:{
-              idLike:'',
-              cjsjLike:'',
-              pageNum: 1,
-              pageSize: 8
-            },
-            options2: {
-              shortcuts: [
-                {
-                  text: '1 week',
-                  value () {
-                    const end = new Date();
-                    const start = new Date();
-                    start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-                    return [start, end];
-                  }
+              return h('Tag', {
+                style: {
+                  width: '90px'
                 },
-                {
-                  text: '1 month',
-                  value () {
-                    const end = new Date();
-                    const start = new Date();
-                    start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-                    return [start, end];
-                  }
+                props: {
+                  color: p.row.ddzt == 3 ? 'error' : 'success'
                 },
-                {
-                  text: '3 months',
-                  value () {
-                    const end = new Date();
-                    const start = new Date();
-                    start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-                    return [start, end];
+              }, str);
+            }
+          },
+          {
+            title: '下单时间',
+            key: 'cjsj',
+            render:(h,p)=>{
+              return h('div',[
+                h('div',this.moment(p.row.cjsj).format('YYYY-MM-DD')),
+                h('div',this.moment(p.row.cjsj).format('HH:mm:ss'))
+              ])
+            }
+          },
+          {
+            title: '用户名',
+            key: 'userName'
+          },
+          {
+            title: '支付金额',
+            width: 120,
+            key: 'zfje'
+          },
+          // {
+          //   title: '支付时间',
+          //   align: 'center',
+          //   key: 'zfsj'
+          // },
+          {
+            title: '详情',
+            key: 'action',
+            width: 180,
+            align: 'center',
+            render: (h, p) => {
+              return h('div', [
+                h('Button', {
+                  props: {
+                    type: 'primary',
+                    icon: 'md-menu',
+                    shape: 'circle',
+                    size: 'small'
+                  },
+                  style: {
+                    cursor: "pointer",
+                    margin: '0 8px 0 0'
+                  },
+                  on: {
+                    click: () => {
+                      this.usermes = p.row
+                      this.compName = mess
+                    }
                   }
-                }
-              ]
+                })
+              ]);
             }
           }
-      },
-      created(){
+        ],
+        tableData: [],
+        param: {
+          orderType:"2",// 订单类型   1 直接购买  2 参与抽奖
+          ddzt:"00",
+          idLike: '',
+          cjsjLike: '',
+          pageNum: 1,
+          pageSize: 8
+        }
+      }
+    },
+    created() {
+      this.getPagerList()
+    },
+    mounted(){
+      this.$nextTick(() => {
+        try {
+          this.tab_H = this.AF.getDom_H(this.tabBox)
+        } catch (e) {
+        }
+      })
+    },
+    methods: {
+      chPager(p) {
+        this.param.pageNum = p.pageNum
+        this.param.pageSize = p.pageSize
         this.getPagerList()
       },
-      methods:{
-        chPager(p){
-          this.param.pageNum = p.pageNum
-          this.param.pageSize = p.pageSize
-          this.getPagerList()
-        },
-        changTime(value){
-          this.param.cjsjGte = value[0]+' 00:00:00'
-          this.param.cjsjLte = value[1]+' 23:59:59'
-          this.getPagerList()
-        },
-        getPagerList(){
-          this.$http.post(this.apis.ORDER.QUERY,this.param).then((res)=>{
-            if (res.code == 200){
-              this.tableData = res.page.list
-              this.param.pageNum = res.page.pageNum
-              this.param.pageSize = res.page.pageSize
-              this.total = res.page.total
-            }
-          })
-        },
-      }
+      changTime(value) {
+        this.param.cjsjGte = value[0] + ' 00:00:00'
+        this.param.cjsjLte = value[1] + ' 23:59:59'
+        this.getPagerList()
+      },
+      getPagerList() {
+        let a = JSON.parse(JSON.stringify(this.param))
+        if(a.ddzt == "00"){
+          a.ddzt = ""
+        }
+        this.$http.post(this.apis.ORDER.QUERY, a).then((res) => {
+          if (res.code == 200) {
+            this.tableData = res.page.list
+            this.total = res.page.total
+          }
+        })
+      },
     }
+  }
 </script>
 
-<style scoped>
-
+<style lang="less">
+  .findOrderBox {
+    .ivu-card-body {
+      flex: 1;
+      overflow: auto;
+    }
+  }
 </style>
