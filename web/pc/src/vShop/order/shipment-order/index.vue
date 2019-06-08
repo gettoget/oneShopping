@@ -1,99 +1,116 @@
 <template>
-  <div>
-    <pager-tit title="订单发货"></pager-tit>
-    <div class="box_row colCenter rowRight pageFindSty" style="border: none">
-      <div>
-        <!--<Icon type="md-person" size="34"/>-->
-        <Input
-          placeholder="请输入订单编号" style="width: 200px">
-        </Input>
+  <Card class="box_col findOrderBox">
+    <div slot="title" class="box_row colCenter">
+      <div class="">
+        <pager-tit title="发货订单"></pager-tit>
       </div>
+      <div class="box_row_100">
+        <div class="box_row rowRight">
+          <div>
+            <!--<DatePicker value='yyyy-MM-dd' @on-change="changTime" type="daterange" :options="options2"-->
+            <!--placement="bottom-end" placeholder="Select date" style="width: 200px"></DatePicker>-->
+          </div>
+          <div>
+            <Input
+              v-model="param.idLike"
+              placeholder="order id" style="width: 200px"/>
+          </div>
+          <Button type="primary" @click="getPagerList">
+            <Icon type="md-search"></Icon>
+            <!--查询-->
+          </Button>
+        </div>
 
-      <div>
-        <!--<Icon type="ios-call" size="34"/>-->
-        <Input
-          placeholder="请输入手机号码" style="width: 200px"
-        ></Input>
       </div>
-      <Button type="primary">
-        <Icon type="md-search"></Icon>
-        <!--查询-->
-      </Button>
     </div>
-    <Row style="position: relative;padding-top: 5px">
-      <Table
-        size='large' stripe
-        :height="AF.getPageHeight()-320"
-        :columns="tableTiT"
-        :data="tableData"></Table>
-    </Row>
-  </div>
+    <div class="box_col">
+      <div :id="tabBox" class="box_col_auto">
+        <goods-order-card-box v-for="(it,index) in tableData" :mess="it" :key="index"></goods-order-card-box>
+      </div>
+      <div class="pagerBoxSty boxMar_T box_row rowRight">
+        <one-page :total="total" :size="param.pageSize"
+                  :opts="[4,8,12,16]"
+                  @chPager="chPager"></one-page>
+      </div>
+    </div>
+
+    <component
+      :is="compName"
+      :usermes="usermes"
+    ></component>
+  </Card>
 </template>
 
 <script>
+  import goodsOrderCardBox from '../comp/goodsOrderCardBox'
+
+
   export default {
     name: "index",
-    data(){
-      return{
-        tableTiT: [{
-          title: "序号",
-          width: 80,
-          align: 'center',
-          type: 'index'
-        },
-          {
-            title: '订单编号',
-            align: 'center',
-            key: 'bh'
-          },
-          {
-            title: '下单时间',
-            align: 'center',
-            key: 'sj'
-          },
-          {
-            title: '下单手机号',
-            align: 'center',
-            key: 'sjh'
-          },
-          {
-            title: '收货地址',
-            align: 'center',
-            key: 'dz',
-          },
-          {
-            title: '订单状态',
-            width: 120,
-            align: 'center',
-            key: 'zt'
-          },
-          {
-            title: '备注',
-            align: 'center',
-            key: 'bz'
-          },
-          {
-            title: '审核人',
-            align: 'center',
-            key: 'shr'
-          },
-        ],
-        tableData: [
-          {
-            bh:'20180909000123431',
-            sj:'2018-04-01',
-            sjh:'0908-1678-18766',
-            dz:'sjhfjsfkjdakd',
-            zt:'已审核',
-            bz:'赠品111',
-            shr:'losslll'
-          }
-        ],
+    components: {
+      goodsOrderCardBox
+    },
+    data() {
+      return {
+        total: 0,
+        usermes: {},
+        userMesType: true,
+        compName: '',
+        tabBox:"tabBox",
+        tab_H:0,
+        tableData: [],
+        param: {
+          ddztIn:"1",
+          idLike: '',
+          cjsjLike: '',
+          pageNum: 1,
+          pageSize: 8
+        }
       }
+    },
+    created() {
+      this.getPagerList()
+    },
+    mounted(){
+      this.$nextTick(() => {
+        try {
+          this.tab_H = this.AF.getDom_H(this.tabBox)
+        } catch (e) {
+        }
+      })
+    },
+    methods: {
+      chPager(p) {
+        this.param.pageNum = p.pageNum
+        this.param.pageSize = p.pageSize
+        this.getPagerList()
+      },
+      changTime(value) {
+        this.param.cjsjGte = value[0] + ' 00:00:00'
+        this.param.cjsjLte = value[1] + ' 23:59:59'
+        this.getPagerList()
+      },
+      getPagerList() {
+        let a = JSON.parse(JSON.stringify(this.param))
+        if(a.ddzt == "00"){
+          a.ddzt = ""
+        }
+        this.$http.post(this.apis.ORDER.QUERY, a).then((res) => {
+          if (res.code == 200) {
+            this.tableData = res.page.list
+            this.total = res.page.total
+          }
+        })
+      },
     }
   }
 </script>
 
-<style scoped>
-
+<style lang="less">
+  .findOrderBox {
+    .ivu-card-body {
+      flex: 1;
+      overflow: auto;
+    }
+  }
 </style>

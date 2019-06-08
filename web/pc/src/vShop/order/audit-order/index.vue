@@ -3,13 +3,6 @@
     <div slot="title" class="box_row colCenter">
       <div class="">
         <pager-tit title="订单查询"></pager-tit>
-        <!--<div>-->
-          <!--<RadioGroup v-model="param.orderType" type="button"-->
-                      <!--@on-change="getPagerList()" style="margin-right: 20px">-->
-            <!--<Radio label="2">参与抽奖</Radio>-->
-            <!--<Radio label="1">直接购买</Radio>-->
-          <!--</RadioGroup>-->
-        <!--</div>-->
       </div>
       <div class="box_row_100">
         <div class="box_row rowRight">
@@ -44,13 +37,6 @@
       </div>
     <div class="box_col">
       <div :id="tabBox" class="box_col_auto">
-        <!--<Table-->
-        <!--size='large' stripe-->
-        <!--v-if="tab_H>0"-->
-        <!--:height="tab_H"-->
-        <!--:columns="tableTiT"-->
-        <!--:data="tableData">-->
-        <!--</Table>-->
         <find-order-card-box v-for="(it,index) in tableData" :mess="it" :key="index"></find-order-card-box>
       </div>
       <div class="pagerBoxSty boxMar_T box_row rowRight">
@@ -85,106 +71,6 @@
         compName: '',
         tabBox:"tabBox",
         tab_H:0,
-        tableTiT: [
-          {
-            title: "序号",
-            width: 80,
-            align: 'center',
-            render:(h,p)=>{
-              return h("div",p.index+1+((this.param.pageNum-1)*this.param.pageSize))
-            }
-          },
-          {
-            title: '订单编号',
-            key: 'id',
-            width:110
-          },
-          {
-            title: '商品名',
-            key: 'proName',
-          },
-          {
-            title: '订单状态',
-            width: 120,
-            key: 'ddzt',
-            render: (h, p) => {
-              let str = p.row.ddzt;
-              if (str == 0) {
-                str = '待开奖';
-              } else if (str == 1) {
-                str = '已中奖';
-              } else if (str == 2) {
-                str = '未中奖';
-              } else if (str == 3) {
-                str = '待支付';
-              } else if (str == 4) {
-                str = '已支付';
-              } else if (str == 5) {
-                str = '取消支付'
-              }
-              return h('Tag', {
-                style: {
-                  width: '90px'
-                },
-                props: {
-                  color: p.row.ddzt == 3 ? 'error' : 'success'
-                },
-              }, str);
-            }
-          },
-          {
-            title: '下单时间',
-            key: 'cjsj',
-            render:(h,p)=>{
-              return h('div',[
-                h('div',this.moment(p.row.cjsj).format('YYYY-MM-DD')),
-                h('div',this.moment(p.row.cjsj).format('HH:mm:ss'))
-              ])
-            }
-          },
-          {
-            title: '用户名',
-            key: 'userName'
-          },
-          {
-            title: '支付金额',
-            width: 120,
-            key: 'zfje'
-          },
-          // {
-          //   title: '支付时间',
-          //   align: 'center',
-          //   key: 'zfsj'
-          // },
-          {
-            title: '详情',
-            key: 'action',
-            width: 180,
-            align: 'center',
-            render: (h, p) => {
-              return h('div', [
-                h('Button', {
-                  props: {
-                    type: 'primary',
-                    icon: 'md-menu',
-                    shape: 'circle',
-                    size: 'small'
-                  },
-                  style: {
-                    cursor: "pointer",
-                    margin: '0 8px 0 0'
-                  },
-                  on: {
-                    click: () => {
-                      this.usermes = p.row
-                      this.compName = mess
-                    }
-                  }
-                })
-              ]);
-            }
-          }
-        ],
         tableData: [],
         param: {
           orderType:"2",// 订单类型   1 直接购买  2 参与抽奖
