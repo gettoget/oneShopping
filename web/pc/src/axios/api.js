@@ -1,6 +1,16 @@
 import config from '@/config'
-// const ajaxUrl = process.env.NODE_ENV === 'development' ? config.baseUrl.dev : config.baseUrl.pro
-const ajaxUrl = process.env.NODE_ENV === 'development'
+/**
+ *字段收索规则
+ * keyGte  大于等于
+ * keyLte  小于等于
+ * keyIn   多值查询  “,”  分割
+ * keyLike 模糊查询
+ * key     精确查询
+ **/
+
+
+
+const ajaxUrl = process.env.NODE_ENV === 'development'//development开发环境
   ? ' http://119.23.242.234:8088'
   : ' http://119.23.242.234:8088'
 const fileUrl = "http://119.23.242.234:9092/"

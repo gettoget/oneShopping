@@ -7,13 +7,24 @@
       <div class="box_row_100">
         <div class="box_row rowRight">
           <div>
-            <!--<DatePicker value='yyyy-MM-dd' @on-change="changTime" type="daterange" :options="options2"-->
-            <!--placement="bottom-end" placeholder="Select date" style="width: 200px"></DatePicker>-->
+            <Input
+              v-model="param.proNameLike" @on-change="getPagerList"
+              placeholder="商品名称" style="width: 160px;margin-right: 18px"/>
           </div>
           <div>
             <Input
-              v-model="param.idLike"
-              placeholder="order id" style="width: 200px"/>
+              v-model="param.userNameLike" @on-change="getPagerList"
+              placeholder="用户姓名" style="width: 160px;margin-right: 18px"/>
+          </div>
+          <div>
+            <Input
+              v-model="param.phoneLike" @on-change="getPagerList"
+              placeholder="用户电话" style="width: 160px;margin-right: 18px"/>
+          </div>
+          <div>
+            <DatePicker format='yyyy-MM-dd' @on-change="changTime" type="daterange"
+                        split-panels style="width: 160px;margin-right: 18px"
+                        placement="bottom-end" placeholder="购买时间"></DatePicker>
           </div>
           <Button type="primary" @click="getPagerList">
             <Icon type="md-search"></Icon>
@@ -24,7 +35,7 @@
       </div>
     </div>
     <div class="box_col">
-      <div :id="tabBox" class="box_col_auto">
+      <div class="box_col_auto">
         <goods-order-card-box v-for="(it,index) in tableData" :mess="it" :key="index"></goods-order-card-box>
       </div>
       <div class="pagerBoxSty boxMar_T box_row rowRight">
@@ -43,8 +54,6 @@
 
 <script>
   import goodsOrderCardBox from '../comp/goodsOrderCardBox'
-
-
   export default {
     name: "index",
     components: {
@@ -54,13 +63,11 @@
       return {
         total: 0,
         usermes: {},
-        userMesType: true,
         compName: '',
-        tabBox:"tabBox",
         tab_H:0,
         tableData: [],
         param: {
-          ddztIn:"1",
+          ddztIn:"1,4",
           idLike: '',
           cjsjLike: '',
           pageNum: 1,
@@ -72,12 +79,6 @@
       this.getPagerList()
     },
     mounted(){
-      this.$nextTick(() => {
-        try {
-          this.tab_H = this.AF.getDom_H(this.tabBox)
-        } catch (e) {
-        }
-      })
     },
     methods: {
       chPager(p) {

@@ -8,8 +8,8 @@
     </div>
 
     <div class="box_row orderBox rowBetween colTop" style="height: 160px">
-      <img :src="mess.imgUrl[0].substring(0,4)==='http'?mess.imgUrl[0]:apis.GETFILEURL+mess.imgUrl[0]"
-           style="height: 160px;width: 160px" alt="">
+      <!--<img :src="mess.imgUrl[0].substring(0,4)==='http'?mess.imgUrl[0]:apis.GETFILEURL+mess.imgUrl[0]"-->
+           <!--style="height: 160px;width: 160px" alt="">-->
       <div>
         <Poptip placement="left-start" :transfer="true" trigger="hover">
           <div class="comp-shop-name">
@@ -47,7 +47,7 @@
           </div>
           <div class="item-val">
             <div class="addressMess">
-              {{mess.addr.address}}sadfasdfasdfadfasdfasdfadsfasf
+              <span v-if="mess.addr">{{mess.addr.address}}</span>
             </div>
           </div>
         </div>
@@ -59,7 +59,7 @@
             单价：
           </div>
           <div class="item-val">
-            {{mess.singlePrice}}
+              {{mess.singlePrice}}
           </div>
         </div>
         <div class="box_row itemSty">
@@ -67,7 +67,9 @@
             数量：
           </div>
           <div class="item-val">
-            <span style="font-size: 22px;font-weight: 700">x</span> {{mess.orderLists.length}}
+            <span style="font-size: 22px;font-weight: 700">x</span>
+            <span v-if="mess.orderLists">{{mess.orderLists.length}}</span>
+            <span v-else>1</span>
           </div>
         </div>
         <div class="box_row rowRight itemSty">
@@ -105,7 +107,7 @@
       }
     },
     created() {
-      this.mess.imgUrl = this.mess.imgUrl.split(',')
+      // this.mess.imgUrl = this.mess.imgUrl.split(',')
     }
   }
 </script>

@@ -4,23 +4,33 @@
       <div class="box_row_100">
         <pager-tit title="直购订单"></pager-tit>
       </div>
-      <div style="margin-right: 20px">
+      <div>
         <Input
-          placeholder="order id" style="width: 200px"/>
+          v-model="param.proNameLike" @on-change="getPagerList"
+          placeholder="商品名称" style="width: 160px;margin-right: 18px"/>
       </div>
-      <div style="margin-right: 20px">
+      <div>
         <Input
-          placeholder="phone number" style="width: 200px"/>
+          v-model="param.userNameLike" @on-change="getPagerList"
+          placeholder="用户姓名" style="width: 160px;margin-right: 18px"/>
       </div>
-      <Button type="primary">
+      <div>
+        <Input
+          v-model="param.phoneLike" @on-change="getPagerList"
+          placeholder="用户电话" style="width: 160px;margin-right: 18px"/>
+      </div>
+      <div>
+        <DatePicker format='yyyy-MM-dd' @on-change="changTime" type="daterange"
+                    split-panels style="width: 160px;margin-right: 18px"
+                    placement="bottom-end" placeholder="购买时间"></DatePicker>
+      </div>
+      <Button type="primary" @click="getPagerList">
         <Icon type="md-search"></Icon>
         <!--查询-->
       </Button>
     </div>
     <div class="box_col">
       <div class="box_col_auto">
-        <!--<order-card v-for="(it,index) in tableData" :mess="it" v-if="index == 0"></order-card>-->
-
         <order-card-box v-for="(it,index) in tableData" :mess="it" :key="index"></order-card-box>
       </div>
       <div class="pagerBoxSty boxMar_T box_row rowRight">
@@ -103,11 +113,14 @@
         ],
         tableData: [],
         param: {
-          // orderType:1,
-          idLike: '',
-          cjsjLike: '',
+          orderType:1,
+          proNameLike: '',
+          userNameLike: '',
+          phoneLike:"",
+          cjsjGte: '',//开始
+          cjsjLte: '',//结束
           pageNum: 1,
-          pageSize: 4
+          pageSize: 8
         },
         total: 0,
       }
@@ -119,6 +132,17 @@
       chPager(p) {
         this.param.pageNum = p.pageNum
         this.param.pageSize = p.pageSize
+        this.getPagerList()
+      },
+      changTime(value) {
+        console.log(value);
+        if(value[1] != ""){
+          this.param.cjsjGte = this.moment(value[0]).format('YYYY-MM-DD HH:mm:ss')
+          this.param.cjsjLte = this.moment(value[1]).format('YYYY-MM-DD HH:mm:ss')
+        }else{
+          this.param.cjsjGte = ""
+          this.param.cjsjLte = ""
+        }
         this.getPagerList()
       },
       getPagerList() {
