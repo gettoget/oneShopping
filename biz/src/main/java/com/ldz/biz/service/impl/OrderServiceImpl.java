@@ -98,7 +98,6 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             Set<String> receIds = orders.stream().filter(order -> StringUtils.isNotBlank(order.getReceId())).map(Order::getReceId).collect(Collectors.toSet());
             Map<String, ReceiveAddr> addrMap = new HashMap<>();
             if (CollectionUtils.isNotEmpty(receIds)) {
-
                 List<ReceiveAddr> addrs = addrService.findByIds(receIds);
                 addrMap = addrs.stream().collect(Collectors.toMap(ReceiveAddr::getId, p -> p));
             }
@@ -106,58 +105,68 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             condition.in(OrderList.InnerColumn.orderId, list);
             List<OrderList> orderLists = orderListService.findByCondition(condition);
 
-            if (CollectionUtils.isNotEmpty(orderLists)) {
 
-                Set<String> set = orders.stream().filter(order -> StringUtils.equals(order.getOrderType(), "1")).map(Order::getProId).collect(Collectors.toSet());
+            Set<String> set = orders.stream().filter(order -> StringUtils.equals(order.getOrderType(), "1")).map(Order::getProId).collect(Collectors.toSet());
+            Map<String, ProBaseinfo> baseMap = new HashMap<>();
+            if (CollectionUtils.isNotEmpty(set)) {
                 List<ProBaseinfo> baseinfos = proBaseinfoService.findByIds(set);
-                Map<String,ProBaseinfo> baseMap = new HashMap<>();
-                if(CollectionUtils.isNotEmpty(baseinfos)){
+
+                if (CollectionUtils.isNotEmpty(baseinfos)) {
                     baseMap = baseinfos.stream().collect(Collectors.toMap(ProBaseinfo::getId, p -> p));
                 }
-
-                Map<String, List<OrderList>> listMap = orderLists.stream().collect(Collectors.groupingBy(OrderList::getOrderId));
-                Set<String> collect = orderLists.stream().filter(orderList -> StringUtils.isNotBlank(orderList.getProId())).map(OrderList::getProId).collect(Collectors.toSet());
-                Set<String> userIds = orderLists.stream().filter(orderList -> StringUtils.isNotBlank(orderList.getUserid())).map(OrderList::getUserid).collect(Collectors.toSet());
-
+            }
+            Set<String> userIds = orders.stream().filter(orderList -> StringUtils.isNotBlank(orderList.getUserId())).map(Order::getUserId).collect(Collectors.toSet());
+            Map<String, User> userMap = new HashMap<>();
+            if (CollectionUtils.isNotEmpty(userIds)) {
                 List<User> users = userService.findByIds(userIds);
-                Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
+                userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
+            }
+            Map<String, ReceiveAddr> finalAddrMap = addrMap;
+            Map<String, ProBaseinfo> finalBaseMap = baseMap;
+            Map<String, List<OrderList>> listMap = new HashMap<>();
+            Map<String, ProInfo> map = new HashMap<>();
+            if (CollectionUtils.isNotEmpty(orderLists)) {
+                listMap = orderLists.stream().collect(Collectors.groupingBy(OrderList::getOrderId));
+                Set<String> collect = orderLists.stream().filter(orderList -> StringUtils.isNotBlank(orderList.getProId())).map(OrderList::getProId).collect(Collectors.toSet());
 
                 List<ProInfo> infos = proInfoService.findByIds(collect);
-                Map<String, ProInfo> map = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
-                Map<String, ReceiveAddr> finalAddrMap = addrMap;
-                Map<String, ProBaseinfo> finalBaseMap = baseMap;
-                orders.forEach(order -> {
-                    if (listMap.containsKey(order.getId())) {
-                        List<OrderList> lists = listMap.get(order.getId());
-                        order.setOrderLists(lists);
-                        List<String> nums = lists.stream().map(OrderList::getNum).collect(Collectors.toList());
-                        order.setNums(nums);
-                    }
-                    if (map.containsKey(order.getProId())) {
-                        ProInfo info = map.get(order.getProId());
-                        order.setRate((Integer.parseInt(info.getProPrice()) - Integer.parseInt(info.getRePrice())) * 100 / Integer.parseInt(info.getProPrice()));
-                        order.setKjsj(info.getKjsj());
-                        order.setImgUrl(info.getUrls());
-                        order.setSinglePrice(info.getProPrice());
-                    }
-                    if(finalBaseMap.containsKey(order.getProId())){
-                        ProBaseinfo baseinfo = finalBaseMap.get(order.getProId());
-                        order.setImgUrl(baseinfo.getUrls());
-                        order.setSinglePrice(baseinfo.getProPrice());
-                    }
-                    if (userMap.containsKey(order.getUserId())) {
-                        User user = userMap.get(order.getUserId());
-                        order.setUserName(user.getUserName());
-                        order.setPhone(user.getPhone());
-                    }
-                    if (finalAddrMap.containsKey(order.getReceId())) {
-                        ReceiveAddr addr = finalAddrMap.get(order.getReceId());
-                        order.setAddr(addr);
-                    }
-                });
+                map = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
             }
+            Map<String, List<OrderList>> finalListMap = listMap;
+            Map<String, ProInfo> finalMap = map;
+            Map<String, User> finalUserMap = userMap;
+            orders.forEach(order -> {
+                if (finalListMap.containsKey(order.getId())) {
+                    List<OrderList> lists = finalListMap.get(order.getId());
+                    order.setOrderLists(lists);
+                    List<String> nums = lists.stream().map(OrderList::getNum).collect(Collectors.toList());
+                    order.setNums(nums);
+                }
+                if (finalMap.containsKey(order.getProId())) {
+                    ProInfo info = finalMap.get(order.getProId());
+                    order.setRate((Integer.parseInt(info.getProPrice()) - Integer.parseInt(info.getRePrice())) * 100 / Integer.parseInt(info.getProPrice()));
+                    order.setKjsj(info.getKjsj());
+                    order.setImgUrl(info.getUrls());
+                    order.setSinglePrice(info.getProPrice());
+                }
+                if (finalBaseMap.containsKey(order.getProId())) {
+                    ProBaseinfo baseinfo = finalBaseMap.get(order.getProId());
+                    order.setImgUrl(baseinfo.getUrls());
+                    order.setSinglePrice(baseinfo.getProPrice());
+                }
+                if (finalUserMap.containsKey(order.getUserId())) {
+                    User user = finalUserMap.get(order.getUserId());
+                    order.setUserName(user.getUserName());
+                    order.setPhone(user.getPhone());
+                }
+                if (finalAddrMap.containsKey(order.getReceId())) {
+                    ReceiveAddr addr = finalAddrMap.get(order.getReceId());
+                    order.setAddr(addr);
+                }
+            });
         }
     }
+
 
     @Override
     public ApiResponse<String> saveEntity(Order entity) {
@@ -447,16 +456,16 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             OrderList lastOrder = baseMapper.findLatestRobot(info.getId());
             // 判断当前价格是否高于 2000 及以上
             List<String> orderIds = null;
-            if(Integer.parseInt(info.getProPrice()) >= 2000){
-                SimpleCondition simpleCondition= new SimpleCondition(Order.class);
+            if (Integer.parseInt(info.getProPrice()) >= 2000) {
+                SimpleCondition simpleCondition = new SimpleCondition(Order.class);
                 simpleCondition.and().andCondition(" gmfs >= '5' or gmfs >= 10 ");
                 List<Order> orders = findByCondition(simpleCondition);
-                if(CollectionUtils.isNotEmpty(orders)){
+                if (CollectionUtils.isNotEmpty(orders)) {
                     orderIds = orders.stream().map(Order::getId).collect(Collectors.toList());
                 }
             }
             //从最后一个购买订单的抽取一个中间号码
-            OrderList orderList = baseMapper.getOrderByRobotZjhm(id,orderIds);
+            OrderList orderList = baseMapper.getOrderByRobotZjhm(id, orderIds);
 
             if (orderList != null && StringUtils.isNotBlank(lastOrder.getId())) {
                 List<String> strings = lastFifty.stream().map(OrderList::getId).collect(Collectors.toList());

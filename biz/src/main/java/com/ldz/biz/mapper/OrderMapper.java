@@ -27,7 +27,7 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
             " and order_id in   <foreach item='item' index='index' collection='orderIds' open='(' separator=',' close=')'>" +
             " #{item} </foreach>" +
             "</if> order by r desc LIMIT 1 </script>")
-    OrderList getOrderByRobotZjhm(@Param("id") String id, List<String> orderIds);
+    OrderList getOrderByRobotZjhm(@Param("id") String id, @Param("orderIds")List<String> orderIds);
 
     /**
      * 充值所有未中奖状态
