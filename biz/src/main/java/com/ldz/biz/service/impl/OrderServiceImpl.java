@@ -107,6 +107,14 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             List<OrderList> orderLists = orderListService.findByCondition(condition);
 
             if (CollectionUtils.isNotEmpty(orderLists)) {
+
+                Set<String> set = orders.stream().filter(order -> StringUtils.equals(order.getOrderType(), "1")).map(Order::getProId).collect(Collectors.toSet());
+                List<ProBaseinfo> baseinfos = proBaseinfoService.findByIds(set);
+                Map<String,ProBaseinfo> baseMap = new HashMap<>();
+                if(CollectionUtils.isNotEmpty(baseinfos)){
+                    baseMap = baseinfos.stream().collect(Collectors.toMap(ProBaseinfo::getId, p -> p));
+                }
+
                 Map<String, List<OrderList>> listMap = orderLists.stream().collect(Collectors.groupingBy(OrderList::getOrderId));
                 Set<String> collect = orderLists.stream().filter(orderList -> StringUtils.isNotBlank(orderList.getProId())).map(OrderList::getProId).collect(Collectors.toSet());
                 Set<String> userIds = orderLists.stream().filter(orderList -> StringUtils.isNotBlank(orderList.getUserid())).map(OrderList::getUserid).collect(Collectors.toSet());
@@ -117,6 +125,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 List<ProInfo> infos = proInfoService.findByIds(collect);
                 Map<String, ProInfo> map = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
                 Map<String, ReceiveAddr> finalAddrMap = addrMap;
+                Map<String, ProBaseinfo> finalBaseMap = baseMap;
                 orders.forEach(order -> {
                     if (listMap.containsKey(order.getId())) {
                         List<OrderList> lists = listMap.get(order.getId());
@@ -130,6 +139,11 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                         order.setKjsj(info.getKjsj());
                         order.setImgUrl(info.getUrls());
                         order.setSinglePrice(info.getProPrice());
+                    }
+                    if(finalBaseMap.containsKey(order.getProId())){
+                        ProBaseinfo baseinfo = finalBaseMap.get(order.getProId());
+                        order.setImgUrl(baseinfo.getUrls());
+                        order.setSinglePrice(baseinfo.getProPrice());
                     }
                     if (userMap.containsKey(order.getUserId())) {
                         User user = userMap.get(order.getUserId());
