@@ -34,8 +34,18 @@ export default {
   "IDENTIFICATION_NUMBER":"identification Number",
   "PHONE_NUMBER":"phone-number",
   "SEX":"sex",
-  "STATE":"state"
+  "STATE":"state",
 
+  /**********************************
+   ***********************************/
+
+
+  /**
+   * 订单管理模块
+   */
+   "SPMC":"Name of commodity",
+   "ORDERNUMBER":'Order number',
+   "SL":"Number"
   /**********************************
    ***********************************/
 }

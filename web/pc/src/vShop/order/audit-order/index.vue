@@ -19,17 +19,17 @@
           <div>
             <Input
               v-model="param.proNameLike" @on-change="getPagerList"
-              placeholder="商品名称" style="width: 160px;margin-right: 18px"/>
+              placeholder="Name of commodity" style="width: 160px;margin-right: 18px"/>
           </div>
           <div>
             <Input
               v-model="param.userNameLike" @on-change="getPagerList"
-              placeholder="用户姓名" style="width: 160px;margin-right: 18px"/>
+              placeholder="UserName" style="width: 160px;margin-right: 18px"/>
           </div>
           <div>
             <Input
               v-model="param.phoneLike" @on-change="getPagerList"
-              placeholder="用户电话" style="width: 160px;margin-right: 18px"/>
+              placeholder="User PhoneNumber" style="width: 160px;margin-right: 18px"/>
           </div>
           <div>
             <DatePicker format='yyyy-MM-dd' @on-change="changTime" type="daterange"
@@ -64,15 +64,19 @@
 <script>
   import mess from './comp/mess'
   import findOrderCardBox from '../comp/findOrderCardBox'
-
+  // import i18nTabTit from '@/mixins/i18nTabTit'
   export default {
     name: "index",
     components: {
       findOrderCardBox,
       mess
     },
+    // mixins: [i18nTabTit],
     data() {
       return {
+        // pageGjh:[
+        //   {spmc:'请输入商品名称',i18n:'SPMC'}
+        // ],
         total: 0,
         usermes: {},
         userMesType: true,

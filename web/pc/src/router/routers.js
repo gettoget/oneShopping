@@ -63,7 +63,7 @@ export default [
         path: 'system-user',
         name: 'system-user',
         meta: {
-          icon: 'md-trending-up',
+          icon: 'ios-contact',
           title: '用户管理'
         },
         component: () => import('@/vShop/system/system-user')
@@ -128,7 +128,7 @@ export default [
     path: '/stock',
     name: 'stock',
     meta: {
-      icon: 'logo-buffer',
+      icon: 'ios-cube-outline',
       title: '商品管理'
     },
     component: Main,
@@ -137,7 +137,7 @@ export default [
         path:'/newstock',
         name:'newstock',
         meta: {
-          icon: 'md-trending-up',
+          icon: 'md-grid',
           title: '商品上架'
         },
         component: () => import('@/vShop/commodity/NewStock')
@@ -146,7 +146,7 @@ export default [
         path:'/reserve',
         name:'reserve',
         meta: {
-          icon: 'md-trending-up',
+          icon: 'md-home',
           title: '库存管理'
         },
         component: () => import('@/vShop/commodity/reserve')
@@ -155,7 +155,7 @@ export default [
         path:'/manage',
         name:'manage',
         meta: {
-          icon: 'md-trending-up',
+          icon: 'ios-eye',
           title: '商品浏览'
         },
         component: () => import('@/vShop/commodity/Manage')
@@ -166,7 +166,7 @@ export default [
     path: '/user',
     name: 'user',
     meta: {
-      icon: 'logo-buffer',
+      icon: 'md-person',
       title: '用户管理'
     },
     component: Main,
@@ -175,7 +175,7 @@ export default [
         path:'/usermanagement',
         name:'usermanagement',
         meta: {
-          icon: 'md-trending-up',
+          icon: 'ios-person',
           title: '用户信息'
         },
         component: () => import('@/vShop/user/usermanagement')
@@ -193,7 +193,7 @@ export default [
         path:'/showorder',
         name:'showorder',
         meta: {
-          icon: 'md-trending-up',
+          icon: 'md-create',
           title: '晒单审核'
         },
         component: () => import('@/vShop/user/showorder')
@@ -204,7 +204,7 @@ export default [
     path: '/order',
     name: 'order',
     meta: {
-      icon: 'logo-buffer',
+      icon: 'md-clipboard',
       title: '订单管理'
     },
     component: Main,
@@ -213,7 +213,7 @@ export default [
         path:'/audit-order',
         name:'audit-order',
         meta: {
-          icon: 'md-trending-up',
+          icon: 'md-search',
           title: '订单查询'
         },
         component: () => import('@/vShop/order/audit-order')
@@ -222,7 +222,7 @@ export default [
         path:'/direct-order',
         name:'direct-order',
         meta: {
-          icon: 'md-trending-up',
+          icon: 'ios-document-outline',
           title: '直购订单'
         },
         component: () => import('@/vShop/order/direct-order')
@@ -249,7 +249,7 @@ export default [
         path:'/shipment-order',
         name:'shipment-order',
         meta: {
-          icon: 'md-trending-up',
+          icon: 'logo-foursquare',
           title: '订单发货'
         },
         component: () => import('@/vShop/order/shipment-order')
@@ -269,7 +269,7 @@ export default [
         path: '/carousel',
         name: 'carousel',
         meta: {
-          icon: 'logo-buffer',
+          icon: 'md-images',
           title:"轮播图"
         },
         component: () => import('@/vShop/appManger/carousel')
