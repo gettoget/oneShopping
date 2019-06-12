@@ -144,6 +144,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 //                proInfo.setHimg(user.gethImg());
             }
         }
+        setImgUrl(proInfo);
         return ApiResponse.success(proInfo);
     }
 
@@ -194,8 +195,6 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 proInfo.setWinRecord(record);
             }
         }
-
-
         return ApiResponse.success(proInfo);
     }
 
@@ -794,6 +793,8 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
             }
 
         }
+        String urls = StringUtils.join(imgUrls.toArray(), ",");
+        info.setUrls(urls);
         info.setImgUrls(imgUrls);
         List<String> coverUrls = new ArrayList<>();
         for (String s : info.getCoverUrl().split(",")) {
@@ -803,6 +804,8 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 coverUrls.add(s);
             }
         }
+        String coverUrl = StringUtils.join(coverUrls.toArray(), ",");
+        info.setCoverUrl(coverUrl);
         info.setCoverUrls(coverUrls);
         List<String> refUrls = new ArrayList<>();
         for (String s : info.getRefUrl().split(",")) {
@@ -812,6 +815,8 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 refUrls.add(s);
             }
         }
+        String refUrl = StringUtils.join(refUrls.toArray(), ",");
+        info.setRefUrl(refUrl);
         info.setRefUrls(refUrls);
     }
 

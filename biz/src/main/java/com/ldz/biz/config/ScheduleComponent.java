@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import com.ldz.biz.job.KjJob;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,10 @@ public class ScheduleComponent {
 
         // 每10秒运行一次。商品开奖功能
         jobConfigs.add(new JobConfig(ProInfoFinishSyncJob.class,"0/10 * * * * ? *","ProInfoFinishSyncJob"));
+
+        // 每5分钟检查一次。商品开奖功能
+        jobConfigs.add(new JobConfig(KjJob.class,"0 */5 * * * ?","kjJob"));
+
         try {
             for (JobConfig jobConfig : jobConfigs) {
                 schedulerFactory.getScheduler().scheduleJob(jobConfig.getJobDetail(), jobConfig.getCronTrigger());

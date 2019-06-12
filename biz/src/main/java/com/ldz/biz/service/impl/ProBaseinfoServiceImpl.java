@@ -12,6 +12,7 @@ import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -103,21 +104,40 @@ public class ProBaseinfoServiceImpl extends BaseServiceImpl<ProBaseinfo, String>
 	}
 
 
-	private void setImgUrl(ProBaseinfo info){
+	private void setImgUrl(ProBaseinfo info) {
 		List<String> imgUrls = new ArrayList<>();
 		for (String s : info.getUrls().split(",")) {
-			imgUrls.add(filePath + s);
+			if(!StringUtils.startsWith(s,"http://")){
+				imgUrls.add(filePath + s);
+			}else{
+				imgUrls.add(s);
+			}
+
 		}
+		String urls = StringUtils.join(imgUrls.toArray(), ",");
+		info.setUrls(urls);
 		info.setImgUrls(imgUrls);
 		List<String> coverUrls = new ArrayList<>();
 		for (String s : info.getCoverUrl().split(",")) {
-			coverUrls.add(filePath + s);
+			if(!StringUtils.startsWith(s,"http://")) {
+				coverUrls.add(filePath + s);
+			}else{
+				coverUrls.add(s);
+			}
 		}
+		String coverUrl = StringUtils.join(coverUrls.toArray(), ",");
+		info.setCoverUrl(coverUrl);
 		info.setCoverUrls(coverUrls);
 		List<String> refUrls = new ArrayList<>();
 		for (String s : info.getRefUrl().split(",")) {
-			refUrls.add(filePath + s);
+			if(!StringUtils.startsWith(s,"http://")) {
+				refUrls.add(filePath + s);
+			}else {
+				refUrls.add(s);
+			}
 		}
+		String refUrl = StringUtils.join(refUrls.toArray(), ",");
+		info.setRefUrl(refUrl);
 		info.setRefUrls(refUrls);
 	}
 
