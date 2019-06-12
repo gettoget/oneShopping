@@ -114,8 +114,9 @@
     &-selImg {
       text-align: center;
       height: 160px;
+      text-align: center;
       img {
-        width: 140px;
+        /*width: 140px;*/
         height: 140px;
       }
     }

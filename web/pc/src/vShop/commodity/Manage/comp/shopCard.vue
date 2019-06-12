@@ -4,10 +4,12 @@
       <div class="bqBox">
         {{mess.proZt | proZt}}
       </div>
-      <img v-if='mess.coverUrls[0].substring(0,4)==="http"'
-           :src="mess.coverUrls" alt="">
+      <div class="shopCardSty-selImg">
+        <img v-if='mess.coverUrls[0].substring(0,4)==="http"'
+             :src="mess.coverUrls" alt="">
 
-      <img v-else :src="apis.GETFILEURL+mess.coverUrls" alt="">
+        <img v-else :src="apis.GETFILEURL+mess.coverUrls" alt="">
+      </div>
 
     </div>
     <div class="shopMoney">
@@ -125,10 +127,29 @@
       }
     },
     created(){
+      this.tegList=[
+        {
+          bol:false,
+          text:"推荐",
+          key:"1"
+        },
+        {
+          bol:false,
+          text:"上新",
+          key:"2"
+        },
+        {
+          bol:false,
+          text:"热门",
+          key:"3"
+        },
+      ]
       let a = this.mess.proLx.split(',')
       a.forEach((it,index)=>{
         this.tegList[parseInt(it)-1].bol = true
       })
+    },
+    mounted(){
     },
     methods:{
       getMess(){
@@ -148,7 +169,9 @@
       },
       upShopMess(mes){
         this.$http.post("/api/proinfo/update",{id:this.mess.id,proLx:mes}).then(res=>{
-
+          if(res.code == 200){
+            this.$emit('labSave')
+          }
         }).catch(err=>{})
       }
     }
@@ -160,13 +183,7 @@
     width: 300px;
     margin: 16px;
     .ivu-card-head {
-      text-align: center;
       position: relative;
-      height: 268px;
-      img {
-        width: 240px;
-        height: 240px;
-      }
       .bqBox {
         position: absolute;
         left: -30px;
@@ -179,6 +196,16 @@
         transform: rotate(-45deg);
         line-height: 30px;
         color: #fff;
+        text-align:center;
+      }
+    }
+    &-selImg {
+      text-align: center;
+      height: 160px;
+      text-align: center;
+      img {
+        /*width: 140px;*/
+        height: 140px;
       }
     }
     .ivu-card-body {

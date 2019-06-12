@@ -16,8 +16,8 @@
       </RadioGroup>
       <div style="margin-right: 20px">
         <Button :type="it.bol?'primary':'default'"
-             v-for="(it,index) in tegList"
-             @click.native="tagEvent(it,index)">
+                v-for="(it,index) in tegList"
+                @click.native="tagEvent(it,index)">
           {{it.text}}
         </Button>
       </div>
@@ -34,14 +34,21 @@
       <Input v-model="param.proPriceLte" type="number" :number="true"
              style="width: 90px;margin-right: 20px" @on-change="getDataList()">
       </Input>
+
+      <Button type="primary" icon="ios-search" style=";margin-right: 20px"
+              @click="getDataList()"></Button>
+      <Button type="primary" icon="md-refresh"
+              @click="reset"></Button>
+
     </div>
     <!--图  名字 参与分数 剩余分数 状态（售卖中 开奖中  已开奖） 详情-->
     <div class="box_col">
       <div class="box_col_auto">
         <div class="box_row_list" style="width: 1328px;margin: auto">
-          <shop-card :inVal="index" :mess="it"
-                     v-for="(it,index) in shopList"
-                     :key="index" @getMess="getMess(it)"></shop-card>
+          <!--:mess="JSON.parse(JSON.stringify(it))"-->
+          <shop-card v-if="datamess" :inVal="index+((param.pageNum-1)*param.pageSize)" :mess="it"
+                     v-for="(it,index) in shopList" :key="index+((param.pageNum-1)*param.pageSize)"
+                     @labSave="getDataList" @getMess="getMess(it)"></shop-card>
         </div>
       </div>
       <div class="pagerBoxSty boxMar_T box_row rowRight">
@@ -57,41 +64,43 @@
 <script>
   import shopCard from './comp/shopCard'
   import dr from './comp/DrawerMod'
+
   export default {
     name: "index",
     components: {
-      shopCard,dr
+      shopCard, dr
     },
     data() {
       return {
-        compName:"",
-        itmess:{},
-        tegList:[
+        compName: "",
+        datamess:true,
+        itmess: {},
+        tegList: [
           {
-            bol:false,
-            text:"推荐",
-            key:"1"
+            bol: false,
+            text: "推荐",
+            key: "1"
           },
           {
-            bol:false,
-            text:"上新",
-            key:"2"
+            bol: false,
+            text: "上新",
+            key: "2"
           },
           {
-            bol:false,
-            text:"热门",
-            key:"3"
+            bol: false,
+            text: "热门",
+            key: "3"
           },
         ],
         shopList: [],
         total: 0,
         param: {
-          proPriceGte:null,
-          proPriceLte:null,
-          proZt:"0",
-          proLx:"",
+          proPriceGte: null,
+          proPriceLte: null,
+          proZt: "0",
+          proLx: "",
           pageNum: 1,
-          pageSize: 8
+          pageSize:8
         }
 
       }
@@ -100,14 +109,25 @@
       this.getDataList()
     },
     methods: {
-      tagEvent(it,index){
+      reset() {
+        this.param = {
+          proPriceGte: null,
+          proPriceLte: null,
+          proZt: "0",
+          proLx: "",
+          pageNum: 1,
+          pageSize: 8
+        }
+        this.getDataList()
+      },
+      tagEvent(it, index) {
         it.bol = !it.bol
         let b = []
-        this.tegList.forEach((it,index)=>{
-          if(it.bol){
+        this.tegList.forEach((it, index) => {
+          if (it.bol) {
             b.push(it.key)
           }
-          if(index == this.tegList.length-1){
+          if (index == this.tegList.length - 1) {
             this.param.proLx = b.join(',')
             this.getDataList()
           }
@@ -120,19 +140,20 @@
       },
       getDataList() {
         let a = JSON.parse(JSON.stringify(this.param))
-        if(a.proZt == "0"){
+        if (a.proZt == "0") {
           a.proZt = ""
         }
+        this.datamess = false
         this.$http.post("/api/proinfo/pager", a).then(res => {
-          console.log(res);
           if (res.code == 200) {
             this.shopList = res.page.list
             this.total = res.page.total
+            this.datamess = true
           }
         }).catch(err => {
         })
       },
-      getMess(it){
+      getMess(it) {
         this.compName = "dr"
         this.itmess = it
       }
