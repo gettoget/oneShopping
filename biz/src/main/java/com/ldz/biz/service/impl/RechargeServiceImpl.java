@@ -85,6 +85,7 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 		Recharge recharge = new Recharge();
 		recharge.setId(genId());
 		recharge.setAmonut(amount+"");
+		recharge.setCzjb(amount + "");
 		recharge.setCjsj(DateUtils.getNowTime());
 		recharge.setCzzt("1");
 		recharge.setCzqjbs(user.getBalance());
