@@ -162,46 +162,47 @@
           // zjlx: "0",
         },
         tab_H: 0,
-        tabBox:"tabBox",
+        tabBox: "tabBox",
         tableTiT: [
           {
-            type:"index",
-            width:80,
+            type: "index",
+            width: 80,
           },
           {
-            title:"头像",
-            width:100,
-            render:(h,p)=>{
-              return h('div',[
-                h('Avatar',{
-                  props:{
-                    src:p.row.user.hImg
-                  }
-                })
-              ])
+            title: "头像",
+            width: 100,
+            slot: 'action',
+            render: (h, p) => {
+              return h('Avatar', {
+                props: {
+                  src: p.row.user.hImg
+                }
+              })
             }
           },
           {
             title: "用户姓名",
-            minWidth:140,
-            render:(h,p)=>{
-              return h('div',p.row.user.userName)
+            minWidth: 140,
+            render: (h, p) => {
+              return h('div', p.row.user.userName)
             }
           },
           {
-            title: "手机号码",
-            minWidth:140,
-            render:(h,p)=>{
-              return h('div',p.row.user.phone)
+            title: "购买时间",
+            minWidth: 140,
+            render: (h, p) => {
+              let a = this.moment(p.row.cjsj).format('YYYY-MM-DD HH:mm:ss')
+              let b = this.moment(p.row.cjsj).format('HH:mm:ss')
+              return h('div', a)
             }
           },
           {
             title: "购买数量",
-            width:120,
-            key:"gmfs"
+            width: 120,
+            key: "gmfs"
           }
         ],
-        tableData:[],
+        tableData: [],
       }
     },
     filters: {
@@ -253,7 +254,7 @@
       this.getBuyUserList()
     },
     methods: {
-      close(){
+      close() {
         this.$emit("close")
       },
       visible(val) {
@@ -269,22 +270,27 @@
         }).catch(err => {
         })
       },
-      getUserList(){
-        this.$http.post("/api/order/pager",{proId:this.mess.id,pageNum: 1,
-          pageSize: this.mess.proPrice}).then(res=>{
+      getUserList() {
+        this.$http.post("/api/order/pager", {
+          proId: this.mess.id, pageNum: 1,
+          pageSize: this.mess.proPrice
+        }).then(res => {
 
-        }).catch(err=>{})
+        }).catch(err => {
+        })
       },
-      getBuyUserList(){
-        this.$http.post('/api/proinfo/getUsers',{
-          id:this.mess.id,
+      getBuyUserList() {
+        this.$http.post('/api/proinfo/getUsers', {
+          id: this.mess.id,
           pageNum: 1,
-          pageSize: this.mess.proPrice}).then(res=>{
+          pageSize: this.mess.proPrice
+        }).then(res => {
           console.log(res);
-          if(res.code == 200){
+          if (res.code == 200) {
             this.tableData = res.page.list
           }
-        }).catch(err=>{})
+        }).catch(err => {
+        })
       }
     }
   }

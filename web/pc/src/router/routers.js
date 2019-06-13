@@ -132,10 +132,10 @@ export default [
       title: '商品管理'
     },
     component: Main,
-    children:[
+    children: [
       {
-        path:'/newstock',
-        name:'newstock',
+        path: '/newstock',
+        name: 'newstock',
         meta: {
           icon: 'md-grid',
           title: '商品上架'
@@ -143,8 +143,8 @@ export default [
         component: () => import('@/vShop/commodity/NewStock')
       },
       {
-        path:'/reserve',
-        name:'reserve',
+        path: '/reserve',
+        name: 'reserve',
         meta: {
           icon: 'md-home',
           title: '库存管理'
@@ -152,8 +152,8 @@ export default [
         component: () => import('@/vShop/commodity/reserve')
       },
       {
-        path:'/manage',
-        name:'manage',
+        path: '/manage',
+        name: 'manage',
         meta: {
           icon: 'ios-eye',
           title: '商品浏览'
@@ -170,10 +170,10 @@ export default [
       title: '用户管理'
     },
     component: Main,
-    children:[
+    children: [
       {
-        path:'/usermanagement',
-        name:'usermanagement',
+        path: '/usermanagement',
+        name: 'usermanagement',
         meta: {
           icon: 'ios-person',
           title: '用户信息'
@@ -190,8 +190,8 @@ export default [
       //   component: () => import('@/vShop/user/usermess')
       // },
       {
-        path:'/showorder',
-        name:'showorder',
+        path: '/showorder',
+        name: 'showorder',
         meta: {
           icon: 'md-create',
           title: '晒单审核'
@@ -208,10 +208,10 @@ export default [
       title: '订单管理'
     },
     component: Main,
-    children:[
+    children: [
       {
-        path:'/audit-order',
-        name:'audit-order',
+        path: '/audit-order',
+        name: 'audit-order',
         meta: {
           icon: 'md-search',
           title: '订单查询'
@@ -219,13 +219,22 @@ export default [
         component: () => import('@/vShop/order/audit-order')
       },
       {
-        path:'/direct-order',
-        name:'direct-order',
+        path: '/direct-order',
+        name: 'direct-order',
         meta: {
           icon: 'ios-document-outline',
           title: '直购订单'
         },
         component: () => import('@/vShop/order/direct-order')
+      },
+      {
+        path: '/chargeOrder',
+        name: 'chargeOrder',
+        meta: {
+          icon: 'ios-document-outline',
+          title: '充值订单'
+        },
+        component: () => import('@/vShop/order/chargeOrder')
       },
       // {
       //   path:'/draw-order',
@@ -246,8 +255,8 @@ export default [
       //   component: () => import('@/vShop/order/draw-order-robot')
       // },
       {
-        path:'/shipment-order',
-        name:'shipment-order',
+        path: '/shipment-order',
+        name: 'shipment-order',
         meta: {
           icon: 'logo-foursquare',
           title: '订单发货'
@@ -257,20 +266,20 @@ export default [
     ]
   },
   {
-    path:'/appmanger',
-    name:'appmanger',
+    path: '/appmanger',
+    name: 'appmanger',
     meta: {
       icon: 'md-trending-up',
       title: 'app管理'
     },
     component: Main,
-    children:[
+    children: [
       {
         path: '/carousel',
         name: 'carousel',
         meta: {
           icon: 'md-images',
-          title:"轮播图"
+          title: "轮播图"
         },
         component: () => import('@/vShop/appManger/carousel')
       }
@@ -281,7 +290,7 @@ export default [
     name: 'iview',
     component: Main,
     meta: {
-      hideInMenu:true,
+      hideInMenu: true,
       icon: 'logo-buffer',
       title: 'iviewDemoComp'
     },
