@@ -49,6 +49,9 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 		String username = getRequestParamterAsString("username");
 		if(StringUtils.isNotBlank(username)){
 			List<User> users = userService.findLike(User.InnerColumn.userName, username);
+			if(CollectionUtils.isEmpty(users)){
+				return false;
+			}
 			Set<String> userid = users.stream().map(User::getId).collect(Collectors.toSet());
 			condition.in(Recharge.InnerColumn.userId, userid);
 		}
