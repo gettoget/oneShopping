@@ -746,6 +746,29 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         return res;
     }
 
+    @Override
+    public ApiResponse<String> getUsers(String id, int pageNum, int pageSize) {
+        RuntimeCheck.ifBlank(id, MessageUtils.get("pro.idBlank"));
+        SimpleCondition condition = new SimpleCondition(Order.class);
+        condition.eq(Order.InnerColumn.proId, id);
+        condition.setOrderByClause(" cjsj desc");
+        PageInfo<Order> info = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> {
+            orderService.findByCondition(condition);
+        });
+        if(CollectionUtils.isNotEmpty(info.getList())){
+
+            List<String> list = info.getList().stream().map(Order::getUserId).collect(Collectors.toList());
+            List<User> users = userService.findByIds(list);
+            Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
+            info.getList().forEach(order -> {
+                order.setUser(userMap.get(order.getUserId()));
+            });
+        }
+        ApiResponse<String> api = new ApiResponse<>();
+        api.setPage(info);
+        return api;
+    }
+
 
     @Override
     public void afterPager(PageInfo<ProInfo> result) {
