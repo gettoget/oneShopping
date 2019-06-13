@@ -49,6 +49,9 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 		String username = getRequestParamterAsString("username");
 		if(StringUtils.isNotBlank(username)){
 			List<User> users = userService.findLike(User.InnerColumn.userName, username);
+			if(CollectionUtils.isEmpty(users)){
+				return false;
+			}
 			Set<String> userid = users.stream().map(User::getId).collect(Collectors.toSet());
 			condition.in(Recharge.InnerColumn.userId, userid);
 		}
@@ -85,6 +88,7 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 		Recharge recharge = new Recharge();
 		recharge.setId(genId());
 		recharge.setAmonut(amount+"");
+		recharge.setCzjb(amount + "");
 		recharge.setCjsj(DateUtils.getNowTime());
 		recharge.setCzzt("1");
 		recharge.setCzqjbs(user.getBalance());
