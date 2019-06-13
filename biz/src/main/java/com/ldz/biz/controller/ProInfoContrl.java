@@ -6,7 +6,10 @@ import com.ldz.sys.base.BaseController;
 import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/proinfo")
@@ -71,7 +74,13 @@ public class ProInfoContrl extends BaseController<ProInfo, String> {
         return service.getWinRecordById(id,pageNum,pageSize);
     }
 
-
+    /**
+     * 根据商品id查询当前商品参与的用户列表
+     */
+    @PostMapping("/getUsers")
+    public  ApiResponse<String> getUsers(String id,@RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "8") int pageSize){
+        return service.getUsers(id, pageNum, pageSize);
+    }
 
 
 
