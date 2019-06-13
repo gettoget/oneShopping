@@ -100,9 +100,17 @@
 
         </div>
       </Card>
+
+      <div :id="tabBox" class="box_col_auto" style="margin-top: 12px">
+        <Table
+          size='large' stripe
+          :height="tab_H"
+          v-if="tab_H>0"
+          :columns="tableTiT"
+          :data="tableData"></Table>
+      </div>
     </div>
     <div class="userListBox" @click="close">
-
     </div>
 
   </div>
@@ -119,6 +127,12 @@
       swiper,
       swiperSlide
     },
+    props: {
+      mess: {
+        type: Object,
+        default: {}
+      }
+    },
     data() {
       return {
         defAva,
@@ -134,42 +148,60 @@
             reverseDirection: false,//反向轮播
           }
         },
-        tabBox: "tabBox",
-        tab_H: 0,
         winList: {
-          cjsj: "2019-06-05 22:20:13.394",
-          himg: "http://cdnoss.luno.id/cashcash/users/header/2018-09-26/c470e962cd86d5cef9e11b510a684092.png",
-          id: "585956069029707776",
-          num: "10004808",
-          nums: null,
-          proId: "585410180749983744",
-          proName: "惠普（HP）战66 二代",
-          userId: "567293823873449984",
-          userName: "maryono",
-          zjfs: "19",
-          zjlx: "0",
+          // cjsj: "2019-06-05 22:20:13.394",
+          // himg: "http://cdnoss.luno.id/cashcash/users/header/2018-09-26/c470e962cd86d5cef9e11b510a684092.png",
+          // id: "585956069029707776",
+          // num: "10004808",
+          // nums: null,
+          // proId: "585410180749983744",
+          // proName: "惠普（HP）战66 二代",
+          // userId: "567293823873449984",
+          // userName: "maryono",
+          // zjfs: "19",
+          // zjlx: "0",
         },
+        tab_H: 0,
+        tabBox:"tabBox",
         tableTiT: [
           {
+            type:"index",
+            width:80,
+          },
+          {
+            title:"头像",
+            width:100,
+            render:(h,p)=>{
+              return h('div',[
+                h('Avatar',{
+                  props:{
+                    src:p.row.user.hImg
+                  }
+                })
+              ])
+            }
+          },
+          {
             title: "用户姓名",
-            ley:"userName"
+            minWidth:140,
+            render:(h,p)=>{
+              return h('div',p.row.user.userName)
+            }
           },
           {
             title: "手机号码",
-            ley:"phone"
+            minWidth:140,
+            render:(h,p)=>{
+              return h('div',p.row.user.phone)
+            }
           },
           {
             title: "购买数量",
-            ley:"gmfs"
+            width:120,
+            key:"gmfs"
           }
         ],
         tableData:[],
-      }
-    },
-    props: {
-      mess: {
-        type: Object,
-        default: {}
       }
     },
     filters: {
@@ -218,6 +250,7 @@
         } catch (e) {
         }
       })
+      this.getBuyUserList()
     },
     methods: {
       close(){
@@ -240,6 +273,17 @@
         this.$http.post("/api/order/pager",{proId:this.mess.id,pageNum: 1,
           pageSize: this.mess.proPrice}).then(res=>{
 
+        }).catch(err=>{})
+      },
+      getBuyUserList(){
+        this.$http.post('/api/proinfo/getUsers',{
+          id:this.mess.id,
+          pageNum: 1,
+          pageSize: this.mess.proPrice}).then(res=>{
+          console.log(res);
+          if(res.code == 200){
+            this.tableData = res.page.list
+          }
         }).catch(err=>{})
       }
     }
