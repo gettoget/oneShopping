@@ -97,7 +97,7 @@
             }
           },
           {
-            title:"充值结果",
+            title:"充值状态",
             minWidth:120,
             key:"czzt",
             render:(h,p)=>{

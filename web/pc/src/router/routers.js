@@ -227,15 +227,6 @@ export default [
         },
         component: () => import('@/vShop/order/direct-order')
       },
-      {
-        path: '/chargeOrder',
-        name: 'chargeOrder',
-        meta: {
-          icon: 'ios-document-outline',
-          title: '充值订单'
-        },
-        component: () => import('@/vShop/order/chargeOrder')
-      },
       // {
       //   path:'/draw-order',
       //   name:'draw-order',
@@ -262,6 +253,15 @@ export default [
           title: '订单发货'
         },
         component: () => import('@/vShop/order/shipment-order')
+      },
+      {
+        path: '/chargeOrder',
+        name: 'chargeOrder',
+        meta: {
+          icon: 'ios-document-outline',
+          title: '充值订单'
+        },
+        component: () => import('@/vShop/order/chargeOrder')
       }
     ]
   },
@@ -277,6 +277,26 @@ export default [
       {
         path: '/carousel',
         name: 'carousel',
+        meta: {
+          icon: 'md-images',
+          title: "轮播图"
+        },
+        component: () => import('@/vShop/appManger/carousel')
+      }
+    ]
+  },
+  {
+    path: '/statistics',
+    name: 'statistics',
+    meta: {
+      icon: 'md-trending-up',
+      title: 'app管理'
+    },
+    component: Main,
+    children: [
+      {
+        path: '/topUpData',
+        name: 'topUpData',
         meta: {
           icon: 'md-images',
           title: "轮播图"

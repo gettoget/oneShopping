@@ -5,11 +5,20 @@
         订单号:{{mess.id}}
       </div>
       <div>购买日期:{{moment(mess.cjsj).format('YYYY-MM-DD HH:mm:ss')}}</div>
+      <div style="width: 100px;text-align: right">
+        <div class="box_row rowBetween">
+          <Button v-if="mess.ddzt=='2'" type="info" size="small" @click="shopFH">发货</Button>
+
+          <div class="box_row_100">
+            <Button type="success" size="small" @click="getMess">详情</Button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="box_row orderBox rowBetween colTop" style="height: 160px">
       <img :src="mess.imgUrl[0].substring(0,4)==='http'?mess.imgUrl[0]:apis.GETFILEURL+mess.imgUrl[0]"
-           style="height: 160px;width: 160px" alt="">
+           style="width: 160px" alt="">
       <div>
         <Poptip placement="left-start" :transfer="true" trigger="hover">
           <div class="comp-shop-name">
@@ -37,7 +46,9 @@
             <Icon type="ios-call" size="32" color="#ff9776"/>
           </div>
           <div class="item-val">
-            {{mess.phone}}
+            {{mess.phone.substring(0,mess.phone.length-8)}}
+            ****
+            {{mess.phone.substring(mess.phone.length-4,mess.phone.length)}}
           </div>
         </div>
         <div class="box_row itemSty">
@@ -47,7 +58,7 @@
           </div>
           <div class="item-val">
             <div class="addressMess">
-              {{mess.addr.address}}sadfasdfasdfadfasdfasdfadsfasf
+              {{mess.addr.address}}
             </div>
           </div>
         </div>
@@ -109,6 +120,14 @@
     },
     created() {
       this.mess.imgUrl = this.mess.imgUrl.split(',')
+    },
+    methods:{
+      shopFH(){
+        this.$emit('shopFH')
+      },
+      getMess(){
+        this.$emit('getMess')
+      }
     }
   }
 </script>

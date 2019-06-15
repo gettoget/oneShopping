@@ -5,6 +5,9 @@
         订单号:{{mess.id}}
       </div>
       <div>购买日期:{{moment(mess.cjsj).format('YYYY-MM-DD HH:mm:ss')}}</div>
+      <div>
+        <Button type="info" size="small" @click="shopFH">发货</Button>
+      </div>
     </div>
 
     <div class="box_row orderBox rowBetween colTop" style="height: 160px">

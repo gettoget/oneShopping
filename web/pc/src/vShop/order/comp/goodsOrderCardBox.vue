@@ -12,9 +12,6 @@
       <div>购买日期:
         {{moment(mess.cjsj).format('YYYY-MM-DD HH:mm:ss')}}
       </div>
-      <div>
-        <Button type="info" size="small" @click="shopFk">发货</Button>
-      </div>
     </div>
 
     <div class="box_row orderBox rowBetween colTop" style="height: 160px">
@@ -136,12 +133,9 @@
 <script>
   import iphone from '@/assets/img/iphone.jpg'
 
-  import logistics from '../shipment-order/comp/logisticsMess'
-
   export default {
     name: "orderCardBox",
     components: {
-      logistics
     },
     props: {
       mess: {

@@ -45,7 +45,11 @@
     </div>
     <div class="box_col">
       <div :id="tabBox" class="box_col_auto">
-        <find-order-card-box v-for="(it,index) in tableData" :mess="it" :key="index"></find-order-card-box>
+        <find-order-card-box v-for="(it,index) in tableData"
+                             :mess="it" :key="index"
+                             @shopFH="shopFH"
+                             @getMess="()=>{getMess(it)}"
+        ></find-order-card-box>
       </div>
       <div class="pagerBoxSty boxMar_T box_row rowRight">
         <one-page :total="total" :size="param.pageSize"
@@ -53,23 +57,25 @@
                   @chPager="chPager"></one-page>
       </div>
     </div>
-
     <component
       :is="compName"
-      :usermes="usermes"
+      :orderMess="orderMess"
+      @close="close"
     ></component>
   </Card>
 </template>
 
 <script>
-  import mess from './comp/mess'
+  // import mess from './comp/mess'
+  import FH from '@/componentsShop/logisticsMess'
   import findOrderCardBox from '../comp/findOrderCardBox'
+  import orderMess from '@/vShop/order/comp/orderMess'
   // import i18nTabTit from '@/mixins/i18nTabTit'
   export default {
     name: "index",
     components: {
       findOrderCardBox,
-      mess
+      FH,orderMess
     },
     // mixins: [i18nTabTit],
     data() {
@@ -78,7 +84,7 @@
         //   {spmc:'请输入商品名称',i18n:'SPMC'}
         // ],
         total: 0,
-        usermes: {},
+        orderMess: {},
         userMesType: true,
         compName: '',
         tabBox: "tabBox",
@@ -130,6 +136,17 @@
           }
         })
       },
+      close(){
+        this.compName = ''
+        this.orderMess = ""
+      },
+      shopFH(){
+        this.compName = "FH"
+      },
+      getMess(mes){
+        this.orderMess = mes
+        this.compName = "orderMess"
+      }
     }
   }
 </script>

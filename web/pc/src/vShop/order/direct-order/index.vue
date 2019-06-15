@@ -31,14 +31,21 @@
     </div>
     <div class="box_col">
       <div class="box_col_auto">
-        <order-card-box v-for="(it,index) in tableData" :mess="it" :key="index"></order-card-box>
+        <order-card-box v-for="(it,index) in tableData" v-if="tableData.length>0"
+                        :mess="it" :key="index"
+                        @shopFH="shopFH"
+        ></order-card-box>
       </div>
       <div class="pagerBoxSty boxMar_T box_row rowRight">
         <one-page :total="total" :size="param.pageSize"
                   :opts="[4,8,12,16]" @chPager="chPager"></one-page>
       </div>
     </div>
-
+    <component
+      :is="compName"
+      :usermes="usermes"
+      @close="compName = ''"
+    ></component>
   </Card>
 </template>
 
@@ -46,13 +53,17 @@
   import orderCard from '../comp/orderCard'
   import orderCardBox from '../comp/orderCardBox'
 
+  import FH from '@/componentsShop/logisticsMess'
+
   export default {
     name: "index",
     components: {
-      orderCard, orderCardBox
+      orderCard, orderCardBox, FH
     },
     data() {
       return {
+        usermes:{},
+        compName:"",
         tableTiT: [
           {
             title: "序号",
@@ -113,10 +124,10 @@
         ],
         tableData: [],
         param: {
-          orderType:1,
+          orderType: 1,
           proNameLike: '',
           userNameLike: '',
-          phoneLike:"",
+          phoneLike: "",
           cjsjGte: '',//开始
           cjsjLte: '',//结束
           pageNum: 1,
@@ -136,10 +147,10 @@
       },
       changTime(value) {
         console.log(value);
-        if(value[1] != ""){
+        if (value[1] != "") {
           this.param.cjsjGte = this.moment(value[0]).format('YYYY-MM-DD HH:mm:ss')
           this.param.cjsjLte = this.moment(value[1]).format('YYYY-MM-DD HH:mm:ss')
-        }else{
+        } else {
           this.param.cjsjGte = ""
           this.param.cjsjLte = ""
         }
@@ -153,6 +164,9 @@
           }
         })
       },
+      shopFH() {
+        this.compName = "FH"
+      }
     }
   }
 </script>
