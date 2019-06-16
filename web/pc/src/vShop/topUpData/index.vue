@@ -14,7 +14,7 @@
       </div>
     </div>
     <div class="box_col_auto">
-
+      <all-data></all-data>
     </div>
   </div>
 </template>
@@ -22,10 +22,11 @@
 <script>
   import chartNumber from './comp/chartNumber'
   import chartTopup from './comp/chartTopUp'
+  import allData from './comp/allData'
   export default {
     name: "index",
     components:{
-      chartNumber,chartTopup
+      chartNumber,chartTopup,allData
     }
   }
 </script>
