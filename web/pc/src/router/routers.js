@@ -299,9 +299,9 @@ export default [
         name: 'topUpData',
         meta: {
           icon: 'md-images',
-          title: "轮播图"
+          title: "统计"
         },
-        component: () => import('@/vShop/appManger/carousel')
+        component: () => import('@/vShop/topUpData')
       }
     ]
   },
