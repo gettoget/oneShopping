@@ -16,6 +16,7 @@
 
 <script>
   import echarts from 'echarts'
+
   export default {
     name: "chartNumber",
     data() {
@@ -27,11 +28,48 @@
         //   this.GetTabTitLang()
         //   this.tab_H = this.AF.getDom_H(this.tabBox)
         // } catch (e) {}
-        this.buildEchart()
+        this.getData()
       })
     },
     methods: {
-      buildEchart() {
+      getData() {
+        this.$http.post('/api/statis/rechargeNum').then(res => {
+          if (res.code == 200) {
+            let a = [
+              {
+                value: res.result.one,
+                name: "一次"
+              },
+              {
+                value: res.result.two,
+                name: "二次"
+              },
+              {
+                value: res.result.more,
+                name: "多次"
+              }
+            ]
+
+            let b = [
+              {
+                value: res.result.allone,
+                name: "一次"
+              },
+              {
+                value: res.result.alltwo,
+                name: "二次"
+              },
+              {
+                value: res.result.allmore,
+                name: "多次"
+              }
+            ]
+            this.buildEchart(a, b)
+          }
+        }).catch(err => {
+        })
+      },
+      buildEchart(a, b) {
         var v = this
         var myChart = echarts.init(document.getElementById('chartNumber'));
 
@@ -67,21 +105,22 @@
                   }
                 }
               },
-              data: [
-                {
-                  value: 335,
-                  name: "一次"
-                },
-                {
-                  value: 310,
-                  name: "二次"
-                },
-                {
-                  value: 234,
-                  name: "多次"
-                }
-              ],
-              animation:false,
+              data: a,
+              //   [
+              //   {
+              //     value: 335,
+              //     name: "一次"
+              //   },
+              //   {
+              //     value: 310,
+              //     name: "二次"
+              //   },
+              //   {
+              //     value: 234,
+              //     name: "多次"
+              //   }
+              // ],
+              animation: false,
               startAngle: 135,
               minAngle: 0,
               selectedMode: false
@@ -105,28 +144,29 @@
                   }
                 }
               },
-              data: [
-                {
-                  value: 335,
-                  name: "一次"
-                },
-                {
-                  value: 310,
-                  name: "二次"
-                },
-                {
-                  value: 234,
-                  name: "多次"
-                }
-              ],
-              animation:false,
+              data: b,
+              //   [
+              //   {
+              //     value: 335,
+              //     name: "一次"
+              //   },
+              //   {
+              //     value: 310,
+              //     name: "二次"
+              //   },
+              //   {
+              //     value: 234,
+              //     name: "多次"
+              //   }
+              // ],
+              animation: false,
               startAngle: 180,
               minAngle: 0,
               selectedMode: false
             }
           ],
 
-          color: [ "rgb(136, 173, 218)", "rgb(239, 157, 119)", "rgb(153, 206, 152)","#ff7f50", "#87cefa", "#da70d6", "#32cd32", "#6495ed", "#ff69b4", "#ba55d3", "#cd5c5c", "#ffa500", "#40e0d0", "#1e90ff", "#ff6347", "#7b68ee", "#00fa9a", "#ffd700", "#6699FF", "#ff6666", "#3cb371", "#b8860b", "#30e0e0"]
+          color: ["rgb(136, 173, 218)", "rgb(239, 157, 119)", "rgb(153, 206, 152)", "#ff7f50", "#87cefa", "#da70d6", "#32cd32", "#6495ed", "#ff69b4", "#ba55d3", "#cd5c5c", "#ffa500", "#40e0d0", "#1e90ff", "#ff6347", "#7b68ee", "#00fa9a", "#ffd700", "#6699FF", "#ff6666", "#3cb371", "#b8860b", "#30e0e0"]
         }
         myChart.setOption(option);
       }

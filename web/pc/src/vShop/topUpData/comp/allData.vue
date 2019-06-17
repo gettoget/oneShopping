@@ -27,11 +27,29 @@
         //   this.GetTabTitLang()
         //   this.tab_H = this.AF.getDom_H(this.tabBox)
         // } catch (e) {}
-        this.buildEchart()
+        this.getData()
       })
     },
     methods: {
-      buildEchart() {
+      getData() {
+        this.$http.post('/api/statis/rechargeTrend').then(res => {
+          if(res.code == 200){
+            let a = []
+            let b = []
+            let c = []
+            res.result.forEach((it,index)=>{
+              a.push(it.one)
+              b.push(it.two)
+              c.push(it.more)
+              if(index==res.result.length-1){
+                this.buildEchart(a,b,c)
+              }
+            })
+
+          }
+        }).catch(err => {})
+      },
+      buildEchart(a,b,c) {
         var v = this
         var myChart = echarts.init(document.getElementById('allData'));
 
@@ -114,17 +132,20 @@
             {
               name: "1次",
               type: "bar",
-              data: [2, 4.9, 7, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20, 6.4, 3.3]
+              data:a
+                // [2, 4.9, 7, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20, 6.4, 3.3]
             },
             {
               name: "2次",
               type: "bar",
-              data: [2.6, 5.9, 9, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6, 2.3]
+              data:b
+                // [2.6, 5.9, 9, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6, 2.3]
             },
             {
               type: "bar",
               name: ">2次",
-              data: [2, 4.9, 7, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20, 6.4, 3.3]
+              data:c
+                // [2, 4.9, 7, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20, 6.4, 3.3]
             }
           ],
           color: [ "rgb(136, 173, 218)", "rgb(239, 157, 119)", "rgb(153, 206, 152)"]

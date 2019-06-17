@@ -27,11 +27,28 @@
         //   this.GetTabTitLang()
         //   this.tab_H = this.AF.getDom_H(this.tabBox)
         // } catch (e) {}
-        this.buildEchart()
+        this.getData()
       })
     },
     methods: {
-      buildEchart() {
+      getData() {
+        this.$http.post('/api/statis/rechargeChannel').then(res => {
+          if(res.code == 200){
+            res.result.all.forEach((it,index)=>{
+              it.name=it.czqd=="1"?'微信支付':'银联支付',
+                it.value=it.cz
+            })
+
+            res.result.today.forEach((it,index)=>{
+              it.name=it.czqd=="1"?'微信支付':'银联支付',
+                it.value=it.cz
+            })
+
+            this.buildEchart(res.result.today,res.result.all)
+          }
+        }).catch(err => {})
+      },
+      buildEchart(a,b) {
         var v = this
         var myChart = echarts.init(document.getElementById('chartTopUp'));
 
@@ -40,7 +57,7 @@
             orient: "horizontal",
             x: "lfte",
             y: "bottom",
-            data: ["微信", "支付宝", "银联"],
+            data: ["微信支付", "银联支付"],
             selectedMode: false
           },
           toolbox: {
@@ -67,20 +84,21 @@
                   }
                 }
               },
-              data: [
-                {
-                  value: 335,
-                  name: "微信"
-                },
-                {
-                  value: 310,
-                  name: "支付宝"
-                },
-                {
-                  value: 234,
-                  name: "银联"
-                }
-              ],
+              data:a,
+              //   [
+              //   {
+              //     value: 335,
+              //     name: "微信"
+              //   },
+              //   {
+              //     value: 310,
+              //     name: "支付宝"
+              //   },
+              //   {
+              //     value: 234,
+              //     name: "银联"
+              //   }
+              // ],
               animation:false,
               startAngle: 0,
               minAngle: 0,
@@ -105,20 +123,21 @@
                   }
                 }
               },
-              data: [
-                {
-                  value: 335,
-                  name: "微信"
-                },
-                {
-                  value: 310,
-                  name: "支付宝"
-                },
-                {
-                  value: 234,
-                  name: "银联"
-                }
-              ],
+              data:b,
+              //   [
+              //   {
+              //     value: 335,
+              //     name: "微信"
+              //   },
+              //   {
+              //     value: 310,
+              //     name: "支付宝"
+              //   },
+              //   {
+              //     value: 234,
+              //     name: "银联"
+              //   }
+              // ],
               animation:false,
               startAngle: 45,
               minAngle: 0,
