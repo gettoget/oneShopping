@@ -3,6 +3,7 @@ package com.ldz.biz.service.impl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import com.ldz.biz.bean.ProInfoLuckNumBean;
+import com.ldz.biz.mapper.OrderListMapper;
 import com.ldz.biz.mapper.OrderMapper;
 import com.ldz.biz.mapper.ProInfoMapper;
 import com.ldz.biz.model.*;
@@ -66,7 +67,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
     @Autowired
     private ReceiveAddrService addrService;
 
-
+    @Autowired
+    private OrderListMapper orderListMapper;
     @Autowired
     private WinRecordService recordService;
 
@@ -101,11 +103,11 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 List<ReceiveAddr> addrs = addrService.findByIds(receIds);
                 addrMap = addrs.stream().collect(Collectors.toMap(ReceiveAddr::getId, p -> p));
             }
-            SimpleCondition condition = new SimpleCondition(OrderList.class);
-            condition.in(OrderList.InnerColumn.orderId, list);
-            List<OrderList> orderLists = orderListService.findByCondition(condition);
 
-
+//            SimpleCondition condition = new SimpleCondition(OrderList.class);
+//            condition.in(OrderList.InnerColumn.orderId, list);
+            List<OrderList> orderLists  = orderListMapper.getList(list);
+//            List<OrderList> orderLists = orderListService.findByCondition(condition);
             Set<String> set = orders.stream().filter(order -> StringUtils.equals(order.getOrderType(), "1")).map(Order::getProId).collect(Collectors.toSet());
             Map<String, ProBaseinfo> baseMap = new HashMap<>();
             if (CollectionUtils.isNotEmpty(set)) {
@@ -127,7 +129,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             Map<String, ProInfo> map = new HashMap<>();
             if (CollectionUtils.isNotEmpty(orderLists)) {
                 listMap = orderLists.stream().collect(Collectors.groupingBy(OrderList::getOrderId));
-                Set<String> collect = orderLists.stream().filter(orderList -> StringUtils.isNotBlank(orderList.getProId())).map(OrderList::getProId).collect(Collectors.toSet());
+                Set<String> collect = orders.stream().filter(orderList -> StringUtils.isNotBlank(orderList.getProId())).map(Order::getProId).collect(Collectors.toSet());
 
                 List<ProInfo> infos = proInfoService.findByIds(collect);
                 map = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));

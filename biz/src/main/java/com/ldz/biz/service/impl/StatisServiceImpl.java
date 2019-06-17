@@ -5,7 +5,6 @@ import com.ldz.biz.mapper.ProInfoMapper;
 import com.ldz.biz.mapper.RechargeMapper;
 import com.ldz.biz.mapper.UserMapper;
 import com.ldz.biz.model.ProInfo;
-import com.ldz.biz.service.ExchangeService;
 import com.ldz.biz.service.OrderService;
 import com.ldz.biz.service.ProInfoService;
 import com.ldz.biz.service.StatisService;
@@ -134,6 +133,74 @@ public class StatisServiceImpl implements StatisService {
 
             String data = s + "|" + amount + "|" + sumAmount;
             list.add(data);
+        }
+        return ApiResponse.success(list);
+    }
+
+    @Override
+    public ApiResponse<Map<String, Long>> rechargeNum() {
+        // 查询今日充值次数统计
+        String today = DateTime.now().toString("yyyy-MM-dd");
+        // 今日累计充值一次用户
+        long one = rechargeMapper.sumreone(today);
+        // 今日累计充值俩次的用户
+        long two = rechargeMapper.sumretwo(today);
+        // 今日累计充值三次的用户
+        long more = rechargeMapper.sumremore(today);
+
+        // 全部统计
+        // 充值一次的统计
+        long allone = rechargeMapper.sumAllone();
+        // 充值俩次的用户数
+        long alltwo = rechargeMapper.sumAlltwo();
+        // 充值三次的用户数
+        long allmore = rechargeMapper.sumAllmore();
+        Map<String,Long> map = new HashMap<>();
+        map.put("one",one);
+        map.put("two", two);
+        map.put("more", more);
+        map.put("allone", allone);
+        map.put("alltwo",alltwo);
+        map.put("allmore",allmore);
+
+        return ApiResponse.success(map);
+    }
+
+    @Override
+    public ApiResponse<Map<String, Object>> rechargeChannel() {
+        // 当天充值渠道统计
+        String today = DateTime.now().toString("yyyy-MM-dd");
+        Map<String,Long> map = rechargeMapper.sumChannel(today);
+        Map<String, Long> longMap = rechargeMapper.sumAllChannel();
+        Map<String,Object> res = new HashMap<>();
+        res.put("today",map);
+        res.put("all",longMap);
+        return ApiResponse.success(res);
+    }
+
+    @Override
+    public ApiResponse<List<Map<String, Long>>> rechargeTrend() {
+        // 按月份
+        String year = DateTime.now().toString("yyyy");
+        List<Map<String, Long>> list = new ArrayList<>();
+        for(int i = 1; i<= 12; i++){
+            String mon;
+            if(i< 10){
+                mon = year + "-0" + i;
+            }else{
+                mon = year + "-" + i;
+            }
+            // 今日累计充值一次用户
+            long one = rechargeMapper.sumreone(mon);
+            // 今日累计充值俩次的用户
+            long two = rechargeMapper.sumretwo(mon);
+            // 今日累计充值三次的用户
+            long more = rechargeMapper.sumremore(mon);
+            Map<String, Long> map = new HashMap<>();
+            map.put("one", one);
+            map.put("two", two);
+            map.put("more", more);
+            list.add(map);
         }
         return ApiResponse.success(list);
     }

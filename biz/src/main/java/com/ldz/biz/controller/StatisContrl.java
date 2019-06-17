@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.constraints.PastOrPresent;
 import java.util.List;
 import java.util.Map;
 
@@ -78,6 +77,31 @@ public class StatisContrl {
     }
 
 
+    /**
+     * 充值统计
+     * @return
+     */
+    @PostMapping("/rechargeNum")
+    public ApiResponse<Map<String, Long>> rechargeNum(){
+        return service.rechargeNum();
+    }
+
+    /**
+     * 充值渠道统计
+     * @return
+     */
+    @PostMapping("/rechargeChannel")
+    public ApiResponse<Map<String, Object>> rechargeChannel(){
+        return service.rechargeChannel();
+    }
+
+    /**
+     * 充值趋势统计
+     */
+    @PostMapping("/rechargeTrend")
+    public ApiResponse<List<Map<String,Long>>> rechargeTrend(){
+        return service.rechargeTrend();
+    }
 
 
 
