@@ -31,11 +31,17 @@ public interface RechargeMapper extends Mapper<Recharge> {
     @Select(" SELECT COUNT(c) count from (SELECT count(*) c from recharge where  user_id is not null GROUP BY user_id HAVING c > 2 ) a")
     long sumAllmore();
 
-    @Select(" SELECT czqd ,count(recharge.czqd) cz from recharge where user_id is not null and cjsj like '${time}%' GROUP BY czqd; ")
-    List<Map<String, Long>> sumChannel(@Param("time") String today);
+    @Select(" SELECT czqd ,count(recharge.czqd) cz from recharge where user_id is not null and cjsj like '${time}%' and czqd='1' GROUP BY czqd ")
+    Map<String, String> sumChannelOne(@Param("time") String today);
 
-    @Select(" SELECT czqd ,count(recharge.czqd) cz from recharge where user_id is not null GROUP BY czqd; ")
-    List<Map<String, Long>> sumAllChannel();
+    @Select(" SELECT czqd ,count(recharge.czqd) cz from recharge where user_id is not null and cjsj like '${time}%' and czqd='2' GROUP BY czqd ")
+    Map<String, String> sumChannelTwo(@Param("time") String today);
+
+    @Select(" SELECT czqd ,count(recharge.czqd) cz from recharge where user_id is not null and czqd='1' GROUP BY czqd; ")
+    Map<String, String> sumAllChannelOne();
+
+    @Select(" SELECT czqd ,count(recharge.czqd) cz from recharge where user_id is not null and czqd='2' GROUP BY czqd; ")
+    Map<String, String> sumAllChannelTwo();
 
     @Select(" select * from recharge where year like '${year}%'")
     List<Recharge> getYearRecharge(@Param("year") String year);
