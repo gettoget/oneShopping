@@ -3,13 +3,13 @@
   <Card style="margin-bottom: 12px">
     <div slot="title" class="box_row rowBetween colCenter" style="position: relative">
       <div class="dispatchType">
-        发货状态
+        {{$t('FHZT')}}:
       </div>
       <div style="margin-left: 100px">
-        订单号:
+        {{$t('ORDERNUMBER')}}:
         {{mess.id}}
       </div>
-      <div>购买日期:
+      <div>{{$t('GMRQ')}}:
         {{moment(mess.cjsj).format('YYYY-MM-DD HH:mm:ss')}}
       </div>
     </div>
@@ -82,7 +82,7 @@
 
         <div v-else-if="mess.orderType == '1'" class="box_row rowRight itemSty">
           <div class="item-tit">
-            单价：
+            {{$t('DJ')}}：
           </div>
           <div class="item-val">
             {{mess.singlePrice}}
@@ -91,7 +91,7 @@
 
         <div class="box_row rowRight itemSty">
           <div class="item-tit">
-            数量：
+            {{$t('SL')}}：
           </div>
           <div class="item-val">
             <span style="font-size: 22px;font-weight: 700">x</span>
@@ -101,7 +101,7 @@
         </div>
         <div class="box_row rowRight itemSty">
           <div class="styBox">
-            支付 ：
+            {{$t('ZF')}} ：
             {{mess.zfje}}
           </div>
         </div>
