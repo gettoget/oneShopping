@@ -10,6 +10,7 @@ import com.ldz.biz.service.ProInfoService;
 import com.ldz.biz.service.StatisService;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.SimpleCondition;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -170,11 +171,42 @@ public class StatisServiceImpl implements StatisService {
     public ApiResponse<Map<String, Object>> rechargeChannel() {
         // 当天充值渠道统计
         String today = DateTime.now().toString("yyyy-MM-dd");
-        List<Map<String,Long>> map = rechargeMapper.sumChannel(today);
-        List<Map<String, Long>> longMap = rechargeMapper.sumAllChannel();
+        List<Map<String,String>> todayList = new ArrayList<>();
+        List<Map<String,String>> allList = new ArrayList<>();
+        Map<String,String> map = rechargeMapper.sumChannelOne(today);
+        if(map == null){
+            map = new HashedMap();
+            map.put("czqd","1");
+            map.put("cz","0");
+        }
+        Map<String, String> channelTwo = rechargeMapper.sumChannelTwo(today);
+        if(channelTwo == null){
+            channelTwo = new HashedMap();
+            channelTwo.put("czqd","2");
+            channelTwo.put("cz","0");
+        }
+        todayList.add(map);
+        todayList.add(channelTwo);
+
+
+        Map<String,String> allMap = rechargeMapper.sumAllChannelOne();
+        if(map == null){
+            allMap = new HashedMap();
+            allMap.put("czqd","1");
+            allMap.put("cz","0");
+        }
+        Map<String, String> allChannelTwo = rechargeMapper.sumAllChannelTwo();
+        if(allChannelTwo == null){
+            allChannelTwo = new HashedMap();
+            allChannelTwo.put("czqd","2");
+            allChannelTwo.put("cz","0");
+        }
+        allList.add(allMap);
+        allList.add(allChannelTwo);
+
         Map<String,Object> res = new HashMap<>();
-        res.put("today",map);
-        res.put("all",longMap);
+        res.put("today",todayList);
+        res.put("all",allList);
         return ApiResponse.success(res);
     }
 
