@@ -2,27 +2,27 @@
   <Card class="directIndexBox box_col">
     <div slot="title" class="box_row colCenter">
       <div class="box_row_100">
-        <pager-tit title="直购订单"></pager-tit>
+<!--        <pager-tit title="直购订单"></pager-tit>-->
       </div>
       <div>
         <Input
           v-model="param.proNameLike" @on-change="getPagerList"
-          placeholder="商品名称" style="width: 160px;margin-right: 18px"/>
+          :placeholder="$t('SPMC')" style="width: 160px;margin-right: 18px"/>
       </div>
       <div>
         <Input
           v-model="param.userNameLike" @on-change="getPagerList"
-          placeholder="用户姓名" style="width: 160px;margin-right: 18px"/>
+          :placeholder="$t('YHM')" style="width: 160px;margin-right: 18px"/>
       </div>
       <div>
         <Input
           v-model="param.phoneLike" @on-change="getPagerList"
-          placeholder="用户电话" style="width: 160px;margin-right: 18px"/>
+          :placeholder="$t('YHDH')" style="width: 160px;margin-right: 18px"/>
       </div>
       <div>
         <DatePicker format='yyyy-MM-dd' @on-change="changTime" type="daterange"
                     split-panels style="width: 160px;margin-right: 18px"
-                    placement="bottom-end" placeholder="购买时间"></DatePicker>
+                    placement="bottom-end" :placeholder="$t('GMRQ')"></DatePicker>
       </div>
       <Button type="primary" @click="getPagerList">
         <Icon type="md-search"></Icon>
@@ -52,11 +52,12 @@
 <script>
   import orderCard from '../comp/orderCard'
   import orderCardBox from '../comp/orderCardBox'
-
+  import i18nTabTit from '@/mixins/i18nTabTit'
   import FH from '@/componentsShop/logisticsMess'
 
   export default {
     name: "index",
+    mixins: [i18nTabTit],
     components: {
       orderCard, orderCardBox, FH
     },
@@ -66,7 +67,7 @@
         compName:"",
         tableTiT: [
           {
-            title: "序号",
+            title: "#",
             width: 80,
             align: 'center',
             type: 'index'
@@ -75,51 +76,60 @@
             title: '订单编号',
             align: 'center',
             key: 'bh',
-            width: 180
+            width: 180,
+            i18n:'ORDERNUMBER'
           },
           {
             title: '下单时间',
             align: 'center',
-            key: 'sj'
+            key: 'sj',
+            i18n:'GMRQ'
           },
           {
             title: '下单手机号',
             align: 'center',
-            key: 'sjh'
+            key: 'sjh',
+            i18n:'YHDH'
           },
           {
             title: '收货地址',
             align: 'center',
             key: 'dz',
+            i18n:'SHDZ'
           },
           {
             title: '订单状态',
             width: 120,
             align: 'center',
-            key: 'zt'
+            key: 'zt',
+            i18n:'DDZT'
           },
           {
             title: '商品种类',
             width: 120,
             align: 'center',
-            key: 'splb'
+            key: 'splb',
+            i18n:'SPZL'
           },
           {
             title: '商品名',
             width: 120,
             align: 'center',
-            key: 'spm'
+            key: 'spm',
+            i18n:'SPMC'
           },
           {
             title: '商品数量',
             width: 120,
             align: 'center',
-            key: 'spsl'
+            key: 'spsl',
+            i18n:'SL'
           },
           {
             title: '备注',
             align: 'center',
-            key: 'bz'
+            key: 'bz',
+            i18n:'BZ'
           },
         ],
         tableData: [],

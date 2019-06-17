@@ -19,4 +19,10 @@ public interface StatisService {
     ApiResponse<List<String>> exchargeWater(String day);
 
     ApiResponse<List<String>> paymentWater(String day);
+
+    ApiResponse<Map<String, Long>> rechargeNum();
+
+    ApiResponse<Map<String, Object>> rechargeChannel();
+
+    ApiResponse<List<Map<String, Long>>> rechargeTrend();
 }

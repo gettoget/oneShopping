@@ -35,16 +35,16 @@
 
     <div class="box_row rowBetween">
       <div>
-        余 : {{mess.balance}}
+        {{$t('YE')}} : {{mess.balance}}
       </div>
       <div>
-        充 : {{mess.cz}}
+        {{$t('CZ')}} : {{mess.cz}}
       </div>
       <div>
-        参 : {{mess.cy }}
+        {{$t('CY')}} : {{mess.cy }}
       </div>
       <div>
-        中 : {{mess.zjcs}}
+        {{$t('ZJ')}} : {{mess.zjcs}}
       </div>
     </div>
   </Card>
