@@ -32,10 +32,10 @@ public interface RechargeMapper extends Mapper<Recharge> {
     long sumAllmore();
 
     @Select(" SELECT czqd ,count(recharge.czqd) cz from recharge where user_id is not null and cjsj like '${time}%' GROUP BY czqd; ")
-    Map<String, Long> sumChannel(@Param("time") String today);
+    List<Map<String, Long>> sumChannel(@Param("time") String today);
 
     @Select(" SELECT czqd ,count(recharge.czqd) cz from recharge where user_id is not null GROUP BY czqd; ")
-    Map<String, Long> sumAllChannel();
+    List<Map<String, Long>> sumAllChannel();
 
     @Select(" select * from recharge where year like '${year}%'")
     List<Recharge> getYearRecharge(@Param("year") String year);

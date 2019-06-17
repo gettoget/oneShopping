@@ -170,8 +170,8 @@ public class StatisServiceImpl implements StatisService {
     public ApiResponse<Map<String, Object>> rechargeChannel() {
         // 当天充值渠道统计
         String today = DateTime.now().toString("yyyy-MM-dd");
-        Map<String,Long> map = rechargeMapper.sumChannel(today);
-        Map<String, Long> longMap = rechargeMapper.sumAllChannel();
+        List<Map<String,Long>> map = rechargeMapper.sumChannel(today);
+        List<Map<String, Long>> longMap = rechargeMapper.sumAllChannel();
         Map<String,Object> res = new HashMap<>();
         res.put("today",map);
         res.put("all",longMap);
