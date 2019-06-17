@@ -2,29 +2,29 @@
   <Card class="box_col findOrderBox">
     <div slot="title" class="box_row colCenter">
       <div class="">
-        <pager-tit title="发货订单"></pager-tit>
+<!--        <pager-tit title="发货订单"></pager-tit>-->
       </div>
       <div class="box_row_100">
         <div class="box_row rowRight">
           <div>
             <Input
               v-model="param.proNameLike" @on-change="getPagerList"
-              placeholder="商品名称" style="width: 160px;margin-right: 18px"/>
+              :placeholder="$t('SPMC')" style="width: 160px;margin-right: 18px"/>
           </div>
           <div>
             <Input
               v-model="param.userNameLike" @on-change="getPagerList"
-              placeholder="用户姓名" style="width: 160px;margin-right: 18px"/>
+              :placeholder="$t('YHM')" style="width: 160px;margin-right: 18px"/>
           </div>
           <div>
             <Input
               v-model="param.phoneLike" @on-change="getPagerList"
-              placeholder="用户电话" style="width: 160px;margin-right: 18px"/>
+              :placeholder="$t('YHDH')" style="width: 160px;margin-right: 18px"/>
           </div>
           <div>
             <DatePicker format='yyyy-MM-dd' @on-change="changTime" type="daterange"
                         split-panels style="width: 160px;margin-right: 18px"
-                        placement="bottom-end" placeholder="购买时间"></DatePicker>
+                        placement="bottom-end" :placeholder="$t('GMRQ')"></DatePicker>
           </div>
           <Button type="primary" @click="getPagerList">
             <Icon type="md-search"></Icon>

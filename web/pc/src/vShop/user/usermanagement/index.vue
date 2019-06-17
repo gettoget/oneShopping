@@ -6,12 +6,12 @@
         <div class="box_row colCenter rowRight pageFindSty" style="border: none">
           <div>
             <Input v-model="param.userNameLike" @on-change="param.pageNum = 1,getDataList()"
-                   clearable placeholder="请输入用户名" style="width: 200px"/>
+                   clearable :placeholder="$t('YHM')" style="width: 200px"/>
           </div>
 
           <div>
             <Input v-model="param.Like" @on-change="param.pageNum = 1,getDataList()"
-                   placeholder="请输入手机号码" style="width: 200px;margin: 0 12px"/>
+                   :placeholder="$t('YHDH')" style="width: 200px;margin: 0 12px"/>
           </div>
           <Button type="primary" @click="param.pageNum = 1,getDataList()">
             <Icon type="md-search"></Icon>

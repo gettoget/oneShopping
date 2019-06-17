@@ -2,17 +2,17 @@
   <Card class="chargeOrderBoxSty box_col">
     <div slot="title"  class="box_row colCenter">
       <div class="box_row_100">
-        <pager-tit title="充值记录"></pager-tit>
+<!--        <pager-tit title="充值记录"></pager-tit>-->
       </div>
       <div>
         <Input
           v-model="param.username" @on-change="getPagerList" clearable
-          placeholder="用户姓名" style="width: 160px;margin-right: 18px"/>
+          :placeholder="$t('YHM')" style="width: 160px;margin-right: 18px"/>
       </div>
       <div>
         <DatePicker format='yyyy-MM-dd' @on-change="changTime" type="daterange"
                     split-panels style="width: 160px;margin-right: 18px"
-                    placement="bottom-end" placeholder="购买时间"></DatePicker>
+                    placement="bottom-end" :placeholder="$t('GMRQ')"></DatePicker>
       </div>
       <Button type="primary" @click="getPagerList">
         <Icon type="md-search"></Icon>
@@ -37,8 +37,10 @@
 </template>
 
 <script>
+  import i18nTabTit from '@/mixins/i18nTabTit'
   export default {
     name: "index",
+    mixins: [i18nTabTit],
     data(){
       return {
         tab_H: 0,
@@ -55,12 +57,14 @@
           {
             title:"用户名称",
             key:"username",
-            minWidth:100
+            minWidth:100,
+            i18n:'YHM'
           },
           {
             title:"充值时间",
             minWidth:180,
             key:"cjsj",
+            i18n:'CZSJ',
             render:(h,p)=>{
               return h('div',this.moment(p.row.cjsj).format("YYYY-MM-DD HH:mm:ss"))
             }
@@ -69,6 +73,7 @@
             title:"支付时间",
             minWidth:180,
             key:"cjsj",
+            i18n:'ZFSJ',
             render:(h,p)=>{
               return h('div',this.moment(p.row.qrsj).format("YYYY-MM-DD HH:mm:ss"))
             }
@@ -76,11 +81,13 @@
           {
             title:"充值金额",
             minWidth:120,
+            i18n:'CZJE',
             key:"amonut"
           },
           {
             title:"充值渠道",
             minWidth:120,
+            i18n:'CZQD',
             key:"czqd",
             render:(h,p)=>{
               let a={
@@ -99,6 +106,7 @@
           {
             title:"充值状态",
             minWidth:120,
+            i18n:'CZZT',
             key:"czzt",
             render:(h,p)=>{
               let a={

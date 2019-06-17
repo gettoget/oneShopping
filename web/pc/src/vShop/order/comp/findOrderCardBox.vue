@@ -2,15 +2,15 @@
   <Card style="margin-bottom: 12px">
     <div slot="title" class="box_row rowBetween colCenter">
       <div>
-        订单号:{{mess.id}}
+        {{$t('ORDERNUMBER')}}:{{mess.id}}
       </div>
-      <div>购买日期:{{moment(mess.cjsj).format('YYYY-MM-DD HH:mm:ss')}}</div>
+      <div>{{$t('GMRQ')}}:{{moment(mess.cjsj).format('YYYY-MM-DD HH:mm:ss')}}</div>
       <div style="width: 100px;text-align: right">
         <div class="box_row rowBetween">
-          <Button v-if="mess.ddzt=='2'" type="info" size="small" @click="shopFH">发货</Button>
+          <Button v-if="mess.ddzt=='2'" type="info" size="small" @click="shopFH">{{$t('FH')}}</Button>
 
           <div class="box_row_100">
-            <Button type="success" size="small" @click="getMess">详情</Button>
+            <Button type="success" size="small" @click="getMess">{{$t('XQ')}}</Button>
           </div>
         </div>
       </div>
@@ -84,7 +84,7 @@
         </div>
         <div class="box_row rowRight itemSty">
           <div class="item-tit">
-            数量：
+            {{$t('SL')}}：
           </div>
           <div class="item-val">
             <span style="font-size: 22px;font-weight: 700">x</span> {{mess.orderLists.length}}
@@ -92,7 +92,7 @@
         </div>
         <div class="box_row rowRight itemSty">
           <div class="styBox">
-            支付 ：{{mess.zfje}}
+            {{$t('ZF')}}： ：{{mess.zfje}}
           </div>
         </div>
       </div>
