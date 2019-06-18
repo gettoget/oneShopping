@@ -37,8 +37,8 @@
     </div>
 
     <div class="box_row rowBetween colCenter">
-      <div class="lineVal">库存:{{mess.proStore}}</div>
-      <Button type="info" size="small" @click="upShop">上架</Button>
+      <div class="lineVal">{{$t('KC')}}:{{mess.proStore}}</div>
+      <Button type="info" size="small" @click="upShop">{{$t('SJ')}}</Button>
     </div>
 
 

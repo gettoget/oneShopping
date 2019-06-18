@@ -7,7 +7,6 @@
       <div class="shopCardSty-selImg">
         <img v-if='mess.coverUrls[0].substring(0,4)==="http"'
              :src="mess.coverUrls" alt="">
-
         <img v-else :src="apis.GETFILEURL+mess.coverUrls" alt="">
       </div>
 
@@ -25,8 +24,8 @@
     </Poptip>
     <div class="lineBox">
       <div class="lineVal">
-        已售:{{(parseInt(mess.proPrice)-parseInt(mess.rePrice))}}
-        份/剩余{{mess.rePrice}}份</div>
+        {{$t('YS')}}:{{(parseInt(mess.proPrice)-parseInt(mess.rePrice))}}
+        {{$t('F')}}/{{$t('SY')}}{{mess.rePrice}}{{$t('F')}}</div>
       <div class="lineback box_row">
         <div class="line" :style="{width:((parseInt(mess.proPrice)-parseInt(mess.rePrice))/parseInt(mess.rePrice))*100+'%'}">
         </div>
@@ -53,9 +52,10 @@
 
 <script>
   import iphone from '../img/iphone.jpg'
-
+  import i18nTabTit from '@/mixins/i18nTabTit'
   export default {
     name: "shopCard",
+    mixins: [i18nTabTit],
     props: {
       inVal: {
         type: Number,

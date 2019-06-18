@@ -18,6 +18,13 @@ export default {
 
   "home": "Home",
   "login": "Login",
+  "DDCX":"Order query",
+  "FHDD":"Outgoing orders",
+  "ZGDD":"Direct Order",
+  "YHGL":"user management",
+  "SDSH":"Audit of sheets",
+  "SPLL":"Goods Browsing",
+  "KC":"Stock",
 
   /**********************************
    ***********************************/
@@ -81,6 +88,47 @@ export default {
   "CZ":"Recharge",
   "CY":"participate in",
   "ZJ":"Winning the prize",
+  /**********************************
+   ***********************************/
+
+
+  /**
+   * 商品管理模块
+   */
+   "JG":"Price",
+   "SMZ":"On sale",
+   "YKJ":"Award has been awarded",
+   "TJ":"Recommend",
+   "SX":"Up to date",
+   "RM":"Popular",
+   "YS":"Sold",
+   "F":"share",
+   "SY":"Surplus",
+  "SJSJ":"Shelf time",
+  "CYRS":"Number of participants",
+  "SQHJZ":"Last winner",
+  "ZJHM":"Winning numbers",
+  "HJZ":"Prize winner",
+  "CYSL":"Number of participants",
+  "CYSJ":"Participation time",
+  "TX":"Head portrait",
+  "SJ":"Upper shelf",
+  "SPLX":"Commodity types",
+  "XZSPFL":"Choosing Classification of Commodities",
+  "SRSPMC":"Enter the name of the product",
+  "SPDJ":"item pricing",
+  "SRSPDJ":"Unit price of imported goods",
+  "SPKC":"Commodity Inventory",
+  "SRSPKC":"Inventory of imported goods",
+  "SPBQ":"Commodity label",
+  "SRSPBQ":"Input commodity label",
+  "QGLX":"Types of snap-up",
+  "XZQGLX":"Choose the type of snap-up",
+  "FMT":"Cover Chart",
+  "TJT":"Recommendation chart",
+  "NRT":"Content Map",
+  "TIJAO":"Submission",
+  "CHONGZHI":"Reset",
   /**********************************
    ***********************************/
 }

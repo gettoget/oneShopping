@@ -32,7 +32,7 @@
             </Tag>
           </div>
           <div class="box_row_100" style="text-align: right;font-size: 18px;font-weight: 500;color: orangered">
-            上架时间：{{moment(mess.cjsj).format('YYYY-MM-DD')}}
+            {{$t('SJSJ')}}：{{moment(mess.cjsj).format('YYYY-MM-DD')}}
           </div>
         </div>
 
@@ -47,7 +47,7 @@
             <div class="box_row_100" style="cursor: pointer">
               <Poptip placement="left" :transfer="false">
                 <Icon type="md-menu" size="24"/>
-                参与人数：{{mess.cyyhs}}
+                {{$t('CYRS')}}：{{mess.cyyhs}}
                 <div slot="content" class="purchaserListBox">
                   <Table
                     size='small' stripe
@@ -58,8 +58,8 @@
               </Poptip>
             </div>
             <div>
-              已售:{{(parseInt(mess.proPrice)-parseInt(mess.rePrice))}}份 / 剩余
-              <span style="color: orangered;font-weight: 700">{{mess.rePrice}}</span>份
+              {{$t('YS')}}:{{(parseInt(mess.proPrice)-parseInt(mess.rePrice))}}{{$t('F')}} / {{$t('SY')}}
+              <span style="color: orangered;font-weight: 700">{{mess.rePrice}}</span>{{$t('F')}}
             </div>
           </div>
           <div class="lineback box_row">
@@ -75,11 +75,11 @@
           <div>
             <h4>
               <Icon type="ios-film-outline"></Icon>
-              上期获奖者
+              {{$t('SQHJZ')}}
             </h4>
           </div>
           <div class="box_row_100" style="text-align: right">
-            <h3>中奖号码:{{winList.num}}</h3>
+            <h3>{{$t('ZJHM')}}:{{winList.num}}</h3>
           </div>
         </div>
         <div class="box_row colCenter">
@@ -88,13 +88,13 @@
           <Avatar v-else :src="defAva"/>
           <div style="margin-left: 22px">
             <div class="winUserItemSty">
-              获奖者：<span style="color: orangered">{{winList.userName}}</span>
+              {{$t('HJZ')}}：<span style="color: orangered">{{winList.userName}}</span>
             </div>
             <div class="winUserItemSty">
-              参与数量：{{winList.zjfs}}
+              {{$t('CYSL')}}：{{winList.zjfs}}
             </div>
             <div class="winUserItemSty">
-              参与时间：{{moment(winList.cjsj).format('YYYY-MM-DD')}}
+              {{$t('CYSJ')}}：{{moment(winList.cjsj).format('YYYY-MM-DD')}}
             </div>
           </div>
 
@@ -120,9 +120,10 @@
   import 'swiper/dist/css/swiper.css'
   import {swiper, swiperSlide} from 'vue-awesome-swiper'
   import defAva from '@/assets/images/007.png'
-
+  import i18nTabTit from '@/mixins/i18nTabTit'
   export default {
     name: "DrawerMod",
+    mixins: [i18nTabTit],
     components: {
       swiper,
       swiperSlide
@@ -171,6 +172,7 @@
           {
             title: "头像",
             width: 100,
+            i18n:'TX',
             slot: 'action',
             render: (h, p) => {
               return h('Avatar', {
@@ -183,12 +185,14 @@
           {
             title: "用户姓名",
             minWidth: 140,
+            i18n:'YHM',
             render: (h, p) => {
               return h('div', p.row.user.userName)
             }
           },
           {
             title: "购买时间",
+            i18n:'GMRQ',
             minWidth: 140,
             render: (h, p) => {
               let a = this.moment(p.row.cjsj).format('YYYY-MM-DD HH:mm:ss')
@@ -199,6 +203,7 @@
           {
             title: "购买数量",
             width: 120,
+            i18n:'SL',
             key: "gmfs"
           }
         ],

@@ -9,7 +9,7 @@
       <div>
         <!--<Icon type="md-person" size="34"/>-->
         <Input v-model="param.xmLike"
-               placeholder="请输入用户姓名" style="width: 200px"
+               :placeholder="$t('YHM')" style="width: 200px"
                @on-keyup.enter="findMessList()"
                @on-change="findMessList"></Input>
       </div>
@@ -17,7 +17,7 @@
       <div>
         <!--<Icon type="ios-call" size="34"/>-->
         <Input v-model="param.sjhLike"
-               placeholder="请输入手机号码" style="width: 200px"
+               :placeholder="$t('YHDH')" style="width: 200px"
                @on-keyup.enter="findMessList()"
                @on-change="findMessList"></Input>
       </div>

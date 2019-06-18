@@ -2,7 +2,7 @@
   <Card class="directIndexBox box_col">
     <div slot="title" class="box_row colCenter">
       <div class="box_row_100">
-<!--        <pager-tit title="直购订单"></pager-tit>-->
+        <pager-tit :title="$t('ZGDD')"></pager-tit>
       </div>
       <div>
         <Input

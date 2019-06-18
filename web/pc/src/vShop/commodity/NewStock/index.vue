@@ -4,14 +4,14 @@
 <template>
   <Card class="NewStockSty box_col">
     <div slot="title">
-      <pager-tit title="商品上架"></pager-tit>
+      <pager-tit :title="$t('SJ')"></pager-tit>
     </div>
 
     <div class="UpBox box_row">
       <div class="box_row_100 boxPadd_R">
         <Form ref="formValidate" :model="formValidate" :rules="ruleValidate">
-          <FormItem label="商品类型" prop="proType">
-            <Select v-model="formValidate.proType" placeholder="选择商品分类">
+          <FormItem :label="$t('SPLX')" prop="proType">
+            <Select v-model="formValidate.proType" :placeholder="$t('XZSPFL')">
               <Option value="computer">电脑</Option>
               <Option value="phone">手机</Option>
               <Option value="pad">平板电脑</Option>
@@ -20,21 +20,21 @@
               <Option value="other">其他</Option>
             </Select>
           </FormItem>
-          <FormItem label="商品名称" prop="proName">
-            <Input v-model="formValidate.proName" placeholder="输入商品名称"></Input>
+          <FormItem :label="$t('SPMC')" prop="proName">
+            <Input v-model="formValidate.proName" :placeholder="$t('SRSPMC')"></Input>
           </FormItem>
-          <FormItem label="商品单价" prop="proPrice">
-            <Input v-model="formValidate.proPrice" placeholder="输入商品单价"/>
+          <FormItem :label="$t('SPDJ')" prop="proPrice">
+            <Input v-model="formValidate.proPrice" :placeholder="$t('SRSPDJ')"/>
           </FormItem>
-          <FormItem label="商品库存" prop="proStore">
-            <Input v-model="formValidate.proStore" placeholder="输入库存量"/>
+          <FormItem :label="$t('SPKC')" prop="proStore">
+            <Input v-model="formValidate.proStore" :placeholder="$t('SRKCL')"/>
           </FormItem>
-          <FormItem label="商品标签" prop="proSign">
+          <FormItem :label="$t('SPBQ')" prop="proSign">
             <Input v-model="formValidate.proSign" type="textarea" :autosize="{minRows: 1,maxRows: 5}"
-                   placeholder="输入商品标签"></Input>
+                   :placeholder="$t('SRSPBQ')"></Input>
           </FormItem>
-          <FormItem label="抢购类型" prop="rType">
-            <Select v-model="formValidate.rType" placeholder="选择抢购类型">
+          <FormItem :label="$t('QGLX')" prop="rType">
+            <Select v-model="formValidate.rType" :placeholder="$t('XZQGLX')">
               <Option value="1">1</Option>
               <Option value="2">2</Option>
             </Select>
@@ -42,10 +42,10 @@
           <FormItem>
             <div class="box_row rowRight">
               <Button type="success" style="margin-right: 12px"
-                      @click="handleSubmit('formValidate')">提交
+                      @click="handleSubmit('formValidate')">{{$t('TIJAO')}}
               </Button>
 
-              <Button @click="handleReset">重置</Button>
+              <Button @click="handleReset">{{$t('CHONGZHI')}}</Button>
             </div>
           </FormItem>
         </Form>
@@ -53,7 +53,7 @@
       <div class="box_row_1auto boxPadd_L">
         <Row>
           <Col span="12" class-name="coverImgBoxSty boxPadd_LR">
-            <h2>封面图</h2>
+            <h2>{{$t('FMT')}}</h2>
 
             <div span="12" class="contentItemSty" v-if="formData.coverImg">
               <img :src="getUrl+formData.coverImg" alt="">
@@ -70,7 +70,7 @@
             </div>
           </Col>
           <Col span="12" class-name="tuijianImgBoxSty boxPadd_LR">
-            <h2>推荐图</h2>
+            <h2>{{$t('TJT')}}</h2>
 
             <div class="contentItemSty" v-if="formData.tuijianImg">
               <img :src="getUrl+formData.tuijianImg" alt="">
@@ -88,7 +88,7 @@
           </Col>
         </Row>
         <div style="margin-top: 12px;padding-left: 18px">
-          <h2>内容图</h2>
+          <h2>{{$t('NRT')}}</h2>
         </div>
         <Row>
           <Col span="12" class-name="contentImgSty boxPadd_LR boxPadd_B" v-for="(it,index) in formData.content"

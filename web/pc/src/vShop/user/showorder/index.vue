@@ -1,6 +1,6 @@
 <template>
   <div class="box_col">
-    <pager-tit title="晒单审核"></pager-tit>
+    <pager-tit :title="$t('SDSH')"></pager-tit>
     <div class="box_col_auto">
       <div v-if="dataList.length >0" v-for="(it,index) in dataList" :key="index">
         <shaidan :mess="it"></shaidan>

@@ -5,15 +5,15 @@
   <Card class="KcPageBox box_col">
     <div slot="title" class="box_row">
       <div class="box_row_100">
-        <pager-tit title="库存"></pager-tit>
+        <pager-tit :title="$t('KC')"></pager-tit>
       </div>
-      <Input v-model="param.proNameLike" placeholder="商品名称"
+      <Input v-model="param.proNameLike" :placeholder="$t('YHM')"
              style="width: 200px;margin-right: 20px"
              @on-clear="getDataList()"
              @on-change="getDataList()" clearable/>
       <Input v-model="param.proPriceGte" type="number" :number="true"
              style="width: 200px" @on-change="getDataList()">
-      <span slot="prepend">价格</span>
+      <span slot="prepend">{{$t('JG')}}</span>
       </Input>
       <Input v-model="param.proPriceLte" type="number" :number="true"
              style="width: 200px;margin-right: 20px" @on-change="getDataList()">

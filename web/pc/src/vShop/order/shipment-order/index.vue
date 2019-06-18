@@ -1,8 +1,8 @@
 <template>
   <Card class="box_col findOrderBox">
     <div slot="title" class="box_row colCenter">
-      <div class="">
-<!--        <pager-tit title="发货订单"></pager-tit>-->
+      <div class="box_row_100">
+        <pager-tit :title="$t('FHDD')"></pager-tit>
       </div>
       <div class="box_row_100">
         <div class="box_row rowRight">

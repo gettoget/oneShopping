@@ -1,7 +1,7 @@
 <template>
   <div class="box_col">
     <div class="box_row">
-      <pager-tit title="用户管理"></pager-tit>
+      <pager-tit :title="$t('YHGL')"></pager-tit>
       <div class="box_row_100">
         <div class="box_row colCenter rowRight pageFindSty" style="border: none">
           <div>

@@ -1,8 +1,8 @@
 <template>
   <Card class="box_col findOrderBox">
     <div slot="title" class="box_row colCenter">
-      <div class="">
-        <!--<pager-tit title="订单查询"></pager-tit>-->
+      <div class="box_row_100">
+        <pager-tit :title="$t('DDCX')"></pager-tit>
         <RadioGroup v-model="param.ddzt" type="button"
                     @on-change="getPagerList()" style="margin-right: 20px">
           <Radio label="00">{{$t('QB')}}</Radio>

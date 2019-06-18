@@ -5,14 +5,14 @@
   <Card class="UpStockListSty box_col">
     <div slot="title" class="box_row">
       <div class="box_row_100">
-        <pager-tit title="商品浏览"></pager-tit>
+        <pager-tit :title="$t('SPLL')"></pager-tit>
       </div>
       <RadioGroup v-model="param.proZt" type="button"
                   @on-change="getDataList()" style="margin-right: 20px">
-        <Radio label="0">全部</Radio>
-        <Radio label="1">售卖中</Radio>
-        <Radio label="3">待开奖</Radio>
-        <Radio label="4">已开奖</Radio>
+        <Radio label="0">{{$t('QB')}}</Radio>
+        <Radio label="1">{{$t('SMZ')}}</Radio>
+        <Radio label="3">{{$t('DKJ')}}</Radio>
+        <Radio label="4">{{$t('YKJ')}}</Radio>
       </RadioGroup>
       <div style="margin-right: 20px">
         <Button :type="it.bol?'primary':'default'"
@@ -21,12 +21,12 @@
           {{it.text}}
         </Button>
       </div>
-      <Input v-model="param.proNameLike" placeholder="商品名称"
+      <Input v-model="param.proNameLike" :placeholder="$t('SPMC')"
              style="width: 200px;margin-right: 20px" @on-clear="getDataList()"
              @on-change="getDataList()" clearable/>
       <Input v-model="param.proPriceGte" type="number" :number="true"
              style="width: 120px" @on-change="getDataList()">
-      <span slot="prepend">价格</span>
+      <span slot="prepend">{{$t('JG')}}</span>
       </Input>
       <div style="padding: 10px 6px">
         ——
@@ -64,12 +64,13 @@
 <script>
   import shopCard from './comp/shopCard'
   import dr from './comp/DrawerMod'
-
+  import i18nTabTit from '@/mixins/i18nTabTit'
   export default {
     name: "index",
     components: {
       shopCard, dr
     },
+    mixins: [i18nTabTit],
     data() {
       return {
         compName: "",
