@@ -2,10 +2,10 @@
   <Card class="box_col chartTopUpBox">
     <div slot="title" class="box_row">
       <div class="box_row_100">
-        <pager-tit title="今日充值渠道统计"></pager-tit>
+        <pager-tit :title="$t('JRCZQDTJ')"></pager-tit>
       </div>
       <div class="box_row_100">
-        <pager-tit title="累计充值渠道统计"></pager-tit>
+        <pager-tit :title="$t('LJCZQDTJ')"></pager-tit>
       </div>
     </div>
     <div id="chartTopUp" style="height: 100%">

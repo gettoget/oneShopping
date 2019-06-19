@@ -7,7 +7,7 @@
       @on-visible-change="visible"
     >
       <div slot="header">
-        <pager-tit title="添加轮播图"></pager-tit>
+        <pager-tit :title="$t('TJLBT')"></pager-tit>
       </div>
       <div class="box_row">
         <div style="width: 200px;margin-right: 18px">
@@ -19,7 +19,7 @@
               </div>
             </div>
             <div class="" v-else>
-              <Tooltip content="点击上传文件" placement="top" :transfer="true">
+              <Tooltip :content="$t('DJSCTP')" placement="top" :transfer="true">
                 <up-file-img upGroup="cover" @handleSuccess="handleSuccess">
                   <Button type="text" style="height: 120px;width: 200px">
                     <Icon type="md-cloud-upload" size="80"/>
@@ -30,8 +30,8 @@
           </div>
           <div>
             <Select v-model="formData.imgLx" style="width:200px">
-              <Option value="1">商品推荐</Option>
-              <Option value="2">活动页面</Option>
+              <Option value="1">{{$t('SPTJ')}}</Option>
+              <Option value="2">{{$t('HDYM')}}</Option>
             </Select>
           </div>
         </div>
@@ -39,7 +39,7 @@
           <div class="box_col" style="max-height: 600px;">
             <div>
               <Input v-model="param.proNameLike" clearable
-                     placeholder="请输入您想绑定的上品"/>
+                     :placeholder="$t('SRBDSP')"/>
             </div>
 
             <div class="box_col_auto shopListRadio">

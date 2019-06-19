@@ -2,10 +2,10 @@
   <Card class="box_col chartNumberBox">
     <div slot="title" class="box_row">
       <div class="box_row_100">
-        <pager-tit title="今日充值统计"></pager-tit>
+        <pager-tit :title="$t('JRCZTJ')"></pager-tit>
       </div>
       <div class="box_row_100">
-        <pager-tit title="累计充值统计"></pager-tit>
+        <pager-tit :title="$t('LJCZTJ')"></pager-tit>
       </div>
     </div>
     <div id="chartNumber" style="height: 100%">

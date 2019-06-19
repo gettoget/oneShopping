@@ -131,4 +131,29 @@ export default {
   "CHONGZHI":"Reset",
   /**********************************
    ***********************************/
+
+  /**
+   * 轮播图模块
+   */
+
+  "LBT":"Rotary Planting Map",
+  "TJLBT":"Adding Rotary Planting Map",
+  "DJSCTP":"Click Upload File",
+  "SRBDSP":"Please enter the top quality you want to bind.",
+  "SPTJ":"Merchandise Recommendation",
+  "HDYM":"Activity Page",
+
+  /**********************************
+   ***********************************/
+
+  /**
+   * 统计模块
+   */
+
+  "JRCZQDTJ":"Statistics of today's recharge channels",
+  "LJCZQDTJ":"Cumulative recharge channel statistics",
+  "JRCZTJ":"Today's recharge statistics",
+  "LJCZTJ":"Cumulative recharge statistics",
+  /**********************************
+   ***********************************/
 }

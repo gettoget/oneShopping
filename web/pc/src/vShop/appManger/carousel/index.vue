@@ -1,7 +1,7 @@
 <template>
   <Card class="carouselBox box_col">
     <div slot="title">
-      <pager-tit title="轮播图"></pager-tit>
+      <pager-tit :title="$t('LBT')"></pager-tit>
     </div>
     <div style="width: 1100px;height: 100%;margin: auto;">
       <Row :gutter="32">
