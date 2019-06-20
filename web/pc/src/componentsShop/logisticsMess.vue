@@ -2,20 +2,20 @@
   <div>
     <Modal
       v-model="showModal"
-      title="物流发货"
+      :title="$t('WLFH')"
       :mask-closable="false"
       @on-visible-change="visible"
     >
       <Form>
         <FormItem lable="物流公司">
           <Select value="1">
-            <Option value="1">中通快递</Option>
-            <Option value="2">韵达快递</Option>
-            <Option value="3">百世汇通</Option>
+            <Option value="1">{{$t('ZTKD')}}</Option>
+            <Option value="2">{{$t('YDKD')}}</Option>
+            <Option value="3">{{$t('BSHT')}}</Option>
           </Select>
         </FormItem>
-        <FormItem lable="物流编号">
-          <Input value="" placeholder="物流编号"/>
+        <FormItem :lable="$t('WLBH')">
+          <Input value="" :placeholder="$t('WLBH')"/>
         </FormItem>
       </Form>
       <div slot="footer">

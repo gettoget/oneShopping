@@ -8,9 +8,9 @@
     >
             <!--:mask-closable="false"-->
       <div slot="header" class="box_row rowBetween colCenter">
-        <h2>订单号:{{orderMess.id}}</h2>
+        <h2>{{$t('ORDERNUMBER')}}:{{orderMess.id}}</h2>
         <div>
-          <Button type="primary">订单状态</Button>
+          <Button type="primary">{{$t('DDZT')}}</Button>
         </div>
       </div>
       <div class="box_col">
@@ -29,10 +29,10 @@
         <Card>
           <div class="box_row">
             <div class="box_row_100">
-              数量：<span style="font-size: 18px;font-weight: 600">X {{orderMess.orderLists.length}}</span>
+              {{$t('SL')}}：<span style="font-size: 18px;font-weight: 600">X {{orderMess.orderLists.length}}</span>
             </div>
             <div class="box_row_100">
-              支付：<span style="font-size: 18px;font-weight: 600">{{orderMess.zfje}}</span>
+              {{$t('ZF')}}：<span style="font-size: 18px;font-weight: 600">{{orderMess.zfje}}</span>
             </div>
           </div>
         </Card>
@@ -42,11 +42,11 @@
             <div>
               <h4>
                 <Icon type="ios-film-outline"></Icon>
-                购买用户
+                {{$t('GMYH')}}
               </h4>
             </div>
             <div class="box_row_100" style="text-align: right">
-              购买日期:{{moment(orderMess.cjsj).format('YYYY-MM-DD HH:mm:ss')}}
+              {{$t('GMSJ')}}:{{moment(orderMess.cjsj).format('YYYY-MM-DD HH:mm:ss')}}
               <!--{{moment(mess.cjsj).format('YYYY-MM-DD HH:mm:ss')}}-->
             </div>
           </div>
@@ -81,7 +81,7 @@
         <div class="box_col_auto" style="margin-top: 12px">
           <Card>
             <div slot="title" class="box_row">
-              购买的号码
+              {{$t('GMHM')}}
             </div>
             <div>
               <Tag color="cyan" v-for="(it,index) in orderMess.orderLists" :key="index">{{it.num}}</Tag>

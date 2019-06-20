@@ -112,19 +112,20 @@
               let a={
                 "1":{
                   typ:"primary",
-                  val:" 待确认"
+                  i18n:"DQR",
+                  val:this.$t('DQR')
                 },
                 "2":{
                   typ:"success",
-                  val:" 充值成功"
+                  val:this.$t('CZCG')
                 },
                 "3":{
                   typ:"error",
-                  val:" 充值失败"
+                  val:this.$t('CZSB')
                 },
                 "4":{
                   typ:"warning",
-                  val:" 充值取消"
+                  val:this.$t('CZQX')
                 }
               }
 

@@ -76,6 +76,18 @@ export default {
   "BZ":"Remarks",
   "FHZT":"Delivery status",
   "DJ":"Unit Price",
+  "DQR":"To be confirmed",
+  "CZCG":"Successful recharge",
+  "CZSB":"Refill failure",
+  "CZQX":"Cancellation of recharge",
+  "GMYH":"Buying Users",
+  "GMSJ":"Purchase time",
+  "GMHM":"Number of Purchase",
+  "WLFH":"Logistics Delivery",
+  "WLBH":"Logistics Number",
+  "ZTKD":"ZTO",
+  "YDKD":"YUNDA",
+  "BSHT":"BEST EXPRESS",
   /**********************************
    ***********************************/
 
