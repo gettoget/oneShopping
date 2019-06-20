@@ -306,6 +306,26 @@ export default [
     ]
   },
   {
+    path: '/message',
+    name: 'message',
+    meta: {
+      icon: 'md-trending-up',
+      title: '留言管理'
+    },
+    component: Main,
+    children: [
+      {
+        path: '/message',
+        name: 'message',
+        meta: {
+          icon: 'md-images',
+          title: "message"
+        },
+        component: () => import('@/vShop/message')
+      }
+    ]
+  },
+  {
     path: '/iview',
     name: 'iview',
     component: Main,
@@ -634,8 +654,8 @@ export default [
     ]
   },
   {
-    path: '/message',
-    name: 'message',
+    path: '',
+    name: '',
     component: Main,
     meta: {
       hideInBread: true,
