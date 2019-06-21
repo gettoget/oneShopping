@@ -12,4 +12,6 @@ public interface QuestionService  extends BaseService<Question,String> {
     PageResponse<Question> getNewPager(Page<Question> page);
 
     ApiResponse<String> delete(String id);
+
+    ApiResponse<String> updateEntity(Question entity);
 }

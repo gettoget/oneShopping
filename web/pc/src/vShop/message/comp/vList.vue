@@ -2,11 +2,17 @@
   <div class="list">
     <div  v-if="this.list.length">
       <div v-for="(item,index) in list" :key="index"  class="list-item">
+        <div>
+        </div>
         <div class="span-con">
+          <Icon type="ios-paper" />
           <span>{{item.name}}:</span>
         </div>
         <div class="list-msg">
-          <div>{{item.message}}</div>
+          <div>
+            {{item.message}}
+            <p v-if="item.hf">@{{item.name}}:{{item.hf}}</p>
+          </div>
           <div class="list-reply">
             <a @click="listChange(item)">回复</a>
           </div>
@@ -42,6 +48,9 @@
 <style scoped>
   .list{
     margin: 50px 20px 0 20px;
+  }
+  .list-icon{
+
   }
   .list-item{
     display: flex;
