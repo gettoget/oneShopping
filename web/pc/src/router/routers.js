@@ -63,29 +63,29 @@ export default [
         path: 'system-user',
         name: 'system-user',
         meta: {
-          icon: 'md-trending-up',
+          icon: 'ios-contact',
           title: '用户管理'
         },
         component: () => import('@/vShop/system/system-user')
       },
-      {
-        path: 'system-role',
-        name: 'system-role',
-        meta: {
-          icon: '_bear',
-          title: '角色管理'
-        },
-        component: () => import('@/vShop/system/system-root')
-      },
-      {
-        path: 'system-function',
-        name: 'system-function',
-        meta: {
-          icon: '_bear',
-          title: '功能管理'
-        },
-        component: () => import('@/vShop/system/system-function')
-      },
+      // {
+      //   path: 'system-role',
+      //   name: 'system-role',
+      //   meta: {
+      //     icon: '_bear',
+      //     title: '角色管理'
+      //   },
+      //   component: () => import('@/vShop/system/system-root')
+      // },
+      // {
+      //   path: 'system-function',
+      //   name: 'system-function',
+      //   meta: {
+      //     icon: '_bear',
+      //     title: '功能管理'
+      //   },
+      //   component: () => import('@/vShop/system/system-function')
+      // },
       // {
       //   path: 'system_Jurisdiction',
       //   name: 'system_Jurisdiction',
@@ -95,84 +95,246 @@ export default [
       //   },
       //   component: () => import('@/vShop/system/system-Jurisdiction')
       // },
-      {
-        path: 'system-daily',
-        name: 'system-daily',
-        meta: {
-          icon: '_bear',
-          title: '日志管理'
-        },
-        component: () => import('@/vShop/system/system-daily')
-      },
-      {
-        path: 'dictionaries',
-        name: 'dictionaries',
-        meta: {
-          icon: '_bear',
-          title: '字典管理'
-        },
-        component: () => import('@/vShop/system/dictionaries')
-      },
-      {
-        path: 'system-ShortMessage',
-        name: 'system-ShortMessage',
-        meta: {
-          icon: '_bear',
-          title: '短信管理'
-        },
-        component: () => import('@/vShop/system/system-ShortMessage')
-      }
+      // {
+      //   path: 'system-daily',
+      //   name: 'system-daily',
+      //   meta: {
+      //     icon: '_bear',
+      //     title: '日志管理'
+      //   },
+      //   component: () => import('@/vShop/system/system-daily')
+      // },
+      // {
+      //   path: 'dictionaries',
+      //   name: 'dictionaries',
+      //   meta: {
+      //     icon: '_bear',
+      //     title: '字典管理'
+      //   },
+      //   component: () => import('@/vShop/system/dictionaries')
+      // },
+      // {
+      //   path: 'system-ShortMessage',
+      //   name: 'system-ShortMessage',
+      //   meta: {
+      //     icon: '_bear',
+      //     title: '短信管理'
+      //   },
+      //   component: () => import('@/vShop/system/system-ShortMessage')
+      // }
     ]
   },
   {
     path: '/stock',
     name: 'stock',
     meta: {
-      icon: 'logo-buffer',
+      icon: 'ios-cube-outline',
       title: '商品管理'
     },
     component: Main,
-    children:[
+    children: [
       {
-        path:'/newstock',
-        name:'newstock',
+        path: '/newstock',
+        name: 'newstock',
         meta: {
-          icon: 'md-trending-up',
+          icon: 'md-grid',
           title: '商品上架'
         },
         component: () => import('@/vShop/commodity/NewStock')
       },
       {
-        path:'/manage',
-        name:'manage',
+        path: '/reserve',
+        name: 'reserve',
         meta: {
-          icon: 'md-trending-up',
-          title: '上架管理'
+          icon: 'md-home',
+          title: '库存管理'
+        },
+        component: () => import('@/vShop/commodity/reserve')
+      },
+      {
+        path: '/manage',
+        name: 'manage',
+        meta: {
+          icon: 'ios-eye',
+          title: '商品浏览'
         },
         component: () => import('@/vShop/commodity/Manage')
       }
     ]
   },
-
-
+  {
+    path: '/user',
+    name: 'user',
+    meta: {
+      icon: 'md-person',
+      title: '用户管理'
+    },
+    component: Main,
+    children: [
+      {
+        path: '/usermanagement',
+        name: 'usermanagement',
+        meta: {
+          icon: 'ios-person',
+          title: '用户信息'
+        },
+        component: () => import('@/vShop/user/usermanagement')
+      },
+      // {
+      //   path:'/usermess',
+      //   name:'usermess',
+      //   meta: {
+      //     icon: 'md-trending-up',
+      //     title: '用户查询'
+      //   },
+      //   component: () => import('@/vShop/user/usermess')
+      // },
+      {
+        path: '/showorder',
+        name: 'showorder',
+        meta: {
+          icon: 'md-create',
+          title: '晒单审核'
+        },
+        component: () => import('@/vShop/user/showorder')
+      }
+    ]
+  },
+  {
+    path: '/order',
+    name: 'order',
+    meta: {
+      icon: 'md-clipboard',
+      title: '订单管理'
+    },
+    component: Main,
+    children: [
+      {
+        path: '/audit-order',
+        name: 'audit-order',
+        meta: {
+          icon: 'md-search',
+          title: '订单查询'
+        },
+        component: () => import('@/vShop/order/audit-order')
+      },
+      {
+        path: '/direct-order',
+        name: 'direct-order',
+        meta: {
+          icon: 'ios-document-outline',
+          title: '直购订单'
+        },
+        component: () => import('@/vShop/order/direct-order')
+      },
+      // {
+      //   path:'/draw-order',
+      //   name:'draw-order',
+      //   meta: {
+      //     icon: 'md-trending-up',
+      //     title: '中奖订单'
+      //   },
+      //   component: () => import('@/vShop/order/draw-order')
+      // },
+      // {
+      //   path:'/draw-order-robot',
+      //   name:'draw-order-robot',
+      //   meta: {
+      //     icon: 'md-trending-up',
+      //     title: 'Robot中奖订单'
+      //   },
+      //   component: () => import('@/vShop/order/draw-order-robot')
+      // },
+      {
+        path: '/shipment-order',
+        name: 'shipment-order',
+        meta: {
+          icon: 'logo-foursquare',
+          title: '订单发货'
+        },
+        component: () => import('@/vShop/order/shipment-order')
+      },
+      {
+        path: '/chargeOrder',
+        name: 'chargeOrder',
+        meta: {
+          icon: 'ios-document-outline',
+          title: '充值订单'
+        },
+        component: () => import('@/vShop/order/chargeOrder')
+      }
+    ]
+  },
+  {
+    path: '/appmanger',
+    name: 'appmanger',
+    meta: {
+      icon: 'md-trending-up',
+      title: 'app管理'
+    },
+    component: Main,
+    children: [
+      {
+        path: '/carousel',
+        name: 'carousel',
+        meta: {
+          icon: 'md-images',
+          title: "轮播图"
+        },
+        component: () => import('@/vShop/appManger/carousel')
+      }
+    ]
+  },
+  {
+    path: '/statistics',
+    name: 'statistics',
+    meta: {
+      icon: 'md-trending-up',
+      title: 'app管理'
+    },
+    component: Main,
+    children: [
+      {
+        path: '/topUpData',
+        name: 'topUpData',
+        meta: {
+          icon: 'md-images',
+          title: "统计"
+        },
+        component: () => import('@/vShop/topUpData')
+      }
+    ]
+  },
+  {
+    path: '/message',
+    name: 'message',
+    meta: {
+      icon: 'md-trending-up',
+      title: '留言管理'
+    },
+    component: Main,
+    children: [
+      {
+        path: '/message',
+        name: 'message',
+        meta: {
+          icon: 'md-images',
+          title: "message"
+        },
+        component: () => import('@/vShop/message')
+      }
+    ]
+  },
   {
     path: '/iview',
     name: 'iview',
     component: Main,
     meta: {
+      hideInMenu: true,
       icon: 'logo-buffer',
       title: 'iviewDemoComp'
     },
     children: [
-      // {
-      //   path: '',
-      //   name: 'doc',
-      //   meta: {
-      //     title: '文档',
-      //     href: 'https://lison16.github.io/iview-admin-doc/#/',
-      //     icon: 'ios-book'
-      //   }
-      // },
       {
         path: '/components',
         name: 'components',
@@ -492,8 +654,8 @@ export default [
     ]
   },
   {
-    path: '/message',
-    name: 'message',
+    path: '',
+    name: '',
     component: Main,
     meta: {
       hideInBread: true,

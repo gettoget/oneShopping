@@ -110,7 +110,41 @@ public class User implements Serializable {
     /**
      * 充值和消费记录
      */
+    @Transient
     private List<Map<String,String>> record;
+
+    @Transient
+    private String cz;
+
+    @Transient
+    private String xf;
+
+    @Transient
+    private String cy;
+
+    public String getCz() {
+        return cz;
+    }
+
+    public void setCz(String cz) {
+        this.cz = cz;
+    }
+
+    public String getXf() {
+        return xf;
+    }
+
+    public void setXf(String xf) {
+        this.xf = xf;
+    }
+
+    public String getCy() {
+        return cy;
+    }
+
+    public void setCy(String cy) {
+        this.cy = cy;
+    }
 
     private static final long serialVersionUID = 1L;
 
@@ -262,7 +296,7 @@ public class User implements Serializable {
     }
 
     /**
-     * 设置用户状态。正常、锁定
+     * 设置用户状态。正常、锁定   0  正常  1 锁定
      *
      * @param zt 用户状态。正常、锁定
      */

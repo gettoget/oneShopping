@@ -37,11 +37,11 @@ public class StringDivUtils {
         return buffer.toString();
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         for (int j = 0; j < 1000; j++) {
             System.out.println(getSix());
         }
-    }
+    }*/
     /**
      * 判断手机号是否合格
      *

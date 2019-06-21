@@ -7,6 +7,7 @@ import com.github.pagehelper.PageInfo;
 import com.ldz.sys.model.SysYh;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.ExcelParams;
+import com.ldz.util.bean.PageResponse;
 import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.SnowflakeIdWorker;
 import com.ldz.util.exception.RuntimeCheck;
@@ -76,6 +77,28 @@ public abstract class BaseServiceImpl<T, PK extends Serializable> implements Bas
     }
 
     @Override
+    public PageResponse<T> newPager(Page<T> page) {
+        PageResponse<T> result = new PageResponse<>();
+        LimitedCondition condition = getQueryCondition();
+        if(!fillNewPagerCondition(condition)){
+            result.setList(new ArrayList<>());
+            result.setPageNum(0);
+            result.setPageSize(0);
+            result.setTotal(0);
+            return result;
+        }
+        PageInfo<T> info = findPage(page, condition);
+        afterNewPager(info.getList());
+        result.setTotal(info.getTotal());
+        result.setPageSize(page.getPageSize());
+        result.setPageNum(page.getPageNum());
+        result.setList(info.getList());
+        return result;
+    }
+    protected void afterNewPager(List<T> result){
+        return;
+    }
+    @Override
     public ApiResponse<List<T>> pager(Page<T> pager) {
         ApiResponse<List<T>> result = new ApiResponse<>();
         LimitedCondition condition = getQueryCondition();
@@ -88,6 +111,8 @@ public abstract class BaseServiceImpl<T, PK extends Serializable> implements Bas
         result.setPage(resultPage);
         return result;
     }
+
+
 
     protected void afterPager(PageInfo<T> resultPage) {
         return;
@@ -109,6 +134,10 @@ public abstract class BaseServiceImpl<T, PK extends Serializable> implements Bas
     }
 
     public boolean fillPagerCondition(LimitedCondition condition) {
+        return true;
+    }
+    @Override
+    public boolean fillNewPagerCondition(LimitedCondition condition){
         return true;
     }
 
@@ -133,9 +162,19 @@ public abstract class BaseServiceImpl<T, PK extends Serializable> implements Bas
         return  requset.getAttribute(key);
     }
 
+    public String getAttributeAsString(String key){
+        HttpServletRequest requset = getRequset();
+        return  (String) requset.getAttribute(key);
+    }
+
     public HttpServletRequest getRequset() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         return request;
+    }
+
+    public String getHeader(String key){
+        HttpServletRequest requset = getRequset();
+        return requset.getHeader(key);
     }
 
     /**

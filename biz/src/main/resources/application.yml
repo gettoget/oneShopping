@@ -1,22 +1,21 @@
 server:
   port: 8088
 spring:
+  profiles:
+    active: test  #合并 application-test.yml 中的配置参数
   messages:
     basename: i18n/messages
     cache-second: 3600
-    encoding: utf-8
+    encoding: UTF-8
   redis:
-    database: 10
     host: 127.0.0.1
     port: 6379
-    timeout: 3000ms
-    jedis:
-      pool:
-        max-idle: 500
-        min-idle: 50
-        max-active: 2000
-        max-wait: 1000ms
+    maxIdle: 200
+    maxActive: 1024
+    maxWait: 1000
+    database: 10
   datasource:
+#    url: jdbc:mysql://119.23.242.234:9306/yyg?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
     url: jdbc:mysql://127.0.0.1:3306/yyg?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
     username: root
     password: 123456
@@ -46,5 +45,12 @@ logging:
 mapper:
   identity: MYSQL
 
-filePath: http://127.0.0.1:9090/
+filePath:
+
+staticPath:  D:/static/common/
+
+robot:
+  point: 0.01
+  people: 5
+  lowsize: 55
 

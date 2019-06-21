@@ -201,7 +201,7 @@ public class ExcelReader {
 
     }
 
-    public static void main(String[] args) {
+   /* public static void main(String[] args) {
         try {
             ExcelReader excelReader = new ExcelReader();
             // 对读取Excel表格标题测试
@@ -231,5 +231,5 @@ public class ExcelReader {
             System.out.println("未找到指定路径的文件!");
             e.printStackTrace();
         }
-    }
+    }*/
 }

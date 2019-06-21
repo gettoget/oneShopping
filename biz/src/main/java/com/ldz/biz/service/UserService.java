@@ -1,10 +1,14 @@
 package com.ldz.biz.service;
 
+import com.ldz.biz.model.PaymentBean;
 import com.ldz.biz.model.User;
+import com.ldz.biz.model.UserModel;
 import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
+import com.ldz.util.bean.PageResponse;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author slu
@@ -12,12 +16,12 @@ import java.util.List;
 public interface UserService extends BaseService<User, String> {
     /**
      * 用户注册
-     * @param username
      * @param password
      * @param code
+     * @param username
      * @return
      */
-    ApiResponse<String> register(String username, String password, String password1, String code);
+    ApiResponse<Map<String, Object>> register(String phone, String password, String password1, String code, String username);
 
     /**
      * 用户登录
@@ -25,24 +29,23 @@ public interface UserService extends BaseService<User, String> {
      * @param password
      * @return
      */
-    ApiResponse<String> login(String phone, String password);
+    ApiResponse<Map<String, Object>> login(String phone, String password) throws Exception;
 
     /**
      * 用户修改密码
-     * @param phone
      * @param pwd
      * @param newPwd
      * @param newPwd1
      * @return
      */
-    ApiResponse<String> editPwd(String phone, String pwd, String newPwd, String newPwd1);
+    ApiResponse<String> editPwd(String pwd, String newPwd, String newPwd1);
 
     /**
      * 修改用户信息
      * @param user
      * @return
      */
-    ApiResponse<String> editUserInfo(User user);
+    ApiResponse<UserModel> editUserInfo(User user);
 
     /**
      * 重设密码
@@ -60,7 +63,7 @@ public interface UserService extends BaseService<User, String> {
      * @param pageSize
      * @return
      */
-    ApiResponse<String> getMyWallet(int pageNum, int pageSize);
+    PageResponse<PaymentBean> getMyWallet(int pageNum, int pageSize);
 
     /**
      * 发送短信接口
@@ -85,7 +88,31 @@ public interface UserService extends BaseService<User, String> {
      */
     ApiResponse<String> savePayPwd(String pwd, String pwd1);
 
+    /**
+     * 重设支付密码
+     * @param newPwd
+     * @param newPwd1
+     * @param code
+     * @return
+     */
     ApiResponse<String> findPayPwd(String newPwd, String newPwd1, String code);
 
+    /**
+     * 获取推荐码
+     * @return
+     */
     ApiResponse<String> genRefferCode();
+
+    /**
+     * 获取当前登录用户信息
+     * @return
+     */
+    ApiResponse<UserModel> getUserInfo();
+
+    /**
+     * 初始化所有的机器人用户
+     */
+    void initRobot();
+
+    ApiResponse<String> updateEntity(User entity);
 }

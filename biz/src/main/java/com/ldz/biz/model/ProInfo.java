@@ -1,10 +1,16 @@
 package com.ldz.biz.model;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
-import javax.persistence.*;
+import java.util.List;
 
 @Table(name = "pro_info")
 public class ProInfo implements Serializable {
+
+
     @Id
     private String id;
 
@@ -39,7 +45,7 @@ public class ProInfo implements Serializable {
     private String proStore;
 
     /**
-     * 商品状态。上架、下架、已开奖  1 上架  2 下架 3 已开奖
+     * 商品状态。上架、下架、已开奖  1 上架  2 下架 3 待开奖 4 已开奖
      */
     @Column(name = "pro_zt")
     private String proZt;
@@ -89,6 +95,19 @@ public class ProInfo implements Serializable {
     private String urls;
 
     /**
+     * 商品封面图
+     */
+    @Column(name = "cover_url")
+    private String coverUrl;
+
+    /**
+     * 商品推荐图
+     */
+    @Column(name = "ref_url")
+    private String refUrl;
+
+
+    /**
      * 参与的真实用户数
      */
     private String cyyhs;
@@ -103,6 +122,8 @@ public class ProInfo implements Serializable {
      */
     @Column(name = "user_id")
     private String userId;
+
+
 
     /**
      * 备注一
@@ -136,6 +157,70 @@ public class ProInfo implements Serializable {
     @Transient
     private WinRecord winRecord;
 
+    @Transient
+    List<String> nums;
+
+    @Transient
+    private List<String> imgUrls;
+    @Transient
+    private List<String> coverUrls;
+    @Transient
+    private List<String> refUrls;
+    @Transient
+    private String zjfs;
+    /**
+     * 是否收藏  0 为未收藏   1为已收藏
+     */
+    @Transient
+    private String store;
+
+    public String getStore() {
+        return store;
+    }
+
+    public void setStore(String store) {
+        this.store = store;
+    }
+
+    public String getZjfs() {
+        return zjfs;
+    }
+
+    public void setZjfs(String zjfs) {
+        this.zjfs = zjfs;
+    }
+
+    public List<String> getNums() {
+        return nums;
+    }
+
+    public void setNums(List<String> nums) {
+        this.nums = nums;
+    }
+
+    public List<String> getImgUrls() {
+        return imgUrls;
+    }
+
+    public void setImgUrls(List<String> imgUrls) {
+        this.imgUrls = imgUrls;
+    }
+
+    public List<String> getCoverUrls() {
+        return coverUrls;
+    }
+
+    public void setCoverUrls(List<String> coverUrls) {
+        this.coverUrls = coverUrls;
+    }
+
+    public List<String> getRefUrls() {
+        return refUrls;
+    }
+
+    public void setRefUrls(List<String> refUrls) {
+        this.refUrls = refUrls;
+    }
 
     private static final long serialVersionUID = 1L;
 
@@ -145,6 +230,22 @@ public class ProInfo implements Serializable {
 
     public void setWinRecord(WinRecord winRecord) {
         this.winRecord = winRecord;
+    }
+
+    public String getCoverUrl() {
+        return coverUrl;
+    }
+
+    public void setCoverUrl(String coverUrl) {
+        this.coverUrl = coverUrl;
+    }
+
+    public String getRefUrl() {
+        return refUrl;
+    }
+
+    public void setRefUrl(String refUrl) {
+        this.refUrl = refUrl;
     }
 
     public int getCycs() {
@@ -279,7 +380,7 @@ public class ProInfo implements Serializable {
     /**
      * 设置商品状态。上架、下架、已开奖
      *
-     * @param proZt 商品状态。上架、下架、已开奖
+     * @param proZt 商品状态。 1 上架、 2 下架、 3 待开奖  4 已开奖
      */
     public void setProZt(String proZt) {
         this.proZt = proZt;
@@ -536,6 +637,25 @@ public class ProInfo implements Serializable {
     public void setBz3(String bz3) {
         this.bz3 = bz3;
     }
+
+
+    public ProInfo() {
+    }
+
+    public ProInfo(ProBaseinfo baseinfo) {
+        this.proBaseid = baseinfo.getId();
+        this.proName = baseinfo.getProName();
+        this.proPrice = baseinfo.getProPrice();
+        this.proSign = baseinfo.getProSign();
+        this.proType = baseinfo.getProType();
+        this.rePrice = baseinfo.getProPrice();
+        this.rType = baseinfo.getrType();
+        this.urls = baseinfo.getUrls();
+        this.coverUrl = baseinfo.getCoverUrl();
+        this.refUrl = baseinfo.getRefUrl();
+
+    }
+
 
     public enum InnerColumn {
         id("id"),

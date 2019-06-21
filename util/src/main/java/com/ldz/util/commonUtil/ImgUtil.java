@@ -14,7 +14,7 @@ import java.util.List;
  *
  */
 public class ImgUtil {
-    public static void main(String[] args) {
+   /* public static void main(String[] args) {
         String yearlateryyyy="";
         String jsonMapString="";
 
@@ -84,7 +84,7 @@ public class ImgUtil {
 //        ///Users/yangx/Desktop/img/logo/thtc.png
 //
 //        generateCode("/Users/yangx/Desktop/img/out",parameterlist,"/Users/yangx/Desktop/img/1.jpeg","order13456");
-    }
+    }*/
 
     /**
      * 图片处理

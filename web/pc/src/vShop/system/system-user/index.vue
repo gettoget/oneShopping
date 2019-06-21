@@ -4,12 +4,12 @@
 <!--用户管理-->
 <template>
   <div class="boxbackborder box_col">
-    <pager-tit title="用户管理"></pager-tit>
+    <pager-tit :title='$t("SYSTEM_USER")'></pager-tit>
     <div class="box_row colCenter rowRight pageFindSty" style="border: none">
       <div>
         <!--<Icon type="md-person" size="34"/>-->
         <Input v-model="param.xmLike"
-               placeholder="请输入用户姓名" style="width: 200px"
+               :placeholder="$t('YHM')" style="width: 200px"
                @on-keyup.enter="findMessList()"
                @on-change="findMessList"></Input>
       </div>
@@ -17,7 +17,7 @@
       <div>
         <!--<Icon type="ios-call" size="34"/>-->
         <Input v-model="param.sjhLike"
-               placeholder="请输入手机号码" style="width: 200px"
+               :placeholder="$t('YHDH')" style="width: 200px"
                @on-keyup.enter="findMessList()"
                @on-change="findMessList"></Input>
       </div>
@@ -29,15 +29,14 @@
         <Icon type="md-add"></Icon>
       </Button>
     </div>
-
-    <Row style="position: relative;">
+    <div :id="tabBox" class="box_col_100">
       <Table
         size='large' stripe
-        :height="AF.getPageHeight()-320"
-        :row-class-name="rowClassName"
+        :height="tab_H"
+        v-if="tab_H>0"
         :columns="tableTiT"
         :data="tableData"></Table>
-    </Row>
+    </div>
     <Row class="margin-top-10 pageSty">
       <Page :total=pageTotal :current=param.pageNum :page-size=param.pageSize
             :page-size-opts=[8,10,20,30,40,50] @on-page-size-change='(e)=>{param.pageSize=e;pageChange()}'
@@ -52,7 +51,7 @@
 </template>
 
 <script>
-  import mixins from '@/mixins'
+  import i18nTabTit from '@/mixins/i18nTabTit'
   import ukey from './comp/ukey.vue'
   import newmess from './comp/newmes.vue'
   import changemes from './comp/changmes.vue'
@@ -64,43 +63,47 @@
       newmess,
       changemes
     },
-    mixins: [mixins],
+    mixins: [i18nTabTit],
     data() {
       return {
-        //tab高度
-        tabHeight: 220,
         //动态组建
         compName: '',
         //动态组建数据
         usermes: {},
         userMesType: true,
         //分页
-        //---数据总数
-        pageTotal: 2,
+        //tab高度
+        tab_H: 0,
+        tabBox:"tabBox",
         tableTiT: [{
           title: "序号",
-          width: 80,
+          i18n:"NUMBER",
+          width: 100,
           align: 'center',
           type: 'index'
         },
           {
             title: '帐号',
+            i18n:"ACCOUNT_NUMBER",
             align: 'center',
             key: 'zh'
           },
           {
             title: '姓名',
+            i18n:"NAME",
             align: 'center',
             key: 'xm'
           },
           {
             title: '证件号码',
+            i18n:"IDENTIFICATION_NUMBER",
             align: 'center',
             key: 'zjhm'
           },
           {
             title: '性别',
             align: 'center',
+            i18n:"SEX",
             key: 'xb',
             render: (h, params) => {
               return h('div', params.row.xb == '10' ? '男' : '女')
@@ -110,12 +113,20 @@
             title: '手机号',
             width: 120,
             align: 'center',
+            i18n:"PHONE_NUMBER",
             key: 'sjh'
           },
           {
             title: '职务',
             align: 'center',
+            i18n:"ACCOUNT_NUMBER",
             key: 'zw'
+          },
+          {
+            title: '状态',
+            align: 'center',
+            i18n:"STATE",
+            key: 'zt'
           },
           {
             title: '类型',
@@ -132,7 +143,7 @@
             width: 180,
             align: 'center',
             render: (h, params) => {
-              if (params.row.lx === 'su') {
+              if (params.row.zt === '00') {
                 return ''
               }
               return h('div', [
@@ -214,6 +225,8 @@
           }
         ],
         tableData: [],
+        //---数据总数
+        pageTotal: 2,
         //收索
         param: {
           sjhLike: '',

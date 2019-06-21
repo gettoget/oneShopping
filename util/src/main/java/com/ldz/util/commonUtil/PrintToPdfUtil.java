@@ -89,7 +89,7 @@ public class PrintToPdfUtil {
 //        }
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         long time1 = System.currentTimeMillis();
         File[] files =new File[1] ;
         files[0]=new File("D:\\2003/86619-107.png");
@@ -97,6 +97,6 @@ public class PrintToPdfUtil {
         long time2 = System.currentTimeMillis();
         int time = (int) ((time2 - time1)/1000);
         System.out.println("执行了："+time+"秒！");
-    }
+    }*/
 
 }

@@ -15,6 +15,7 @@ import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.SimpleCondition;
 import com.ldz.util.commonUtil.Des;
 import com.ldz.util.commonUtil.EncryptUtil;
+import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -68,15 +69,17 @@ public class YhServiceImpl extends BaseServiceImpl<SysYh, String> implements YhS
 	 */
 	@Override
 	public ApiResponse<String> validAndSave(SysYh user) {
-		RuntimeCheck.ifBlank(user.getZh(),"账号不能为空");
-		RuntimeCheck.ifBlank(user.getXm(),"姓名不能为空");
-		RuntimeCheck.ifBlank(user.getSjh(),"手机号不能为空");
-		RuntimeCheck.ifFalse(StringUtils.isAlphanumeric(user.getZh()),"登陆名只能是数字和字母组成！");
+		RuntimeCheck.ifBlank(user.getZh(), MessageUtils.get("user.phoneblank"));
+		RuntimeCheck.ifBlank(user.getXm(),MessageUtils.get("user.xmIsEmpty"));
+		RuntimeCheck.ifBlank(user.getSjh(),MessageUtils.get("user.phoneIsEmpty"));
+		RuntimeCheck.ifFalse(StringUtils.isAlphanumeric(user.getZh()),MessageUtils.get("user.usernameIsError"));
 		boolean exists = ifExists(SysYh.InnerColumn.zh.name(),user.getZh());
-		RuntimeCheck.ifTrue(exists,"登陆名已存在，请更换别的登陆名！");
+		RuntimeCheck.ifTrue(exists,MessageUtils.get("user.isExits"));
 //		SysJg org = jgService.findByOrgCode(user.getJgdm());
 //		RuntimeCheck.ifNull(org,"机构不存在");
-
+		if(StringUtils.isBlank(user.getMm())){
+			user.setMm("123456");
+		}
 		SysYh currentUser = getCurrentUser();
 		user.setYhid(String.valueOf(idGenerator.nextId()));
 		user.setMm(EncryptUtil.encryptUserPwd(user.getMm()));
@@ -98,7 +101,7 @@ public class YhServiceImpl extends BaseServiceImpl<SysYh, String> implements YhS
 			role.setJsId("ur"+user.getYhid());
 			role.setCjsj(new Date());
 			role.setJgdm(user.getJgdm());
-			role.setJsmc(user.getXm()+"-角色");
+			role.setJsmc(user.getXm()+"-role");
 			role.setJslx("40");
 			jsService.save(role);
 
@@ -130,7 +133,7 @@ public class YhServiceImpl extends BaseServiceImpl<SysYh, String> implements YhS
 		adminRole.setCjsj(now);
 		adminRole.setJsId(genId());
 		adminRole.setJslx("00");
-		adminRole.setJsmc(jg.getJgmc()+"-机构管理员");
+		adminRole.setJsmc(jg.getJgmc()+"-orgManager");
 		adminRole.setZt("00");
 		jsService.saveEntity(adminRole);
 
@@ -160,7 +163,7 @@ public class YhServiceImpl extends BaseServiceImpl<SysYh, String> implements YhS
 
 	@Override
 	public ApiResponse<String> saveEntity(SysYh entity) {
-		RuntimeCheck.ifBlank(entity.getZh(),"请先输入登陆名！");
+		RuntimeCheck.ifBlank(entity.getZh(),MessageUtils.get("user.phoneblank"));
 		RuntimeCheck.ifBlank(entity.getMm(),"请先输入登陆密码！");
 		RuntimeCheck.ifFalse(StringUtils.isAlphanumeric(entity.getZh()),"登陆名只能是数字和字母组成！");
 
@@ -280,7 +283,7 @@ public class YhServiceImpl extends BaseServiceImpl<SysYh, String> implements YhS
 		}
 	}
 
-	@Override
+	/*@Override
 	public ApiResponse<String> bindUKey(SysYh updateUser) {
 		ApiResponse<String> result = new ApiResponse<>();
 		if (StringUtils.isEmpty(updateUser.getUkey())){
@@ -304,9 +307,9 @@ public class YhServiceImpl extends BaseServiceImpl<SysYh, String> implements YhS
 			return ApiResponse.fail("用户已经颁发过UKey，不能重复颁发！");
 		}
 		return result;
-	}
+	}*/
 
-	@Override
+	/*@Override
 	public ApiResponse<String> unBindUKey(SysYh user) {
 		if (StringUtils.isEmpty(user.getUkey())){
 			return ApiResponse.fail("请先插入UKey！");
@@ -334,7 +337,7 @@ public class YhServiceImpl extends BaseServiceImpl<SysYh, String> implements YhS
 		exist.setLoginType(user.getLoginType());
 		baseMapper.updateByPrimaryKeySelective(exist);
 		return ApiResponse.success();
-	}
+	}*/
 
     @Override
     public ApiResponse<String> initUserRole() {

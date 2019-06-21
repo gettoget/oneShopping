@@ -49,7 +49,11 @@
 			<version>1.1.0</version>
 		</dependency>
 		<!--阿里云短信验证码下发包 结束-->
-
+		<dependency>
+			<groupId>com.baidu.push</groupId>
+			<artifactId>bccs.api</artifactId>
+			<version>3.0.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

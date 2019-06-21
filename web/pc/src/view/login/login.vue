@@ -4,19 +4,29 @@
 
 <template>
   <div class="login">
+    <div class="login-TiT">
+      Go - ABC
+    </div>
     <div class="login-con">
-      <Card icon="log-in" title="欢迎登录" :bordered="false">
-        <div class="form-con">
+      <div class="FormBox box_col">
+        <div class="FormTit">
+          管理
+        </div>
+        <div class="FormCenter box_row_100">
           <login-form @on-success-valid="handleSubmit"></login-form>
         </div>
-      </Card>
+      </div>
+      <!--<Card icon="log-in" title="欢迎登录" :bordered="false">-->
+        <!--<div class="form-con">-->
+        <!--</div>-->
+      <!--</Card>-->
     </div>
   </div>
 </template>
 
 <script>
 import LoginForm from '_c/login-form'
-import Cookies from 'js-cookie';
+import {setToken,setUserId,localSave} from '@/libs/util'
 import { mapActions } from 'vuex'
 export default {
   components: {
@@ -35,38 +45,23 @@ export default {
     ]),
     handleSubmit (form) {
       this.login(form)
-      // this.$router.push({
-      //   name: this.$config.homeName
-      // })
-
-      // this.handleLogin({ userName, password }).then(res => {
-      //   this.getUserInfo().then(res => {
-      //   })
-      // })
     },
     login(form){
       var v = this
-      v.$http.post(this.apis.LOGIN.QUERY, form).then((res) => {
+      v.$http.post(this.apis.LOGIN, form).then((res) => {
         if (res.code === 200) {
-        //   localStorage.setItem('user',this.form.username)
-        //   Cookies.set('usermess', this.form.username);
-          Cookies.set('accessToken', res.result.accessToken);
-        //
-        //   sessionStorage.setItem("userInfo", JSON.stringify(res.result.userInfo));
-        //   localStorage.setItem('menuList', JSON.stringify(res.result.menuTree))
-        //   this.setMenuList()
-          v.initDict(res.result.dictList);
-        //
+          setToken(res.result.accessToken.token)
+          setUserId(res.result.accessToken.userId)
+
           this.$router.push('home')
-        // } else {
-        //   this.swal({
-        //     text: res.message,
-        //     type: 'error',
-        //     showCancelButton: false,
-        //     confirmButtonText:'确认',
-        //   });
+        } else {
+          this.swal({
+            text: res.message,
+            type: 'error',
+            showCancelButton: false,
+            confirmButtonText:'确认',
+          });
         }
-        // this.getUrl()
       })
     },
     initDict(dictList) {

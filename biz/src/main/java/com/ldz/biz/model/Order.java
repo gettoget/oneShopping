@@ -1,8 +1,11 @@
 package com.ldz.biz.model;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.List;
-import javax.persistence.*;
 
 @Table(name = "order_form")
 public class Order implements Serializable {
@@ -37,6 +40,12 @@ public class Order implements Serializable {
     private String userId;
 
     /**
+     * 收货地址 id
+     */
+    @Column(name = "rece_id")
+    private String receId;
+
+    /**
      * 购买份数
      */
     private String gmfs;
@@ -47,9 +56,14 @@ public class Order implements Serializable {
     private String zfje;
 
     /**
-     * 支付时间
+     * 创建时间
      */
     private String cjsj;
+
+    /**
+     * 确认支付时间
+     */
+    private String zfsj;
 
     /**
      * IMEI
@@ -81,6 +95,8 @@ public class Order implements Serializable {
      */
     private String bz3;
 
+
+
     /**
      * 抽奖订单详情
      */
@@ -89,6 +105,111 @@ public class Order implements Serializable {
 
     @Transient
     private String userName;
+    @Transient
+    private ReceiveAddr addr;
+    @Transient
+    private String kjsj;
+
+    @Transient
+    private String payPwd;
+    @Transient
+    private String coverUrl;
+    @Transient
+    private int rate;
+
+    @Transient
+    private List<String> nums;
+
+    @Transient
+    private String phone;
+    @Transient
+    private String imgUrl;
+
+    @Transient
+    private String singlePrice;
+
+    @Transient
+    private User user;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
+    public String getSinglePrice() {
+        return singlePrice;
+    }
+
+    public void setSinglePrice(String singlePrice) {
+        this.singlePrice = singlePrice;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public List<String> getNums() {
+        return nums;
+    }
+
+    public void setNums(List<String> nums) {
+        this.nums = nums;
+    }
+
+    public int getRate() {
+        return rate;
+    }
+
+    public void setRate(int rate) {
+        this.rate = rate;
+    }
+
+    public String getCoverUrl() {
+        return coverUrl;
+    }
+
+    public void setCoverUrl(String coverUrl) {
+        this.coverUrl = coverUrl;
+    }
+
+    public String getKjsj() {
+        return kjsj;
+    }
+
+    public void setKjsj(String kjsj) {
+        this.kjsj = kjsj;
+    }
+
+    public String getPayPwd() {
+        return payPwd;
+    }
+
+    public void setPayPwd(String payPwd) {
+        this.payPwd = payPwd;
+    }
+
+    public ReceiveAddr getAddr() {
+        return addr;
+    }
+
+    public void setAddr(ReceiveAddr addr) {
+        this.addr = addr;
+    }
 
     private static final long serialVersionUID = 1L;
 
@@ -100,12 +221,28 @@ public class Order implements Serializable {
         this.userName = userName;
     }
 
+    public String getZfsj() {
+        return zfsj;
+    }
+
+    public void setZfsj(String zfsj) {
+        this.zfsj = zfsj;
+    }
+
     public List<OrderList> getOrderLists() {
         return orderLists;
     }
 
     public void setOrderLists(List<OrderList> orderLists) {
         this.orderLists = orderLists;
+    }
+
+    public String getReceId() {
+        return receId;
+    }
+
+    public void setReceId(String receId) {
+        this.receId = receId;
     }
 
     /**
@@ -367,6 +504,7 @@ public class Order implements Serializable {
         proName("pro_name"),
         userId("user_id"),
         gmfs("gmfs"),
+        zfsj("zfsj"),
         zfje("zfje"),
         cjsj("cjsj"),
         imei("imei"),
@@ -374,7 +512,8 @@ public class Order implements Serializable {
         zjhm("zjhm"),
         bz1("bz1"),
         bz2("bz2"),
-        bz3("bz3");
+        bz3("bz3"),
+        receId("rece_id");
 
         private final String column;
 

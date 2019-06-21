@@ -1,6 +1,7 @@
 package com.ldz.biz.model;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.*;
 
 @Table(name = "win_record")
@@ -61,7 +62,44 @@ public class WinRecord implements Serializable {
      */
     private String bz3;
 
+    /**
+     * 商品名称
+     */
+    @Transient
+    private String proName;
+
+    @Transient
+    private String himg;
+
+
+    @Transient
+    private List<String> nums;
+
+    public List<String> getNums() {
+        return nums;
+    }
+
+    public void setNums(List<String> nums) {
+        this.nums = nums;
+    }
+
     private static final long serialVersionUID = 1L;
+
+    public String getHimg() {
+        return himg;
+    }
+
+    public void setHimg(String himg) {
+        this.himg = himg;
+    }
+
+    public String getProName() {
+        return proName;
+    }
+
+    public void setProName(String proName) {
+        this.proName = proName;
+    }
 
     /**
      * @return id

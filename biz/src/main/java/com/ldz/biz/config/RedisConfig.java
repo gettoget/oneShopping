@@ -1,7 +1,12 @@
 package com.ldz.biz.config;
 
 
+import com.ldz.biz.listener.ExpiredListener;
+import com.ldz.biz.listener.GroundingListener;
+import com.ldz.biz.service.OrderService;
+import com.ldz.biz.service.ProInfoService;
 import com.ldz.util.redis.RedisTemplateUtil;
+import com.ldz.util.spring.SpringContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,11 +14,11 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import redis.clients.jedis.JedisPoolConfig;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * redis配置
@@ -27,15 +32,15 @@ public class RedisConfig {
 	@Autowired
 	private RedisConnectionFactory redisConnectionFactory;
 
-	@Autowired
-	private JedisConfig jedisConfig;
+/*	@Autowired
+	private JedisConfig jedisConfig;*/
 
 	private RedisTemplateUtil redisTemplateUtil;
 
 	/**
 	 * 从外部提取数据的Redis对象
 	 * @return
-	 */
+	 *//*
 	@Bean(name="redisOtherDB")
 	public RedisTemplateUtil redisTemplateOtherDB(){
 		RedisStandaloneConfiguration rf=new RedisStandaloneConfiguration();
@@ -57,7 +62,7 @@ public class RedisConfig {
 		RedisTemplateUtil bean = new RedisTemplateUtil(jedisConnectionFactory);
 		return bean;
 	}
-
+*/
 
 
 	/**
@@ -82,6 +87,19 @@ public class RedisConfig {
 		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
 		container.setConnectionFactory(connectionFactory);
 
+		// 订单支付超时监听
+		PatternTopic topic = new PatternTopic("__keyevent@*__:expired");
+		OrderService orderService = SpringContextUtil.getBean(OrderService.class);
+		ExpiredListener expiredListener = new ExpiredListener(redisTemplateUtil,orderService);
+
+		List<PatternTopic> topicList = new ArrayList<>();
+		topicList.add(new PatternTopic("grounding"));
+		ProInfoService proInfoService = SpringContextUtil.getBean(ProInfoService.class);
+		GroundingListener groundingListener = new GroundingListener(redisTemplateUtil, proInfoService);
+
+
+		container.addMessageListener(expiredListener,topic);
+		container.addMessageListener(groundingListener, topicList);
 		//这个container 可以添加多个 messageListener
 		return container;
 	}

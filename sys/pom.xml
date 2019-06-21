@@ -40,8 +40,8 @@
             </resource>
         </resources>
 
-        <plugins>
-            <plugin>
+        <!--<plugins>
+            <&lt;!&ndash;plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.6.1</version>
@@ -50,7 +50,7 @@
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
-            </plugin>
-        </plugins>
+            </plugin>&ndash;&gt;
+        </plugins>-->
     </build>
 </project>

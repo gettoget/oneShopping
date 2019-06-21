@@ -112,7 +112,7 @@ public class SendSmsUtil {
         return querySendDetailsResponse;
     }
 
-    public static void main(String[] args) throws ClientException, InterruptedException {
+   /* public static void main(String[] args) throws ClientException, InterruptedException {
 
         Map<String, String> map = new HashMap<>();
         map.put("phoneNumbers", "18672922385");//电话号码
@@ -152,7 +152,7 @@ public class SendSmsUtil {
             System.out.println("RequestId=" + querySendDetailsResponse.getRequestId());
         }
 
-    }
+    }*/
 
     public static String sendMSG(String phone, String type){
         return "123456";

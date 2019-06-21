@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.ExcelParams;
+import com.ldz.util.bean.PageResponse;
 import tk.mybatis.mapper.entity.Example;
 
 import java.io.Serializable;
@@ -22,6 +23,9 @@ import java.util.List;
  * @param <PK>
  */
 public interface BaseService<T, PK extends Serializable> {
+
+	boolean fillNewPagerCondition(LimitedCondition condition);
+
 	LimitedCondition getQueryCondition();
 
 	boolean fillCondition(LimitedCondition condition);
@@ -29,6 +33,7 @@ public interface BaseService<T, PK extends Serializable> {
 	ApiResponse<List<T>> pager(Page<T> pager);
 
 	List<List<String>> getSheetData(ExcelParams params);
+
 	List<List<String>> getSheetData(List<T> list, ExcelParams params);
 	/**
 	 * 根据主键查询对象
@@ -173,4 +178,6 @@ public interface BaseService<T, PK extends Serializable> {
     public boolean ifExists(String key, String val);
 
     List<T> query(T entity);
+
+    PageResponse<T> newPager(Page<T> page);
 }
