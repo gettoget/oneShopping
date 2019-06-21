@@ -1,11 +1,14 @@
 package com.ldz.biz.model;
 
 import javax.persistence.Column;
+import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Table(name = "question")
 public class Question {
 
+    @Id
     private String id;
 
     private String que;
@@ -16,6 +19,27 @@ public class Question {
 
     @Column(name = "user_id")
     private String userId;
+
+    @Transient
+    private String himg;
+    @Transient
+    private String username;
+
+    public String getHimg() {
+        return himg;
+    }
+
+    public void setHimg(String himg) {
+        this.himg = himg;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     public String getId() {
         return id;
