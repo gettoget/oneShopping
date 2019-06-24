@@ -13,28 +13,30 @@
         <div class="message_box" v-if="list && list.length>0">
           <Row>
             <Col span="6" v-for="(item,index) in list" :key="index">
-              <Card style="width: 340px;height: 300px">
-                <div style="text-align:center">
-                  <img style="width: 80px;height: 80px"
-                       :src='item.himg'>
-                  <h3>{{item.username}}</h3>
-                </div>
-                <div style="padding: 20px">
-                  <div style="width: 260px">{{item.que}}</div>
-                  <div style="text-align: right">
-                    <Tag color="default">{{item.cjsj}}</Tag>
-                    <Button v-if="item.ans == null" type="primary" ghost @click="handleReply(item)">点击回复</Button>
-<!--                    <Tag v-if="item.ans != null" color="volcano" >{{item.ans}}</Tag>-->
+              <Card style="width: 340px">
+                <div>
+                  <div style="text-align:center">
+                    <img style="width: 80px;height: 80px"
+                         :src='item.himg'>
+                    <h3>{{item.username}}</h3>
+                  </div>
+                  <div style="padding: 20px">
+                    <div><Tag color="default">{{item.cjsj}}</Tag>{{item.content}}</div>
+
                     <div style="color: #ff6600">
-                      {{item.ans}}
+                      <Tag color="volcano" >{{item.replyList[item.replyList.length-1].cjsj}}</Tag> {{item.replyList[item.replyList.length-1].content}}
                     </div>
+
+                  </div>
+                  <div style="text-align: center">
+                    <Button  type="primary" ghost @click="handleReply(item)">点击回复</Button>
                   </div>
                 </div>
               </Card>
             </Col>
           </Row>
       </div>
-    <div style="color: #5d6c7b;font-size: 48px;font-weight: 700;text-align: center" v-else>
+    <div  class="message_box" style="color: #5d6c7b;font-size: 48px;font-weight: 700;text-align: center" v-else>
        暂无数据
     </div>
     <!--    <div>-->
@@ -46,10 +48,12 @@
       @saveAns="saveAns"
       @close="close"
     ></component>
-    <div class="pagerBoxSty boxMar_T box_row rowRight">
-      <one-page :total="total" :size="param.pageSize"
-                :opts="[4,8,12,16]"
-                @chPager="chPager"></one-page>
+    <div class="box_col">
+      <div class="pagerBoxSty boxMar_T box_row rowRight">
+        <one-page :total="total" :size="param.pageSize"
+                  :opts="[4,8,12,16]"
+                  @chPager="chPager"></one-page>
+      </div>
     </div>
   </div>
 </template>
@@ -81,8 +85,8 @@
     },
     methods: {
       close(){
-        this.compName = ' '
-        this.mess = ''
+        this.compName = ''
+        console.log(123);
       },
       changeMenu(name){
         if(name == '1'){
@@ -126,8 +130,8 @@
           }
         })
       },
-      handleReply(id) {
-        this.mess = id
+      handleReply(item) {
+        this.mess = item
         this.compName = 'ans'
       }
     }
@@ -138,8 +142,6 @@
   .message_box {
      background:#eee;
       padding: 10px;
-      display:inline;
-      width: 1200px;
   }
   .message_box_v{
     width: 300px;
