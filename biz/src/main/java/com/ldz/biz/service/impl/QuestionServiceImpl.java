@@ -1,19 +1,23 @@
 package com.ldz.biz.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.bean.copier.CopyOptions;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
+import com.ldz.biz.mapper.QueAnsMapper;
 import com.ldz.biz.mapper.QuestionMapper;
+import com.ldz.biz.model.QueAns;
 import com.ldz.biz.model.Question;
 import com.ldz.biz.model.User;
 import com.ldz.biz.service.QuestionService;
 import com.ldz.biz.service.UserService;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.sys.base.LimitedCondition;
+import com.ldz.util.bean.AndroidMsgBean;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
+import com.ldz.util.bean.SimpleCondition;
+import com.ldz.util.commonUtil.BaiduPushUtils;
 import com.ldz.util.commonUtil.DateUtils;
+import com.ldz.util.commonUtil.JsonUtil;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
 import org.apache.commons.collections4.CollectionUtils;
@@ -22,10 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +34,9 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
 
     @Autowired
     private QuestionMapper baseMapper;
+
+    @Autowired
+    private QueAnsMapper queAnsMapper;
 
     @Autowired
     private UserService userService;
@@ -44,12 +48,13 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
     @Override
     public ApiResponse<String> saveQuestion(Question entity) {
         String userId = getHeader("userId");
-        RuntimeCheck.ifBlank(entity.getQue(), MessageUtils.get("que.isBlank"));
+        RuntimeCheck.ifBlank(entity.getContent(), MessageUtils.get("que.isBlank"));
         RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
-        entity.setAns(null);
         entity.setId(genId());
+        entity.setType("1");
         entity.setCjsj(DateUtils.getNowTime());
         entity.setUserId(userId);
+        entity.setHf("2");
         save(entity);
         return ApiResponse.success();
     }
@@ -64,7 +69,11 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
 
         LimitedCondition condition = getQueryCondition();
         condition.eq(Question.InnerColumn.userId, userId);
+        condition.setOrderByClause(" cjsj desc ");
         PageInfo<Question> info = findPage(page, condition);
+        if(CollectionUtils.isNotEmpty(info.getList())){
+            info.getList().sort(Comparator.comparing(Question::getCjsj));
+        }
         res.setList(info.getList());
         res.setTotal(info.getTotal());
         return res;
@@ -73,6 +82,9 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
     @Override
     public ApiResponse<String> delete(String id) {
         remove(id);
+        SimpleCondition  simpleCondition = new SimpleCondition(Question.class);
+        simpleCondition.eq(Question.InnerColumn.parentId, id);
+        baseMapper.deleteByExample(simpleCondition);
         return ApiResponse.success();
     }
 
@@ -80,9 +92,30 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
     public ApiResponse<String> updateEntity(Question entity) {
         String id = entity.getId();
         RuntimeCheck.ifBlank(id, "que.idBlank");
+        RuntimeCheck.ifBlank(entity.getContent(), "que.isBlank");
         Question question = findById(id);
-        BeanUtil.copyProperties(entity,question, CopyOptions.create().setIgnoreError(true).setIgnoreNullValue(true).setIgnoreProperties("id","que","cjsj","userId"));
+        question.setHf("1");
         update(question);
+
+        Question que = new Question();
+        que.setType("2");
+        que.setContent(entity.getContent());
+        que.setCjsj(DateUtils.getNowTime());
+        que.setId(genId());
+        que.setUserId(question.getUserId());
+        save(que);
+
+        QueAns queAns = new QueAns();
+        queAns.setId(genId());
+        queAns.setAnsId(que.getId());
+        queAns.setQueId(question.getId());
+        queAnsMapper.insert(queAns);
+
+        // 客服回复 ， 推送消息
+        AndroidMsgBean msgBean = new AndroidMsgBean();
+        msgBean.setType("6");
+        msgBean.setJson(JsonUtil.toJson(que));
+        BaiduPushUtils.pushAllMsg(0,JsonUtil.toJson(msgBean),3,0);
         return ApiResponse.success();
     }
 
@@ -91,11 +124,11 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
 
         String reply = getRequestParamterAsString("reply");
         if(StringUtils.isNotBlank(reply)){
-            if(StringUtils.equals(reply,"1")){
-                condition.and().andIsNotNull(Question.InnerColumn.ans.name());
-            }else if(StringUtils.equals(reply,"2")){
-                condition.and().andIsNull(Question.InnerColumn.ans.name());
-            }else {
+            if(StringUtils.equals("1",reply)){
+                condition.eq(Question.InnerColumn.hf, "1");
+            }else if(StringUtils.equals("2",reply)){
+                condition.eq(Question.InnerColumn.hf, "2");
+            }else{
                 return false;
             }
         }
@@ -108,6 +141,20 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
         if(CollectionUtils.isEmpty(list)){
             return;
         }
+        String reply = getRequestParamterAsString("reply");
+        Map<String,List<Question>> queMap = new HashMap<>();
+        if(StringUtils.equals(reply, "1")){
+            List<String> collect = list.stream().map(Question::getId).collect(Collectors.toList());
+            SimpleCondition simpleCondition = new SimpleCondition(QueAns.class);
+            simpleCondition.in(QueAns.InnerColumn.queId, collect);
+            List<QueAns> queAns = queAnsMapper.selectByExample(simpleCondition);
+            Map<String, List<String>> map = queAns.stream().collect(Collectors.groupingBy(QueAns::getQueId, Collectors.mapping(QueAns::getAnsId, Collectors.toList())));
+            map.forEach((s, strings) -> {
+                List<Question> questions = findByIds(strings);
+                queMap.put(s,questions);
+            });
+        }
+
         Set<String> set = list.stream().map(Question::getUserId).collect(Collectors.toSet());
         List<User> users = userService.findByIds(set);
         Map<String,User> userMap = new HashMap<>();
@@ -116,6 +163,9 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
         }
         Map<String, User> finalUserMap = userMap;
         list.forEach(question -> {
+            if(queMap.containsKey(question.getId())){
+                question.setReplyList(queMap.get(question.getId()));
+            }
             if(finalUserMap.containsKey(question.getUserId())){
                 User user = finalUserMap.get(question.getUserId());
                 question.setHimg(user.gethImg());
