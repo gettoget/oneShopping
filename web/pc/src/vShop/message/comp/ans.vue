@@ -13,10 +13,9 @@
   <Modal
     :title="'@'+mess.username+' : ' "
     v-model="modal9"
-    closable
     @on-ok="OK"
     @on-cancel="cancel"
-    :styles="{top: '20px'}">
+    >
     <Input v-model="ans" type="textarea" :rows="4" placeholder="Enter something..." />
   </Modal>
     
@@ -35,10 +34,10 @@
     },
     methods:{
       OK(){
-        this.$emit('saveAns', {id:this.mess.id,ans:this.ans})
+        this.$emit("saveAns",{id:this.mess.id,ans:this.ans})
       },
       cancel(){
-        this.$emit("close")
+        this.$emit("close",{})
       }
     }
   }

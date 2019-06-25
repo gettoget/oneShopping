@@ -8,11 +8,11 @@ import java.io.Serializable;
  */
 public class AndroidMsgBean implements Serializable {
     /**
-     * 透传消息类型    1  商品上新  2 商品变更热门  3 商品待开奖 4 商品已开奖  5 商品下架
+     * 透传消息类型    1  商品上新  2 商品变更热门  3 商品待开奖 4 商品已开奖  5 商品下架  6.客服回复
      */
     private String type;
     /**
-     *   json 数据    ProInfo 对象
+     *   json 数据   （1 - 5 ） ProInfo 对象     （6） Question对象
      */
     private String json;
 
