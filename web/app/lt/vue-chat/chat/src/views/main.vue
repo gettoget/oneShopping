@@ -8,19 +8,19 @@
         <div v-if="!toShowMaskInfo" :class="[toShowMaskInfo ? '' : 'bounceInRight' , 'animated']">
           <img src="static/images/logo.jpg" class="xw-header-avatar">
           <div class="xw-header-title-wrap">
-            <div class="xw-header-title">小薇客服</div>
+            <div class="xw-header-title">GO-SAKU</div>
           </div>
         </div>
       </div>
-      <!-- 小薇客服弹出的具体信息 -->
+      <!-- GO-SAKU弹出的具体信息 -->
       <div v-show="toShowMaskInfo" :class="[toShowMaskInfo ? 'bounceInDown' : '' , 'xw-show-info-box', 'animated']">
         <div class="xw-logo">
           <img src="static/images/logo.jpg">
-          <h4>小薇客服</h4>
+          <h4>GO-SAKU</h4>
         </div>
         <div class="xw-header-info">
           <p class="animated bounceInLeft">
-            小薇客服产品，集成了电话呼叫中心、IM在线客服、移动在线客服、微信、微博、移动APP SDK、邮件等全客服渠道，用工单系统承载售后服务，配合帮助中心、智能机器人等自助服务。
+            GO-SAKU产品，集成了电话呼叫中心、IM在线客服、移动在线客服、微信、微博、移动APP SDK、邮件等全客服渠道，用工单系统承载售后服务，配合帮助中心、智能机器人等自助服务。
           </p>
         </div>
       </div>
@@ -182,7 +182,7 @@
           this.records.push({
             type: 2,
             time: new Date().format('yyyy-mm-dd hh:MM:ss'),
-            content: '您好！欢迎来到小薇客服，请问有什么能帮到您?'
+            content: '您好！欢迎来到GO-SAKU，请问有什么能帮到您?'
           })
         }
         this.scrollToBottom();
