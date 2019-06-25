@@ -315,13 +315,13 @@ export default [
     component: Main,
     children: [
       {
-        path: '/message',
-        name: 'message',
+        path: '/imessage',
+        name: 'imessage',
         meta: {
           icon: 'md-images',
-          title: "message"
+          title: "留言管理"
         },
-        component: () => import('@/vShop/message')
+        component: () => import('@/vShop/imessage')
       }
     ]
   },
