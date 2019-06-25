@@ -147,5 +147,13 @@ public class UserCtrl  {
         return service.getUserInfo();
     }
 
+    /**
+     * 保存用户的channelId
+     */
+    @PostMapping("/saveChannel")
+    public ApiResponse<String> saveChannelId(String channelId){
+        return service.saveChannelId(channelId);
+    }
+
 
 }

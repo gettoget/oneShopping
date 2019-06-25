@@ -417,6 +417,14 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         return ApiResponse.success();
     }
 
+    @Override
+    public ApiResponse<String> saveChannelId(String channelId) {
+        String userId = getHeader("userId");
+        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
+        redis.boundValueOps(userId + "_channelId").set(channelId);
+        return ApiResponse.success();
+    }
+
 
     private String checkPer(String secret) {
         String s;
