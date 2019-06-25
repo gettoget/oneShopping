@@ -30,7 +30,7 @@
       <div class="xw-chat-wrap">
         <ul>
           <li v-for="messageList in records">
-            <div v-if="messageList.type==1">
+            <div v-if="messageList.type==2">
               <div class="xw-chat-time">{{messageList.time}}</div>
               <div class="xw-chat-servicer">
                 <div class="xw-servicer-avantar-wrap">
@@ -72,74 +72,24 @@
               <a href="javascript:void(0)" class="xw-send-btn-text" v-if="content.trim().length" @click="sendMsg">发送</a>
             </transition>
           </div>
-<!--          <div class="xw-chat-tool-item">-->
-<!--            <a href="javascript:;" :class="[showEmoji ? 'xw-face' :'xw-face-close','xw-chat-tool-btn']"-->
-<!--               @click="emojiFuc"></a>-->
-<!--          </div>-->
-<!--          <div class="xw-chat-tool-item">-->
-<!--            <a :class="[showMoreOpratin ? 'xw-hide-operation-close' :'xw-hide-operation','xw-chat-tool-btn']"-->
-<!--               @click="showMoreOpratin=!showMoreOpratin"></a>-->
-<!--            <transition name="fade">-->
-<!--              <div class="xw-window-text" v-if="showMoreOpratin">-->
-<!--                <label for="uploadImg">-->
-<!--                   <span>-->
-<!--	                  <input type="file" name="image" accept="image/*" multiple style="display:none;" id="uploadImg">图片-->
-<!--                  </span>-->
-<!--                </label>-->
-<!--                <span @click="videoFuc">视频</span>-->
-<!--                <span @touchstart="showEvaluateFuc">评价</span>-->
-<!--                <span>结束</span>-->
-<!--              </div>-->
-<!--            </transition>-->
-<!--          </div>-->
         </div>
       </div>
 
-      <!--  <emojiSlider :isShow="showEmoji" :EXPS="EXPS"></emojiSlider> -->
       <!-- 表情开始 -->
-      <transition name="slide-fade" style="display:none">
-        <div class="xw-window-text xw-face-emoji-ul" v-if="showEmoji">
-          <div class="xw-chat-ul-box">
-            <mt-swipe :auto="0">
-              <mt-swipe-item v-for="n in Math.ceil(EXPS.length/15)" :key="n">
-                <li v-for="(item, index) in getEmotionData(n,15)" class="xw-faceEmoji">
-                  <img :src="item.file" :data="item.code" v-on:click="content+=item.code">
-                </li>
-              </mt-swipe-item>
-            </mt-swipe>
-          </div>
-        </div>
-      </transition>
+<!--      <transition name="slide-fade" style="display:none">-->
+<!--        <div class="xw-window-text xw-face-emoji-ul" v-if="showEmoji">-->
+<!--          <div class="xw-chat-ul-box">-->
+<!--            <mt-swipe :auto="0">-->
+<!--              <mt-swipe-item v-for="n in Math.ceil(EXPS.length/15)" :key="n">-->
+<!--                <li v-for="(item, index) in getEmotionData(n,15)" class="xw-faceEmoji">-->
+<!--                  <img :src="item.file" :data="item.code" v-on:click="content+=item.code">-->
+<!--                </li>-->
+<!--              </mt-swipe-item>-->
+<!--            </mt-swipe>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </transition>-->
     </div>
-
-    <!-- 提示音 -->
-    <!--		 <audio style="display:none"  preload="metadata" controls="controls" autoplay="autoplay" ref="hintAudio">-->
-    <!--	        <source :src="myaudio" type="audio/mpeg"/>-->
-    <!--	      </audio>-->
-
-    <!-- 右上角的通话小窗口 -->
-    <div class="xw-samll-pop-wrap animated bounceInUp" v-if="showNarrowPopVal">
-      <span class="xw-big-pop" @click="showBigPopFuc">显示大窗</span>
-    </div>
-
-    <!-- 客服窗口 -->
-    <div class="xw-pop-server animated bounceInRight" v-if="videoVal">
-      <h5>客服</h5>
-      <span class="xw-narrow-pop" @click="showNarrowPopFuc">显示小窗</span>
-    </div>
-
-    <!-- 顾客窗口 -->
-    <div class="xw-pop-customer animated bounceInLeft" v-if="videoVal">
-      顾客
-      <div>
-        <a class="xw-hang-up" href="#"><img src="/static/images/hang-up.png" class="xw-hang-up-icon"></a>
-      </div>
-    </div>
-
-    <!--客服评分-->
-    <evaluate :ScoreDB="ScoreDB" :showScore="showScore" @on-star="selectStar" @confirm-star="confrmStar">
-    </evaluate>
-
     <Toast :showToast="showToast">{{toastText}}</Toast>
   </div>
 </template>
@@ -170,12 +120,7 @@
         testContents: [ '请稍后--', '当前客服忙', '您还有什么咨询的吗', '正在查询', 'gone with the wind'],
         content: '',
         //聊天记录
-        records: [{
-          type: 1,
-          time: new Date().toLocaleTimeString(),
-          content: '您好！欢迎来到小薇客服，请问有什么能帮到您?'
-        }
-        ],
+        records: [],
         showScore: false,//显示评分
         ScoreDB: {
           scoreDatas: [
@@ -204,7 +149,44 @@
     created() {
       this._loadEmojiData();
     },
+    mounted(){
+      window.onHistory = this.onHistory
+      window.onMessage = this.onMessage
+    },
     methods: {
+      onMessage(m){
+        console.log(m);
+        let r = JSON.parse(m)
+        this.records.push({
+          type: r.type,
+          time: r.cjsj.substring(0,19),
+          content: r.content
+        })
+        this.scrollToBottom();
+      },
+      onHistory(m){
+        this.records = []
+        console.log(m);
+        let data = JSON.parse(m)
+        if (data.code == 200){
+          let list = []
+          for (let r of data.list){
+            list.push({
+              type: r.type,
+              time: r.cjsj.substring(0,19),
+              content: r.content
+            })
+          }
+          this.records = list
+        }else{
+          this.records.push({
+            type: 2,
+            time: new Date().format('yyyy-mm-dd hh:MM:ss'),
+            content: '您好！欢迎来到小薇客服，请问有什么能帮到您?'
+          })
+        }
+        this.scrollToBottom();
+      },
       showInfo() {
         this.toShowMaskInfo = true;
       },
@@ -233,22 +215,20 @@
         this.showScore = !this.showScore;
       },
       sendMsg() {
+        let m = {
+          content:this.content,
+          type:"1"
+        }
+        let msg = JSON.stringify(m)
+        $webview.onQuestion(msg)
         var content = this.content.trim();
         this.records.push({
-          time: new Date().toLocaleTimeString(),
+          time: new Date().format('yyyy-mm-dd hh:MM:ss'),
           content: content,
-          type: 2
+          type: 1
         });
         this.content = "";
-        setTimeout(() => {
-          // this.hint();
-          this.records.push({
-            time: new Date().toLocaleTimeString(),
-            content: this.testContents[Math.floor(Math.random() * 9)],
-            type: 1
-          });
-          this.scrollToBottom();
-        }, 800);
+        this.scrollToBottom();
       },
       getEmotionData(pageNow, pageSize) {
         return this.EXPS.slice((pageNow - 1) * pageSize, pageSize * pageNow)
