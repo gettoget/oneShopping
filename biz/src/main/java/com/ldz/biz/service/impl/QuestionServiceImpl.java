@@ -20,6 +20,7 @@ import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.JsonUtil;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
+import com.ldz.util.redis.RedisTemplateUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,9 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
 
     @Autowired
     private QueAnsMapper queAnsMapper;
+
+    @Autowired
+    private RedisTemplateUtil redis;
 
     @Autowired
     private UserService userService;
@@ -91,8 +95,8 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
     @Override
     public ApiResponse<String> updateEntity(Question entity) {
         String id = entity.getId();
-        RuntimeCheck.ifBlank(id, "que.idBlank");
-        RuntimeCheck.ifBlank(entity.getContent(), "que.isBlank");
+        RuntimeCheck.ifBlank(id, MessageUtils.get("que.idBlank"));
+        RuntimeCheck.ifBlank(entity.getContent(), MessageUtils.get("user.notLogin"));
         Question question = findById(id);
         question.setHf("1");
         update(question);
@@ -115,7 +119,8 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
         AndroidMsgBean msgBean = new AndroidMsgBean();
         msgBean.setType("6");
         msgBean.setJson(JsonUtil.toJson(que));
-        BaiduPushUtils.pushAllMsg(0,JsonUtil.toJson(msgBean),3,0);
+        String channelId = (String) redis.boundValueOps(question.getUserId() + "_channelId").get();
+        BaiduPushUtils.pushSingleMsg(channelId,0,JsonUtil.toJson(msgBean),3);
         return ApiResponse.success();
     }
 

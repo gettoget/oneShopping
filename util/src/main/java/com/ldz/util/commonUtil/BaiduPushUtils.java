@@ -17,7 +17,7 @@ public class BaiduPushUtils {
    private static Logger errorLog = LoggerFactory.getLogger("error_info");
 
 
-    public static void pushSingleMsg(String chnnelId, int messageType, String message, int deviceType) throws PushClientException, PushServerException {
+    public static void pushSingleMsg(String chnnelId, int messageType, String message, int deviceType) {
         String apiKey = "zid2bvrlXw2KjoD85RfgFPAu";
         String secretKey = "FlfACjZ6MCQZ52kAAA3vGv4nPcFu713Y";
 

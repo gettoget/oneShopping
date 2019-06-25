@@ -24,7 +24,7 @@ public class ResponseAdvice implements ResponseBodyAdvice {
     @Override
     public Object beforeBodyWrite(Object o, MethodParameter methodParameter, MediaType mediaType, Class aClass, ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse) {
         URI uri = serverHttpRequest.getURI();
-        if(StringUtils.startsWith(uri.getPath(),"/app/") && !StringUtils.startsWith(uri.getPath(),"/app/user/question")){
+        if(StringUtils.startsWith(uri.getPath(),"/app/")){
             String rsa="";
             try {
                 rsa = RSAUtils.encryptWithRSA(JsonUtil.toJson(o));

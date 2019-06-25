@@ -115,4 +115,6 @@ public interface UserService extends BaseService<User, String> {
     void initRobot();
 
     ApiResponse<String> updateEntity(User entity);
+
+    ApiResponse<String> saveChannelId(String channelId);
 }
