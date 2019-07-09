@@ -85,7 +85,10 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 
     @Override
     public boolean fillPagerCondition(LimitedCondition condition) {
-        condition.and().andIsNotNull(Order.InnerColumn.receId.name());
+        String cs = getRequestParamterAsString("cs");
+        if(StringUtils.isBlank(cs)){
+            condition.and().andIsNotNull(Order.InnerColumn.receId.name());
+        }
         return true;
     }
 
