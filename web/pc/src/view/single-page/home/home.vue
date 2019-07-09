@@ -13,15 +13,18 @@
           <div class="box_col rowAuto" style="padding-left: 18px">
             <div class="box_row colCenter">
               <div class="count-tit-style">今日 :</div>
-              <count-to :end="statisUser.today" count-class="count-style"/>
+              <!--<count-to :end="statisUser.today" count-class="count-style"/>-->
+              <h1>{{AF.Format_Num(statisUser.today,3)}}</h1>
             </div>
             <div class="box_row colCenter">
               <div class="count-tit-style">本月 :</div>
-              <count-to :end="statisUser.mon" count-class="count-style"/>
+              <!--<count-to :end="statisUser.mon" count-class="count-style"/>-->
+              <h1>{{AF.Format_Num(statisUser.mon,3)}}</h1>
             </div>
             <div class="box_row colCenter">
               <div class="count-tit-style">累计 :</div>
-              <count-to :end="statisUser.total" count-class="count-style"/>
+              <!--<count-to :end="statisUser.total" count-class="count-style"/>-->
+              <h1>{{AF.Format_Num(statisUser.total,3)}}</h1>
             </div>
           </div>
         </infor-card>
@@ -32,15 +35,18 @@
           <div class="box_col rowAuto" style="padding-left: 18px">
             <div class="box_row colCenter">
               <div class="count-tit-style">上架 :</div>
-              <count-to :end="statisPro.sj" count-class="count-style"/>
+              <!--<count-to :end="statisPro.sj" count-class="count-style"/>-->
+              <h1>{{AF.Format_Num(statisPro.sj,3)}}</h1>
             </div>
             <div class="box_row colCenter">
               <div class="count-tit-style">开奖 :</div>
-              <count-to :end="statisPro.kj" count-class="count-style"/>
+              <!--<count-to :end="statisPro.kj" count-class="count-style"/>-->
+              <h1>{{AF.Format_Num(statisPro.kj,3)}}</h1>
             </div>
             <div class="box_row colCenter">
               <div class="count-tit-style">参与 :</div>
-              <count-to :end="statisPro.cyyh" count-class="count-style"/>
+              <!--<count-to :end="statisPro.cyyh" count-class="count-style"/>-->
+              <h1>{{AF.Format_Num(statisPro.cyyh,3)}}</h1>
             </div>
           </div>
         </infor-card>
@@ -51,15 +57,19 @@
           <div class="box_col rowAuto" style="padding-left: 18px">
             <div class="box_row colCenter">
               <div class="count-tit-style">今日 :</div>
-              <count-to :end="statisRecharge.today" count-class="count-style"/>
+              <!--<count-to :end="statisRecharge.today" count-class="count-style"/>-->
+              <h1>{{AF.Format_Num(statisRecharge.today,3)}}</h1>
+
             </div>
             <div class="box_row colCenter">
               <div class="count-tit-style">本月 :</div>
-              <count-to :end="statisRecharge.mon" count-class="count-style"/>
+              <!--<count-to :end="statisRecharge.mon" count-class="count-style"/>-->
+              <h1>{{AF.Format_Num(statisRecharge.mon,3)}}</h1>
             </div>
             <div class="box_row colCenter">
               <div class="count-tit-style">累计 :</div>
-              <count-to :end="statisRecharge.total" count-class="count-style"/>
+              <!--<count-to :end="statisRecharge.total" count-class="count-style"/>-->
+              <h1>{{AF.Format_Num(statisRecharge.total,3)}}</h1>
             </div>
           </div>
         </infor-card>
@@ -70,15 +80,18 @@
           <div class="box_col rowAuto" style="padding-left: 18px">
             <div class="box_row colCenter">
               <div class="count-tit-style">今日 :</div>
-              <count-to :end="statisCharge.today" count-class="count-style"/>
+              <!--<count-to :end="statisCharge.today" count-class="count-style"/>-->
+              <h1>{{AF.Format_Num(statisCharge.today,3)}}</h1>
             </div>
             <div class="box_row colCenter">
               <div class="count-tit-style">本月 :</div>
-              <count-to :end="statisCharge.mon" count-class="count-style"/>
+              <!--<count-to :end="statisCharge.mon" count-class="count-style"/>-->
+              <h1>{{AF.Format_Num(statisCharge.mon,3)}}</h1>
             </div>
             <div class="box_row colCenter">
               <div class="count-tit-style">累计 :</div>
-              <count-to :end="statisCharge.total" count-class="count-style"/>
+              <!--<count-to :end="statisCharge.total" count-class="count-style"/>-->
+              <h1>{{AF.Format_Num(statisCharge.total,3)}}</h1>
             </div>
           </div>
         </infor-card>
