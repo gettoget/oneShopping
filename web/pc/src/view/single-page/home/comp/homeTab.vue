@@ -68,8 +68,7 @@
             key: 'kjsj',
             render:(h,p)=>{
               return h('div',[
-                h('div',p.row.cjsj.substring(0,10)),
-                h('div',p.row.cjsj.substring(11,p.row.cjsj.length))
+                h('div',p.row.kjsj.substring(5,16)),
               ])
             }
           },
@@ -96,15 +95,22 @@
             title: '手机号码',
             align:'left',
             minWidth:120,
-            key: 'phone'
+            key: 'phone',
+            render:(h,p)=>{
+              return h('div',[
+                h('div',p.row.phone.substring(0,3)+'****'+p.row.phone.substring(7)),
+              ])
+            }
           }
         ],
         tableData: [
         ],
         param: {
+          ddzt:1,
           orderType: 2,
           pageNum: 1,
-          pageSize: 10
+          pageSize: 10,
+          cs:'cs'  //不要删除 做个标识给接口用来查询
         },
       }
     },
