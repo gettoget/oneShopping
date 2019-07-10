@@ -1,6 +1,7 @@
 package com.ldz.biz.service.impl;
 
 import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.ldz.biz.bean.ProInfoLuckNumBean;
 import com.ldz.biz.mapper.OrderListMapper;
@@ -86,7 +87,19 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
     @Override
     public boolean fillPagerCondition(LimitedCondition condition) {
         String cs = getRequestParamterAsString("cs");
-        if(StringUtils.isBlank(cs)){
+        if (StringUtils.equals(cs,"cs")) {
+            SimpleCondition condition1 = new SimpleCondition(ProInfo.class);
+            condition1.and().andIsNotNull(ProInfo.InnerColumn.kjsj.name());
+            condition1.setOrderByClause(ProInfo.InnerColumn.kjsj.desc());
+            PageInfo<ProInfo> proInfos = PageHelper.startPage(1, 10).doSelectPageInfo(() -> {
+                proInfoService.findByCondition(condition1);
+            });
+            if(CollectionUtils.isNotEmpty(proInfos.getList())){
+                condition.in(Order.InnerColumn.proId, proInfos.getList().stream().map(ProInfo::getId).collect(Collectors.toList()));
+            }else{
+                return false;
+            }
+        } else {
             condition.and().andIsNotNull(Order.InnerColumn.receId.name());
         }
         return true;
@@ -101,16 +114,14 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         List<String> list = orders.stream().map(Order::getId).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(list)) {
             Set<String> receIds = orders.stream().filter(order -> StringUtils.isNotBlank(order.getReceId())).map(Order::getReceId).collect(Collectors.toSet());
+            long count = orders.stream().map(Order::getUserId).distinct().count();
             Map<String, ReceiveAddr> addrMap = new HashMap<>();
             if (CollectionUtils.isNotEmpty(receIds)) {
                 List<ReceiveAddr> addrs = addrService.findByIds(receIds);
                 addrMap = addrs.stream().collect(Collectors.toMap(ReceiveAddr::getId, p -> p));
             }
 
-//            SimpleCondition condition = new SimpleCondition(OrderList.class);
-//            condition.in(OrderList.InnerColumn.orderId, list);
-            List<OrderList> orderLists  = orderListMapper.getList(list);
-//            List<OrderList> orderLists = orderListService.findByCondition(condition);
+            List<OrderList> orderLists = orderListMapper.getList(list);
             Set<String> set = orders.stream().filter(order -> StringUtils.equals(order.getOrderType(), "1")).map(Order::getProId).collect(Collectors.toSet());
             Map<String, ProBaseinfo> baseMap = new HashMap<>();
             if (CollectionUtils.isNotEmpty(set)) {
@@ -169,6 +180,9 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                     order.setAddr(addr);
                 }
             });
+            if (StringUtils.equals(getRequestParamterAsString("cs"),"cs")){
+                orders.sort(Comparator.comparing(Order::getKjsj).reversed());
+            }
         }
     }
 

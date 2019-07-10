@@ -1,5 +1,6 @@
 package com.ldz.biz.controller;
 
+import com.ldz.biz.model.Order;
 import com.ldz.biz.model.ProInfo;
 import com.ldz.biz.service.ProInfoService;
 import com.ldz.sys.base.BaseController;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/proinfo")
@@ -76,10 +79,11 @@ public class ProInfoContrl extends BaseController<ProInfo, String> {
 
     /**
      * 根据商品id查询当前商品参与的用户列表
+     * @return
      */
     @PostMapping("/getUsers")
-    public  ApiResponse<String> getUsers(String id,@RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "8") int pageSize){
-        return service.getUsers(id, pageNum, pageSize);
+    public ApiResponse<List<Order>> getUsers(String id){
+        return service.getUsers(id);
     }
 
 

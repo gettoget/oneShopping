@@ -121,6 +121,7 @@
   import {swiper, swiperSlide} from 'vue-awesome-swiper'
   import defAva from '@/assets/images/007.png'
   import i18nTabTit from '@/mixins/i18nTabTit'
+
   export default {
     name: "DrawerMod",
     mixins: [i18nTabTit],
@@ -177,7 +178,7 @@
             render: (h, p) => {
               return h('Avatar', {
                 props: {
-                  src: p.row.user.hImg
+                  src: p.row.hImg
                 }
               })
             }
@@ -187,7 +188,7 @@
             minWidth: 140,
             i18n:'YHM',
             render: (h, p) => {
-              return h('div', p.row.user.userName)
+              return h('div', p.row.userName)
             }
           },
           {
@@ -286,13 +287,11 @@
       },
       getBuyUserList() {
         this.$http.post('/api/proinfo/getUsers', {
-          id: this.mess.id,
-          pageNum: 1,
-          pageSize: this.mess.proPrice
+          id: this.mess.id
         }).then(res => {
           console.log(res);
           if (res.code == 200) {
-            this.tableData = res.page.list
+            this.tableData = res.result
           }
         }).catch(err => {
         })

@@ -14,27 +14,6 @@ spring:
     maxActive: 1024
     maxWait: 1000
     database: 10
-  datasource:
-#    url: jdbc:mysql://119.23.242.234:9306/yyg?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
-    url: jdbc:mysql://127.0.0.1:3306/yyg?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
-    username: root
-    password: 123456
-    type: com.alibaba.druid.pool.DruidDataSource
-    initialSize: 5
-    minIdle: 5
-    maxActive: 20
-    maxWait: 60000
-    timeBetweenEvictionRunsMillis: 60000
-    minEvictableIdleTimeMillis: 300000
-    validationQuery: SELECT 'x'
-    testWhileIdle: true
-    testOnBorrow: false
-    testOnReturn: false
-    poolPreparedStatements: true
-    maxPoolPreparedStatementPerConnectionSize: 20
-    filters: stat,wall,log4j
-    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
-    cachePrepStmts: true
 #mybatis配置信息
 mybatis:
   configLocation: classpath:mybatis/MapperConfig.xml

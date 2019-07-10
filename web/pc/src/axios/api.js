@@ -1,4 +1,3 @@
-import config from '@/config'
 /**
  *字段收索规则
  * keyGte  大于等于

@@ -131,6 +131,17 @@ public class Order implements Serializable {
     @Transient
     private User user;
 
+    @Transient
+    private String hImg;
+
+    public String gethImg() {
+        return hImg;
+    }
+
+    public void sethImg(String hImg) {
+        this.hImg = hImg;
+    }
+
     public User getUser() {
         return user;
     }

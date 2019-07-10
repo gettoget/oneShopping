@@ -747,26 +747,10 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
     }
 
     @Override
-    public ApiResponse<String> getUsers(String id, int pageNum, int pageSize) {
+    public ApiResponse<List<Order>> getUsers(String id) {
         RuntimeCheck.ifBlank(id, MessageUtils.get("pro.idBlank"));
-        SimpleCondition condition = new SimpleCondition(Order.class);
-        condition.eq(Order.InnerColumn.proId, id);
-        condition.setOrderByClause(" cjsj desc");
-        PageInfo<Order> info = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> {
-            orderService.findByCondition(condition);
-        });
-        if(CollectionUtils.isNotEmpty(info.getList())){
-
-            List<String> list = info.getList().stream().map(Order::getUserId).collect(Collectors.toList());
-            List<User> users = userService.findByIds(list);
-            Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
-            info.getList().forEach(order -> {
-                order.setUser(userMap.get(order.getUserId()));
-            });
-        }
-        ApiResponse<String> api = new ApiResponse<>();
-        api.setPage(info);
-        return api;
+        List<Order> orderList = orderMapper.getUsersOrders(id);
+        return ApiResponse.success(orderList);
     }
 
 
@@ -776,23 +760,31 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
-        Set<String> userIds = list.stream().map(ProInfo::getUserId).collect(Collectors.toSet());
-        List<User> users = userService.findByIds(userIds);
+        Set<String> userIds = list.stream().map(ProInfo::getUserId).filter(s -> StringUtils.isNotBlank(s)).collect(Collectors.toSet());
+        List<User> users = new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(userIds)){
+           users =  userService.findByIds(userIds);
+        }
+
         Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
         SimpleCondition condition = new SimpleCondition(Order.class);
-        condition.in(Order.InnerColumn.userId,userIds);
-        List<String> proIds = list.stream().map(ProInfo::getId).collect(Collectors.toList());
+
+        Set<String> proIds = list.stream().map(ProInfo::getId).collect(Collectors.toSet());
         condition.in(Order.InnerColumn.proId,proIds);
-        condition.eq(Order.InnerColumn.ddzt,"1");
         List<Order> orders = orderService.findByCondition(condition);
-        Map<String, String> map = orders.stream().collect(Collectors.toMap(Order::getProId, p -> p.getGmfs()));
+        Map<String, String> map = orders.stream().filter(order -> userIds.contains(order.getUserId()) && StringUtils.equals(order.getDdzt(),"1")).collect(Collectors.toMap(Order::getProId, p -> p.getGmfs()));
+
         for (ProInfo proBaseinfo : list) {
+            long count = orders.stream().filter(order -> StringUtils.equals(proBaseinfo.getId(),order.getProId())).map(Order::getUserId).distinct().count();
+            proBaseinfo.setCyyhs(count+ "");
             if (userMap.containsKey(proBaseinfo.getUserId())) {
                 User user = userMap.get(proBaseinfo.getUserId());
                 proBaseinfo.setUserName(user.getUserName());
             }
             if(map.containsKey(proBaseinfo.getId())){
+
                 proBaseinfo.setZjfs(map.get(proBaseinfo.getId()));
+
             }
             setImgUrl(proBaseinfo);
         }
