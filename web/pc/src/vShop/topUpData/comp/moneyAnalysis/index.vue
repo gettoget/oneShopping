@@ -12,6 +12,7 @@
     mounted() {
       this.$nextTick(() => {
         // this.getData()
+
         this.buildEchart()
       })
     },
