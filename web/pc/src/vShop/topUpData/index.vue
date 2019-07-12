@@ -7,7 +7,7 @@
       <div style="height: 400px">
         <user-analysis></user-analysis>
       </div>
-      <div style="height: 400px">
+      <div style="height: 600px">
         <money-analysis></money-analysis>
       </div>
 

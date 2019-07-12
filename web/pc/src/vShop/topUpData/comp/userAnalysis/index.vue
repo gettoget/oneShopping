@@ -19,6 +19,7 @@
     name: "index",
     data(){
       return {
+        value2:[],
         dateOptions: {
           disabledDate (date) {
             return date && date.valueOf() > Date.now();
@@ -135,7 +136,7 @@
             x: "center"
           },
           grid: {
-            left: 40,
+            left: "40px",
             top: '14px',
             right: '10px',
             bottom: '20px'
