@@ -107,7 +107,11 @@
           :height="tab_H"
           v-if="tab_H>0"
           :columns="tableTiT"
-          :data="tableData"></Table>
+          :data="tableData">
+          <template slot-scope="{ row, index }" slot="action">
+            <img :src="row.hImg" alt="" style="width: 40px;height: 40px;border-radius: 100%"/>
+          </template>
+        </Table>
       </div>
     </div>
     <div class="userListBox" @click="close">
@@ -151,17 +155,6 @@
           }
         },
         winList: {
-          // cjsj: "2019-06-05 22:20:13.394",
-          // himg: "http://cdnoss.luno.id/cashcash/users/header/2018-09-26/c470e962cd86d5cef9e11b510a684092.png",
-          // id: "585956069029707776",
-          // num: "10004808",
-          // nums: null,
-          // proId: "585410180749983744",
-          // proName: "惠普（HP）战66 二代",
-          // userId: "567293823873449984",
-          // userName: "maryono",
-          // zjfs: "19",
-          // zjlx: "0",
         },
         tab_H: 0,
         tabBox: "tabBox",
@@ -175,14 +168,20 @@
             width: 100,
             i18n:'TX',
             slot: 'action',
-            render: (h, p) => {
-              return h('Avatar', {
-                props: {
-                  src: p.row.hImg
-                }
-              })
-            }
           },
+          // {
+          //   title: "头像",
+          //   width: 100,
+          //   i18n:'TX',
+          //   slot: 'action',
+          //   render: (h, p) => {
+          //     return h('Avatar', {
+          //       props: {
+          //         src: p.row.hImg
+          //       }
+          //     })
+          //   }
+          // },
           {
             title: "用户姓名",
             minWidth: 140,

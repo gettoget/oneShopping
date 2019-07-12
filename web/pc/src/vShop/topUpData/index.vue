@@ -4,7 +4,16 @@
       <!--<pager-tit title="充值统计"></pager-tit>-->
     <!--</Card>-->
     <div class="box_col_auto">
-      <div class="box_row" style="height: 100%">
+      <div style="height: 400px">
+        <user-analysis></user-analysis>
+      </div>
+      <div style="height: 400px">
+        <money-analysis></money-analysis>
+      </div>
+
+
+
+      <div class="box_row" style="height: 400px">
         <div class="box_row_100">
           <chart-number></chart-number>
         </div>
@@ -12,9 +21,9 @@
           <chart-topup></chart-topup>
         </div>
       </div>
-    </div>
-    <div class="box_col_auto">
-      <all-data></all-data>
+      <div class="" style="height: 400px">
+        <all-data></all-data>
+      </div>
     </div>
   </div>
 </template>
@@ -23,10 +32,15 @@
   import chartNumber from './comp/chartNumber'
   import chartTopup from './comp/chartTopUp'
   import allData from './comp/allData'
+
+  import userAnalysis from './comp/userAnalysis'
+  import moneyAnalysis from './comp/moneyAnalysis'
+
+
   export default {
     name: "index",
     components:{
-      chartNumber,chartTopup,allData
+      chartNumber,chartTopup,allData,userAnalysis,moneyAnalysis
     }
   }
 </script>
