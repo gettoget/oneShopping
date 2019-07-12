@@ -185,14 +185,26 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         setImgUrl(proInfo);
         // 获取上一期中奖的 商品id
         ProInfo info = baseMapper.getLatestPerson(proInfo.getProBaseid());
+        WinRecord record;
         if (info != null) {
-            SimpleCondition simpleCondition = new SimpleCondition(WinRecord.class);
-            simpleCondition.eq(WinRecord.InnerColumn.proId, info.getId());
-            List<WinRecord> winRecordList = winRecordService.findByCondition(simpleCondition);
+            List<WinRecord> winRecordList = winRecordService.findEq(WinRecord.InnerColumn.proId, info.getId());
+
             if (CollectionUtils.isNotEmpty(winRecordList)) {
-                WinRecord record = winRecordList.get(0);
+                record = winRecordList.get(0);
                 record.setProName(proInfo.getProName());
-                proInfo.setWinRecord(record);
+                if (StringUtils.isNotBlank(info.getUserId())) {
+                    User user = userService.findById(info.getUserId());
+                    record.setHimg(user.gethImg());
+                    SimpleCondition simpleCondition = new SimpleCondition(OrderList.class);
+                    simpleCondition.eq(OrderList.InnerColumn.proId, info.getId());
+                    simpleCondition.eq(OrderList.InnerColumn.userid, user.getId());
+                    List<OrderList> orderLists = orderListService.findByCondition(simpleCondition);
+                    if (CollectionUtils.isNotEmpty(orderLists)) {
+                        List<String> numList = orderLists.stream().map(OrderList::getNum).sorted(String::compareTo).collect(Collectors.toList());
+                        record.setNums(numList);
+                    }
+                }
+               proInfo.setWinRecord(record);
             }
         }
         return ApiResponse.success(proInfo);
@@ -258,7 +270,6 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
             List<WinRecord> winRecordList = winRecordService.findByCondition(simpleCondition);
 
             if (CollectionUtils.isNotEmpty(winRecordList)) {
-
                 record = winRecordList.get(0);
                 record.setProName(proInfo.getProName());
                 if (StringUtils.isNotBlank(info.getUserId())) {
