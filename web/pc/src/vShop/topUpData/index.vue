@@ -11,6 +11,10 @@
         <money-analysis></money-analysis>
       </div>
 
+      <div style="height: 600px">
+        <exp-money-analysis></exp-money-analysis>
+      </div>
+
 
 
       <div class="box_row" style="height: 400px">
@@ -35,12 +39,14 @@
 
   import userAnalysis from './comp/userAnalysis'
   import moneyAnalysis from './comp/moneyAnalysis'
+  import expMoneyAnalysis from './comp/expMoneyAnalysis'
+
 
 
   export default {
     name: "index",
     components:{
-      chartNumber,chartTopup,allData,userAnalysis,moneyAnalysis
+      chartNumber,chartTopup,allData,userAnalysis,moneyAnalysis,expMoneyAnalysis
     }
   }
 </script>

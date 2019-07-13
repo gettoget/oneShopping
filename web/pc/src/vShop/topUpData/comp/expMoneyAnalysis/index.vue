@@ -1,17 +1,17 @@
 <template>
-  <Card class="box_col moneyAnalysisBox">
-    <div id="moneyAnalysis" style="height: 100%"></div>
+  <Card class="box_col expMoneyAnalysisBox">
+    <div id="expMoneyAnalysis" style="height: 100%"></div>
 
-    <Card class="moneyAnalysis_lineBox">
-      <div id="moneyAnalysis_lineBox" style="height: 100%"></div>
+    <Card class="expMoneyAnalysis_lineBox">
+      <div id="expMoneyAnalysis_lineBox" style="height: 100%"></div>
     </Card>
 
-    <Card class="qd_rs_Analysis_lineBox">
-      <div id="qd_Analysis_lineBox" style="height: 100%"></div>
+    <Card class="exp_qd_rs_Analysis_lineBox">
+      <div id="exp_qd_Analysis_lineBox" style="height: 100%"></div>
     </Card>
 
-    <Card class="qd_money_time_Analysis">
-      <div id="qd_money_time_Analysis" style="height: 100%"></div>
+    <Card class="exp_qd_money_time_Analysis">
+      <div id="exp_qd_money_time_Analysis" style="height: 100%"></div>
     </Card>
   </Card>
 </template>
@@ -35,11 +35,11 @@
     methods: {
       buildEchart() {
         var v = this
-        var myChart = echarts.init(document.getElementById('moneyAnalysis'));
+        var myChart = echarts.init(document.getElementById('expMoneyAnalysis'));
 
         let option = {
           title: {
-            text: "用户充值走势",
+            text: "用户消费走势",
             subtext: "",
             x: "center"
           },
@@ -179,11 +179,11 @@
 
       buildMoneyAnalysis(){
         var v = this
-        var myChart = echarts.init(document.getElementById('moneyAnalysis_lineBox'));
+        var myChart = echarts.init(document.getElementById('expMoneyAnalysis_lineBox'));
         let option = {
           title: {
             show:true,
-            text: '渠道充值走势',
+            text: '渠道消费走势',
             x: "left",
             textStyle: {
               fontSize: 14,
@@ -250,12 +250,12 @@
 
       buildqd_qd_Analysis(){
         var v = this
-        var myChart = echarts.init(document.getElementById('qd_Analysis_lineBox'));
+        var myChart = echarts.init(document.getElementById('exp_qd_Analysis_lineBox'));
 
         let option = {
           title: {
             show:true,
-            text: '2019/09/09 各渠道充值人数、金额统计',
+            text: '2019/09/09 各渠道消费人数、金额统计',
             x: "left",
             textStyle: {
               fontSize: 14,
@@ -359,12 +359,12 @@
 
       build_qd_money_time_Analysis(){
         var v = this
-        var myChart = echarts.init(document.getElementById('qd_money_time_Analysis'));
+        var myChart = echarts.init(document.getElementById('exp_qd_money_time_Analysis'));
 
         let option = {
           title: {
             show:true,
-            text: '09/09 充值人数、次数统计',
+            text: '09/09 消费人数、次数统计',
             x: "left",
             textStyle: {
               fontSize: 14,
@@ -479,14 +479,14 @@
 </script>
 
 <style lang="less">
-  .moneyAnalysisBox {
+  .expMoneyAnalysisBox {
     .ivu-card-body {
       flex: 1;
       overflow: auto;
       position: relative;
     }
   }
-  .moneyAnalysis_lineBox{
+  .expMoneyAnalysis_lineBox{
     position: absolute;
     right: 45px;
     top: 40px;
@@ -499,7 +499,7 @@
       padding: 0;
     }
   }
-  .qd_rs_Analysis_lineBox{
+  .exp_qd_rs_Analysis_lineBox{
     position: absolute;
     left: 55px;
     top: 40px;
@@ -513,7 +513,7 @@
     }
   }
 
-  .qd_money_time_Analysis{
+  .exp_qd_money_time_Analysis{
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
