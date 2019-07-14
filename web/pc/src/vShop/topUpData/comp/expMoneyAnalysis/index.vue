@@ -6,13 +6,13 @@
       <div id="expMoneyAnalysis_lineBox" style="height: 100%"></div>
     </Card>
 
-    <Card class="exp_qd_rs_Analysis_lineBox">
-      <div id="exp_qd_Analysis_lineBox" style="height: 100%"></div>
-    </Card>
+    <!--<Card class="exp_qd_rs_Analysis_lineBox">-->
+      <!--<div id="exp_qd_Analysis_lineBox" style="height: 100%"></div>-->
+    <!--</Card>-->
 
-    <Card class="exp_qd_money_time_Analysis">
-      <div id="exp_qd_money_time_Analysis" style="height: 100%"></div>
-    </Card>
+    <!--<Card class="exp_qd_money_time_Analysis">-->
+      <!--<div id="exp_qd_money_time_Analysis" style="height: 100%"></div>-->
+    <!--</Card>-->
   </Card>
 </template>
 
@@ -27,9 +27,9 @@
 
         this.buildEchart()
         this.buildMoneyAnalysis()
-        this.buildqd_qd_Analysis()
+        // this.buildqd_qd_Analysis()
 
-        this.build_qd_money_time_Analysis()
+        // this.build_qd_money_time_Analysis()
       })
     },
     methods: {
@@ -197,7 +197,7 @@
           },
           grid: {
             left: '20px',
-            right: '5px',
+            right: '20px',
             bottom: "10px",
             top:"30px",
             containLabel: true
@@ -488,7 +488,7 @@
   }
   .expMoneyAnalysis_lineBox{
     position: absolute;
-    right: 45px;
+    left: 55px;
     top: 40px;
     z-index: 200;
     width: 400px;

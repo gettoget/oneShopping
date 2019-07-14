@@ -197,7 +197,7 @@
           },
           grid: {
             left: '20px',
-            right: '5px',
+            right: '20px',
             bottom: "10px",
             top:"30px",
             containLabel: true
@@ -488,7 +488,7 @@
   }
   .moneyAnalysis_lineBox{
     position: absolute;
-    right: 45px;
+    left: 55px;
     top: 40px;
     z-index: 200;
     width: 400px;
@@ -501,7 +501,7 @@
   }
   .qd_rs_Analysis_lineBox{
     position: absolute;
-    left: 55px;
+    right: 45px;
     top: 40px;
     z-index: 200;
     width: 400px;
