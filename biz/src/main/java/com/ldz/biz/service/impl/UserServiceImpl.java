@@ -282,8 +282,10 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
             condition.eq(User.InnerColumn.phone, phone);
             List<User> users = findByCondition(condition);
             RuntimeCheck.ifTrue(CollectionUtils.isNotEmpty(users), MessageUtils.get("user.registered"));
-            //todo 短信发送过程暂时忽略
-            String code = SendSmsUtil.sendMSG(phone, type);
+            String code = SendSmsUtil.sendOtp(phone);
+            if(StringUtils.equals(code, "error")){
+                RuntimeCheck.ifTrue(true, MessageUtils.get("sms.isError"));
+            }
             redis.boundValueOps(phone + "_register_code").set(code, 5, TimeUnit.MINUTES);
         } else if (StringUtils.equals(type, "2")) {
             // 用户找回密码 验证码
@@ -295,15 +297,20 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
             List<User> users = findByCondition(condition);
             RuntimeCheck.ifTrue(CollectionUtils.isEmpty(users), MessageUtils.get("user.notregister"));
 
-            //todo 短信发送过程暂时忽略
-            String code = SendSmsUtil.sendMSG(phone, type);
+            String code = SendSmsUtil.sendOtp(phone);
+            if(StringUtils.equals(code, "error")){
+                RuntimeCheck.ifTrue(true, MessageUtils.get("sms.isError"));
+            }
             redis.boundValueOps(phone + "_find_pwd").set(code, 5, TimeUnit.MINUTES);
         } else if (StringUtils.equals(type, "3")) {
             // 找回支付密码不需要填手机号
             String userId = (String) getAttribute("userId");
             RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
             User user = findById(userId);
-            String code = SendSmsUtil.sendMSG(user.getPhone(), type);
+            String code = SendSmsUtil.sendOtp(user.getPhone());
+            if(StringUtils.equals(code, "error")){
+                RuntimeCheck.ifTrue(true, MessageUtils.get("sms.isError"));
+            }
             // 存储验证码
             redis.boundValueOps(user.getPhone() + "_find_pay_pwd").set(code, 5, TimeUnit.MINUTES);
         } else if (StringUtils.equals(type, "4")) {
@@ -311,7 +318,10 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
             String userId = (String) getAttribute("userId");
             RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
             User user = findById(userId);
-            String code = SendSmsUtil.sendMSG(user.getPhone(), type);
+            String code = SendSmsUtil.sendOtp(user.getPhone());
+            if(StringUtils.equals(code, "error")){
+                RuntimeCheck.ifTrue(true, MessageUtils.get("sms.isError"));
+            }
             // 存储验证码
             redis.boundValueOps(user.getPhone() + "_pay").set(code, 5, TimeUnit.MINUTES);
         } else {

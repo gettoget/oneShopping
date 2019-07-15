@@ -13,11 +13,13 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections.map.HashedMap;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * 短信 下发平台
@@ -157,7 +159,7 @@ public class SendSmsUtil {
 
     }*/
 
-    public static String sendMSG(String phone, String type){
+    public static String sendMSG(String phone, String type)  {
         String url = "http://cs.kmindo.com:9980";
         String account = "GoSaku";
         String password = DigestUtils.md5Hex("GoSaku6057");
@@ -169,18 +171,77 @@ public class SendSmsUtil {
         JSONObject jsonObject = JSON.parseObject(s);
         String token = (String) jsonObject.getJSONObject("data").get("token");
 
+        String smsUrl = url + "/sm/sender";
+        Map<String,String> postHeader = new HashedMap();
+        postHeader.put("content-type", "application/json");
+
 
         JSONObject object = new JSONObject();
         object.put("token",token);
         object.put("sendType",1);
         object.put("msisdn","6282121224879");
         object.put("message","测试");
+        String post = "";
+        try {
+             post = HttpUtil.postJson(smsUrl, postHeader,JSON.toJSONString(object));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
-        return "123456";
+
+
+        return post;
     }
 
+    public static String sendOtp(String phone){
+        Random random = new Random();
+        String smsCode ="";
+        for(int i = 0 ; i < 6; i++){
+            int nextInt = random.nextInt(9);
+            smsCode += nextInt;
+        }
+        String url = "http://cs.kmindo.com:9980";
+        String account = "GoSaku";
+        String password = DigestUtils.md5Hex("GoSaku6057");
+        String loginUrl = url + "/cs/login";
+        Map<String,String> loginParam = new HashMap<>();
+        loginParam.put("account",account);
+        loginParam.put("password",password);
+        String s = HttpUtil.get(loginUrl, loginParam);
+        JSONObject jsonObject = JSON.parseObject(s);
+        String token = (String) jsonObject.getJSONObject("data").get("token");
+
+        String otpUrl = url + "/sm/otp/send";
+        Map<String,String> postHeader = new HashedMap();
+        postHeader.put("content-type", "application/json");
+
+        JSONObject params = new JSONObject();
+        params.put("token", token);
+        params.put("from","AFT");
+        params.put("to",phone);
+        params.put("message",smsCode);
+
+        String post = "";
+        try {
+            post = HttpUtil.postJson(otpUrl, postHeader,JSON.toJSONString(params));
+        }catch (Exception e){
+            return "error";
+        }
+
+        JSONObject parseObject = JSON.parseObject(post);
+        int code = (int) parseObject.getJSONObject("result").get("code");
+        if( code == 0) {
+            // 发送成功
+            return smsCode;
+        }else{
+            return "error";
+        }
+
+    }
+
+
     public static void main(String[] args) {
-        sendMSG("","");
+        sendOtp("6282121224879");
     }
 
 
