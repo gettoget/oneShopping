@@ -1,6 +1,8 @@
 package com.ldz.util.commonUtil;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
 import com.aliyuncs.dysmsapi.model.v20170525.QuerySendDetailsRequest;
@@ -10,6 +12,7 @@ import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -155,7 +158,29 @@ public class SendSmsUtil {
     }*/
 
     public static String sendMSG(String phone, String type){
+        String url = "http://cs.kmindo.com:9980";
+        String account = "GoSaku";
+        String password = DigestUtils.md5Hex("GoSaku6057");
+        String loginUrl = url + "/cs/login";
+        Map<String,String> loginParam = new HashMap<>();
+        loginParam.put("account",account);
+        loginParam.put("password",password);
+        String s = HttpUtil.get(loginUrl, loginParam);
+        JSONObject jsonObject = JSON.parseObject(s);
+        String token = (String) jsonObject.getJSONObject("data").get("token");
+
+
+        JSONObject object = new JSONObject();
+        object.put("token",token);
+        object.put("sendType",1);
+        object.put("msisdn","6282121224879");
+        object.put("message","测试");
+
         return "123456";
+    }
+
+    public static void main(String[] args) {
+        sendMSG("","");
     }
 
 

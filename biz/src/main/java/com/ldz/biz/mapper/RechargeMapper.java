@@ -45,4 +45,16 @@ public interface RechargeMapper extends Mapper<Recharge> {
 
     @Select(" select * from recharge where year like '${year}%'")
     List<Recharge> getYearRecharge(@Param("year") String year);
+
+    @Select(" select czqd ,convert( SUM(czjb), signed) czjb, COUNT(czqd) bz1 from recharge where cjsj like '%${time}%' GROUP BY czqd ;")
+    List<Recharge> statisCzqd(@Param("time") String time);
+
+    @Select("SELECT co bz1, convert(sum(a.jb) ,SIGNED) czjb from ( SELECT user_id, IF(count(user_id) >= 3,3,count(user_id)) co,sum(czjb) jb from recharge where cjsj like '%${time}%' group by user_id ) a GROUP BY co")
+    List<Recharge> statisCzjb(@Param("time") String time);
+
+    @Select(" SELECT SUBSTR(cjsj,1,10) cjsj,convert(sum(czjb),signed) czjb  from recharge WHERE  czqd = #{czqd} and SUBSTR(cjsj,1,10) >= #{start} and SUBSTR(cjsj,1,10) <= #{end}  GROUP BY SUBSTR(cjsj,1,10)  ")
+    List<Recharge> getQdRecord(@Param("czqd") String czqd ,@Param("start") String start,@Param("end") String end);
+
+    @Select("select SUBSTR(cjsj , 1 , 10) cjsj ,convert(sum(czjb),signed) czjb from recharge where SUBSTR(cjsj , 1 , 10) >= #{start} and SUBSTR(cjsj , 1 , 10) <=#{end} GROUP BY SUBSTR(cjsj , 1 , 10)  ")
+    List<Recharge> getCz(@Param("start") String start, @Param("end") String end);
 }

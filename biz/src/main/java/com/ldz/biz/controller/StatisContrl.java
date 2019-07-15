@@ -104,5 +104,63 @@ public class StatisContrl {
     }
 
 
+    /**
+     * 用户消费走势 查当天
+     */
+    @PostMapping("/statisXf")
+    public ApiResponse<Map<String,String>> statisXf(String time){
+        return service.statisXf(time);
+    }
+
+    /**
+     * 消费金额走势  默认查一个月
+     */
+    @PostMapping("/statisXfje")
+    public ApiResponse<List<String>> statisXfje(String day){
+        return service.statisXfje(day);
+    }
+
+    /**
+     * 充值渠道统计
+     */
+    @PostMapping("/statisCzqd")
+    public ApiResponse<Map<String,String>> statisCzqd(String time){
+        return service.statisCzqd(time);
+    }
+
+    /**
+     * 充值走势
+     */
+    @PostMapping("/statisCzjb")
+    public ApiResponse<Map<String,String>> statisCzjb(String time){
+        return service.statisCzjb(time);
+    }
+
+    /**
+     *  近七天 充值渠道走势
+     */
+    @PostMapping("/statisLastSeven")
+    public ApiResponse<List<String>> statisLastSeven(String day){
+        return service.statisLastSeven(day);
+    }
+
+    /**
+     *  充值金额走势
+     */
+    @PostMapping("/statisCz")
+    public ApiResponse<List<String>> statisCz(String day){
+        return  service.statisCz(day);
+    }
+
+    /**
+     * 新增用户走势
+     */
+    @PostMapping("/statisNewUser")
+    public ApiResponse<List<String>> statisNewUser(String day){
+        return service.statisNewUser(day);
+    }
+
+
+
 
 }

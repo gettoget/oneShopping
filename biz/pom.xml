@@ -6,7 +6,7 @@
         <groupId>com.ldz</groupId>
         <artifactId>parent</artifactId>
         <version>0.0.1</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath>..</relativePath> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.ldz</groupId>
     <artifactId>biz</artifactId>

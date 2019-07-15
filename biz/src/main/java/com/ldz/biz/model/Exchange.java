@@ -2,6 +2,7 @@ package com.ldz.biz.model;
 
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
 
 @Table(name = "exchange")
@@ -67,10 +68,34 @@ public class Exchange implements Serializable {
      */
     private String bz3;
 
+    @Transient
     private String username;
 
+    @Transient
     private String himg;
 
+    @Transient
+    private String time;
+
+    @Transient
+    private String je;
+
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getJe() {
+        return je;
+    }
+
+    public void setJe(String je) {
+        this.je = je;
+    }
 
     public String getUsername() {
         return username;

@@ -4,13 +4,17 @@ import com.ldz.biz.mapper.ExchangeMapper;
 import com.ldz.biz.mapper.ProInfoMapper;
 import com.ldz.biz.mapper.RechargeMapper;
 import com.ldz.biz.mapper.UserMapper;
+import com.ldz.biz.model.Exchange;
 import com.ldz.biz.model.ProInfo;
+import com.ldz.biz.model.Recharge;
+import com.ldz.biz.model.User;
 import com.ldz.biz.service.OrderService;
 import com.ldz.biz.service.ProInfoService;
 import com.ldz.biz.service.StatisService;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.SimpleCondition;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class StatisServiceImpl implements StatisService {
@@ -235,5 +240,193 @@ public class StatisServiceImpl implements StatisService {
             list.add(map);
         }
         return ApiResponse.success(list);
+    }
+
+    @Override
+    public ApiResponse<Map<String, String>> statisXf(String time) {
+        // 查询消费走势 ， 分为 1 ， 2 ， 和多次
+        Map<String,String> result = new HashMap<>();
+        if(StringUtils.isBlank(time)){
+            time = DateTime.now().toString("yyyy-MM-dd");
+        }
+        List<Map<String, Long>> map = exchangeMapper.statisXf(time);
+        Map<Long, List<Map<String, Long>>> co = map.stream().collect(Collectors.groupingBy(m -> m.get("co")));
+        for(int i = 0 ; i< 3 ; i++){
+            Long key = Long.valueOf((i + 1));
+            if(co.containsKey(key)){
+                List<Map<String, Long>> list = co.get(key);
+                Long j = Long.valueOf(list.get(0).get("j"));
+                result.put(key+"",j+"");
+            }else{
+                result.put(key+"","0");
+            }
+        }
+
+        return ApiResponse.success(result);
+    }
+
+    @Override
+    public ApiResponse<List<String>> statisXfje(String day) {
+        if(StringUtils.isBlank(day)){
+            day = "30";
+        }
+        List<String> result = new ArrayList<>();
+
+        List<String> times = new ArrayList<>();
+
+        int parseDay = Integer.parseInt(day);
+        DateTime now = DateTime.now();
+        DateTime dateTime = now.minusDays(parseDay-1);
+        for (int i = 0; i < parseDay; i++) {
+            times.add(dateTime.plusDays(i).toString("yyyy-MM-dd"));
+        }
+
+        String start = dateTime.toString("yyyy-MM-dd");
+        String end = now.toString("yyyy-MM-dd");
+        List<Exchange> list = exchangeMapper.statisXfje(start, end);
+        Map<String, String> map = list.stream().collect(Collectors.toMap(Exchange::getTime, p -> p.getJe()));
+        for (String time : times) {
+            String s = map.get(time);
+            if(StringUtils.isBlank(s)){
+                s = "0";
+            }
+            result.add(time + "," + s);
+        }
+        return ApiResponse.success(result);
+    }
+
+    @Override
+    public ApiResponse<Map<String, String>> statisCzqd(String time) {
+        if(StringUtils.isBlank(time)){
+            time = DateTime.now().toString("yyyy-MM-dd");
+        }
+        Map<String,String> m = new HashMap<>();
+        List<Recharge> recharges = rechargeMapper.statisCzqd(time);
+        Map<String, Recharge> map = recharges.stream().collect(Collectors.toMap(Recharge::getCzqd, p -> p));
+        for(int i = 1 ; i <= 2 ;  i++){
+            String key =  i + "";
+            if(map.containsKey(key)){
+                Recharge recharge = map.get(key);
+                m.put(key, recharge.getCzjb() + "," + recharge.getBz1());
+            }else{
+                m.put(key, "0,0");
+            }
+        }
+
+        return ApiResponse.success(m);
+    }
+
+    @Override
+    public ApiResponse<Map<String, String>> statisCzjb(String time) {
+        // 查询消费走势 ， 分为 1 ， 2 ， 和多次
+        Map<String,String> result = new HashMap<>();
+        if(StringUtils.isBlank(time)){
+            time = DateTime.now().toString("yyyy-MM-dd");
+        }
+        List<Recharge> map = rechargeMapper.statisCzjb(time);
+
+        Map<String, String> collect = map.stream().collect(Collectors.toMap(Recharge::getBz1, p -> p.getCzjb()));
+        for(int i = 1 ; i<= 3 ; i++){
+            String key = i+"";
+            if(collect.containsKey(key)){
+                String j = collect.get(key);
+                result.put(key,j);
+            }else{
+                result.put(key,"0");
+            }
+        }
+        return ApiResponse.success(result);
+    }
+
+    @Override
+    public ApiResponse<List<String>> statisLastSeven(String day) {
+        if(StringUtils.isBlank(day)){
+            day = "7";
+        }
+        List<String> result = new ArrayList<>();
+
+        DateTime now = DateTime.now();
+        int anInt = Integer.parseInt(day);
+        DateTime minusDays = now.minusDays(anInt - 1);
+        String start = minusDays.toString("yyyy-MM-dd");
+        String end = now.toString("yyyy-MM-dd");
+        // 支付通道
+        List<Recharge> qdRecord = rechargeMapper.getQdRecord("1", start, end);
+        Map<String, String> collect = qdRecord.stream().collect(Collectors.toMap(Recharge::getCjsj, p -> p.getCzjb()));
+        // 积分通道
+        List<Recharge> record = rechargeMapper.getQdRecord("2", start, end);
+        Map<String, String> stringMap = record.stream().collect(Collectors.toMap(Recharge::getCjsj, p -> p.getCzjb()));
+        for (int i = 0; i < anInt; i++) {
+            String key = minusDays.plusDays(i).toString("yyyy-MM-dd");
+            String value = key;
+            if(collect.containsKey(key)){
+                value = value + "," +  collect.get(key);
+            }else{
+                value = value + "," + "0";
+            }
+            if(stringMap.containsKey(key)){
+                value = value + "," + stringMap.get(key);
+            }else{
+                value = value + "," + "0";
+            }
+            result.add(value);
+        }
+        return ApiResponse.success(result);
+    }
+
+    @Override
+    public ApiResponse<List<String>> statisCz(String day) {
+        if(StringUtils.isBlank(day)){
+            day = "30";
+        }
+        List<String> result = new ArrayList<>();
+        DateTime now = DateTime.now();
+        int anInt = Integer.parseInt(day);
+        DateTime minusDays = now.minusDays(anInt - 1);
+        String start = minusDays.toString("yyyy-MM-dd");
+        String end = now.toString("yyyy-MM-dd");
+
+        List<Recharge> recharges = rechargeMapper.getCz(start, end);
+        Map<String, String> map = recharges.stream().collect(Collectors.toMap(Recharge::getCjsj, p -> p.getCzjb()));
+        for (int i = 0; i < anInt ; i++){
+            String key = minusDays.plusDays(i).toString("yyyy-MM-dd");
+            String value = key;
+            if(map.containsKey(key)){
+                value += "," + map.get(key);
+            }else{
+                value += ",0";
+            }
+            result.add(value);
+        }
+
+
+        return ApiResponse.success(result);
+    }
+
+    @Override
+    public ApiResponse<List<String>> statisNewUser(String day) {
+        if(StringUtils.isBlank(day)){
+            day = "30";
+        }
+        List<String> result = new ArrayList<>();
+        DateTime now = DateTime.now();
+        int anInt = Integer.parseInt(day);
+        DateTime minusDays = now.minusDays(anInt - 1);
+        String start = minusDays.toString("yyyy-MM-dd");
+        String end = now.toString("yyyy-MM-dd");
+        List<User> list = userMapper.countUsers(start, end);
+        Map<String, String> map = list.stream().collect(Collectors.toMap(User::getCjsj, p -> p.getBz1()));
+        for(int i = 0 ; i < anInt ; i++){
+            String key = minusDays.plusDays(i).toString("yyyy-MM-dd");
+            String value = key;
+            if(map.containsKey(key)){
+                value += ","+map.get(key);
+            }else{
+                value += ",0";
+            }
+            result.add(value);
+        }
+
+        return ApiResponse.success(result);
     }
 }

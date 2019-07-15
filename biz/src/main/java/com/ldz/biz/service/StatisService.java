@@ -25,4 +25,18 @@ public interface StatisService {
     ApiResponse<Map<String, Object>> rechargeChannel();
 
     ApiResponse<List<Map<String, Long>>> rechargeTrend();
+
+    ApiResponse<Map<String, String>> statisXf(String time);
+
+    ApiResponse<List<String>> statisXfje(String day);
+
+    ApiResponse<Map<String, String>> statisCzqd(String time);
+
+    ApiResponse<Map<String, String>> statisCzjb(String time);
+
+    ApiResponse<List<String>> statisLastSeven(String day);
+
+    ApiResponse<List<String>> statisCz(String day);
+
+    ApiResponse<List<String>> statisNewUser(String day);
 }

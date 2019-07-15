@@ -29,4 +29,8 @@ public interface UserMapper extends Mapper<User> {
             ", (select ifnull(sum(CAST(ifnull(xfjb,'0') as unsigned )),0) xf,userid userId from exchange where userid in <foreach collection='idList' item='id' index='index' open='('  close=')' separator=','> #{id}</foreach> group by userid) c) WHERE a.userId = b.userId and b.userId = c.userId and c.userId = a.userId" +
             "</script>")
     List<UserInModel> sumCharge(@Param("idList") Set<String> id);
+
+    @Select(" SELECT SUBSTR(cjsj , 1, 10) cjsj , count(1) bz1  from user where SUBSTR(cjsj , 1, 10) >= #{start} and SUBSTR(cjsj , 1, 10) <= #{end} GROUP BY SUBSTR(cjsj , 1, 10) ")
+    List<User> countUsers(@Param("start") String start, @Param("end") String end);
+
 }
