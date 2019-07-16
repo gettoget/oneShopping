@@ -6,13 +6,22 @@ import ajaxUrl from './api'
 
 import {getToken,getUserId} from '@/libs/util'
 
+let dicLoca = {
+  "zh-CN":"zh_CN",
+  "in-ID":"in_ID",
+  "en-US":"en_US"
+}
+
 // 订单分配权限
 let url = ajaxUrl.url
 
 let httpInstance = axios.create({
   baseURL: url,
   timeout: 30000,
-  headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'lang':dicLoca[navigator.language]
+  },
   withCredentials: true
 });
 httpInstance.url = url;
@@ -47,6 +56,7 @@ httpInstance.interceptors.request.use((config) => {
     }
   }
   // 在发送请求之前做些什么
+  config.headers.lang = dicLoca[localStorage.getItem("local")]
   if(getToken()){
     config.headers.token = getToken();
   }
