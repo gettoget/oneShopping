@@ -14,7 +14,6 @@ import com.ldz.biz.service.StatisService;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.SimpleCondition;
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -317,22 +316,22 @@ public class StatisServiceImpl implements StatisService {
     }
 
     @Override
-    public ApiResponse<Map<String, String>> statisCzjb(String time) {
+    public ApiResponse<List<String>> statisCzjb(String time) {
         // 查询消费走势 ， 分为 1 ， 2 ， 和多次
-        Map<String,String> result = new HashMap<>();
+        List<String> result = new ArrayList<>();
         if(StringUtils.isBlank(time)){
             time = DateTime.now().toString("yyyy-MM-dd");
         }
         List<Recharge> map = rechargeMapper.statisCzjb(time);
 
-        Map<String, String> collect = map.stream().collect(Collectors.toMap(Recharge::getBz1, p -> p.getCzjb()));
+        Map<String, Recharge> collect = map.stream().collect(Collectors.toMap(Recharge::getBz1, p -> p));
         for(int i = 1 ; i<= 3 ; i++){
             String key = i+"";
             if(collect.containsKey(key)){
-                String j = collect.get(key);
-                result.put(key,j);
+                Recharge j = collect.get(key);
+                result.add( j.getCzjb() + "," + j.getBz2());
             }else{
-                result.put(key,"0");
+                result.add( "0,0");
             }
         }
         return ApiResponse.success(result);

@@ -130,9 +130,10 @@ public class StatisContrl {
 
     /**
      * 充值走势
+     * @return
      */
     @PostMapping("/statisCzjb")
-    public ApiResponse<Map<String,String>> statisCzjb(String time){
+    public ApiResponse<List<String>> statisCzjb(String time){
         return service.statisCzjb(time);
     }
 
