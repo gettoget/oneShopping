@@ -23,7 +23,7 @@ public class ResponseAdvice implements ResponseBodyAdvice {
 
     @Override
     public Object beforeBodyWrite(Object o, MethodParameter methodParameter, MediaType mediaType, Class aClass, ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse) {
-        URI uri = serverHttpRequest.getURI();
+        /*URI uri = serverHttpRequest.getURI();
         if(StringUtils.startsWith(uri.getPath(),"/app/")){
             String rsa="";
             try {
@@ -32,9 +32,9 @@ public class ResponseAdvice implements ResponseBodyAdvice {
                 MessageUtils.get("error");
             }
             return rsa;
-        }else {
+        }else {*/
            return o;
-        }
+//        }
 
 //       return o;
     }

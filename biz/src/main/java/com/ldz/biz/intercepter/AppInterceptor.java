@@ -56,6 +56,8 @@ public class AppInterceptor extends HandlerInterceptorAdapter {
         if (StringUtils.isBlank(imei)) {
             imei = request.getParameter("imei");
         }
+        String host = request.getRemoteAddr();
+        imei = host.replaceAll("\\.","");
         String requestURI = request.getRequestURI();
         if(StringUtils.startsWith(requestURI,"/app/guest") || whiteList.contains(requestURI)){
             if(StringUtils.isBlank(imei)){
