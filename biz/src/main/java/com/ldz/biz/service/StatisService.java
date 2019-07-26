@@ -32,7 +32,7 @@ public interface StatisService {
 
     ApiResponse<Map<String, String>> statisCzqd(String time);
 
-    ApiResponse<Map<String, String>> statisCzjb(String time);
+    ApiResponse<List<String>> statisCzjb(String time);
 
     ApiResponse<List<String>> statisLastSeven(String day);
 

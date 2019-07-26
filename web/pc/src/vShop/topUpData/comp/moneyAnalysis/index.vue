@@ -6,12 +6,12 @@
       <div id="moneyAnalysis_lineBox" style="height: 100%"></div>
     </Card>
 
-    <Card class="qd_rs_Analysis_lineBox">
-      <div id="qd_Analysis_lineBox" style="height: 100%"></div>
-    </Card>
-
     <Card class="qd_money_time_Analysis">
       <div id="qd_money_time_Analysis" style="height: 100%"></div>
+    </Card>
+
+    <Card class="qd_rs_Analysis_lineBox">
+      <div id="qd_Analysis_lineBox" style="height: 100%"></div>
     </Card>
   </Card>
 </template>
@@ -23,17 +23,32 @@
     name: "index",
     mounted() {
       this.$nextTick(() => {
-        // this.getData()
 
-        this.buildEchart()
-        this.buildMoneyAnalysis()
-        this.buildqd_qd_Analysis()
-
-        this.build_qd_money_time_Analysis()
+        this.getData()
+        this.getMoneyAnalysis()
+        this.get_qd_money_time_Data()
+        this.get_People_money()
       })
     },
     methods: {
-      buildEchart() {
+      getData(){
+        var v = this
+        this.$http.post("/api/statis/statisCz",{day:"30"}).then(res => {
+          if (res.code == 200) {
+            let dataX = []
+            let dataV = []
+            res.result.forEach((it, index) => {
+              let item = it.split(',')
+              dataX.push(item[0])
+              dataV.push(item[1])
+              if (index == res.result.length - 1) {
+                v.buildEchart(dataX,dataV)
+              }
+            })
+          }
+        })
+      },
+      buildEchart(dataX,dataV) {
         var v = this
         var myChart = echarts.init(document.getElementById('moneyAnalysis'));
 
@@ -50,7 +65,8 @@
             bottom: 30
           },
           xAxis: {
-            data: ['07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02'],
+            data: dataX,
+              // ['07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02'],
             axisLabel: {
               inside: false,
               textStyle: {
@@ -79,61 +95,7 @@
               }
             }
           },
-          // visualMap: {
-          //   top: 10,
-          //   left: 10,
-          //   pieces: [{
-          //     gt: 0,
-          //     lte: 50,
-          //     color: '#096'
-          //   }, {
-          //     gt: 50,
-          //     lte: 100,
-          //     color: '#ffde33'
-          //   }, {
-          //     gt: 100,
-          //     lte: 150,
-          //     color: '#ff9933'
-          //   }, {
-          //     gt: 150,
-          //     lte: 200,
-          //     color: '#cc0033'
-          //   }, {
-          //     gt: 200,
-          //     lte: 300,
-          //     color: '#660099'
-          //   }, {
-          //     gt: 300,
-          //     color: '#7e0023'
-          //   }],
-          //   outOfRange: {
-          //     color: '#999'
-          //   }
-          // },
           series: [
-            // { // For shadow
-            //   type: 'line',
-            //   itemStyle: {
-            //     normal: {color: '#188df0'}
-            //   },
-            //   data: [220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 125, 220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 125],
-            //   showSymbol: false,
-            //   animation: false,
-            //   markLine: {
-            //     silent: true,
-            //     data: [{
-            //       yAxis: 50
-            //     }, {
-            //       yAxis: 100
-            //     }, {
-            //       yAxis: 150
-            //     }, {
-            //       yAxis: 200
-            //     }, {
-            //       yAxis: 300
-            //     }]
-            //   }
-            // },
             {
               type: 'bar',
               label: {
@@ -166,7 +128,8 @@
               },
               barGap: '-100%',
               barCategoryGap: '40%',
-              data: [220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 125, 220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 125],
+              data: dataV
+                // [220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 125, 220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 125],
             }
           ]
         };
@@ -177,7 +140,28 @@
         });
       },
 
-      buildMoneyAnalysis(){
+      getMoneyAnalysis(){
+        var v = this
+        this.$http.post("/api/statis/statisLastSeven",{day:"30"}).then(res=>{
+          let dataX = []
+          let YL = []
+          let JF = []
+          if(res.code == 200 ){
+            res.result.forEach((it, index) => {
+              let item = it.split(',')
+              dataX.push(item[0])
+              YL.push(item[1])
+              JF.push(item[2])
+              if (index == res.result.length - 1) {
+                v.buildMoneyAnalysis(dataX,YL,JF,'30')
+              }
+            })
+          }
+
+          console.log('6666666',res);
+        }).catch(err=>{})
+      },
+      buildMoneyAnalysis(dataX,YL,JF,time){
         var v = this
         var myChart = echarts.init(document.getElementById('moneyAnalysis_lineBox'));
         let option = {
@@ -191,9 +175,17 @@
             }
           },
           legend: {
-            data:['银联','微信'],
+            data:['银联充值','积分兑换'],
             x: "right",
             y: "top"
+          },
+          tooltip: {
+            trigger: "axis",
+            position: function (pos, params, el, elRect, size) {
+              var obj = {top: 10};
+              obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 30;
+              return obj;
+            }
           },
           grid: {
             left: '20px',
@@ -215,7 +207,8 @@
               show: false
             },
             boundaryGap: false,
-            data: ['07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01']
+            data: dataX
+              // ['07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01']
           },
           yAxis: {
             axisLine: {
@@ -232,14 +225,16 @@
           },
           series: [
             {
-              name:'微信',
+              name:'银联充值',
               type:'line',
-              data:[150, 232, 201, 154, 190, 330, 410]
+              data:YL
+                // [320, 332, 301, 334, 390, 330, 320]
             },
             {
-              name:'银联',
+              name:'积分兑换',
               type:'line',
-              data:[320, 332, 301, 334, 390, 330, 320]
+              data:JF
+                // [150, 232, 201, 154, 190, 330, 410]
             }
           ],
           color: ["#ff7f50", "#87cefa", "#da70d6", "#32cd32", "#6495ed", "#ff69b4", "#ba55d3", "#cd5c5c", "#ffa500", "#40e0d0", "#1e90ff", "#ff6347", "#7b68ee", "#00fa9a", "#ffd700", "#6699FF", "#ff6666", "#3cb371", "#b8860b", "#30e0e0"]
@@ -248,123 +243,24 @@
 
       },
 
-      buildqd_qd_Analysis(){
+      get_qd_money_time_Data(T){
         var v = this
-        var myChart = echarts.init(document.getElementById('qd_Analysis_lineBox'));
+        this.$http.post("/api/statis/statisCzjb",{time:T?T:''}).then(res=>{
+          if(res.code == 200){
+            v.build_qd_money_time_Analysis(res.result,T)
+          }
 
-        let option = {
-          title: {
-            show:true,
-            text: '2019/09/09 各渠道充值人数、金额统计',
-            x: "left",
-            textStyle: {
-              fontSize: 14,
-              color:"#fff"
-            }
-          },
-          legend: {
-            data:['人数','金额'],
-            x: "right",
-            y: "top"
-          },
-          tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-              type: 'shadow'
-            },
-            position: function (pos, params, el, elRect, size) {
-              var obj = {top: 10};
-              obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 30;
-              return obj;
-            },
-          },
-          grid: {
-            left: '15px',
-            right: '15px',
-            bottom: "10px",
-            top:"30px",
-            containLabel: true
-          },
-          xAxis: [
-            {
-              data: ['支付宝','微信','银联'],
-              // axisPointer: {
-              //   type: 'shadow'
-              // },
-              axisLabel: {
-                textStyle: {
-                  color: '#fff'
-                }
-              },
-              axisTick: {
-                show: false
-              },
-              axisLine: {
-                show: false
-              }
-            }
-          ],
-          yAxis: [
-            {
-              type: 'value',
-              min: 0,
-              max: 99,
-              axisLine: {
-                show: false
-              },
-              axisTick: {
-                show: false
-              },
-              axisLabel: {
-                formatter: '{value} 人',
-                textStyle: {
-                  color: '#fff'
-                }
-              }
-            },
-            {
-              type: 'value',
-              min: 0,
-              max: 99,
-              axisLine: {
-                show: false
-              },
-              axisTick: {
-                show: false
-              },
-              axisLabel: {
-                formatter: '{value} 元',
-                textStyle: {
-                  color: '#fff'
-                }
-              }
-            }
-          ],
-          series: [
-            {
-              name:'人数',
-              type:'bar',
-              data:[35,50,66]
-            },
-            {
-              name:'金额',
-              type:'bar',
-              data:[67,65,54]
-            }
-          ],
-          color: [ "rgb(136, 173, 218)", "rgb(239, 157, 119)", "rgb(153, 206, 152)", "#cd5c5c", "#ffa500", "#40e0d0", "#1e90ff", "#ff6347", "#7b68ee", "#00fa9a", "#ffd700", "#6699FF", "#ff6666", "#3cb371", "#b8860b", "#30e0e0"]
-        }
-        myChart.setOption(option);
+        }).catch(err=>{})
       },
 
-      build_qd_money_time_Analysis(){
+      build_qd_money_time_Analysis(mess,time){
         var v = this
         var myChart = echarts.init(document.getElementById('qd_money_time_Analysis'));
 
         let option = {
           title: {
             show:true,
-            text: '09/09 充值人数、次数统计',
+            text: time?time:v.moment(new Date()).format('MM-DD')  +'充值人数、次数统计',
             x: "left",
             textStyle: {
               fontSize: 14,
@@ -441,7 +337,7 @@
                   formatter: "{c} 元\n30人"
                 }
               },
-              data: [320]
+              data: [mess[1]]
             },
             {
               name: '两次',
@@ -454,7 +350,7 @@
                   formatter: "{c} 元\n30人"
                 }
               },
-              data: [120]
+              data: [mess[2]]
             },
             {
               name: '多次',
@@ -467,13 +363,135 @@
                   formatter: "{c} 元\n30人"
                 }
               },
-              data: [220]
+              data: [mess[3]]
             }
           ]
         };
 
         myChart.setOption(option);
+      },
+
+      get_People_money(T){
+        var v = this
+        this.$http.post("/api/statis/statisCzqd",{time:T?T:''}).then(res=>{
+          console.log('+++++++',res);
+          let people = []
+          let money = []
+          if(res.code == 200){
+            money = [res.result[1].split(',')[0],res.result[2].split(',')[0]]
+            people = [res.result[1].split(',')[1],res.result[2].split(',')[1]]
+            v.buildqd_qd_Analysis(people,money)
+          }
+        }).catch(err=>{})
+      },
+      buildqd_qd_Analysis(people,money,time){
+        var v = this
+        var myChart = echarts.init(document.getElementById('qd_Analysis_lineBox'));
+        let option = {
+          title: {
+            show:true,
+            text: time?time:v.moment(new Date()).format('YYYY-MM-DD')  +'各渠道充值人数、金额统计',
+            x: "left",
+            textStyle: {
+              fontSize: 14,
+              color:"#fff"
+            }
+          },
+          legend: {
+            data:['人数','金额'],
+            x: "right",
+            y: "top"
+          },
+          tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+              type: 'shadow'
+            },
+            position: function (pos, params, el, elRect, size) {
+              var obj = {top: 10};
+              obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 30;
+              return obj;
+            },
+          },
+          grid: {
+            left: '15px',
+            right: '15px',
+            bottom: "10px",
+            top:"30px",
+            containLabel: true
+          },
+          xAxis: [
+            {
+              data: ['银联充值','积分兑换'],
+              axisLabel: {
+                textStyle: {
+                  color: '#fff'
+                }
+              },
+              axisTick: {
+                show: false
+              },
+              axisLine: {
+                show: false
+              }
+            }
+          ],
+          yAxis: [
+            {
+              type: 'value',
+              min: 0,
+              max: 99,
+              axisLine: {
+                show: false
+              },
+              axisTick: {
+                show: false
+              },
+              axisLabel: {
+                formatter: '{value} 人',
+                textStyle: {
+                  color: '#fff'
+                }
+              }
+            },
+            {
+              type: 'value',
+              min: 0,
+              max: 99,
+              axisLine: {
+                show: false
+              },
+              axisTick: {
+                show: false
+              },
+              axisLabel: {
+                formatter: '{value} 元',
+                textStyle: {
+                  color: '#fff'
+                }
+              }
+            }
+          ],
+          series: [
+            {
+              name:'人数',
+              type:'bar',
+              data:people
+                // [35,50]
+            },
+            {
+              name:'金额',
+              type:'bar',
+              data:money
+                // [67,65]
+            }
+          ],
+          color: [ "rgb(136, 173, 218)", "rgb(239, 157, 119)", "rgb(153, 206, 152)", "#cd5c5c", "#ffa500", "#40e0d0", "#1e90ff", "#ff6347", "#7b68ee", "#00fa9a", "#ffd700", "#6699FF", "#ff6666", "#3cb371", "#b8860b", "#30e0e0"]
+        }
+        myChart.setOption(option);
       }
+
+
     }
   }
 </script>

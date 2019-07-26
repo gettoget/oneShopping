@@ -17,24 +17,45 @@
 
   export default {
     name: "index",
-    data(){
+    data() {
       return {
-        value2:[],
+        value2: [],
         dateOptions: {
-          disabledDate (date) {
+          disabledDate(date) {
             return date && date.valueOf() > Date.now();
           }
         },
+        dataX: [],
+        dataV: []
       }
     },
     mounted() {
       this.$nextTick(() => {
-        // this.getData()
-        this.buildEchart()
-        this.buildEchart_line()
+        this.getData()
+        // this.buildEchart()
+        // this.buildEchart_line()
       })
     },
     methods: {
+      getData() {
+        var v = this
+        this.$http.post("/api/statis/statisNewUser").then(res => {
+          if (res.code == 200) {
+            this.dataX = []
+            this.dataV = []
+            res.result.forEach((it, index) => {
+              let item = it.split(',')
+              this.dataX.push(item[0])
+              this.dataV.push(item[1])
+              if (index == res.result.length - 1) {
+                v.buildEchart()
+                v.buildEchart_line()
+              }
+            })
+          }
+
+        })
+      },
       buildEchart() {
         var v = this
         var myChart = echarts.init(document.getElementById('userAnalysis'));
@@ -48,16 +69,18 @@
           grid: {
             left: "40px",
             top: "30px",
-            right: "30px",
-            bottom: "10px"
+            right: "40px",
+            bottom: "60px"
           },
           xAxis: {
-            data: ['07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02'],
+            data: v.dataX,
+              // ['07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02', '07/01', '07/02'],
             axisLabel: {
-              inside: true,
+              inside: false,
               textStyle: {
-                color: '#fff'
-              }
+                color: '#999'
+              },
+              rotate: -40
             },
             axisTick: {
               show: false
@@ -118,7 +141,8 @@
               },
               barGap: '-100%',
               barCategoryGap: '40%',
-              data: [220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 125, 220]
+              data: v.dataV,
+              // data: [220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 125, 220]
             }
           ]
         };
@@ -130,7 +154,7 @@
 
         let option = {
           title: {
-            show:false,
+            show: false,
             text: "用户新增走势",
             subtext: "",
             x: "center"
@@ -142,7 +166,8 @@
             bottom: '20px'
           },
           xAxis: {
-            data: [220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 125, 220],
+            data: v.dataX,
+              // [220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 125, 220],
             axisLabel: {
               textStyle: {
                 color: '#fff'
@@ -175,7 +200,8 @@
               itemStyle: {
                 normal: {color: '#188df0'}
               },
-              data: [220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 125, 220],
+              data: v.dataV,
+                // [220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 125, 220],
               animation: false
             }
           ]
@@ -194,23 +220,25 @@
       position: relative;
     }
   }
-  .userAnalysis_lineBox{
+
+  .userAnalysis_lineBox {
     position: absolute;
     left: 60px;
     top: 20px;
     z-index: 200;
     width: 300px;
     height: 140px;
-    background: rgba(0,0,0,0.4);
+    background: rgba(0, 0, 0, 0.4);
     .ivu-card-body {
       height: 100%;
       padding: 0;
     }
   }
-  .dateoickBox{
+
+  .dateoickBox {
     width: 200px;
     position: absolute;
-    right:45px;
+    right: 45px;
     top: 10px;
     z-index: 200;
   }
