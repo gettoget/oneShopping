@@ -115,7 +115,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         RuntimeCheck.ifBlank(regCode, MessageUtils.get("user.regCodeBlank"));
         RuntimeCheck.ifFalse(StringUtils.equals(regCode, code), MessageUtils.get("user.regCodeError"));
 
-        String imei = getHeader("imei");
+        String imei = getAttributeAsString("imei");
         RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
 
         // 保存用户
@@ -159,7 +159,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         condition.eq(User.InnerColumn.phone, phone);
         List<User> users = findByCondition(condition);
         RuntimeCheck.ifTrue(CollectionUtils.isEmpty(users), MessageUtils.get("user.notregister"));
-        String imei = getHeader("imei");
+        String imei = getAttributeAsString("imei");
         RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
         User user = users.get(0);
         RuntimeCheck.ifFalse(user.getZt().equals("0"), MessageUtils.get("user.isLocked"));
