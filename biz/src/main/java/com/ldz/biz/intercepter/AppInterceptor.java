@@ -7,6 +7,7 @@ import com.ldz.sys.service.GnService;
 import com.ldz.sys.service.YhService;
 import com.ldz.util.commonUtil.JwtUtil;
 import com.ldz.util.spring.SpringContextUtil;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -15,12 +16,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
-
+@Log4j2
 public class AppInterceptor extends HandlerInterceptorAdapter {
 
     private UserService userService;
 
     private StringRedisTemplate redisDao;
+
 
 
     private List<String> whiteList = Arrays.asList("/app/user/login","/app/user/register","/app/user/sendMsg","/app/user/findPwd","/app/user/proeval/newPager");
@@ -36,7 +38,7 @@ public class AppInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
-
+        log.info("接口请求地址 : {}" , request.getRequestURI());
         // 查看请求类型
         String method = request.getMethod();
         if (method.equals("OPTIONS")) {
