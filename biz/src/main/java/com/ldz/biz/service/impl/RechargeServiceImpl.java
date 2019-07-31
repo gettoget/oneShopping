@@ -15,9 +15,11 @@ import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.redis.RedisTemplateUtil;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
@@ -36,6 +38,12 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 	private UserService userService;
 	@Autowired
 	private RedisTemplateUtil redis;
+
+	@Value("${mall_id}")
+	private String mallId;
+
+	@Value("${shared_key}")
+	private String sharedKey;
 
 	@Override
 	protected Mapper<Recharge> getBaseMapper() {
@@ -95,15 +103,14 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 		recharge.setCzqd("1");
 		recharge.setUserId(userId);
 		RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
-		user.setBalance(Integer.parseInt(user.getBalance()) + amount + "");
-		recharge.setCzhjbs(user.getBalance());
+		String balance = Integer.parseInt(user.getBalance()) + amount + "";
+		recharge.setCzhjbs(balance);
 		recharge.setImei(imei);
 		int i = save(recharge);
-		if(i == 1){
-			userService.update(user);
-		}
-
-		return ApiResponse.success(MessageUtils.get("recharge.reSuc"));
+		ApiResponse<String> res = new ApiResponse<>();
+		res.setResult(recharge.getId());
+		res.setMessage(MessageUtils.get("recharge.orderSuc"));
+		return res;
     }
 
 	@Override
@@ -122,6 +129,25 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 			res.setPageNum(page.getPageNum());
 		}
 		return res;
+	}
+
+	@Override
+	public String paySuc(String amount, String trans_id, String words) {
+		Recharge recharge = findById(trans_id);
+		String hex = DigestUtils.sha1Hex(mallId + sharedKey + trans_id + recharge.getAmonut());
+		if (StringUtils.equals(words,hex)) {
+			User user = userService.findById(recharge.getUserId());
+			user.setBalance(recharge.getCzhjbs());
+			userService.update(user);
+			recharge.setCzzt("2");
+			update(recharge);
+			return "SUCCESS";
+		}else{
+			recharge.setCzzt("3");
+			update(recharge);
+			return "WORDS NOT MATCH";
+		}
+
 	}
 
 

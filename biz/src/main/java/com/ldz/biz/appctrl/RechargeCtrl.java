@@ -37,10 +37,12 @@ public class RechargeCtrl  {
      */
     @GetMapping("/newPager")
     public PageResponse<Recharge> gerNewPager(Page<Recharge> page){
-
         return service.getNewPager(page);
 
     }
+
+
+
 
 
 
