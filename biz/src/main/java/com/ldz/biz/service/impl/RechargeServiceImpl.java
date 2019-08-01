@@ -12,11 +12,10 @@ import com.ldz.biz.service.RechargeService;
 import com.ldz.biz.service.UserService;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.sys.base.LimitedCondition;
+import com.ldz.util.bean.AndroidMsgBean;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
-import com.ldz.util.commonUtil.DateUtils;
-import com.ldz.util.commonUtil.HttpUtil;
-import com.ldz.util.commonUtil.MessageUtils;
+import com.ldz.util.commonUtil.*;
 import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.redis.RedisTemplateUtil;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -126,22 +125,10 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 		String data = object.getString("data");
 
 		ApiResponse<String> res = new ApiResponse<>();
-		res.setResult(data);
+		res.setResult(data + "," + recharge.getId());
 		res.setMessage(MessageUtils.get("recharge.orderSuc"));
 		return res;
     }
-
-	public static void main(String[] args) {
-		Map<String,String> paramsMap = new HashMap<>();
-		paramsMap.put("mall_id","cabf5fdd363bbb73209a32d4ce12b65a");
-		paramsMap.put("amount",1+"");
-		paramsMap.put("trans_id","1");
-		paramsMap.put("payment_id","11111029");
-		String words = DigestUtils.sha1Hex("cabf5fdd363bbb73209a32d4ce12b65a" + "t8oO2DMFX8UY" + "1" + "1");
-		paramsMap.put("words",words);
-		String post = HttpUtil.post("https://pay.gokado.id/payment/generate-pay-code", paramsMap);
-		System.out.println(post);
-	}
 
 	@Override
 	public PageResponse<Recharge> getNewPager(Page<Recharge> page) {
@@ -162,20 +149,39 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 	}
 
 	@Override
-	public String paySuc(String amount, String trans_id, String words) {
+	public ApiResponse<String> paySuc(String amount, String trans_id, String words) {
 		Recharge recharge = findById(trans_id);
+		if(recharge == null){
+			return ApiResponse.fail("TRANS_ID IS ERROR");
+		}
+        User user = userService.findById(recharge.getUserId());
 		String hex = DigestUtils.sha1Hex(mallId + sharedKey + trans_id + recharge.getAmonut());
 		if (StringUtils.equals(words,hex)) {
-			User user = userService.findById(recharge.getUserId());
+
 			user.setBalance(recharge.getCzhjbs());
 			userService.update(user);
 			recharge.setCzzt("2");
 			update(recharge);
-			return "SUCCESS";
+            String channelId = (String) redis.boundValueOps(user.getId() + "_channelId").get();
+            if (StringUtils.isNotBlank(channelId)) {
+                AndroidMsgBean msgBean = new AndroidMsgBean();
+                msgBean.setType("7");
+                msgBean.setJson(JsonUtil.toJson(recharge));
+                BaiduPushUtils.pushSingleMsg(channelId,0,JsonUtil.toJson(msgBean),3);
+            }
+
+			return ApiResponse.success("SUCCESS");
 		}else{
 			recharge.setCzzt("3");
 			update(recharge);
-			return "WORDS NOT MATCH";
+            String channelId = (String) redis.boundValueOps(user.getId() + "_channelId").get();
+            if (StringUtils.isNotBlank(channelId)) {
+                AndroidMsgBean msgBean = new AndroidMsgBean();
+                msgBean.setType("7");
+                msgBean.setJson(JsonUtil.toJson(recharge));
+                BaiduPushUtils.pushSingleMsg(channelId,0,JsonUtil.toJson(msgBean),3);
+            }
+			return ApiResponse.fail("WORDS NOT MATCH");
 		}
 
 	}
@@ -194,9 +200,16 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 			return  ApiResponse.success(maps);
     }
 
+	@Override
+	public ApiResponse<String> checkPayment(String id) {
+		RuntimeCheck.ifBlank(id , MessageUtils.get("order.idBlank"));
+		Recharge recharge = findById(id);
+		RuntimeCheck.ifNull(recharge, MessageUtils.get("order.notTrue"));
+		return ApiResponse.success(recharge.getCzzt());
+	}
 
 
-    @Override
+	@Override
 	public void afterPager(PageInfo<Recharge> info){
 		List<Recharge> list = info.getList();
 		if(CollectionUtils.isEmpty(list)){

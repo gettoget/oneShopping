@@ -151,10 +151,10 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 
     @Override
     public ApiResponse<Map<String, Object>> login(String phone, String password) throws Exception {
+        RuntimeCheck.ifBlank(phone, MessageUtils.get("user.phoneblank"));
         RuntimeCheck.ifBlank(password, MessageUtils.get("user.pwdblank"));
         password = checkPer(password);
         RuntimeCheck.ifBlank(password, MessageUtils.get("user.timeError"));
-        RuntimeCheck.ifBlank(phone, MessageUtils.get("user.phoneblank"));
         SimpleCondition condition = new SimpleCondition(User.class);
         condition.eq(User.InnerColumn.phone, phone);
         List<User> users = findByCondition(condition);

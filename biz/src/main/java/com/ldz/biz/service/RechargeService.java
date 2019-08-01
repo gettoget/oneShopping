@@ -19,7 +19,9 @@ public interface RechargeService extends BaseService<Recharge, String> {
 
     PageResponse<Recharge> getNewPager(Page<Recharge> page);
 
-    String paySuc(String amount, String trans_id, String words);
+    ApiResponse<String> paySuc(String amount, String trans_id, String words);
 
     ApiResponse<List<Map>> getPaymentChannel();
+
+    ApiResponse<String> checkPayment(String id);
 }

@@ -50,6 +50,15 @@ public class RechargeCtrl  {
         return service.getPaymentChannel();
     }
 
+    /**
+     * 查询充值订单是否付款成功
+     */
+    @PostMapping("/checkPay")
+    public ApiResponse<String> checkPayment(String id){
+        return service.checkPayment(id);
+    }
+
+
 
 
 

@@ -41,7 +41,6 @@ public class UserCtrl  {
      */
     @RequestMapping(value = "/login",method = {RequestMethod.GET,RequestMethod.POST})
     public ApiResponse<Map<String, Object>> login(String phone, String password) throws Exception {
-        log.info("登录接口: {} , {}" , phone, password);
         return  service.login(phone, password);
     }
 

@@ -1,6 +1,7 @@
 package com.ldz.biz.appctrl;
 
 import com.ldz.biz.service.RechargeService;
+import com.ldz.util.bean.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +19,7 @@ public class PayCtrl {
      * @return
      */
     @PostMapping("/paySuc")
-    public String paySuc(String amount, String trans_id, String words){
+    public ApiResponse<String> paySuc(String amount, String trans_id, String words){
         return service.paySuc(amount,trans_id,words);
     }
 
