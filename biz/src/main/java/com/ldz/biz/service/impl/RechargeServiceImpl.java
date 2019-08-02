@@ -126,6 +126,7 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 
 		ApiResponse<String> res = new ApiResponse<>();
 		res.setResult(data + "," + recharge.getId());
+
 		res.setMessage(MessageUtils.get("recharge.orderSuc"));
 		return res;
     }
@@ -149,20 +150,23 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 	}
 
 	@Override
-	public ApiResponse<String> paySuc(String amount, String trans_id, String words) {
+	public ApiResponse<String> paySuc(String amount, String trans_id, String words, String data) {
 		Recharge recharge = findById(trans_id);
 		if(recharge == null){
 			return ApiResponse.fail("TRANS_ID IS ERROR");
 		}
-        User user = userService.findById(recharge.getUserId());
-		String hex = DigestUtils.sha1Hex(mallId + sharedKey + trans_id + recharge.getAmonut());
+		if(StringUtils.equals(recharge.getCzzt(), "2")){
+			return ApiResponse.success("SUCCESS");
+		}
+		String hex = DigestUtils.sha1Hex(mallId + sharedKey+ amount + trans_id);
 		if (StringUtils.equals(words,hex)) {
 
-			user.setBalance(recharge.getCzhjbs());
-			userService.update(user);
+			userService.saveBalance(recharge.getUserId(), amount.split("\\.")[0]);
 			recharge.setCzzt("2");
+			recharge.setQrsj(DateUtils.getNowTime());
+			recharge.setQrbw(data);
 			update(recharge);
-            String channelId = (String) redis.boundValueOps(user.getId() + "_channelId").get();
+            String channelId = (String) redis.boundValueOps(recharge.getUserId() + "_channelId").get();
             if (StringUtils.isNotBlank(channelId)) {
                 AndroidMsgBean msgBean = new AndroidMsgBean();
                 msgBean.setType("7");
@@ -173,8 +177,10 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 			return ApiResponse.success("SUCCESS");
 		}else{
 			recharge.setCzzt("3");
+			recharge.setQrsj(DateUtils.getNowTime());
+			recharge.setQrbw(data);
 			update(recharge);
-            String channelId = (String) redis.boundValueOps(user.getId() + "_channelId").get();
+            String channelId = (String) redis.boundValueOps(recharge.getUserId() + "_channelId").get();
             if (StringUtils.isNotBlank(channelId)) {
                 AndroidMsgBean msgBean = new AndroidMsgBean();
                 msgBean.setType("7");
@@ -206,6 +212,28 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 		Recharge recharge = findById(id);
 		RuntimeCheck.ifNull(recharge, MessageUtils.get("order.notTrue"));
 		return ApiResponse.success(recharge.getCzzt());
+	}
+
+	@Override
+	public ApiResponse<String> paySucTest(String id) {
+		RuntimeCheck.ifBlank(id, "请上传订单id");
+		Recharge recharge = findById(id);
+		RuntimeCheck.ifNull(recharge, MessageUtils.get("order.notTrue"));
+		if(StringUtils.equals(recharge.getCzzt(),"2")){
+			return ApiResponse.success("SUCCESS");
+		}
+		userService.saveBalance(recharge.getUserId(), recharge.getAmonut().split("\\.")[0]);
+		recharge.setCzzt("2");
+		update(recharge);
+		String channelId = (String) redis.boundValueOps(recharge.getUserId() + "_channelId").get();
+		if (StringUtils.isNotBlank(channelId)) {
+			AndroidMsgBean msgBean = new AndroidMsgBean();
+			msgBean.setType("7");
+			msgBean.setJson(JsonUtil.toJson(recharge));
+			BaiduPushUtils.pushSingleMsg(channelId,0,JsonUtil.toJson(msgBean),3);
+		}
+
+		return ApiResponse.success("SUCCESS");
 	}
 
 

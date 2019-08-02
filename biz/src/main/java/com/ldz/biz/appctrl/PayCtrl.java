@@ -1,9 +1,13 @@
 package com.ldz.biz.appctrl;
 
+import com.alibaba.fastjson.JSON;
+import com.ldz.biz.bean.PaySuc;
 import com.ldz.biz.service.RechargeService;
 import com.ldz.util.bean.ApiResponse;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,9 +22,15 @@ public class PayCtrl {
      * 支付回调接口
      * @return
      */
-    @PostMapping("/paySuc")
-    public ApiResponse<String> paySuc(String amount, String trans_id, String words){
-        return service.paySuc(amount,trans_id,words);
+    @PostMapping(value = "/paySuc")
+    public ApiResponse<String> paySuc( String data){
+        PaySuc suc = JSON.parseObject(data, PaySuc.class);
+        return service.paySuc(suc.getAmount(),suc.getTrans_id(),suc.getWords(),data);
+    }
+
+    @PostMapping("/paySucTest")
+    public ApiResponse<String> paySucTest(String id){
+        return service.paySucTest(id);
     }
 
 }

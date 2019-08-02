@@ -27,6 +27,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -433,6 +434,11 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
         redis.boundValueOps(userId + "_channelId").set(channelId);
         return ApiResponse.success();
+    }
+
+    @Override
+    public void saveBalance(String userId,String amount) {
+        baseMapper.saveBalance(userId,amount);
     }
 
 
