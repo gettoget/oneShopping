@@ -406,18 +406,25 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         });
         List<Order> orders = pageInfo.getList();
         if (CollectionUtils.isNotEmpty(orders)) {
+            Set<String> collect = orders.stream().map(Order::getId).collect(Collectors.toSet());
+            List<OrderList> orderLists = orderListService.findIn(OrderList.InnerColumn.orderId, collect);
+            Map<String, List<OrderList>> listMap = orderLists.stream().collect(Collectors.groupingBy(OrderList::getOrderId));
+            Set<String> set = orderLists.stream().map(OrderList::getUserid).collect(Collectors.toSet());
+            List<User> users = userService.findByIds(set);
+            Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
             for (Order order : orders) {
                 CyyhModel model = new CyyhModel();
-                List<OrderList> lists = orderListService.findEq(OrderList.InnerColumn.orderId, order.getId());
+                List<OrderList> lists = listMap.get(order.getId());
                 if (StringUtils.isNotBlank(order.getUserId())) {
-                    User user = userService.findById(order.getUserId());
-                    model.setHimg(user.gethImg());
-                    model.setUserId(user.getId());
-                    model.setUserName(user.getUserName());
+                    User user = userMap.get(order.getUserId());
+                    if(user != null){
+                        model.setHimg(user.gethImg());
+                        model.setUserId(user.getId());
+                        model.setUserName(user.getUserName());
+                    }
                 }
                 model.setGmfs(lists.size() + "");
                 model.setGmsj(order.getZfsj());
-
                 models.add(model);
             }
         }
