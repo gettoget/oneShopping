@@ -395,16 +395,16 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
     public PageResponse<CyyhModel> getCyyh(int pageNum, int pageSize, String id) {
 
         PageResponse<CyyhModel> response = new PageResponse<>();
-        List<CyyhModel> models = new ArrayList<>();
+//        List<CyyhModel> models = new ArrayList<>();
         // 获取所有购买当前商品的 用户已支付的订单
-        SimpleCondition condition = new SimpleCondition(Order.class);
+        /*SimpleCondition condition = new SimpleCondition(Order.class);
         condition.eq(Order.InnerColumn.proId, id);
         condition.notIn(Order.InnerColumn.ddzt, Arrays.asList("3", "5"));
-        condition.setOrderByClause(" zfsj desc ");
-        PageInfo<Order> pageInfo = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> {
-            orderService.findByCondition(condition);
+        condition.setOrderByClause(" zfsj desc ");*/
+        PageInfo<CyyhModel> pageInfo = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> {
+            orderService.getCyyh(id);
         });
-        List<Order> orders = pageInfo.getList();
+      /*  List<Order> orders = pageInfo.getList();
         if (CollectionUtils.isNotEmpty(orders)) {
             Set<String> collect = orders.stream().map(Order::getId).collect(Collectors.toSet());
             List<OrderList> orderLists = orderListService.findIn(OrderList.InnerColumn.orderId, collect);
@@ -427,13 +427,11 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 model.setGmsj(order.getZfsj());
                 models.add(model);
             }
-        }
+        }*/
         response.setTotal(pageInfo.getTotal());
-        response.setList(models);
+        response.setList(pageInfo.getList());
         response.setPageSize(pageSize);
         response.setPageNum(pageNum);
-
-
         return response;
     }
 

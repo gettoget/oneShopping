@@ -586,5 +586,10 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         baseMapper.insertList(orders);
     }
 
+    @Override
+    public List<CyyhModel> getCyyh(String proId) {
+        return baseMapper.getCyyh(proId);
+    }
+
 
 }

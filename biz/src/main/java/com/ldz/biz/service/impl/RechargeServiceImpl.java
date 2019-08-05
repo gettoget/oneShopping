@@ -49,6 +49,8 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 	@Value("${shared_key}")
 	private String sharedKey;
 
+	@Value("${ratio}")
+	private int ratio;
 	@Override
 	protected Mapper<Recharge> getBaseMapper() {
 		return baseMapper;
@@ -94,7 +96,7 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 		if(StringUtils.isBlank(user.getBalance())){
 			user.setBalance("0");
 		}
-
+		amount = amount / 100;
 		Recharge recharge = new Recharge();
 		recharge.setId(genId());
 		recharge.setAmonut(amount+"");
