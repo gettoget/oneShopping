@@ -66,7 +66,7 @@ public abstract class BaseController<T, PK extends Serializable> {
      * @param entity
      * @return
      */
-    @RequestMapping(value="/query", method={RequestMethod.GET})
+    @RequestMapping(value="/query", method={RequestMethod.GET,RequestMethod.POST})
 	public ApiResponse<List<T>> query(T entity){
 		return ApiResponse.success(getBaseService().query(entity));
 	}

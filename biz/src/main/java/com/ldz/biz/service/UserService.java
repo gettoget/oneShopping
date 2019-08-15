@@ -117,4 +117,6 @@ public interface UserService extends BaseService<User, String> {
     ApiResponse<String> updateEntity(User entity);
 
     ApiResponse<String> saveChannelId(String channelId);
+
+    void saveBalance(String userId, String amount);
 }

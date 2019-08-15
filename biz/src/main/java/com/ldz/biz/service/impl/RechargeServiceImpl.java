@@ -1,5 +1,8 @@
 package com.ldz.biz.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import com.ldz.biz.mapper.RechargeMapper;
@@ -9,18 +12,21 @@ import com.ldz.biz.service.RechargeService;
 import com.ldz.biz.service.UserService;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.sys.base.LimitedCondition;
+import com.ldz.util.bean.AndroidMsgBean;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
-import com.ldz.util.commonUtil.DateUtils;
-import com.ldz.util.commonUtil.MessageUtils;
+import com.ldz.util.commonUtil.*;
 import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.redis.RedisTemplateUtil;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +43,14 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 	@Autowired
 	private RedisTemplateUtil redis;
 
+	@Value("${mall_id}")
+	private String mallId;
+
+	@Value("${shared_key}")
+	private String sharedKey;
+
+	@Value("${ratio}")
+	private int ratio;
 	@Override
 	protected Mapper<Recharge> getBaseMapper() {
 		return baseMapper;
@@ -61,6 +75,8 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
     @Override
     public ApiResponse<String> saveRecharge(int amount) {
 
+		String paymentId = getRequestParamterAsString("paymentId");
+		RuntimeCheck.ifBlank(paymentId, MessageUtils.get("order.paymentError"));
 		RuntimeCheck.ifTrue( amount <= 0 , MessageUtils.get("recharge.amountLessZero"));
 
 		String userId = (String) getAttribute("userId");
@@ -77,14 +93,10 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 			redis.boundValueOps(imei + "recharge").set(1, 10, TimeUnit.SECONDS);
 		}
 
-
-		// todo 充值接口调用
-
-
 		if(StringUtils.isBlank(user.getBalance())){
 			user.setBalance("0");
 		}
-
+		amount = amount / 100;
 		Recharge recharge = new Recharge();
 		recharge.setId(genId());
 		recharge.setAmonut(amount+"");
@@ -95,15 +107,30 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 		recharge.setCzqd("1");
 		recharge.setUserId(userId);
 		RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
-		user.setBalance(Integer.parseInt(user.getBalance()) + amount + "");
-		recharge.setCzhjbs(user.getBalance());
+		String balance = Integer.parseInt(user.getBalance()) + amount + "";
+		recharge.setCzhjbs(balance);
 		recharge.setImei(imei);
 		int i = save(recharge);
-		if(i == 1){
-			userService.update(user);
-		}
 
-		return ApiResponse.success(MessageUtils.get("recharge.reSuc"));
+		Map<String,String> paramsMap = new HashMap<>();
+		paramsMap.put("mall_id",mallId);
+		paramsMap.put("amount",amount+"");
+		paramsMap.put("trans_id",recharge.getId());
+		paramsMap.put("payment_id",paymentId);
+		String words = DigestUtils.sha1Hex(mallId + sharedKey + amount + recharge.getId());
+		paramsMap.put("words",words);
+		String post = HttpUtil.post("https://pay.gokado.id/payment/generate-pay-code", paramsMap);
+		JSONObject object = JSON.parseObject(post);
+		Integer code = object.getInteger("code");
+		Integer status = object.getInteger("status");
+		RuntimeCheck.ifFalse(code == 0 && status == 200, MessageUtils.get("order.error"));
+		String data = object.getString("data");
+
+		ApiResponse<String> res = new ApiResponse<>();
+		res.setResult(data + "," + recharge.getId());
+
+		res.setMessage(MessageUtils.get("recharge.orderSuc"));
+		return res;
     }
 
 	@Override
@@ -122,6 +149,93 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 			res.setPageNum(page.getPageNum());
 		}
 		return res;
+	}
+
+	@Override
+	public ApiResponse<String> paySuc(String amount, String trans_id, String words, String data) {
+		Recharge recharge = findById(trans_id);
+		if(recharge == null){
+			return ApiResponse.fail("TRANS_ID IS ERROR");
+		}
+		if(StringUtils.equals(recharge.getCzzt(), "2")){
+			return ApiResponse.success("SUCCESS");
+		}
+		String hex = DigestUtils.sha1Hex(mallId + sharedKey+ amount + trans_id);
+		if (StringUtils.equals(words,hex)) {
+
+			userService.saveBalance(recharge.getUserId(), amount.split("\\.")[0]);
+			recharge.setCzzt("2");
+			recharge.setQrsj(DateUtils.getNowTime());
+			recharge.setQrbw(data);
+			update(recharge);
+            String channelId = (String) redis.boundValueOps(recharge.getUserId() + "_channelId").get();
+            if (StringUtils.isNotBlank(channelId)) {
+                AndroidMsgBean msgBean = new AndroidMsgBean();
+                msgBean.setType("7");
+                msgBean.setJson(JsonUtil.toJson(recharge));
+                BaiduPushUtils.pushSingleMsg(channelId,0,JsonUtil.toJson(msgBean),3);
+            }
+
+			return ApiResponse.success("SUCCESS");
+		}else{
+			recharge.setCzzt("3");
+			recharge.setQrsj(DateUtils.getNowTime());
+			recharge.setQrbw(data);
+			update(recharge);
+            String channelId = (String) redis.boundValueOps(recharge.getUserId() + "_channelId").get();
+            if (StringUtils.isNotBlank(channelId)) {
+                AndroidMsgBean msgBean = new AndroidMsgBean();
+                msgBean.setType("7");
+                msgBean.setJson(JsonUtil.toJson(recharge));
+                BaiduPushUtils.pushSingleMsg(channelId,0,JsonUtil.toJson(msgBean),3);
+            }
+			return ApiResponse.fail("WORDS NOT MATCH");
+		}
+
+	}
+
+    @Override
+    public ApiResponse<List<Map>> getPaymentChannel() {
+
+		String s = HttpUtil.get("https://pay.gokado.id/payment/get-pay-list");
+		JSONObject object = JSON.parseObject(s);
+		Integer code = object.getInteger("code");
+		Integer status = object.getInteger("status");
+		RuntimeCheck.ifFalse(code == 0 && status == 200, MessageUtils.get("order.payChannelError"));
+
+			JSONArray data = object.getJSONArray("data");
+			List<Map> maps = data.toJavaList(Map.class);
+			return  ApiResponse.success(maps);
+    }
+
+	@Override
+	public ApiResponse<String> checkPayment(String id) {
+		RuntimeCheck.ifBlank(id , MessageUtils.get("order.idBlank"));
+		Recharge recharge = findById(id);
+		RuntimeCheck.ifNull(recharge, MessageUtils.get("order.notTrue"));
+		return ApiResponse.success(recharge.getCzzt());
+	}
+
+	@Override
+	public ApiResponse<String> paySucTest(String id) {
+		RuntimeCheck.ifBlank(id, "请上传订单id");
+		Recharge recharge = findById(id);
+		RuntimeCheck.ifNull(recharge, MessageUtils.get("order.notTrue"));
+		if(StringUtils.equals(recharge.getCzzt(),"2")){
+			return ApiResponse.success("SUCCESS");
+		}
+		userService.saveBalance(recharge.getUserId(), recharge.getAmonut().split("\\.")[0]);
+		recharge.setCzzt("2");
+		update(recharge);
+		String channelId = (String) redis.boundValueOps(recharge.getUserId() + "_channelId").get();
+		if (StringUtils.isNotBlank(channelId)) {
+			AndroidMsgBean msgBean = new AndroidMsgBean();
+			msgBean.setType("7");
+			msgBean.setJson(JsonUtil.toJson(recharge));
+			BaiduPushUtils.pushSingleMsg(channelId,0,JsonUtil.toJson(msgBean),3);
+		}
+
+		return ApiResponse.success("SUCCESS");
 	}
 
 

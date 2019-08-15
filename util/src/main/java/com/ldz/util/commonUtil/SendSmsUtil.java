@@ -159,7 +159,7 @@ public class SendSmsUtil {
 
     }*/
 
-    public static String sendMSG(String phone, String type)  {
+    public static String sendMSG(String phone, String content)  {
         String url = "http://cs.kmindo.com:9980";
         String account = "GoSaku";
         String password = DigestUtils.md5Hex("GoSaku6057");
@@ -179,8 +179,8 @@ public class SendSmsUtil {
         JSONObject object = new JSONObject();
         object.put("token",token);
         object.put("sendType",1);
-        object.put("msisdn","6282121224879");
-        object.put("message","测试");
+        object.put("msisdn",phone);
+        object.put("message",content);
         String post = "";
         try {
              post = HttpUtil.postJson(smsUrl, postHeader,JSON.toJSONString(object));
@@ -219,7 +219,7 @@ public class SendSmsUtil {
         params.put("token", token);
         params.put("from","AFT");
         params.put("to",phone);
-        params.put("message",smsCode);
+        params.put("message",smsCode + " is your code[Go-Saku]");
 
         String post = "";
         try {

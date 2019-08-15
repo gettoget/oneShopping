@@ -5,6 +5,7 @@ import com.ldz.biz.model.User;
 import com.ldz.biz.model.UserInModel;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import tk.mybatis.mapper.common.Mapper;
 
 import java.util.List;
@@ -32,5 +33,8 @@ public interface UserMapper extends Mapper<User> {
 
     @Select(" SELECT SUBSTR(cjsj , 1, 10) cjsj , count(1) bz1  from user where SUBSTR(cjsj , 1, 10) >= #{start} and SUBSTR(cjsj , 1, 10) <= #{end} GROUP BY SUBSTR(cjsj , 1, 10) ")
     List<User> countUsers(@Param("start") String start, @Param("end") String end);
+
+    @Update("  update user set balance = (cast(balance as signed ) + cast(#{amount} as signed)) where id = #{userId}")
+    void saveBalance(@Param("userId") String userId, @Param("amount") String amount);
 
 }

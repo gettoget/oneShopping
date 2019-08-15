@@ -1,6 +1,7 @@
 package com.ldz.biz.service;
 
 import com.github.pagehelper.Page;
+import com.ldz.biz.model.CyyhModel;
 import com.ldz.biz.model.Order;
 import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
@@ -47,4 +48,7 @@ public interface OrderService extends BaseService<Order, String> {
      * @param orders
      */
     void saveList(List<Order>orders);
+
+    List<CyyhModel> getCyyh(String proId);
+
 }

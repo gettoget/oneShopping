@@ -27,6 +27,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -115,7 +116,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         RuntimeCheck.ifBlank(regCode, MessageUtils.get("user.regCodeBlank"));
         RuntimeCheck.ifFalse(StringUtils.equals(regCode, code), MessageUtils.get("user.regCodeError"));
 
-        String imei = getHeader("imei");
+        String imei = getAttributeAsString("imei");
         RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
 
         // 保存用户
@@ -151,15 +152,15 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 
     @Override
     public ApiResponse<Map<String, Object>> login(String phone, String password) throws Exception {
+        RuntimeCheck.ifBlank(phone, MessageUtils.get("user.phoneblank"));
         RuntimeCheck.ifBlank(password, MessageUtils.get("user.pwdblank"));
         password = checkPer(password);
         RuntimeCheck.ifBlank(password, MessageUtils.get("user.timeError"));
-        RuntimeCheck.ifBlank(phone, MessageUtils.get("user.phoneblank"));
         SimpleCondition condition = new SimpleCondition(User.class);
         condition.eq(User.InnerColumn.phone, phone);
         List<User> users = findByCondition(condition);
         RuntimeCheck.ifTrue(CollectionUtils.isEmpty(users), MessageUtils.get("user.notregister"));
-        String imei = getHeader("imei");
+        String imei = getAttributeAsString("imei");
         RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
         User user = users.get(0);
         RuntimeCheck.ifFalse(user.getZt().equals("0"), MessageUtils.get("user.isLocked"));
@@ -433,6 +434,11 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
         redis.boundValueOps(userId + "_channelId").set(channelId);
         return ApiResponse.success();
+    }
+
+    @Override
+    public void saveBalance(String userId,String amount) {
+        baseMapper.saveBalance(userId,amount);
     }
 
 
