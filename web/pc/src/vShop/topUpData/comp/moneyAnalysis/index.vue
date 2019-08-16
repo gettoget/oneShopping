@@ -158,7 +158,6 @@
             })
           }
 
-          console.log('6666666',res);
         }).catch(err=>{})
       },
       buildMoneyAnalysis(dataX,YL,JF,time){
@@ -247,6 +246,8 @@
         var v = this
         this.$http.post("/api/statis/statisCzjb",{time:T?T:''}).then(res=>{
           if(res.code == 200){
+            console.log('tttttttttt',res.result);
+
             v.build_qd_money_time_Analysis(res.result,T)
           }
 
@@ -334,10 +335,12 @@
                 normal: {
                   show: true,
                   position: 'insideRight',
-                  formatter: "{c} 元\n30人"
+                  formatter: function () {
+                    return mess[0].split(',')[0]+"元\n"+mess[0].split(',')[1]+"人"
+                  }
                 }
               },
-              data: [mess[1]]
+              data: [mess[0].split(',')[0]]
             },
             {
               name: '两次',
@@ -347,10 +350,12 @@
                 normal: {
                   show: true,
                   position: 'insideRight',
-                  formatter: "{c} 元\n30人"
+                  formatter: function () {
+                    return mess[1].split(',')[0]+"元\n"+mess[1].split(',')[1]+"人"
+                  }
                 }
               },
-              data: [mess[2]]
+              data: [mess[1].split(',')[0]]
             },
             {
               name: '多次',
@@ -360,10 +365,12 @@
                 normal: {
                   show: true,
                   position: 'insideRight',
-                  formatter: "{c} 元\n30人"
+                  formatter: function () {
+                    return mess[2].split(',')[0]+"元\n"+mess[2].split(',')[1]+"人"
+                  }
                 }
               },
-              data: [mess[3]]
+              data: [mess[2].split(',')[0]]
             }
           ]
         };
@@ -374,7 +381,6 @@
       get_People_money(T){
         var v = this
         this.$http.post("/api/statis/statisCzqd",{time:T?T:''}).then(res=>{
-          console.log('+++++++',res);
           let people = []
           let money = []
           if(res.code == 200){
