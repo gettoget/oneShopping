@@ -18,6 +18,7 @@ import com.ldz.util.bean.SimpleCondition;
 import com.ldz.util.commonUtil.*;
 import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.redis.RedisTemplateUtil;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
  * @author slu
  */
 @Service
+@Log4j2
 public class UserServiceImpl extends BaseServiceImpl<User, String> implements UserService {
 
 
@@ -214,6 +216,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 
     @Override
     public ApiResponse<UserModel> editUserInfo(User user) {
+        log.info(" user ->  {} " , JSON.toJSON(user));
         ApiResponse<UserModel> res = new ApiResponse<>();
         String userId = getAttributeAsString("userId");
         User u = findById(userId);
