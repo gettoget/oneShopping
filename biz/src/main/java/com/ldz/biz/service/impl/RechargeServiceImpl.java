@@ -18,6 +18,7 @@ import com.ldz.util.bean.PageResponse;
 import com.ldz.util.commonUtil.*;
 import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.redis.RedisTemplateUtil;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
+@Log4j2
 public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> implements RechargeService {
 
 	@Autowired
@@ -76,9 +78,10 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
     public ApiResponse<String> saveRecharge(int amount) {
 
 		String paymentId = getRequestParamterAsString("paymentId");
+		log.info("请求参数 : {} , {}" , amount , paymentId);
 		RuntimeCheck.ifBlank(paymentId, MessageUtils.get("order.paymentError"));
 		RuntimeCheck.ifTrue( amount <= 0 , MessageUtils.get("recharge.amountLessZero"));
-
+		int payAmount = amount;
 		String userId = (String) getAttribute("userId");
 		RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
 		User user = userService.findById(userId);
@@ -96,7 +99,7 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 		if(StringUtils.isBlank(user.getBalance())){
 			user.setBalance("0");
 		}
-		amount = amount / 100;
+		amount = amount / ratio;
 		Recharge recharge = new Recharge();
 		recharge.setId(genId());
 		recharge.setAmonut(amount+"");
@@ -114,11 +117,12 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 
 		Map<String,String> paramsMap = new HashMap<>();
 		paramsMap.put("mall_id",mallId);
-		paramsMap.put("amount",amount+"");
+		paramsMap.put("amount",payAmount+"");
 		paramsMap.put("trans_id",recharge.getId());
 		paramsMap.put("payment_id",paymentId);
-		String words = DigestUtils.sha1Hex(mallId + sharedKey + amount + recharge.getId());
+		String words = DigestUtils.sha1Hex(mallId + sharedKey + payAmount + recharge.getId());
 		paramsMap.put("words",words);
+		log.info(" 支付请求参数 : {}" , JSON.toJSON(paramsMap));
 		String post = HttpUtil.post("https://pay.gokado.id/payment/generate-pay-code", paramsMap);
 		JSONObject object = JSON.parseObject(post);
 		Integer code = object.getInteger("code");
@@ -142,6 +146,7 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 			RuntimeCheck.ifNull(user,MessageUtils.get("user.null"));
 			LimitedCondition condition = getQueryCondition();
 			condition.eq(Recharge.InnerColumn.userId, userId);
+			condition.eq(Recharge.InnerColumn.czzt, "2");
 			PageInfo<Recharge> info = findPage(page, condition);
 			res.setTotal(info.getTotal());
 			res.setList(info.getList());
@@ -160,13 +165,16 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 		if(StringUtils.equals(recharge.getCzzt(), "2")){
 			return ApiResponse.success("SUCCESS");
 		}
+
 		String hex = DigestUtils.sha1Hex(mallId + sharedKey+ amount + trans_id);
+		recharge.setQrsj(DateUtils.getNowTime());
+		recharge.setQrbw(data);
 		if (StringUtils.equals(words,hex)) {
 
-			userService.saveBalance(recharge.getUserId(), amount.split("\\.")[0]);
+			userService.saveBalance(recharge.getUserId(), Integer.parseInt(amount.split("\\.")[0])/ratio + "" );
 			recharge.setCzzt("2");
-			recharge.setQrsj(DateUtils.getNowTime());
-			recharge.setQrbw(data);
+
+
 			update(recharge);
             String channelId = (String) redis.boundValueOps(recharge.getUserId() + "_channelId").get();
             if (StringUtils.isNotBlank(channelId)) {
@@ -179,8 +187,6 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 			return ApiResponse.success("SUCCESS");
 		}else{
 			recharge.setCzzt("3");
-			recharge.setQrsj(DateUtils.getNowTime());
-			recharge.setQrbw(data);
 			update(recharge);
             String channelId = (String) redis.boundValueOps(recharge.getUserId() + "_channelId").get();
             if (StringUtils.isNotBlank(channelId)) {
@@ -224,7 +230,7 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 		if(StringUtils.equals(recharge.getCzzt(),"2")){
 			return ApiResponse.success("SUCCESS");
 		}
-		userService.saveBalance(recharge.getUserId(), recharge.getAmonut().split("\\.")[0]);
+		userService.saveBalance(recharge.getUserId(), Integer.parseInt(recharge.getAmonut().split("\\.")[0])/ratio + "");
 		recharge.setCzzt("2");
 		update(recharge);
 		String channelId = (String) redis.boundValueOps(recharge.getUserId() + "_channelId").get();

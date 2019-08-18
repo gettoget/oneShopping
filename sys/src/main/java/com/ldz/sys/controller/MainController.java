@@ -19,7 +19,9 @@ import com.ldz.util.commonUtil.Des;
 import com.ldz.util.commonUtil.FileUtil;
 import com.ldz.util.commonUtil.JwtUtil;
 import com.ldz.util.exception.RuntimeCheck;
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +35,7 @@ import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -242,14 +245,11 @@ public class MainController {
         fileName = uuid.toString().replaceAll("-", "") + suffix;
         String filePath = staticPath + targetPath;
         String path = targetPath + fileName;
-        if (StringUtils.indexOf(targetPath, "car") > -1) {
-            filePath = carStaticPath + targetPath + DateUtils.getDateStr(new Date(), "yyyy-MM-dd") + "/";
-            path = targetPath + DateUtils.getDateStr(new Date(), "yyyy-MM-dd") + "/" + fileName;
-        }
         try {
+//            FileUtils.copyInputStreamToFile(file.getInputStream(),  new File("D:/static/common/test/test.png"));
             FileUtil.uploadFile(file.getBytes(), filePath, fileName);
         } catch (Exception e) {
-            e.printStackTrace();
+            return ApiResponse.fail("文件上传失败");
         }
         return ApiResponse.success(path);
     }
