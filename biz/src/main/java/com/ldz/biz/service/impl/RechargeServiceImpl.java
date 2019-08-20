@@ -158,11 +158,18 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 
 	@Override
 	public ApiResponse<String> paySuc(String amount, String trans_id, String words, String data) {
+		RuntimeCheck.ifBlank(amount, " AMOUNT IS NULL");
+		RuntimeCheck.ifBlank(trans_id, "TRAN_ID IS NULL");
+		RuntimeCheck.ifBlank(words, "WORDS IS NULL");
+		RuntimeCheck.ifBlank(data, "DATA IS NULL");
+		log.info("支付回调接口: {} , {} , {} , {}", amount, trans_id , words, data);
 		Recharge recharge = findById(trans_id);
 		if(recharge == null){
+			log.info(" 订单id 异常 ,  {} " , trans_id );
 			return ApiResponse.fail("TRANS_ID IS ERROR");
 		}
 		if(StringUtils.equals(recharge.getCzzt(), "2")){
+			log.info("订单已经支付成功");
 			return ApiResponse.success("SUCCESS");
 		}
 

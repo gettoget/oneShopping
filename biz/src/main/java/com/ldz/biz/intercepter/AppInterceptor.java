@@ -45,6 +45,9 @@ public class AppInterceptor extends HandlerInterceptorAdapter {
             // 如果收到的是跨域预请求消息，直接响应，返回true，以便后续跨域请求成功
             return true;
         }
+        if(StringUtils.startsWith(request.getRequestURI(),"/api/app/pay")){
+            return true;
+        }
         String userId = request.getHeader("userId");
         if (userId == null) {
             userId = request.getParameter("userId");

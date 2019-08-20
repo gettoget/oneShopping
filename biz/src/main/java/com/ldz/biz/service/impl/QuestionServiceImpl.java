@@ -1,6 +1,7 @@
 package com.ldz.biz.service.impl;
 
 import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.ldz.biz.mapper.QueAnsMapper;
 import com.ldz.biz.mapper.QuestionMapper;
@@ -120,8 +121,38 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
         msgBean.setType("6");
         msgBean.setJson(JsonUtil.toJson(que));
         String channelId = (String) redis.boundValueOps(question.getUserId() + "_channelId").get();
-        BaiduPushUtils.pushSingleMsg(channelId,0,JsonUtil.toJson(msgBean),3);
+        if (StringUtils.isNotBlank(channelId)) {
+            BaiduPushUtils.pushSingleMsg(channelId,0,JsonUtil.toJson(msgBean),3);
+        }
         return ApiResponse.success();
+    }
+
+    @Override
+    public ApiResponse<String> getProGroup(int pageNum, int pageSize, String name) {
+        if (StringUtils.isBlank(name)){
+            name = null;
+        }
+        String finalName = name;
+        PageInfo<Question> info=
+                PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> baseMapper.getPeoGroup(finalName));
+
+        ApiResponse<String> res = new ApiResponse<>();
+        res.setPage(info);
+        return res;
+    }
+
+    @Override
+    public ApiResponse<String> getOneMess(int pageNum, int pageSize, String userId) {
+        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.idIsnull"));
+        PageInfo<Question>  info =
+                PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> findEq(Question.InnerColumn.userId,
+                        userId));
+        ApiResponse<String> res = new ApiResponse<>();
+        if(CollectionUtils.isNotEmpty(info.getList())){
+            info.getList().sort(Comparator.comparing(Question::getCjsj).reversed());
+        }
+        res.setPage(info);
+        return res;
     }
 
     @Override

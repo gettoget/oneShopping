@@ -14,4 +14,8 @@ public interface QuestionService  extends BaseService<Question,String> {
     ApiResponse<String> delete(String id);
 
     ApiResponse<String> updateEntity(Question entity);
+
+    ApiResponse<String> getProGroup(int pageNum, int pageSize, String name);
+
+    ApiResponse<String> getOneMess(int pageNum, int pageSize, String userId);
 }
