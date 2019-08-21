@@ -1,6 +1,7 @@
 package com.ldz.biz.service.impl;
 
 import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.ldz.biz.mapper.QueAnsMapper;
 import com.ldz.biz.mapper.QuestionMapper;
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -120,8 +122,56 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
         msgBean.setType("6");
         msgBean.setJson(JsonUtil.toJson(que));
         String channelId = (String) redis.boundValueOps(question.getUserId() + "_channelId").get();
-        BaiduPushUtils.pushSingleMsg(channelId,0,JsonUtil.toJson(msgBean),3);
+        if (StringUtils.isNotBlank(channelId)) {
+            BaiduPushUtils.pushSingleMsg(channelId,0,JsonUtil.toJson(msgBean),3);
+        }
         return ApiResponse.success();
+    }
+
+    public static void main(String[] args) {
+        AndroidMsgBean bean = new AndroidMsgBean();
+        bean.setType("6");
+        Question question = new Question();
+        question.setCjsj(DateUtils.getNowTime());
+        question.setContent("回复内容");
+        question.setId("1");
+        question.setType("2");
+        question.setUserId("568459971893657600");
+        bean.setJson(JsonUtil.toJson(question));
+        System.out.println(JsonUtil.toJson(bean));
+    }
+
+
+
+    @Override
+    public ApiResponse<String> getProGroup(int pageNum, int pageSize, String name) {
+        if (StringUtils.isBlank(name)){
+            name = null;
+        }
+        String finalName = name;
+        PageInfo<Question> info=
+                PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> baseMapper.getPeoGroup(finalName));
+
+        ApiResponse<String> res = new ApiResponse<>();
+        res.setPage(info);
+        return res;
+    }
+
+    @Override
+    public ApiResponse<String> getOneMess(int pageNum, int pageSize, String userId) {
+        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.idIsnull"));
+        SimpleCondition condition = new SimpleCondition(Question.class);
+        condition.eq(Question.InnerColumn.userId, userId);
+        condition.setOrderByClause(" cjsj desc");
+        PageInfo<Question>  info =
+                PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> findEq(Question.InnerColumn.userId,
+                        userId));
+        ApiResponse<String> res = new ApiResponse<>();
+        if(CollectionUtils.isNotEmpty(info.getList())){
+            info.getList().sort(Comparator.comparing(Question::getCjsj).reversed());
+        }
+        res.setPage(info);
+        return res;
     }
 
     @Override

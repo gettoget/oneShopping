@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.ldz.biz.bean.PaySuc;
 import com.ldz.biz.service.RechargeService;
 import com.ldz.util.bean.ApiResponse;
+import com.ldz.util.exception.RuntimeCheck;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +25,7 @@ public class PayCtrl {
      */
     @PostMapping(value = "/paySuc")
     public ApiResponse<String> paySuc( String data){
+        RuntimeCheck.ifBlank(data, "DATA IS NULL");
         PaySuc suc = JSON.parseObject(data, PaySuc.class);
         return service.paySuc(suc.getAmount(),suc.getTrans_id(),suc.getWords(),data);
     }

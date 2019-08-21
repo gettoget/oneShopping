@@ -25,7 +25,7 @@ public class AppInterceptor extends HandlerInterceptorAdapter {
 
 
 
-    private List<String> whiteList = Arrays.asList("/app/user/login","/app/user/register","/app/user/sendMsg","/app/user/findPwd","/app/user/proeval/newPager");
+    private List<String> whiteList = Arrays.asList("/api/app/user/login","/api/app/user/register","/api/app/user/sendMsg","/api/app/user/findPwd","/api/app/user/proeval/newPager");
 
     public AppInterceptor() {
     }
@@ -45,6 +45,9 @@ public class AppInterceptor extends HandlerInterceptorAdapter {
             // 如果收到的是跨域预请求消息，直接响应，返回true，以便后续跨域请求成功
             return true;
         }
+        if(StringUtils.startsWith(request.getRequestURI(),"/api/app/pay")){
+            return true;
+        }
         String userId = request.getHeader("userId");
         if (userId == null) {
             userId = request.getParameter("userId");
@@ -58,12 +61,18 @@ public class AppInterceptor extends HandlerInterceptorAdapter {
         if (StringUtils.isBlank(imei)) {
             imei = request.getParameter("imei");
         }
-        if (StringUtils.isBlank(imei)) {
+        /*if (StringUtils.isBlank(imei)) {
             String host = request.getRemoteAddr();
             imei = host.replaceAll("\\.","");
+        }*/
+        if (StringUtils.isBlank(imei)){
+            imei = "no imei";
         }
         String requestURI = request.getRequestURI();
-        if(StringUtils.startsWith(requestURI,"/app/guest") || whiteList.contains(requestURI)){
+        log.info(" userId ------------> " + userId);
+        log.info("token -------------->" + token);
+        log.info("imei -----------------> " + imei);
+        if(StringUtils.startsWith(requestURI,"/api/app/guest") || whiteList.contains(requestURI)){
             if(StringUtils.isBlank(imei)){
                 request.getRequestDispatcher("/authFiled").forward(request, response);
                 return false;

@@ -14,10 +14,7 @@ import com.ldz.sys.model.SysZdxm;
 import com.ldz.sys.service.*;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.SimpleCondition;
-import com.ldz.util.commonUtil.DateUtils;
-import com.ldz.util.commonUtil.Des;
-import com.ldz.util.commonUtil.FileUtil;
-import com.ldz.util.commonUtil.JwtUtil;
+import com.ldz.util.commonUtil.*;
 import com.ldz.util.exception.RuntimeCheck;
 import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
@@ -92,22 +89,22 @@ public class MainController {
      */
     @PostMapping(value = "/login")
     public ApiResponse<Map<String, Object>> login(UserPassCredential userCred) {
-        RuntimeCheck.ifTrue((StringUtils.isEmpty(userCred.getUsername()) || StringUtils.isEmpty(userCred.getPassword())), "请提交登陆用户信息！");
+        RuntimeCheck.ifTrue((StringUtils.isEmpty(userCred.getUsername()) || StringUtils.isEmpty(userCred.getPassword())), "Nomor rekening atau password tidak bisa kosong");
         //加密密码
         try {
             userCred.setPassword(Des.encrypt(userCred.getPassword()));
         } catch (Exception e1) {
-            throw new RuntimeException("密码加密异常", e1);
+            throw new RuntimeException(" Password salah.", e1);
         }
 
         SimpleCondition condition = new SimpleCondition(SysYh.class);
         condition.eq(SysYh.InnerColumn.zh.name(), userCred.getUsername());
         condition.eq(SysYh.InnerColumn.mm.name(), userCred.getPassword());
         List<SysYh> existUser = this.userService.findByCondition(condition);
-        RuntimeCheck.ifTrue(existUser == null || existUser.size() == 0, "用户名或密码不正确！");
+        RuntimeCheck.ifTrue(existUser == null || existUser.size() == 0, "Nama pengguna atau kata sandi salah");
 
         SysYh user = existUser.get(0);
-        RuntimeCheck.ifTrue(!"01".equals(user.getZt()), "用户已禁用！");
+        RuntimeCheck.ifTrue(!"01".equals(user.getZt()), "Pengguna dinonaktifkan！");
 
 
         /*// 验证图片验证码
@@ -149,7 +146,7 @@ public class MainController {
             List<Menu> menuTree = gnService.getMenuTree(user);
             if (menuTree.size() == 0) {
                 result.setCode(ApiResponse.FAILED);
-                result.setMessage("您的账号暂未分配权限，请联系机构管理员");
+                result.setMessage("Akun anda saat ini belum di transfer. Hubungi administrator agensi");
                 return result;
             }
             rMap.put("menuTree", menuTree);
@@ -161,7 +158,7 @@ public class MainController {
             result.setResult(rMap);
         } catch (Exception e) {
             result.setCode(ApiResponse.FAILED);
-            result.setMessage("用户登陆失败，请重试！");
+            result.setMessage("Pendaratan pengguna gagal, silakan coba lagi！");
             return result;
         }
         return result;
@@ -249,7 +246,7 @@ public class MainController {
 //            FileUtils.copyInputStreamToFile(file.getInputStream(),  new File("D:/static/common/test/test.png"));
             FileUtil.uploadFile(file.getBytes(), filePath, fileName);
         } catch (Exception e) {
-            return ApiResponse.fail("文件上传失败");
+            return ApiResponse.fail("Upload berkas gagal");
         }
         return ApiResponse.success(path);
     }

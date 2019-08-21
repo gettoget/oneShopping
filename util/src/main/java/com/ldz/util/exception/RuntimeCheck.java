@@ -1,5 +1,6 @@
 package com.ldz.util.exception;
 
+import com.ldz.util.commonUtil.MessageUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Collection;
@@ -39,7 +40,7 @@ public class RuntimeCheck {
     }
     public static void authCheck(boolean express){
         if (express){
-            throw new AuthFailedException("授权认证失败");
+            throw new AuthFailedException(MessageUtils.get("message.authFailed"));
         }
     }
 }
