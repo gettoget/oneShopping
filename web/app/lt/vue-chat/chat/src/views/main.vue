@@ -20,7 +20,7 @@
         </div>
         <div class="xw-header-info">
           <p class="animated bounceInLeft">
-            GO-SAKU产品，集成了电话呼叫中心、IM在线客服、移动在线客服、微信、微博、移动APP SDK、邮件等全客服渠道，用工单系统承载售后服务，配合帮助中心、智能机器人等自助服务。
+            GO-SAKU
           </p>
         </div>
       </div>
@@ -64,7 +64,7 @@
     <div class="xw-footer-wrap" @touchstart="toShowMaskInfo=false">
       <div class="xw-footer-content">
         <div class="xw-vmodel-wrap">
-          <textarea class="xw-content-textarea" placeholder="请输入您的问题" v-model="content" @focus="onFocusText"></textarea>
+          <textarea class="xw-content-textarea" placeholder="Question" v-model="content" @focus="onFocusText"></textarea>
         </div>
         <div class="xw-chat-tool" style="margin-right: 10px">
           <div class="xw-chat-tool-item">
@@ -117,7 +117,7 @@
         myaudio: '../../static/audio/msg.mp3',//铃音
         videoVal: false,//点击视频文字时候
         showNarrowPopVal: false,//点击切换成小窗口
-        testContents: [ '请稍后--', '当前客服忙', '您还有什么咨询的吗', '正在查询', 'gone with the wind'],
+        testContents: [ 'Please wait'],
         content: '',
         //聊天记录
         records: [],
@@ -166,7 +166,6 @@
       },
       onHistory(m){
         this.records = []
-        console.log(m);
         let data = JSON.parse(m)
         if (data.code == 200){
           let list = []
@@ -182,7 +181,7 @@
           this.records.push({
             type: 2,
             time: new Date().format('yyyy-mm-dd hh:MM:ss'),
-            content: '您好！欢迎来到GO-SAKU，请问有什么能帮到您?'
+            content: 'Welcome!'
           })
         }
         this.scrollToBottom();
@@ -307,6 +306,9 @@
   }
 </script>
 <style>
+  .xw-footer-wrap{
+    margin-top: -50px!important;
+  }
   #app {
     position: absolute;
     height: 100%;

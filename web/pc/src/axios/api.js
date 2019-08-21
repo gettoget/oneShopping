@@ -10,8 +10,8 @@
 
 // ' http://119.23.242.234:8088'
 const ajaxUrl = process.env.NODE_ENV === 'development'//development开发环境
-  ? 'https://www.go-saku.com'
-  : 'https://www.go-saku.com'
+  ? 'https://www.go-saku.com/api/'
+  : 'https://www.go-saku.com/api/'
 // const fileUrl = "http://119.23.242.234:9092/"
 const fileUrl = " https://www.go-saku.com/api/"
 export default {
@@ -19,7 +19,7 @@ export default {
   url:ajaxUrl,
   GETFILEURL:fileUrl,
   UPFILE:ajaxUrl+'/upload?targetPath=',
-  LOGIN:"/api/login",
+  LOGIN:"/login",
   USER: {
     QUERY: '/api/yh/pager',//用户管理,查询
     ADD: '/api/yh/save', //新增用户

@@ -1,0 +1,183 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: "微软雅黑";
+}
+/* 设置滚动条的样式 */
+::-webkit-scrollbar {
+    width: 2px;
+    height: 12px;
+}
+
+/* 滚动槽 */
+::-webkit-scrollbar-track {
+    width: 2px;
+    -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+}
+
+/* 滚动条滑块 */
+::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.5);
+}
+/*//容器属性 横向布局 垂直对齐方式 用于弹性布局的 容器*/
+/*//横向布局 上 中 下  文本居中*/
+.colTop {
+  align-items: flex-start;
+}
+
+.colBottom {
+    align-items: flex-end;
+}
+
+.colCenter {
+    align-items: center;
+}
+
+.colText {
+    align-items: stretch;
+}
+
+/*//容器属性 横向 模块的分布*/
+.rowleft {
+  justify-content: flex-start;
+}
+
+.rowRight {
+    justify-content: flex-end;
+}
+
+.rowCenter {
+    justify-content: center;
+}
+.rowBetween{
+    justify-content: space-between;
+}
+/*//模块平分*/
+.rowAuto {
+justify-content: space-around;
+}
+
+.flexItemA {
+  align-self: auto;
+}
+
+.flexItemF {
+    align-self: flex-start;
+}
+
+.flexItemE {
+    align-self: flex-end;
+}
+
+.flexItemC {
+    align-self: center;
+}
+
+.flexItemB {
+    align-self: baseline;
+}
+
+.flexItemS {
+    align-self: stretch;
+}
+
+.box_col {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.box_col_100 {
+    flex: 1;
+}
+.box_col_auto {
+    flex: 1;
+    overflow: auto;
+}
+.box_col_autoY {
+    flex: 1;
+    overflow-y: auto;
+}
+.box_col_autoX {
+    flex: 1;
+    overflow-x: auto;
+}
+
+.box_row {
+    display: flex;
+    flex-direction: row;
+}
+.box_row_100 {
+    flex: 1;
+}
+.box_row_1auto {
+    flex: 1;
+    overflow: auto;
+}
+.box_row_200 {
+    flex: 2;
+}
+.box_row_2auto {
+    flex: 2;
+    overflow: auto;
+}
+.box_row_3auto {
+    flex: 3;
+    overflow: auto;
+}
+.box_row_4auto {
+    flex: 4;
+    overflow: auto;
+}
+.box_row_5auto {
+    flex: 5;
+    overflow: auto;
+}
+/*//横向布局禁止换行*/
+.box_row_z {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    height: 100%;
+}
+/*//横向布局自动换行*/
+.box_row_list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+}
+.pagerTitBox{
+    height: 114px;
+    background-color: #e34311;
+}
+.pagertopBox{
+    height: 768px;
+    background-image: url("./img/bg1.png");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-position: center;
+
+}
+.pagerCentertopBox{
+    height: 472px;
+}
+.pagerCenterBox{
+    height: 600px;
+    background-image: url("./img/bg2.png");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-position: center;
+}
+.pagerCenterBottomBox{
+    height: 472px;
+}
+.pagerBottomBox{
+    height: 188px;
+    background-image: url("./img/bg3.png");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-position: center;
+}
