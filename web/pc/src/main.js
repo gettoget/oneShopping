@@ -50,6 +50,9 @@ Vue.component('pagerTit',pagerTit)
 import onePage from './components/onePage'
 Vue.component('onePage',onePage)
 
+import thor from 'thor-x'
+import 'thor-x/dist/index.css'
+Vue.use(thor)
 
 Vue.use(iView, {
   i18n: (key, value) => i18n.t(key, value),

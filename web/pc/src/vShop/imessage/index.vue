@@ -1,23 +1,14 @@
 <template>
   <div class="box_col findOrderBox">
     <div class="box_row_100">
-      <Menu mode="horizontal" :theme="theme1" active-name="1" @on-select="changeMenu">
-        <MenuItem name="1">
-          <Icon type="ios-paper"/>
-          待回复
-        </MenuItem>
-        <MenuItem name="2">
-          <Icon type="ios-people"/>
-          已回复
-        </MenuItem>
-      </Menu>
+
     </div>
     <div class="box_row_100">
       <div class="box_row rowRight">
         <div>
           <Input
-            v-model="param.contentLike" @on-change="getPagerList"
-            :placeholder="$t('')" style="width: 160px;margin-right: 18px"/>
+            v-model="param.name" @on-change="getPagerList"
+            :placeholder="$t('username')" style="width: 160px;margin-right: 18px"/>
         </div>
         <Button type="primary" @click="getPagerList">
           <Icon type="md-search"></Icon>
@@ -26,7 +17,7 @@
       </div>
     </div>
 
-    <div  class="box_col" v-if="list && list.length >= 0">
+    <div  class="box_col" style="padding-top: 20px" v-if="list && list.length >= 0">
       <Row class="box_col_auto">
         <Col span="6" v-for="(item,index) in list" :key=index>
           <Card style="height: 300px">
@@ -90,8 +81,7 @@
         param: {
           pageSize: 8,
           pageNum: 1,
-          reply: 2,
-          contentLike:''
+          name:''
         },
         list: [],
       }
@@ -104,22 +94,13 @@
         this.compName = ''
         console.log(123);
       },
-      changeMenu(name) {
-        if (name == '1') {
-          this.param.reply = 2
-          this.getPagerList()
-        } else {
-          this.param.reply = 1
-          this.getPagerList()
-        }
-      },
       chPager(p) {
         this.param.pageNum = p.pageNum
         this.param.pageSize = p.pageSize
         this.getPagerList()
       },
       getPagerList() {
-        this.$http.post('/api/question/pager', this.param).then((res) => {
+        this.$http.post('/api/question/getPeoGroup', this.param).then((res) => {
           if (res.code == 200) {
             this.list = res.page.list
             this.total = res.page.total
