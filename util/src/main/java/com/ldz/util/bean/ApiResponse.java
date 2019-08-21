@@ -47,7 +47,7 @@ public class ApiResponse<T> implements Serializable {
 	/**
 	 * 返回消息内容
 	 */
-	private String message = MessageUtils.get("message.success") + "!";
+	private String message = "operasi sukses !";
 	/**
 	 * 返回结果对象
 	 */
@@ -85,22 +85,22 @@ public class ApiResponse<T> implements Serializable {
 	}
 	public static <T> ApiResponse<T> success(T result){
 		ApiResponse<T> res = new ApiResponse<>();
-		res.setMessage(MessageUtils.get("message.success")+"!");
+		res.setMessage("operasi sukses!");
 		res.setResult(result);
 		return res;
 	}
 	public static ApiResponse<String> saveSuccess(){
-		return success(MessageUtils.get("message.saveSuccess") + "!");
+		return success( "Penyimpanan data berhasil!");
 	}
 	public static ApiResponse<String> deleteSuccess(){
-		return success(MessageUtils.get("message.delSuccess") + "!");
+		return success( "Penghapusan data berhasil!");
 	}
 	public static ApiResponse<String> updateSuccess(){
-		return success(MessageUtils.get("message.updateSuccess") + "!");
+		return success( "Pembaruan data berhasil!");
 	}
 
 	public static ApiResponse<String> success(){
-		return success(MessageUtils.get("message.success") + "!");
+		return success( "operasi sukses!");
 	}
 	public static ApiResponse<String> fail(String msg){
 		ApiResponse<String> res = new ApiResponse<>();
@@ -111,7 +111,7 @@ public class ApiResponse<T> implements Serializable {
 	public static ApiResponse<String> authFailed(){
 		ApiResponse<String> res = new ApiResponse<>();
 		res.setCode(AUTH_FAILED);
-		res.setMessage(MessageUtils.get("message.authFailed"));
+		res.setMessage("Kegagalan otentikasi");
 		return res;
 	}
 	public static ApiResponse<String> notFound(String msg){
@@ -128,15 +128,15 @@ public class ApiResponse<T> implements Serializable {
 	}
 
 	public static ApiResponse<String> fail(){
-		return fail(MessageUtils.get("defeat"));
+		return fail("Kegagalan op");
 	}
 	public static ApiResponse<String> error(){
-		return fail(MessageUtils.get("error"));
+		return fail("Galat tak diketahui");
 	}
 	public static ApiResponse<String> forbidden(){
 		ApiResponse<String> res = new ApiResponse<>();
 		res.setCode(FORBIDDEN);
-		res.setMessage(MessageUtils.get("forbidden"));
+		res.setMessage("Tidak ada akses izin");
 		return res;
 	}
 	public boolean isSuccess(){

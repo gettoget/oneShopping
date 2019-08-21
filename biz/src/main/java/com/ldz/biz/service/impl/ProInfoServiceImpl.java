@@ -456,8 +456,11 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 // 拿到中奖用户的信息
                 Map<String, ProInfo> infoMap = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
                 Set<String> userIds = infos.stream().filter(proInfo -> StringUtils.isNotBlank(proInfo.getUserId())).map(ProInfo::getUserId).collect(Collectors.toSet());
-                List<User> users = userService.findByIds(userIds);
-                Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
+                Map<String, User> userMap = new HashMap<>();
+                if(CollectionUtils.isNotEmpty(userIds)){
+                    List<User> users = userService.findByIds(userIds);
+                     userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p));
+                }
                 for (Order order : orders) {
                     CyyhModel model = new CyyhModel();
 
@@ -553,13 +556,18 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         // 查询 此用户的所有中奖信息
         List<WinRecord> records = winRecordService.findEq(WinRecord.InnerColumn.userId, userId);
         Set<String> proIds = records.stream().map(WinRecord::getProId).collect(Collectors.toSet());
-        SimpleCondition condition = new SimpleCondition(Order.class);
-        condition.in(Order.InnerColumn.proId, proIds);
-        condition.eq(Order.InnerColumn.userId, userId);
-        condition.eq(Order.InnerColumn.ddzt, "1");
-        condition.setOrderByClause(" zfsj desc ");
-        PageInfo<Order> info = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> orderService.findByCondition(condition));
-        List<Order> orders = info.getList();
+        List<Order> orders = new ArrayList<>();
+        PageInfo<Order> info = new PageInfo<>();
+        if(CollectionUtils.isNotEmpty(proIds)){
+            SimpleCondition condition = new SimpleCondition(Order.class);
+            condition.in(Order.InnerColumn.proId, proIds);
+            condition.eq(Order.InnerColumn.userId, userId);
+            condition.eq(Order.InnerColumn.ddzt, "1");
+            condition.setOrderByClause(" zfsj desc ");
+             info= PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> orderService.findByCondition(condition));
+            orders = info.getList();
+        }
+
         if (CollectionUtils.isNotEmpty(orders)) {
             List<ProInfo> infos = proInfoService.findByIds(proIds);
             Map<String, ProInfo> infoMap = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
