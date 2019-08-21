@@ -25,7 +25,7 @@ public class AppInterceptor extends HandlerInterceptorAdapter {
 
 
 
-    private List<String> whiteList = Arrays.asList("/app/user/login","/app/user/register","/app/user/sendMsg","/app/user/findPwd","/app/user/proeval/newPager");
+    private List<String> whiteList = Arrays.asList("/api/app/user/login","/api/app/user/register","/api/app/user/sendMsg","/api/app/user/findPwd","/api/app/user/proeval/newPager");
 
     public AppInterceptor() {
     }
@@ -61,12 +61,18 @@ public class AppInterceptor extends HandlerInterceptorAdapter {
         if (StringUtils.isBlank(imei)) {
             imei = request.getParameter("imei");
         }
-        if (StringUtils.isBlank(imei)) {
+        /*if (StringUtils.isBlank(imei)) {
             String host = request.getRemoteAddr();
             imei = host.replaceAll("\\.","");
+        }*/
+        if (StringUtils.isBlank(imei)){
+            imei = "no imei";
         }
         String requestURI = request.getRequestURI();
-        if(StringUtils.startsWith(requestURI,"/app/guest") || whiteList.contains(requestURI)){
+        log.info(" userId ------------> " + userId);
+        log.info("token -------------->" + token);
+        log.info("imei -----------------> " + imei);
+        if(StringUtils.startsWith(requestURI,"/api/app/guest") || whiteList.contains(requestURI)){
             if(StringUtils.isBlank(imei)){
                 request.getRequestDispatcher("/authFiled").forward(request, response);
                 return false;

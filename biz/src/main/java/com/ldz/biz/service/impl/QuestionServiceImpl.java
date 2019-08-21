@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -126,6 +127,21 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
         }
         return ApiResponse.success();
     }
+
+    public static void main(String[] args) {
+        AndroidMsgBean bean = new AndroidMsgBean();
+        bean.setType("6");
+        Question question = new Question();
+        question.setCjsj(DateUtils.getNowTime());
+        question.setContent("回复内容");
+        question.setId("1");
+        question.setType("2");
+        question.setUserId("568459971893657600");
+        bean.setJson(JsonUtil.toJson(question));
+        System.out.println(JsonUtil.toJson(bean));
+    }
+
+
 
     @Override
     public ApiResponse<String> getProGroup(int pageNum, int pageSize, String name) {

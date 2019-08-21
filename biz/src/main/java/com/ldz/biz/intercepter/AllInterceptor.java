@@ -1,5 +1,6 @@
 package com.ldz.biz.intercepter;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -13,6 +14,7 @@ import java.io.IOException;
 
 @Order(1)
 @WebFilter(filterName = "commonDataFilter",urlPatterns = {"/*"})
+@Log4j2
 public class AllInterceptor extends OncePerRequestFilter {
 
 
@@ -24,6 +26,7 @@ public class AllInterceptor extends OncePerRequestFilter {
         if(org.apache.commons.lang3.StringUtils.isNotBlank(lang)){
             requestWrapper.addParameter("lang", lang);
         }
+        log.info("URI  ------ > " + requestWrapper.getRequestURI());
         filterChain.doFilter(requestWrapper,httpServletResponse);
     }
 
