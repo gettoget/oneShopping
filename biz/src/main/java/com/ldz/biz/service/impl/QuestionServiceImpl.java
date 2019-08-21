@@ -160,6 +160,9 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
     @Override
     public ApiResponse<String> getOneMess(int pageNum, int pageSize, String userId) {
         RuntimeCheck.ifBlank(userId, MessageUtils.get("user.idIsnull"));
+        SimpleCondition condition = new SimpleCondition(Question.class);
+        condition.eq(Question.InnerColumn.userId, userId);
+        condition.setOrderByClause(" cjsj desc");
         PageInfo<Question>  info =
                 PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> findEq(Question.InnerColumn.userId,
                         userId));
