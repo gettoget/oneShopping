@@ -30,6 +30,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.SortParameters;
 import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
@@ -379,11 +380,16 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
     @Override
     public PageResponse<Order> getPageInfo(Page<Order> page) {
         PageResponse<Order> res = new PageResponse<>();
+        // 新操作 ,  将所有相同的商品合并成一个
+
+
 
         String userId = getAttributeAsString("userId");
         if (StringUtils.isNotBlank(userId)) {
+
             LimitedCondition condition = getQueryCondition();
             condition.eq(Order.InnerColumn.userId, userId);
+
             // 查询当前用户的订单
             PageInfo<Order> pageInfo = findPage(page, condition);
 
@@ -589,6 +595,68 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
     @Override
     public List<CyyhModel> getCyyh(String proId) {
         return baseMapper.getCyyh(proId);
+    }
+
+    @Override
+    public PageResponse<Order> getMyOrder(int pageNum, int pageSize) {
+        String userId = getAttributeAsString("userId");
+        PageResponse<Order> res = new PageResponse<>();
+        List<Order> orderList = new ArrayList<>();
+        if(StringUtils.isNotBlank(userId)){
+            String ddZt = getRequestParamterAsString("ddzt");
+            if(StringUtils.isBlank(ddZt)){
+                ddZt = null;
+            }
+            String finalDdZt = ddZt;
+            PageInfo<String> info = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> {
+                baseMapper.getProIds(userId, finalDdZt);
+            });
+            if(CollectionUtils.isNotEmpty(info.getList())){
+                List<String> list = info.getList();
+                SimpleCondition simpleCondition = new SimpleCondition(Order.class);
+                simpleCondition.in(Order.InnerColumn.proId, list);
+                simpleCondition.eq(Order.InnerColumn.userId,userId);
+                List<Order> orders = findByCondition(simpleCondition);
+                Map<String, List<Order>> map = orders.stream().collect(Collectors.groupingBy(Order::getProId));
+                List<ProInfo> infos = proInfoService.findByIds(list);
+                Map<String, ProInfo> proInfoMap = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
+
+                Set<String> userIds = infos.stream().map(ProInfo::getUserId).collect(Collectors.toSet());
+                Map<String, String> userMap = new HashMap<>();
+                if (CollectionUtils.isNotEmpty(userIds)) {
+                    List<User> users = userService.findByIds(userIds);
+                    // 根据中奖人 id 分组
+                    userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p.getUserName()));
+                }
+                for (Map.Entry<String, List<Order>> entry : map.entrySet()) {
+                    List<Order> value = entry.getValue();
+                    int sum = value.stream().map(order -> Integer.parseInt(order.getGmfs())).mapToInt(value1 -> value1).sum();
+                    Order o = new Order();
+                    o.setDdzt(ddZt);
+                    o.setCjsj(value.get(0).getCjsj());
+                    o.setGmfs(sum + "");
+                    o.setProId(value.get(0).getProId());
+                    o.setProName(value.get(0).getProName());
+                    if (proInfoMap.containsKey(o.getProId())) {
+                        ProInfo proInfo = proInfoMap.get(o.getProId());
+                        o.setCoverUrl(proInfo.getCoverUrl());
+                        o.setKjsj(proInfo.getKjsj());
+                        o.setRate((Integer.parseInt(proInfo.getProPrice()) - Integer.parseInt(proInfo.getRePrice())) * 100 / Integer.parseInt(proInfo.getProPrice()));
+                        if (userMap.containsKey(proInfo.getUserId())) {
+                            o.setUserName(userMap.get(proInfo.getUserId()));
+                        }
+                    }
+                    orderList.add(o);
+                }
+                res.setTotal(info.getTotal());
+            }
+        }
+
+        res.setList(orderList);
+        res.setPageNum(pageNum);
+        res.setPageSize(pageSize);
+
+        return res;
     }
 
 

@@ -51,4 +51,5 @@ public interface OrderService extends BaseService<Order, String> {
 
     List<CyyhModel> getCyyh(String proId);
 
+    PageResponse<Order> getMyOrder(int pageNum, int pageSize);
 }

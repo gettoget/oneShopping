@@ -88,5 +88,13 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
     @Select(" SELECT u.id userId, u.user_name userName, u.h_img himg , o.gmfs gmfs , o.zfsj gmsj from order_form o ,  user u WHERE pro_id = #{proId} and u.id = o.USER_ID  order by o.zfsj DESC")
     List<CyyhModel> getCyyh(@Param("proId") String proId);
 
+    @Select(" <script>" +
+            "  select pro_id from order_form  where user_id = #{userId} " +
+            " <if test='ddZt != null '>" +
+            " and ddZt = #{ddZt}" +
+            "</if>" +
+            "</script>")
+    List<String> getProIds(@Param("userId")String userId, @Param("ddZt") String ddZt);
+
 
 }

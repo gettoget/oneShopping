@@ -6,10 +6,7 @@ import com.ldz.biz.service.OrderService;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/app/user/order")
@@ -45,6 +42,11 @@ public class OrderCtrl  {
     @PostMapping("/orderCanel")
     public ApiResponse<String> orderCancel(String id){
         return service.updateOrderCancel(id);
+    }
+
+    @GetMapping("/getMyOrder")
+    public PageResponse<Order> getMyOrder(@RequestParam(defaultValue = "1")int pageNum, @RequestParam(defaultValue = "8")int pageSize){
+        return service.getMyOrder(pageNum,pageSize);
     }
 
 
