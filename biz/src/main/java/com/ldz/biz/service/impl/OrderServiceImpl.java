@@ -608,26 +608,30 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 ddZt = null;
             }
             String finalDdZt = ddZt;
-            PageInfo<String> info = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> {
+            PageInfo<Map<String,String>> info = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> {
                 baseMapper.getProIds(userId, finalDdZt);
             });
             if(CollectionUtils.isNotEmpty(info.getList())){
-                List<String> list = info.getList();
+                List<Map<String, String>> list = info.getList();
+                Set<String> collect =
+                        list.stream().map(stringStringMap -> stringStringMap.get("pro_id")).collect(Collectors.toSet());
                 SimpleCondition simpleCondition = new SimpleCondition(Order.class);
-                simpleCondition.in(Order.InnerColumn.proId, list);
+                simpleCondition.in(Order.InnerColumn.proId, collect);
                 simpleCondition.eq(Order.InnerColumn.userId,userId);
+                simpleCondition.setOrderByClause(" cjsj desc ");
                 List<Order> orders = findByCondition(simpleCondition);
                 Map<String, List<Order>> map = orders.stream().collect(Collectors.groupingBy(Order::getProId));
-                List<ProInfo> infos = proInfoService.findByIds(list);
+                List<ProInfo> infos = proInfoService.findByIds(collect);
                 Map<String, ProInfo> proInfoMap = infos.stream().collect(Collectors.toMap(ProInfo::getId, p -> p));
 
-                Set<String> userIds = infos.stream().map(ProInfo::getUserId).collect(Collectors.toSet());
+                Set<String> userIds = infos.stream().map(ProInfo::getUserId).filter(s-> StringUtils.isNotBlank(s)).collect(Collectors.toSet());
                 Map<String, String> userMap = new HashMap<>();
                 if (CollectionUtils.isNotEmpty(userIds)) {
                     List<User> users = userService.findByIds(userIds);
                     // 根据中奖人 id 分组
                     userMap = users.stream().collect(Collectors.toMap(User::getId, p -> p.getUserName()));
                 }
+
                 for (Map.Entry<String, List<Order>> entry : map.entrySet()) {
                     List<Order> value = entry.getValue();
                     int sum = value.stream().map(order -> Integer.parseInt(order.getGmfs())).mapToInt(value1 -> value1).sum();
@@ -648,6 +652,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                     }
                     orderList.add(o);
                 }
+                orderList.sort(Comparator.comparing(Order::getCjsj).reversed());
                 res.setTotal(info.getTotal());
             }
         }

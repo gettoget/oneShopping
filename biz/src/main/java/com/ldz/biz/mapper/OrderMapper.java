@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Update;
 import tk.mybatis.mapper.common.Mapper;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
 
@@ -88,13 +89,15 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
     @Select(" SELECT u.id userId, u.user_name userName, u.h_img himg , o.gmfs gmfs , o.zfsj gmsj from order_form o ,  user u WHERE pro_id = #{proId} and u.id = o.USER_ID  order by o.zfsj DESC")
     List<CyyhModel> getCyyh(@Param("proId") String proId);
 
-    @Select(" <script>" +
-            "  select pro_id from order_form  where user_id = #{userId} " +
+    @Select(" <script> select distinct pro_id,u.id id from order_form u   ,   (" +
+            "  select  max(id) id from order_form   where user_id = #{userId} " +
             " <if test='ddZt != null '>" +
             " and ddZt = #{ddZt}" +
             "</if>" +
+            "group by pro_id" +
+            " ) o where  u.id = o.id    order by  u.id desc" +
             "</script>")
-    List<String> getProIds(@Param("userId")String userId, @Param("ddZt") String ddZt);
+    List<Map<String,String>> getProIds(@Param("userId")String userId, @Param("ddZt") String ddZt);
 
 
 }
