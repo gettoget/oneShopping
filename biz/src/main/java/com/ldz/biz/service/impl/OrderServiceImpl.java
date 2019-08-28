@@ -641,12 +641,14 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 for (Map.Entry<String, List<Order>> entry : map.entrySet()) {
                     List<Order> value = entry.getValue();
                     int sum = value.stream().map(order -> Integer.parseInt(order.getGmfs())).mapToInt(value1 -> value1).sum();
+                    int sum1 = value.stream().map(order -> Integer.parseInt(order.getZfje())).mapToInt(value1 -> value1).sum();
                     Order o = new Order();
                     o.setDdzt(ddZt);
                     o.setCjsj(value.get(0).getCjsj());
                     o.setGmfs(sum + "");
                     o.setProId(value.get(0).getProId());
                     o.setProName(value.get(0).getProName());
+                    o.setZfje(sum1+"");
                     if (proInfoMap.containsKey(o.getProId())) {
                         ProInfo proInfo = proInfoMap.get(o.getProId());
                         o.setCoverUrl(proInfo.getCoverUrl());

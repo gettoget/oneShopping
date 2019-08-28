@@ -95,7 +95,7 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
             " and ddZt = #{ddZt}" +
             "</if>" +
             "<if test='ddzts != null'>" +
-            " and ddzt in " +
+            " and ddZt in " +
             " <foreach collection='ddzts' index='index' open='(' separator=',' close=')' item='item'>" +
             " #{item} " +
             "</foreach>" +
