@@ -607,9 +607,15 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             if(StringUtils.isBlank(ddZt)){
                 ddZt = null;
             }
+            String ddztIn = getRequestParamterAsString("ddztIn");
+            List<String> ddzts = null;
+            if(StringUtils.isNotBlank(ddztIn)){
+                ddzts = Arrays.asList(ddztIn.split(","));
+            }
             String finalDdZt = ddZt;
+            List<String> finalDdzts = ddzts;
             PageInfo<Map<String,String>> info = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> {
-                baseMapper.getProIds(userId, finalDdZt);
+                baseMapper.getProIds(userId, finalDdZt, finalDdzts);
             });
             if(CollectionUtils.isNotEmpty(info.getList())){
                 List<Map<String, String>> list = info.getList();

@@ -94,10 +94,16 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
             " <if test='ddZt != null '>" +
             " and ddZt = #{ddZt}" +
             "</if>" +
+            "<if test='ddzts != null'>" +
+            " and ddzt in " +
+            " <foreach collection='ddzts' index='index' open='(' separator=',' close=')' item='item'>" +
+            " #{item} " +
+            "</foreach>" +
+            "</if>" +
             "group by pro_id" +
             " ) o where  u.id = o.id    order by  u.id desc" +
             "</script>")
-    List<Map<String,String>> getProIds(@Param("userId")String userId, @Param("ddZt") String ddZt);
+    List<Map<String,String>> getProIds(@Param("userId")String userId, @Param("ddZt") String ddZt, @Param("ddzts") List<String> ddzts);
 
 
 }
