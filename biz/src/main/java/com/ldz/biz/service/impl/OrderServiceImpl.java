@@ -582,7 +582,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 inUsers.forEach(s -> {
                     String o = (String) redis.boundValueOps(s + "__channelId").get();
                     if(StringUtils.isNotBlank(o)){
-                        BaiduPushUtils.pushSingleMsg(o,0,JsonUtil.toJson(info),3);
+                        BaiduPushUtils.pushSingleMsg(o,1,JsonUtil.toJson(info),3);
                     }
                 });
             }
