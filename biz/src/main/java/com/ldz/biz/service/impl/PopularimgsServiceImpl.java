@@ -50,6 +50,7 @@ public class PopularimgsServiceImpl extends BaseServiceImpl<Popularimgs, String>
     }
 
 
+    @Override
     public void afterPager(PageInfo<Popularimgs> result){
 		List<Popularimgs> list = result.getList();
 		if(CollectionUtils.isEmpty(list)){

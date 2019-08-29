@@ -58,6 +58,7 @@ public class HdServiceImpl extends BaseServiceImpl<SysHdyx,String> implements Hd
         return true;
     }
 
+    @Override
     public void afterPager(PageInfo<SysHdyx> resultPage){
         setFiles(resultPage.getList());
     }

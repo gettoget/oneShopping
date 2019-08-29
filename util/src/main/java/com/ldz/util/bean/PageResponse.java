@@ -1,5 +1,7 @@
 package com.ldz.util.bean;
 
+import com.ldz.util.commonUtil.MessageUtils;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -8,6 +10,10 @@ public class PageResponse<T> extends ApiResponse<T> implements Serializable {
     private int pageNum;
     private int pageSize;
     private long total;
+
+    public PageResponse() {
+        this.setMessage("operasi sukses !");
+    }
 
     public List<T> getList() {
         return list;

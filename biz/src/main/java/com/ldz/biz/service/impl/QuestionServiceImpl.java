@@ -24,6 +24,7 @@ import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.redis.RedisTemplateUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
@@ -56,6 +57,21 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
         String userId = getHeader("userId");
         RuntimeCheck.ifBlank(entity.getContent(), MessageUtils.get("que.isBlank"));
         RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
+        // 查询聊天记录跟上一条比较是否大于 5 分钟 , 如果是 则添加一条时间
+        SimpleCondition condition = new SimpleCondition(Question.class);
+        String now = DateTime.now().minusMinutes(5).toString("yyyy-MM-dd HH:mm:ss");
+        condition.gte(Question.InnerColumn.cjsj, now);
+        condition.eq(Question.InnerColumn.userId,userId);
+        List<Question> questions = findByCondition(condition);
+        if(CollectionUtils.isEmpty(questions)){
+            Question q = new Question();
+            q.setUserId(userId);
+            q.setType("3");
+            q.setId(genId());
+            q.setContent(DateTime.now().toString("yyyy-MM-dd HH:mm"));
+            q.setCjsj(DateTime.now().minusMillis(1).toString("yyyy-MM-dd HH:mm:ss.SSS"));
+            save(q);
+        }
         entity.setId(genId());
         entity.setType("1");
         entity.setCjsj(DateUtils.getNowTime());
@@ -74,6 +90,7 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
         res.setPageSize(page.getPageSize());
 
         LimitedCondition condition = getQueryCondition();
+        condition.and().andCondition(" type != '3'");
         condition.eq(Question.InnerColumn.userId, userId);
         condition.setOrderByClause(" cjsj desc ");
         PageInfo<Question> info = findPage(page, condition);
@@ -100,6 +117,21 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
         RuntimeCheck.ifBlank(id, MessageUtils.get("que.idBlank"));
         RuntimeCheck.ifBlank(entity.getContent(), MessageUtils.get("user.notLogin"));
         Question question = findById(id);
+        SimpleCondition condition = new SimpleCondition(Question.class);
+        String now = DateTime.now().minusMinutes(5).toString("yyyy-MM-dd HH:mm:ss");
+        condition.gte(Question.InnerColumn.cjsj, now);
+        condition.eq(Question.InnerColumn.userId,question.getUserId());
+        List<Question> questions = findByCondition(condition);
+        if(CollectionUtils.isEmpty(questions)){
+            Question q = new Question();
+            q.setUserId(question.getUserId());
+            q.setType("3");
+            q.setId(genId());
+            q.setContent(DateTime.now().toString("yyyy-MM-dd HH:mm"));
+            q.setCjsj(DateTime.now().minusMillis(1).toString("yyyy-MM-dd HH:mm:ss.SSS"));
+            save(q);
+        }
+
         question.setHf("1");
         update(question);
 
@@ -168,7 +200,15 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
                         userId));
         ApiResponse<String> res = new ApiResponse<>();
         if(CollectionUtils.isNotEmpty(info.getList())){
+            Set<String> set = info.getList().stream().map(Question::getUserId).collect(Collectors.toSet());
+            List<User> users = userService.findByIds(set);
+            String img = users.get(0).gethImg();
+            String name = users.get(0).getUserName();
             info.getList().sort(Comparator.comparing(Question::getCjsj).reversed());
+            info.getList().forEach(question -> {
+                question.setHimg(img);
+                question.setUsername(name);
+            } );
         }
         res.setPage(info);
         return res;

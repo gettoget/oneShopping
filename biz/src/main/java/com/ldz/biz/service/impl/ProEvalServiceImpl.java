@@ -3,8 +3,10 @@ package com.ldz.biz.service.impl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import com.ldz.biz.model.EvalCom;
+import com.ldz.biz.model.Order;
 import com.ldz.biz.model.User;
 import com.ldz.biz.service.EvalComService;
+import com.ldz.biz.service.OrderService;
 import com.ldz.biz.service.UserService;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.sys.base.LimitedCondition;
@@ -40,6 +42,9 @@ public class ProEvalServiceImpl extends BaseServiceImpl<ProEval, String> impleme
 	private UserService userService;
 
 	@Autowired
+	private OrderService orderService;
+
+	@Autowired
 	private EvalComService evalComService;
 
 	@Override
@@ -52,10 +57,16 @@ public class ProEvalServiceImpl extends BaseServiceImpl<ProEval, String> impleme
 	public ApiResponse<String> saveEntity(ProEval entity) {
 		RuntimeCheck.ifBlank(entity.getProId(), MessageUtils.get("eval.proBlank"));
 		RuntimeCheck.ifBlank(entity.getContent(), MessageUtils.get("eval.contentBlank"));
+
 		String userId = getAttributeAsString("userId");
+		SimpleCondition condition = new SimpleCondition(Order.class);
+		condition.eq(Order.InnerColumn.userId, userId);
+		condition.eq(Order.InnerColumn.proId, entity.getProId());
+		condition.eq(Order.InnerColumn.ddzt, "2");
+		List<Order> orders = orderService.findByCondition(condition);
+		RuntimeCheck.ifEmpty(orders,MessageUtils.get("eval.nopromise"));
 		User user = userService.findById(userId);
 		RuntimeCheck.ifNull(user, MessageUtils.get("user.null"));
-
 		entity.setUserId(userId);
 		entity.setUserName(user.getUserName());
 		entity.setId(genId());
