@@ -653,6 +653,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                         ProInfo proInfo = proInfoMap.get(o.getProId());
                         o.setCoverUrl(proInfo.getCoverUrl());
                         o.setKjsj(proInfo.getKjsj());
+                        o.setZjhm(proInfo.getZjhm());
                         o.setRate((Integer.parseInt(proInfo.getProPrice()) - Integer.parseInt(proInfo.getRePrice())) * 100 / Integer.parseInt(proInfo.getProPrice()));
                         if (userMap.containsKey(proInfo.getUserId())) {
                             o.setUserName(userMap.get(proInfo.getUserId()));
