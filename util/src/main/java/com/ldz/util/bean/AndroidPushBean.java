@@ -11,7 +11,7 @@ public class AndroidPushBean {
     /**
      * 通知标题，可以为空；如果为空则设为appid对应的应用名。
      */
-    private String tille;
+    private String title;
 
     /**
      * 通知文本内容，不能为空。

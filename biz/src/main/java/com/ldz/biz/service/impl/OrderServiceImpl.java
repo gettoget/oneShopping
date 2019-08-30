@@ -1,5 +1,7 @@
 package com.ldz.biz.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -30,7 +32,6 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.connection.SortParameters;
 import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
@@ -575,14 +576,19 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             msgBean.setJson(JsonUtil.toJson(info));
             BaiduPushUtils.pushAllMsg(0, JsonUtil.toJson(msgBean), 3, 0);
             if(CollectionUtils.isNotEmpty(inUsers)){
-                msgBean = new AndroidMsgBean();
-                msgBean.setType("8");
-                info.setTip("Hadiah atas partisipasi anda, silahkan dilihat!");
-                msgBean.setJson(JsonUtil.toJson(info));
+                JSONObject object = new JSONObject();
+                object.put("title","");
+                object.put("description","Produk yang anda ikuti sudah mendapatkan pemenang, yuk lihat sekarang");
+                object.put("notification_builder_id",0);
+                object.put("notification_basic_style",7);
+                object.put("open_type",2);
+                object.put("url","");
+                object.put("pkg_content",null);
+                object.put("custom_content", JSON.toJSON(info));
                 inUsers.forEach(s -> {
                     String o = (String) redis.boundValueOps(s + "__channelId").get();
                     if(StringUtils.isNotBlank(o)){
-                        BaiduPushUtils.pushSingleMsg(o,1,JsonUtil.toJson(info),3);
+                        BaiduPushUtils.pushSingleMsg(o,1,JSON.toJSONString(object),3);
                     }
                 });
             }
@@ -651,6 +657,15 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                     int sum = value.stream().map(order -> Integer.parseInt(order.getGmfs())).mapToInt(value1 -> value1).sum();
                     int sum1 = value.stream().map(order -> Integer.parseInt(order.getZfje())).mapToInt(value1 -> value1).sum();
                     Order o = new Order();
+                    Set<String> set = value.stream().map(Order::getDdzt).distinct().collect(Collectors.toSet());
+                    if(set.contains("1")){
+                        ddZt ="1";
+                    }else if(set.contains("2")){
+                        ddZt = "2";
+                    }else{
+                        ddZt  = "0";
+                    }
+
                     o.setDdzt(ddZt);
                     o.setCjsj(value.get(0).getCjsj());
                     o.setGmfs(sum + "");
