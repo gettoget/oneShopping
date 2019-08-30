@@ -474,7 +474,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
 
         List<OrderList> lastFifty = baseMapper.getLastFifty(info.getId(), 50);
 
-        long zjhm = 0l;
+        long zjhm = 0L;
         // 如果是需要机器人中奖，从机器人中抽取一个中间号码
         if (StringUtils.equals(info.getrType(), "2")) {
             //获取最后一个机器人参与的订单号码
@@ -515,13 +515,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                     s = DateTime.parse(lastOrder.getCjsj(), formatter).plusMillis(l).toString("yyyy-MM-dd HH:mm:ss.SSS");
                 }
                 lastOrder.setCjsj(s);
-                /*lastOrder.setZfsj(s);
-                lastOrder.setCjsj(s);
-                update(lastOrder);*/
                 orderListService.update(lastOrder);
-               /* lastFifty = baseMapper.getLastFifty(info.getId(), 50);
-                hHmmssSSS = lastFifty.stream().map(OrderList::getCjsj).map(s1 -> Long.parseLong(DateTime.parse(s1, formatter).toString("HHmmssSSS"))).reduce(Long::sum).get();
-                zjhm = (hHmmssSSS % Long.parseLong(info.getProPrice())) + 10000001;*/
+
                 zjhm = Long.parseLong(hm);
             }
         } else {
@@ -541,6 +536,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         condition.eq(OrderList.InnerColumn.num, zjhm + "");
         condition.eq(OrderList.InnerColumn.proId, info.getId());
         List<OrderList> lists = orderListService.findByCondition(condition);
+        Set<String> inUsers = lists.stream().filter(orderList -> StringUtils.equals(orderList.getYhlx(), "0")).map(OrderList::getUserid).collect(Collectors.toSet());
         if (CollectionUtils.isNotEmpty(lists)) {
             OrderList list = lists.get(0);
             info.setUserId(list.getUserid());
@@ -578,6 +574,18 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             msgBean.setType("4");
             msgBean.setJson(JsonUtil.toJson(info));
             BaiduPushUtils.pushAllMsg(0, JsonUtil.toJson(msgBean), 3, 0);
+            if(CollectionUtils.isNotEmpty(inUsers)){
+                msgBean = new AndroidMsgBean();
+                msgBean.setType("8");
+                info.setTip("Hadiah atas partisipasi anda, silahkan dilihat!");
+                msgBean.setJson(JsonUtil.toJson(info));
+                inUsers.forEach(s -> {
+                    String o = (String) redis.boundValueOps(s + "__channelId").get();
+                    if(StringUtils.isNotBlank(o)){
+                        BaiduPushUtils.pushSingleMsg(o,1,JsonUtil.toJson(info),3);
+                    }
+                });
+            }
             // 商品已中奖  自动上架 下个商品  如果还有库存的话
             ProBaseinfo baseinfo = proBaseinfoService.findById(info.getProBaseid());
             if (Integer.parseInt(baseinfo.getProStore()) > 0) {
@@ -653,6 +661,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                         ProInfo proInfo = proInfoMap.get(o.getProId());
                         o.setCoverUrl(proInfo.getCoverUrl());
                         o.setKjsj(proInfo.getKjsj());
+                        o.setZjhm(proInfo.getZjhm());
                         o.setRate((Integer.parseInt(proInfo.getProPrice()) - Integer.parseInt(proInfo.getRePrice())) * 100 / Integer.parseInt(proInfo.getProPrice()));
                         if (userMap.containsKey(proInfo.getUserId())) {
                             o.setUserName(userMap.get(proInfo.getUserId()));

@@ -1,5 +1,8 @@
 package com.ldz.biz.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -174,20 +177,218 @@ public class ProInfo implements Serializable {
     @Transient
     private String store;
 
-    public String getStore() {
-        return store;
+    /**
+     * 中奖消息提醒
+     */
+    @Transient
+    private String tip;
+
+    public String getId() {
+        return id;
     }
 
-    public void setStore(String store) {
-        this.store = store;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getZjfs() {
-        return zjfs;
+    public String getProBaseid() {
+        return proBaseid;
     }
 
-    public void setZjfs(String zjfs) {
-        this.zjfs = zjfs;
+    public void setProBaseid(String proBaseid) {
+        this.proBaseid = proBaseid;
+    }
+
+    public String getProType() {
+        return proType;
+    }
+
+    public void setProType(String proType) {
+        this.proType = proType;
+    }
+
+    public String getProName() {
+        return proName;
+    }
+
+    public void setProName(String proName) {
+        this.proName = proName;
+    }
+
+    public String getProPrice() {
+        return proPrice;
+    }
+
+    public void setProPrice(String proPrice) {
+        this.proPrice = proPrice;
+    }
+
+    public String getProStore() {
+        return proStore;
+    }
+
+    public void setProStore(String proStore) {
+        this.proStore = proStore;
+    }
+
+    public String getProZt() {
+        return proZt;
+    }
+
+    public void setProZt(String proZt) {
+        this.proZt = proZt;
+    }
+
+    public String getProLx() {
+        return proLx;
+    }
+
+    public void setProLx(String proLx) {
+        this.proLx = proLx;
+    }
+
+    public String getProSign() {
+        return proSign;
+    }
+
+    public void setProSign(String proSign) {
+        this.proSign = proSign;
+    }
+
+    public String getRePrice() {
+        return rePrice;
+    }
+
+    public void setRePrice(String rePrice) {
+        this.rePrice = rePrice;
+    }
+
+    public String getrType() {
+        return rType;
+    }
+
+    public void setrType(String rType) {
+        this.rType = rType;
+    }
+
+    public String getCjsj() {
+        return cjsj;
+    }
+
+    public void setCjsj(String cjsj) {
+        this.cjsj = cjsj;
+    }
+
+    public String getKjsj() {
+        return kjsj;
+    }
+
+    public void setKjsj(String kjsj) {
+        this.kjsj = kjsj;
+    }
+
+    public String getGxsj() {
+        return gxsj;
+    }
+
+    public void setGxsj(String gxsj) {
+        this.gxsj = gxsj;
+    }
+
+    public String getUrls() {
+        return urls;
+    }
+
+    public void setUrls(String urls) {
+        this.urls = urls;
+    }
+
+    public String getCoverUrl() {
+        return coverUrl;
+    }
+
+    public void setCoverUrl(String coverUrl) {
+        this.coverUrl = coverUrl;
+    }
+
+    public String getRefUrl() {
+        return refUrl;
+    }
+
+    public void setRefUrl(String refUrl) {
+        this.refUrl = refUrl;
+    }
+
+    public String getCyyhs() {
+        return cyyhs;
+    }
+
+    public void setCyyhs(String cyyhs) {
+        this.cyyhs = cyyhs;
+    }
+
+    public String getZjhm() {
+        return zjhm;
+    }
+
+    public void setZjhm(String zjhm) {
+        this.zjhm = zjhm;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getBz1() {
+        return bz1;
+    }
+
+    public void setBz1(String bz1) {
+        this.bz1 = bz1;
+    }
+
+    public String getBz2() {
+        return bz2;
+    }
+
+    public void setBz2(String bz2) {
+        this.bz2 = bz2;
+    }
+
+    public String getBz3() {
+        return bz3;
+    }
+
+    public void setBz3(String bz3) {
+        this.bz3 = bz3;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public int getCycs() {
+        return cycs;
+    }
+
+    public void setCycs(int cycs) {
+        this.cycs = cycs;
+    }
+
+    public WinRecord getWinRecord() {
+        return winRecord;
+    }
+
+    public void setWinRecord(WinRecord winRecord) {
+        this.winRecord = winRecord;
     }
 
     public List<String> getNums() {
@@ -222,422 +423,29 @@ public class ProInfo implements Serializable {
         this.refUrls = refUrls;
     }
 
-    private static final long serialVersionUID = 1L;
-
-    public WinRecord getWinRecord() {
-        return winRecord;
+    public String getZjfs() {
+        return zjfs;
     }
 
-    public void setWinRecord(WinRecord winRecord) {
-        this.winRecord = winRecord;
+    public void setZjfs(String zjfs) {
+        this.zjfs = zjfs;
     }
 
-    public String getCoverUrl() {
-        return coverUrl;
+    public String getStore() {
+        return store;
     }
 
-    public void setCoverUrl(String coverUrl) {
-        this.coverUrl = coverUrl;
+    public void setStore(String store) {
+        this.store = store;
     }
 
-    public String getRefUrl() {
-        return refUrl;
+    public String getTip() {
+        return tip;
     }
 
-    public void setRefUrl(String refUrl) {
-        this.refUrl = refUrl;
+    public void setTip(String tip) {
+        this.tip = tip;
     }
-
-    public int getCycs() {
-        return cycs;
-    }
-
-    public void setCycs(int cycs) {
-        this.cycs = cycs;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    /**
-     * @return id
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * @param id
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    /**
-     * 获取商品基础id。来自于商品基本信息表主键
-     *
-     * @return pro_baseid - 商品基础id。来自于商品基本信息表主键
-     */
-    public String getProBaseid() {
-        return proBaseid;
-    }
-
-    /**
-     * 设置商品基础id。来自于商品基本信息表主键
-     *
-     * @param proBaseid 商品基础id。来自于商品基本信息表主键
-     */
-    public void setProBaseid(String proBaseid) {
-        this.proBaseid = proBaseid;
-    }
-
-    /**
-     * 获取商品类目
-     *
-     * @return pro_type - 商品类目
-     */
-    public String getProType() {
-        return proType;
-    }
-
-    /**
-     * 设置商品类目
-     *
-     * @param proType 商品类目
-     */
-    public void setProType(String proType) {
-        this.proType = proType;
-    }
-
-    /**
-     * 获取商品名称
-     *
-     * @return pro_name - 商品名称
-     */
-    public String getProName() {
-        return proName;
-    }
-
-    /**
-     * 设置商品名称
-     *
-     * @param proName 商品名称
-     */
-    public void setProName(String proName) {
-        this.proName = proName;
-    }
-
-    /**
-     * 获取商品价格
-     *
-     * @return pro_price - 商品价格
-     */
-    public String getProPrice() {
-        return proPrice;
-    }
-
-    /**
-     * 设置商品价格
-     *
-     * @param proPrice 商品价格
-     */
-    public void setProPrice(String proPrice) {
-        this.proPrice = proPrice;
-    }
-
-    /**
-     * 获取商品库存
-     *
-     * @return pro_store - 商品库存
-     */
-    public String getProStore() {
-        return proStore;
-    }
-
-    /**
-     * 设置商品库存
-     *
-     * @param proStore 商品库存
-     */
-    public void setProStore(String proStore) {
-        this.proStore = proStore;
-    }
-
-    /**
-     * 获取商品状态。上架、下架、已开奖
-     *
-     * @return pro_zt - 商品状态。上架、下架、已开奖
-     */
-    public String getProZt() {
-        return proZt;
-    }
-
-    /**
-     * 设置商品状态。上架、下架、已开奖
-     *
-     * @param proZt 商品状态。 1 上架、 2 下架、 3 待开奖  4 已开奖
-     */
-    public void setProZt(String proZt) {
-        this.proZt = proZt;
-    }
-
-    /**
-     * 获取商品类型，可多个。推荐、上新、热门
-     *
-     * @return pro_lx - 商品类型，可多个。推荐、上新、热门
-     */
-    public String getProLx() {
-        return proLx;
-    }
-
-    /**
-     * 设置商品类型，可多个。推荐、上新、热门
-     *
-     * @param proLx 商品类型，可多个。推荐、上新、热门
-     */
-    public void setProLx(String proLx) {
-        this.proLx = proLx;
-    }
-
-    /**
-     * 获取商品标签
-     *
-     * @return pro_sign - 商品标签
-     */
-    public String getProSign() {
-        return proSign;
-    }
-
-    /**
-     * 设置商品标签
-     *
-     * @param proSign 商品标签
-     */
-    public void setProSign(String proSign) {
-        this.proSign = proSign;
-    }
-
-    /**
-     * 获取剩余名额
-     *
-     * @return re_price - 剩余名额
-     */
-    public String getRePrice() {
-        return rePrice;
-    }
-
-    /**
-     * 设置剩余名额
-     *
-     * @param rePrice 剩余名额
-     */
-    public void setRePrice(String rePrice) {
-        this.rePrice = rePrice;
-    }
-
-    /**
-     * 获取抢购类型
-     *
-     * @return r_type - 抢购类型
-     */
-    public String getrType() {
-        return rType;
-    }
-
-    /**
-     * 设置抢购类型
-     *
-     * @param rType 抢购类型
-     */
-    public void setrType(String rType) {
-        this.rType = rType;
-    }
-
-    /**
-     * 获取上架时间
-     *
-     * @return cjsj - 上架时间
-     */
-    public String getCjsj() {
-        return cjsj;
-    }
-
-    /**
-     * 设置上架时间
-     *
-     * @param cjsj 上架时间
-     */
-    public void setCjsj(String cjsj) {
-        this.cjsj = cjsj;
-    }
-
-    /**
-     * 获取开奖时间
-     *
-     * @return kjsj - 开奖时间
-     */
-    public String getKjsj() {
-        return kjsj;
-    }
-
-    /**
-     * 设置开奖时间
-     *
-     * @param kjsj 开奖时间
-     */
-    public void setKjsj(String kjsj) {
-        this.kjsj = kjsj;
-    }
-
-    /**
-     * 获取更新时间
-     *
-     * @return gxsj - 更新时间
-     */
-    public String getGxsj() {
-        return gxsj;
-    }
-
-    /**
-     * 设置更新时间
-     *
-     * @param gxsj 更新时间
-     */
-    public void setGxsj(String gxsj) {
-        this.gxsj = gxsj;
-    }
-
-    /**
-     * 获取商品轮播图。多个图片使用','分隔存储
-     *
-     * @return urls - 商品轮播图。多个图片使用','分隔存储
-     */
-    public String getUrls() {
-        return urls;
-    }
-
-    /**
-     * 设置商品轮播图。多个图片使用','分隔存储
-     *
-     * @param urls 商品轮播图。多个图片使用','分隔存储
-     */
-    public void setUrls(String urls) {
-        this.urls = urls;
-    }
-
-    /**
-     * 获取参与的真实用户数
-     *
-     * @return cyyhs - 参与的真实用户数
-     */
-    public String getCyyhs() {
-        return cyyhs;
-    }
-
-    /**
-     * 设置参与的真实用户数
-     *
-     * @param cyyhs 参与的真实用户数
-     */
-    public void setCyyhs(String cyyhs) {
-        this.cyyhs = cyyhs;
-    }
-
-    /**
-     * 获取中奖号码
-     *
-     * @return zjhm - 中奖号码
-     */
-    public String getZjhm() {
-        return zjhm;
-    }
-
-    /**
-     * 设置中奖号码
-     *
-     * @param zjhm 中奖号码
-     */
-    public void setZjhm(String zjhm) {
-        this.zjhm = zjhm;
-    }
-
-    /**
-     * 获取中奖人id
-     *
-     * @return user_id - 中奖人id
-     */
-    public String getUserId() {
-        return userId;
-    }
-
-    /**
-     * 设置中奖人id
-     *
-     * @param userId 中奖人id
-     */
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    /**
-     * 获取备注一
-     *
-     * @return bz1 - 备注一
-     */
-    public String getBz1() {
-        return bz1;
-    }
-
-    /**
-     * 设置备注一
-     *
-     * @param bz1 备注一
-     */
-    public void setBz1(String bz1) {
-        this.bz1 = bz1;
-    }
-
-    /**
-     * 获取备注 二
-     *
-     * @return bz2 - 备注 二
-     */
-    public String getBz2() {
-        return bz2;
-    }
-
-    /**
-     * 设置备注 二
-     *
-     * @param bz2 备注 二
-     */
-    public void setBz2(String bz2) {
-        this.bz2 = bz2;
-    }
-
-    /**
-     * 获取备注三
-     *
-     * @return bz3 - 备注三
-     */
-    public String getBz3() {
-        return bz3;
-    }
-
-    /**
-     * 设置备注三
-     *
-     * @param bz3 备注三
-     */
-    public void setBz3(String bz3) {
-        this.bz3 = bz3;
-    }
-
 
     public ProInfo() {
     }
@@ -655,6 +463,7 @@ public class ProInfo implements Serializable {
         this.refUrl = baseinfo.getRefUrl();
 
     }
+
 
 
     public enum InnerColumn {
