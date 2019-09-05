@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ldz.biz.bean.PaySuc;
 import com.ldz.biz.model.ProInfo;
+import com.ldz.biz.model.Recharge;
 import com.ldz.biz.model.User;
 import com.ldz.biz.service.ProInfoService;
 import com.ldz.biz.service.RechargeService;
@@ -16,12 +17,14 @@ import com.ldz.util.commonUtil.JsonUtil;
 import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.redis.RedisTemplateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/app/pay")
@@ -36,6 +39,10 @@ public class PayCtrl {
 
     @Autowired
     private RedisTemplateUtil redis;
+    @Autowired
+    private JdbcTemplate template;
+    @Autowired
+    private RechargeService rechargeService;
     /**
      * 支付回调接口
      *
@@ -86,5 +93,28 @@ public class PayCtrl {
 
         return ApiResponse.success();
     }
+
+    /**
+     *  前面注册的补送 5 个 币
+     */
+    @GetMapping("/updateBalance")
+    public ApiResponse<String> updateBalance(){
+
+        // 查出所有注册但是没有赠送 5 金币的用户
+        List<User> users = userService.findEq(User.InnerColumn.source, "0");
+        List<String> list = users.stream().map(User::getId).collect(Collectors.toList());
+        SimpleCondition condition = new SimpleCondition(Recharge.class);
+        condition.eq(Recharge.InnerColumn.czqd, "2");
+        condition.eq(Recharge.InnerColumn.amonut, "5");
+        List<Recharge> recharges = rechargeService.findByCondition(condition);
+        List<String> strings = recharges.stream().map(Recharge::getUserId).collect(Collectors.toList());
+        for (String s : list) {
+            if(!strings.contains(s)){
+                template.execute(" update  user set balance = cast(balance as unsigned) + 5  where id = '"+s+"' and source = '0'");
+            }
+        }
+        return ApiResponse.success();
+    }
+
 
 }

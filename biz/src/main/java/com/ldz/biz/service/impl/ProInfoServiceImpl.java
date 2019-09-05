@@ -911,6 +911,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         }
 
         try {
+
             //3.从redis随机获取机器人用户
             Set<Object> users = redis.boundSetOps(User.class.getName()).distinctRandomMembers(randomMaxUserNum);
 
@@ -940,7 +941,12 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 // 生成订单
                 Order order = new Order();
                 order.setUserName(user.getUserName());
-                order.setZfsj(DateUtils.getNowTime());
+                // 避免时间规律 在时间上随机加上几秒
+                Random random = new Random();
+                int ran = random.nextInt(10)-5;
+                DateTime time = DateTime.now().plusSeconds(ran);
+                String cjsj = time.toString("yyyy-MM-dd HH:mm:ss.SSS");
+                order.setZfsj(cjsj);
                 order.setId(genId());
                 order.setOrderType("2");
                 order.setProId(proId);
@@ -948,7 +954,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 order.setUserId(user.getId());
                 order.setGmfs(pUserNum + "");
                 order.setZfje(pUserNum + "");
-                order.setCjsj(DateUtils.getNowTime());
+                order.setCjsj(cjsj);
                 order.setImei(user.getRegImei());
                 order.setDdzt("0");
 
@@ -969,7 +975,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                     if (randomMillis == 0) {
                         randomMillis = 1;
                     }
-                    orderList.setCjsj(DateTime.now().plusMillis(randomMillis).toString("yyyy-MM-dd HH:mm:ss.SSS"));
+                    orderList.setCjsj(time.plusMillis(randomMillis).toString("yyyy-MM-dd HH:mm:ss.SSS"));
                     orderLists.add(orderList);
                 }
                 orders.add(order);
