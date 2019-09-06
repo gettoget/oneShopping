@@ -178,7 +178,7 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 		recharge.setQrbw(data);
 		if (StringUtils.equals(words,hex)) {
 
-			userService.saveBalance(recharge.getUserId(), Integer.parseInt(amount.split("\\.")[0])/ratio + "" );
+			userService.saveBalance(recharge.getUserId(), Integer.parseInt(recharge.getCzjb()) + "");
 			recharge.setCzzt("2");
 
 
@@ -220,6 +220,15 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 			List<Map> maps = data.toJavaList(Map.class);
 			return  ApiResponse.success(maps);
     }
+
+	public static void main(String[] args) {
+
+		String s = HttpUtil.get("https://pay.gokado.id/payment/get-pay-list");
+		JSONObject object = JSON.parseObject(s);
+		JSONArray data = object.getJSONArray("data");
+		List<Map> maps = data.toJavaList(Map.class);
+		System.out.println(JSON.toJSONString(maps));
+	}
 
 	@Override
 	public ApiResponse<String> checkPayment(String id) {
