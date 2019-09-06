@@ -16,10 +16,10 @@ spring:
     maxWait: 1000
     database: 10
   datasource:
-    url: jdbc:mysql://119.23.242.234:9306/yyg?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
+    url: jdbc:mysql://147.139.134.167:5890/yyg?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
 #    url: jdbc:mysql://127.0.0.1:3306/yyg?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
-    username: root
-    password: 123456
+    username: 'root'
+    password: 'sakuDB*!#19.0'
     type: com.alibaba.druid.pool.DruidDataSource
     initialSize: 5
     minIdle: 5

@@ -7,10 +7,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.ldz.biz.mapper.UserMapper;
 import com.ldz.biz.model.*;
-import com.ldz.biz.service.OrderListService;
-import com.ldz.biz.service.OrderService;
-import com.ldz.biz.service.ProInfoService;
-import com.ldz.biz.service.UserService;
+import com.ldz.biz.service.*;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
@@ -28,7 +25,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
-import java.text.NumberFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -60,6 +56,9 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 
     @Autowired
     private OrderListService orderListService;
+
+    @Autowired
+    private RechargeService rechargeService;
 
     @Override
     protected Mapper<User> getBaseMapper() {
@@ -125,7 +124,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         String encryptUserPwd = EncryptUtil.encryptUserPwd(password);
         User user = new User();
         user.setId(genId());
-        user.setBalance("0");
+        user.setBalance("5");
         user.setCjsj(DateUtils.getNowTime());
         user.setPhone(phone);
         user.setPwd(encryptUserPwd);
@@ -138,6 +137,19 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         user.setLastImei(imei);
         user.setLastTime(DateUtils.getNowTime());
         save(user);
+        // 新注册用户赠送 5个币
+        Recharge recharge = new Recharge();
+        recharge.setAmonut("5");
+        recharge.setCzzt("2");
+        recharge.setCjsj(DateUtils.getNowTime());
+        recharge.setCzjb("5");
+        recharge.setCzqd("2");
+        recharge.setUserId(user.getId());
+        recharge.setQrsj(DateUtils.getNowTime());
+        recharge.setCzqjbs("0");
+        recharge.setCzhjbs("5");
+        recharge.setId(genId());
+        rechargeService.save(recharge);
         String token = JwtUtil.createToken(user.getId(), System.currentTimeMillis() + "");
         redisDao.boundValueOps(user.getId()).set(token, 30, TimeUnit.DAYS);
         ApiResponse<Map<String, Object>> response = new ApiResponse<>();

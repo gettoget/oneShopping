@@ -1,20 +1,15 @@
 package com.ldz.biz.job;
 
-import java.util.Set;
-
+import com.ldz.biz.service.ProInfoService;
+import com.ldz.util.redis.RedisTemplateUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.math.RandomUtils;
-import org.quartz.DisallowConcurrentExecution;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.quartz.PersistJobDataAfterExecution;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.ldz.biz.service.ProInfoService;
-import com.ldz.util.redis.RedisTemplateUtil;
+import java.util.Set;
 
 /**
  * 5秒执行一次。机器人商品购买
