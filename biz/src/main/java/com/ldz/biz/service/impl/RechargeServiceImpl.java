@@ -15,6 +15,7 @@ import com.ldz.sys.base.LimitedCondition;
 import com.ldz.util.bean.AndroidMsgBean;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
+import com.ldz.util.bean.SimpleCondition;
 import com.ldz.util.commonUtil.*;
 import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.redis.RedisTemplateUtil;
@@ -101,9 +102,19 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
             user.setBalance("0");
         }
         amount = amount / ratio;
+        // 判断是否为首次充值 , 首次充值 加  50%
+        SimpleCondition condition = new SimpleCondition(Recharge.class);
+        condition.eq(Recharge.InnerColumn.userId, user.getId());
+        condition.eq(Recharge.InnerColumn.czqd, "1");
+        List<Recharge> recharges = findByCondition(condition);
+        int ysje =amount;
+        if(CollectionUtils.isEmpty(recharges)){
+            amount = (int) (amount * 1.5);
+        }
+
         Recharge recharge = new Recharge();
         recharge.setId(genId());
-        recharge.setAmonut(amount + "");
+        recharge.setAmonut(ysje + "");
         recharge.setCzjb(amount + "");
         recharge.setCjsj(DateUtils.getNowTime());
         recharge.setCzzt("1");
