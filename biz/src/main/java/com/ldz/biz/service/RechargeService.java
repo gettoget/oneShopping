@@ -26,4 +26,6 @@ public interface RechargeService extends BaseService<Recharge, String> {
     ApiResponse<String> checkPayment(String id);
 
     ApiResponse<String> paySucTest(String id);
+
+    ApiResponse<String> getRechargeNum();
 }

@@ -106,6 +106,7 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
         SimpleCondition condition = new SimpleCondition(Recharge.class);
         condition.eq(Recharge.InnerColumn.userId, user.getId());
         condition.eq(Recharge.InnerColumn.czqd, "1");
+        condition.eq(Recharge.InnerColumn.czzt, "2");
         List<Recharge> recharges = findByCondition(condition);
         int ysje =amount;
         if(CollectionUtils.isEmpty(recharges)){
@@ -191,7 +192,7 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
         recharge.setQrbw(data);
         if (StringUtils.equals(words, hex)) {
 
-            userService.saveBalance(recharge.getUserId(), Integer.parseInt(amount.split("\\.")[0]) / ratio + "");
+            userService.saveBalance(recharge.getUserId(), Integer.parseInt(recharge.getCzjb())  + "");
             recharge.setCzzt("2");
 
 
@@ -263,6 +264,18 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
         }
 
         return ApiResponse.success("SUCCESS");
+    }
+
+    @Override
+    public ApiResponse<String> getRechargeNum() {
+        String userId = getHeader("userId");
+        SimpleCondition simpleCondition = new SimpleCondition(Recharge.class);
+        simpleCondition.eq(Recharge.InnerColumn.userId, userId);
+        simpleCondition.eq(Recharge.InnerColumn.czqd, "1");
+        simpleCondition.eq(Recharge.InnerColumn.czzt, "2");
+        List<Recharge> list = findByCondition(simpleCondition);
+        int size = list.size();
+        return ApiResponse.success(size+ "");
     }
 
 
