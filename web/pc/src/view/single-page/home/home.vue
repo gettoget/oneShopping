@@ -7,7 +7,7 @@
 
 
     <Row :gutter="20">
-      <i-col :md="24" :lg="12" :xl="6"
+      <i-col :md="24" :lg="12" :xl="4"
              style="height: 200px;padding-bottom: 10px;">
         <infor-card shadow color="#E46CBB" icon="md-person-add" tit="新增用户" :icon-size="36">
           <div class="box_col rowAuto" style="padding-left: 18px">
@@ -29,7 +29,7 @@
           </div>
         </infor-card>
       </i-col>
-      <i-col :md="24" :lg="12" :xl="6"
+      <i-col :md="24" :lg="12" :xl="4"
              style="height: 200px;padding-bottom: 10px;">
         <infor-card shadow color="#2d8cf0" icon="md-cube" tit="今日商品" :icon-size="36">
           <div class="box_col rowAuto" style="padding-left: 18px">
@@ -51,25 +51,48 @@
           </div>
         </infor-card>
       </i-col>
-      <i-col :md="24" :lg="12" :xl="6"
+      <i-col :md="24" :lg="12" :xl="5"
              style="height: 200px;padding-bottom: 10px;">
-        <infor-card shadow color="#9A66E4" icon="md-pulse" tit="充值金额" :icon-size="36">
+        <infor-card shadow color="#9A66E4" icon="md-pulse" tit="今日充值" :icon-size="36">
           <div class="box_col rowAuto" style="padding-left: 18px">
             <div class="box_row colCenter">
-              <div class="count-tit-style">今日 :</div>
+              <div class="count-tit-style">充值失败 :</div>
               <!--<count-to :end="statisRecharge.today" count-class="count-style"/>-->
-              <h1>{{AF.Format_Num(statisRecharge.today,3)}}</h1>
+              <h1>{{AF.Format_Num(statisRecharge.czsb,3)}}</h1>
 
             </div>
             <div class="box_row colCenter">
-              <div class="count-tit-style">本月 :</div>
+              <div class="count-tit-style">充值成功 :</div>
               <!--<count-to :end="statisRecharge.mon" count-class="count-style"/>-->
-              <h1>{{AF.Format_Num(statisRecharge.mon,3)}}</h1>
+              <h1>{{AF.Format_Num(statisRecharge.czcg,3)}}</h1>
             </div>
             <div class="box_row colCenter">
-              <div class="count-tit-style">累计 :</div>
+              <div class="count-tit-style">系统赠送 :</div>
               <!--<count-to :end="statisRecharge.total" count-class="count-style"/>-->
-              <h1>{{AF.Format_Num(statisRecharge.total,3)}}</h1>
+              <h1>{{AF.Format_Num(statisRecharge.zsjb,3)}}</h1>
+            </div>
+          </div>
+        </infor-card>
+      </i-col>
+      <i-col :md="24" :lg="12" :xl="5"
+             style="height: 200px;padding-bottom: 10px;">
+        <infor-card shadow color="#9A66E4" icon="md-pulse" tit="本月充值" :icon-size="36">
+          <div class="box_col rowAuto" style="padding-left: 18px">
+            <div class="box_row colCenter">
+              <div class="count-tit-style">充值失败 :</div>
+              <!--<count-to :end="statisRecharge.today" count-class="count-style"/>-->
+              <h1>{{AF.Format_Num(statisRecharge1.czsb,3)}}</h1>
+
+            </div>
+            <div class="box_row colCenter">
+              <div class="count-tit-style">充值成功 :</div>
+              <!--<count-to :end="statisRecharge.mon" count-class="count-style"/>-->
+              <h1>{{AF.Format_Num(statisRecharge1.czcg,3)}}</h1>
+            </div>
+            <div class="box_row colCenter">
+              <div class="count-tit-style">系统赠送 :</div>
+              <!--<count-to :end="statisRecharge.total" count-class="count-style"/>-->
+              <h1>{{AF.Format_Num(statisRecharge1.zsjb,3)}}</h1>
             </div>
           </div>
         </infor-card>
@@ -168,10 +191,15 @@
           kj: 0             // 开奖
         },
         statisRecharge: {
-          total: 0,      // 总计
-          today: 0,           // 当天
-          mon: 0          // 当月
+            czsb: 0,      // 总计
+            czcg: 0,           // 当天
+            zsjb: 0          // 当月
         },
+          statisRecharge1: {
+              czsb: 0,      // 总计
+              czcg: 0,           // 当天
+              zsjb: 0         // 当月
+          },
         statisCharge:{
           total: 0,       // 总计
           today: 0,       // 当天
@@ -183,6 +211,7 @@
       this.getUtatisUser()
       this.getStatisPro()
       this.getStatisRecharge()
+      this.getStatisRecharge1()
     },
     mounted() {
     },
@@ -204,13 +233,31 @@
         })
       },
       getStatisRecharge() {
-        this.$http.post('/api/statis/statisRecharge').then(res => {
+          let a = (new Date().getMonth()+1)
+          if (a<10){
+              a = "0"+a
+          }
+          let time = new Date().getFullYear() +'-'+a+"-"+new Date().getDate()
+        this.$http.post('/api/statisnew/statisNewRecharge',{time:time}).then(res => {
           if (res.code == 200) {
             this.statisRecharge = res.result
           }
         }).catch(err => {
         })
       },
+        getStatisRecharge1() {
+            let a = (new Date().getMonth()+1)
+            if (a<10){
+                a = "0"+a
+            }
+            let time = new Date().getFullYear() +'-'+a
+            this.$http.post('/api/statisnew/statisNewRecharge',{time:time}).then(res => {
+                if (res.code == 200) {
+                    this.statisRecharge1 = res.result
+                }
+            }).catch(err => {
+            })
+        },
       getSstatisCharge() {
         this.$http.post('/api/statis/statisCharge').then(res => {
           if (res.code == 200) {
@@ -225,14 +272,14 @@
 
 <style lang="less">
   .count-tit-style {
-    font-size: 26px;
+    font-size: 18px;
   }
 
   .count-style {
-    font-size: 30px;
+    font-size: 26px;
   }
 
   .count-style-M {
-    font-size: 25px;
+    font-size: 22px;
   }
 </style>

@@ -80,6 +80,7 @@
           {
             bol: false,
             text: "推荐",
+            i18n:'TJ',
             key: "1"
           },
           {

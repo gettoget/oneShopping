@@ -35,7 +35,7 @@
                   {{item.replyList[item.replyList.length-1].content}}
                 </div>
               <div class="box_col_z" style="text-align: center">
-                <Button type="primary" ghost @click="handleReply(item)">点击回复</Button>
+                <Button type="primary" ghost @click="handleReply(item)">{{$t("DJHF")}}</Button>
               </div>
           </Card>
         </Col>

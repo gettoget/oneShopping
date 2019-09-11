@@ -18,6 +18,7 @@ export default {
 
   "home": "idid",
   "login": "idid",
+  "DJHF":"Klik untuk membalas",
 
   /**********************************
    ***********************************/
@@ -34,7 +35,17 @@ export default {
   "IDENTIFICATION_NUMBER":"Nomor ID",
   "PHONE_NUMBER":"Nomor ponsel",
   "SEX":"Jenis kelamin",
-  "STATE":"Negara"
+  "STATE":"Negara",
+  "XZYH":"pengguna baru",
+  "JR":"hari ini",
+  "BY":"bulan ini",
+  "LJ":"akumulatif",
+  "JRSP":"Hari ini merchandise",
+  "KJ":"Draw",
+  "SJ":"partisipasi pada rak",
+  "CY":" rak",
+  "CZJE":"top-up jumlah",
+  "XFJE":"konsumsi jumlah",
 
   /**********************************
    ***********************************/

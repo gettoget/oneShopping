@@ -2,11 +2,11 @@
   <Card style="margin-bottom: 12px">
     <div slot="title" class="box_row rowBetween colCenter">
       <div>
-        订单号:{{mess.id}}
+        {{$t("ORDERNUMBER")}}:{{mess.id}}
       </div>
-      <div>购买日期:{{moment(mess.cjsj).format('YYYY-MM-DD HH:mm:ss')}}</div>
+      <div> {{$t("GMRQ")}}:{{moment(mess.cjsj).format('YYYY-MM-DD HH:mm:ss')}}</div>
       <div>
-        <Button type="info" size="small" @click="shopFH">发货</Button>
+        <Button type="info" size="small" @click="shopFH"> {{$t("FH")}}</Button>
       </div>
     </div>
 
@@ -59,7 +59,7 @@
       <div class="comp-shop-MoneyMess">
         <div class="box_row itemSty">
           <div class="item-tit">
-            单价：
+            {{$t("DJ")}}：
           </div>
           <div class="item-val">
               {{mess.singlePrice}}
@@ -67,7 +67,7 @@
         </div>
         <div class="box_row itemSty">
           <div class="item-tit">
-            数量：
+            {{$t("SL")}}：
           </div>
           <div class="item-val">
             <span style="font-size: 22px;font-weight: 700">x</span>
@@ -83,7 +83,7 @@
             <!--{{mess.zfje}}-->
           <!--</div>-->
           <div class="styBox">
-            支付 ：{{mess.zfje}}
+            {{$t("ZF")}} ：{{mess.zfje}}
           </div>
         </div>
       </div>

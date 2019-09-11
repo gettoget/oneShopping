@@ -37,6 +37,7 @@
           if (res.code == 200) {
             let dataX = []
             let dataV = []
+
             res.result.forEach((it, index) => {
               let item = it.split(',')
               dataX.push(item[0])
@@ -48,7 +49,7 @@
           }
         })
       },
-      buildEchart(dataX,dataV) {
+      buildEchart(dataX,dataV,data1,data2,data3,data4,data5,data6) {
         var v = this
         var myChart = echarts.init(document.getElementById('moneyAnalysis'));
 
@@ -142,25 +143,37 @@
 
       getMoneyAnalysis(){
         var v = this
-        this.$http.post("/api/statis/statisLastSeven",{day:"30"}).then(res=>{
+        this.$http.post("/api/statisnew/statisCzqd",{day:"30"}).then(res=>{
           let dataX = []
           let YL = []
           let JF = []
+            let data1 = [] //CIMB
+            let data2 = [] //Danamon
+            let data3 = [] //Alfa
+            let data4 = [] //Permata
+            let data5 = [] //BNI
+            let data6 = [] //Mandiri
           if(res.code == 200 ){
             res.result.forEach((it, index) => {
               let item = it.split(',')
               dataX.push(item[0])
               YL.push(item[1])
               JF.push(item[2])
+                data1.push(item[1])
+                data2.push(item[2])
+                data3.push(item[3])
+                data4.push(item[4])
+                data5.push(item[5])
+                data6.push(item[6])
               if (index == res.result.length - 1) {
-                v.buildMoneyAnalysis(dataX,YL,JF,'30')
+                v.buildMoneyAnalysis(dataX,YL,JF,'30',data1,data2,data3,data4,data5,data6)
               }
             })
           }
 
         }).catch(err=>{})
       },
-      buildMoneyAnalysis(dataX,YL,JF,time){
+      buildMoneyAnalysis(dataX,YL,JF,time,data1,data2,data3,data4,data5,data6){
         var v = this
         var myChart = echarts.init(document.getElementById('moneyAnalysis_lineBox'));
         let option = {
@@ -174,7 +187,7 @@
             }
           },
           legend: {
-            data:['银联充值','积分兑换'],
+            data:['银联充值','积分兑换',"12313"],
             x: "right",
             y: "top"
           },
@@ -224,17 +237,41 @@
           },
           series: [
             {
-              name:'银联充值',
+              name:'CIMB',
               type:'line',
-              data:YL
+              data:data1
                 // [320, 332, 301, 334, 390, 330, 320]
             },
             {
-              name:'积分兑换',
+              name:'Danamon',
               type:'line',
-              data:JF
+              data:data2
                 // [150, 232, 201, 154, 190, 330, 410]
-            }
+            },
+              {
+                  name:'Alfa',
+                  type:'line',
+                  data:data3
+                  // [150, 232, 201, 154, 190, 330, 410]
+              },
+              {
+                  name:'Permata',
+                  type:'line',
+                  data:data4
+                  // [150, 232, 201, 154, 190, 330, 410]
+              },
+              {
+                  name:'BNI',
+                  type:'line',
+                  data:data5
+                  // [150, 232, 201, 154, 190, 330, 410]
+              },
+              {
+                  name:'Mandiri',
+                  type:'line',
+                  data:data6
+                  // [150, 232, 201, 154, 190, 330, 410]
+              },
           ],
           color: ["#ff7f50", "#87cefa", "#da70d6", "#32cd32", "#6495ed", "#ff69b4", "#ba55d3", "#cd5c5c", "#ffa500", "#40e0d0", "#1e90ff", "#ff6347", "#7b68ee", "#00fa9a", "#ffd700", "#6699FF", "#ff6666", "#3cb371", "#b8860b", "#30e0e0"]
         };
