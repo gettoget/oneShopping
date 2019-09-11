@@ -40,9 +40,13 @@ public class RobotSyncJob implements Job {
         		if (randomIndex == proInfos.size()){
         			randomIndex = proInfos.size() - 1;
         		}
-        		//随机得到商品ID进行购买操作
-				Object itemKey = CollectionUtils.get(proInfos.iterator(), randomIndex);
-        		infoService.saveRobot(itemKey.toString());
+        		//随机得到商品ID进行购买操作  修改为所有商品都购买
+				for (int i = 0; i < proInfos.size(); i++) {
+					Object itemKey = CollectionUtils.get(proInfos.iterator(), i);
+					infoService.saveRobot(itemKey.toString());
+				}
+//				Object itemKey = CollectionUtils.get(proInfos.iterator(), randomIndex);
+//        		infoService.saveRobot(itemKey.toString());
         	}
     	}catch(Exception e){
     		errorInfo.error("商品剩余名额分配异常", e);

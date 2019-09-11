@@ -577,7 +577,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             BaiduPushUtils.pushAllMsg(0, JsonUtil.toJson(msgBean), 3, 0);
             if(CollectionUtils.isNotEmpty(inUsers)){
                 JSONObject object = new JSONObject();
-                object.put("title","");
+                object.put("title","GoSaku");
                 object.put("description","Produk yang anda ikuti sudah mendapatkan pemenang, yuk lihat sekarang");
                 object.put("notification_builder_id",0);
                 object.put("notification_basic_style",7);

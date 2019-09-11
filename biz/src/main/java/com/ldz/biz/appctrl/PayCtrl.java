@@ -61,7 +61,7 @@ public class PayCtrl {
     }
 
     @GetMapping("/testMsg")
-    public ApiResponse<String> testMsg() {
+    public ApiResponse<String> testMsg(String id) {
 
         SimpleCondition condition = new SimpleCondition(ProInfo.class);
         condition.eq(ProInfo.InnerColumn.proZt, "4");
@@ -79,9 +79,9 @@ public class PayCtrl {
         User byId = userService.findById(info.getUserId());
         info.setUserName(byId.getUserName());
         pushBean.setCustom_content(JsonUtil.toJson(info));
-        String o = (String) redis.boundValueOps("579590080797081600_channelId").get();
+        String o = (String) redis.boundValueOps(id + "_channelId").get();
         JSONObject object = new JSONObject();
-        object.put("title","");
+        object.put("title","GoSaku");
         object.put("description","Produk yang anda ikuti sudah mendapatkan pemenang, yuk lihat sekarang");
         object.put("notification_builder_id",0);
         object.put("notification_basic_style",7);
