@@ -42,7 +42,7 @@
         <div @click="fileIndex = 'danamon'"
              class="buttonItem box_row_100" :class="fileIndex=='danamon'?'selBut':''">
           <!--Danamon-->
-          <img src="https://wishwish.oss-ap-southeast-5.aliyuncs.com/payment/alfa.png" alt="">
+          <img src="https://wishwish.oss-ap-southeast-5.aliyuncs.com/payment/danamon.png" alt="">
         </div>
       </div>
     </div>
