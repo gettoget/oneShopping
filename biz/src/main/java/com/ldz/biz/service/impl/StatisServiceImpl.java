@@ -397,8 +397,6 @@ public class StatisServiceImpl implements StatisService {
             }
             result.add(value);
         }
-
-
         return ApiResponse.success(result);
     }
 
