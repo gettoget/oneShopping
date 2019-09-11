@@ -58,6 +58,14 @@ public class RechargeCtrl  {
         return service.checkPayment(id);
     }
 
+    /**
+     *  查询用户充值次数
+     */
+    @GetMapping("/getRechargeNum")
+    public ApiResponse<String> getRechargeNum(){
+        return service.getRechargeNum();
+    }
+
 
 
 
