@@ -9,6 +9,7 @@
 
 
 // ' http://119.23.242.234:8088'
+// ' http://192.168.123.69:8088'
 const ajaxUrl = process.env.NODE_ENV === 'development'//development开发环境
   ? 'http://192.168.123.69:8088'
   : 'http://192.168.123.69:8088'

@@ -37,6 +37,7 @@
           if (res.code == 200) {
             let dataX = []
             let dataV = []
+
             res.result.forEach((it, index) => {
               let item = it.split(',')
               dataX.push(item[0])
@@ -48,7 +49,7 @@
           }
         })
       },
-      buildEchart(dataX,dataV) {
+      buildEchart(dataX,dataV,data1,data2,data3,data4,data5,data6) {
         var v = this
         var myChart = echarts.init(document.getElementById('moneyAnalysis'));
 
@@ -142,31 +143,43 @@
 
       getMoneyAnalysis(){
         var v = this
-        this.$http.post("/api/statis/statisLastSeven",{day:"30"}).then(res=>{
+        this.$http.post("/api/statisnew/statisCzqd",{day:"30"}).then(res=>{
           let dataX = []
           let YL = []
           let JF = []
+            let data1 = [] //CIMB
+            let data2 = [] //Danamon
+            let data3 = [] //Alfa
+            let data4 = [] //Permata
+            let data5 = [] //BNI
+            let data6 = [] //Mandiri
           if(res.code == 200 ){
             res.result.forEach((it, index) => {
               let item = it.split(',')
               dataX.push(item[0])
               YL.push(item[1])
               JF.push(item[2])
+                data1.push(item[1])
+                data2.push(item[2])
+                data3.push(item[3])
+                data4.push(item[4])
+                data5.push(item[5])
+                data6.push(item[6])
               if (index == res.result.length - 1) {
-                v.buildMoneyAnalysis(dataX,YL,JF,'30')
+                v.buildMoneyAnalysis(dataX,YL,JF,'30',data1,data2,data3,data4,data5,data6)
               }
             })
           }
 
         }).catch(err=>{})
       },
-      buildMoneyAnalysis(dataX,YL,JF,time){
+      buildMoneyAnalysis(dataX,YL,JF,time,data1,data2,data3,data4,data5,data6){
         var v = this
         var myChart = echarts.init(document.getElementById('moneyAnalysis_lineBox'));
         let option = {
           title: {
             show:true,
-            text: '渠道充值走势',
+            text: '',
             x: "left",
             textStyle: {
               fontSize: 14,
@@ -174,14 +187,14 @@
             }
           },
           legend: {
-            data:['银联充值','积分兑换'],
+            data:['CIMB','Danamon',"Alfa","Permata","BNI","Mandiri"],
             x: "right",
             y: "top"
           },
           tooltip: {
             trigger: "axis",
             position: function (pos, params, el, elRect, size) {
-              var obj = {top: 10};
+              var obj = {top: 2};
               obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 30;
               return obj;
             }
@@ -224,17 +237,41 @@
           },
           series: [
             {
-              name:'银联充值',
+              name:'CIMB',
               type:'line',
-              data:YL
+              data:data1
                 // [320, 332, 301, 334, 390, 330, 320]
             },
             {
-              name:'积分兑换',
+              name:'Danamon',
               type:'line',
-              data:JF
+              data:data2
                 // [150, 232, 201, 154, 190, 330, 410]
-            }
+            },
+              {
+                  name:'Alfa',
+                  type:'line',
+                  data:data3
+                  // [150, 232, 201, 154, 190, 330, 410]
+              },
+              {
+                  name:'Permata',
+                  type:'line',
+                  data:data4
+                  // [150, 232, 201, 154, 190, 330, 410]
+              },
+              {
+                  name:'BNI',
+                  type:'line',
+                  data:data5
+                  // [150, 232, 201, 154, 190, 330, 410]
+              },
+              {
+                  name:'Mandiri',
+                  type:'line',
+                  data:data6
+                  // [150, 232, 201, 154, 190, 330, 410]
+              },
           ],
           color: ["#ff7f50", "#87cefa", "#da70d6", "#32cd32", "#6495ed", "#ff69b4", "#ba55d3", "#cd5c5c", "#ffa500", "#40e0d0", "#1e90ff", "#ff6347", "#7b68ee", "#00fa9a", "#ffd700", "#6699FF", "#ff6666", "#3cb371", "#b8860b", "#30e0e0"]
         };
@@ -380,12 +417,15 @@
 
       get_People_money(T){
         var v = this
-        this.$http.post("/api/statis/statisCzqd",{time:T?T:''}).then(res=>{
+        this.$http.post("/api/statisnew/statisQdJe").then(res=>{
           let people = []
           let money = []
           if(res.code == 200){
-            money = [res.result[1].split(',')[0],res.result[2].split(',')[0]]
-            people = [res.result[1].split(',')[1],res.result[2].split(',')[1]]
+              for (var i in res.result) {
+                  money.push(res.result[i].split(',')[0])
+                  people.push(res.result[i].split(',')[1])
+              }
+
             v.buildqd_qd_Analysis(people,money)
           }
         }).catch(err=>{})
@@ -428,8 +468,10 @@
           },
           xAxis: [
             {
-              data: ['银联充值','积分兑换'],
+              data: ["Alfa", "BNI","CIMB","Danamon","Mandiri","Permata"],
               axisLabel: {
+                  show:true,
+                  rotate:69,
                 textStyle: {
                   color: '#fff'
                 }
@@ -482,13 +524,15 @@
             {
               name:'人数',
               type:'bar',
-              data:people
+              data:people,
+                barWidth: 10
                 // [35,50]
             },
             {
               name:'金额',
               type:'bar',
-              data:money
+              data:money,
+                barWidth: 10
                 // [67,65]
             }
           ],
@@ -516,7 +560,7 @@
     top: 40px;
     z-index: 200;
     width: 400px;
-    height: 160px;
+    height: 180px;
     background: rgba(0,0,0,0.4);
     .ivu-card-body {
       height: 100%;
@@ -529,7 +573,7 @@
     top: 40px;
     z-index: 200;
     width: 400px;
-    height: 160px;
+    height: 180px;
     background: rgba(0,0,0,0.4);
     .ivu-card-body {
       height: 100%;
@@ -544,7 +588,7 @@
     top: 40px;
     z-index: 200;
     width: 350px;
-    height: 160px;
+    height: 180px;
     background: rgba(0,0,0,0.4);
     .ivu-card-body {
       height: 100%;

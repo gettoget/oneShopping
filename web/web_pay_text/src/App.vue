@@ -14,29 +14,35 @@
       <div class="bottonGroup box_row">
         <div @click="fileIndex = 'BNI'"
              class="buttonItem box_row_100" :class="fileIndex=='BNI'?'selBut':''">
-          BNI
+          <!--BNI-->
+          <img src="https://wishwish.oss-ap-southeast-5.aliyuncs.com/payment/BNI.png" alt="">
         </div>
         <div @click="fileIndex = 'alfa'"
              class="buttonItem box_row_100" :class="fileIndex=='alfa'?'selBut':''">
-          Alfamart
+          <!--Alfamart-->
+          <img src="https://wishwish.oss-ap-southeast-5.aliyuncs.com/payment/alfa.png" alt="">
         </div>
         <div @click="fileIndex = 'cimb'"
              class="buttonItem box_row_100" :class="fileIndex=='cimb'?'selBut':''">
-          CIMB NIAGA
+          <!--CIMB NIAGA-->
+          <img src="https://wishwish.oss-ap-southeast-5.aliyuncs.com/payment/cimb.png" alt="">
         </div>
       </div>
       <div class="bottonGroup box_row">
         <div @click="fileIndex = 'mandiri'"
              class="buttonItem box_row_100" :class="fileIndex=='mandiri'?'selBut':''">
-          mandiri
+          <!--mandiri-->
+          <img src="https://wishwish.oss-ap-southeast-5.aliyuncs.com/payment/mandiri.png" alt="">
         </div>
         <div @click="fileIndex = 'permata'"
              class="buttonItem box_row_100" :class="fileIndex=='permata'?'selBut':''">
-          PermataBank
+          <!--PermataBank-->
+          <img src="https://wishwish.oss-ap-southeast-5.aliyuncs.com/payment/permata.png" alt="">
         </div>
         <div @click="fileIndex = 'danamon'"
              class="buttonItem box_row_100" :class="fileIndex=='danamon'?'selBut':''">
-          Danamon
+          <!--Danamon-->
+          <img src="https://wishwish.oss-ap-southeast-5.aliyuncs.com/payment/danamon.png" alt="">
         </div>
       </div>
     </div>

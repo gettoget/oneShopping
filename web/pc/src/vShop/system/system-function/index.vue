@@ -94,7 +94,7 @@
         ],
         data1: [
           {
-            gnmc: '用户管理',
+            gnmc: 'system_user',
             gndm: 'system_user',
             url: 'system/system_user',
             fjd: 'system',

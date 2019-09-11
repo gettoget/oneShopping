@@ -30,6 +30,9 @@
         times:[],
         data1:[],//充值
         data2:[],//消费
+        data3:[],
+        data4:[],
+        data5:[],
       }
     },
     watch:{
@@ -48,8 +51,11 @@
         this.times=[]
         this.data1=[]
         this.data2=[]
+        this.data3=[]
+        this.data4=[]
+        this.data5=[]
 
-        this.$http.post("/api/statis/paymentWater",{day:this.time}).then(res=>{
+        this.$http.post("/api/statisnew/statisNewWater",{day:this.time}).then(res=>{
           if(res.code == 200){
             res.result.forEach((it,index)=>{
               let a = it.split('|')
@@ -62,6 +68,18 @@
                 this.buildEchart()
               }
             })
+
+              this.data1.forEach((it,index)=>{
+                  let a = it.split(',')
+                  console.log(a);
+                  this.data3.push(a[0])
+                  this.data4.push(a[1])
+                  this.data5.push(a[2])
+
+                  if(index == res.result.length-1){
+                      this.buildEchart()
+                  }
+              })
           }
         }).catch(err=>{})
       },
@@ -140,11 +158,26 @@
             }
           ],
           series: [
-            {
-              name: "充值",
-              type: "line",
-              data: v.data1
-            },
+            // {
+            //   name: "充值",
+            //   type: "line",
+            //   data: v.data1
+            // },
+              {
+                  name: "充值失败",
+                  type: "line",
+                  data: v.data3
+              },
+              {
+                  name: "充值成功",
+                  type: "line",
+                  data: v.data4
+              },
+              {
+                  name: "系统赠送",
+                  type: "line",
+                  data: v.data5
+              },
             {
               name: "消费",
               type: "line",

@@ -64,7 +64,7 @@ export default [
         name: 'system-user',
         meta: {
           icon: 'ios-contact',
-          title: '用户管理'
+          title: 'system-user',
         },
         component: () => import('@/vShop/system/system-user')
       },
@@ -129,7 +129,7 @@ export default [
     name: 'stock',
     meta: {
       icon: 'ios-cube-outline',
-      title: '商品管理'
+      title: 'stock'
     },
     component: Main,
     children: [
@@ -167,7 +167,7 @@ export default [
     name: 'user',
     meta: {
       icon: 'md-person',
-      title: '用户管理'
+      title: 'system-user'
     },
     component: Main,
     children: [

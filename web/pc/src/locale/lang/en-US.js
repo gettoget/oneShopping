@@ -25,7 +25,7 @@ export default {
   "SDSH":"Audit of sheets",
   "SPLL":"Goods Browsing",
   "KC":"Stock",
-
+  "DJHF":"Click reply",
   /**********************************
    ***********************************/
 
