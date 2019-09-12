@@ -304,13 +304,13 @@ export default [
         component: () => import('@/vShop/topUpData')
       },
       {
-        path: '/User-Details-Statistics',
-        name: 'UserDetailsStatistics',
+        path: '/user-details-statistics',
+        name: 'user-details-statistics',
         meta: {
           icon: 'md-images',
           title: "用户详情统计"
         },
-        component: () => import('@/vShop/User Details Statistics')
+        component: () => import('@/vShop/userdetailsstatistics')
       },
       {
         path: '/CommodityDetailsStatistics',
@@ -319,7 +319,7 @@ export default [
           icon: 'md-images',
           title: "商品详情统计"
         },
-        component: () => import('@/vShop/Commodity Details Statistics')
+        component: () => import('@/vShop/commoditydetailsstatistics')
       }
     ]
   },
