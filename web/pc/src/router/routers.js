@@ -302,6 +302,24 @@ export default [
           title: "统计"
         },
         component: () => import('@/vShop/topUpData')
+      },
+      {
+        path: '/User Details Statistics',
+        name: 'User Details Statistics',
+        meta: {
+          icon: 'md-images',
+          title: "用户详情统计"
+        },
+        component: () => import('@/vShop/User Details Statistics')
+      },
+      {
+        path: '/Commodity Details Statistics',
+        name: 'Commodity Details Statistics',
+        meta: {
+          icon: 'md-images',
+          title: "商品详情统计"
+        },
+        component: () => import('@/vShop/Commodity Details Statistics')
       }
     ]
   },
