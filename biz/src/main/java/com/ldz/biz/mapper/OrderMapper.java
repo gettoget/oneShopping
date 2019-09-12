@@ -91,7 +91,7 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
     @Update(" update user set zjcs = CAST(zjcs as unsigned ) + 1 where id = #{id}")
     int updateZjcs(@Param("id") String id);
 
-    @Select( " select o.gmfs, o.cjsj,u.user_name userName,u.h_img hImg from Order_form o left join user u on u.id = o.user_id where o.pro_id = #{id} order by cjsj desc ")
+    @Select( " select o.gmfs, o.cjsj,u.user_name userName,u.h_img hImg from Order_form o left join user u on u.id = o.user_id where o.pro_id = #{id} and o.user_id in ( select userid from order_list where yhlx = '1' and pro_id = #{id}) order by cjsj desc ")
     List<Order> getUsersOrders(@Param("id") String id);
 
     @Select(" SELECT u.id userId, u.user_name userName, u.h_img himg , o.gmfs gmfs , o.zfsj gmsj from order_form o ,  user u WHERE pro_id = #{proId} and u.id = o.USER_ID  order by o.zfsj DESC")

@@ -785,7 +785,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
-        Set<String> userIds = list.stream().map(ProInfo::getUserId).filter(s -> StringUtils.isNotBlank(s)).collect(Collectors.toSet());
+        Set<String> userIds = list.stream().map(ProInfo::getUserId).filter(StringUtils::isNotBlank).collect(Collectors.toSet());
         List<User> users = new ArrayList<>();
         if(CollectionUtils.isNotEmpty(userIds)){
            users =  userService.findByIds(userIds);
