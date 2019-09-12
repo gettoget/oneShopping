@@ -9,12 +9,8 @@
       </div>
     </div>
     <div class="box_row" style="height:100%">
-      <div id="chartTopUp" class="box_row_1auto" style="height: 100%">
-
-      </div>
-      <div id="chartTopUp1" class="box_row_1auto" style="height: 100%">
-
-      </div>
+      <div id="chartTopUp" class="box_row_1auto" style="height: 100%"></div>
+      <div id="chartTopUp1" class="box_row_1auto" style="height: 100%"></div>
     </div>
 
   </Card>

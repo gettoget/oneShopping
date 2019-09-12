@@ -304,8 +304,8 @@ export default [
         component: () => import('@/vShop/topUpData')
       },
       {
-        path: '/User Details Statistics',
-        name: 'User Details Statistics',
+        path: '/User-Details-Statistics',
+        name: 'UserDetailsStatistics',
         meta: {
           icon: 'md-images',
           title: "用户详情统计"
@@ -313,8 +313,8 @@ export default [
         component: () => import('@/vShop/User Details Statistics')
       },
       {
-        path: '/Commodity Details Statistics',
-        name: 'Commodity Details Statistics',
+        path: '/CommodityDetailsStatistics',
+        name: 'CommodityDetailsStatistics',
         meta: {
           icon: 'md-images',
           title: "商品详情统计"
