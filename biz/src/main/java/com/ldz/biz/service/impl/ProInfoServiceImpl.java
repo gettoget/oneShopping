@@ -150,6 +150,9 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
     @Override
     public ApiResponse<ProInfo> getProInfo(String id) {
+        // 浏览数 +1
+        baseMapper.plusRead(id);
+        baseMapper.plusRead2(id);
         RuntimeCheck.ifBlank(id, MessageUtils.get("pro.idBlank"));
         ProInfo proInfo = findById(id);
         RuntimeCheck.ifNull(proInfo, MessageUtils.get("pro.isNull"));
@@ -175,8 +178,6 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
             if(CollectionUtils.isNotEmpty(stores)){
                 proInfo.setStore("1");
             }
-
-
         }
         if(StringUtils.isBlank(proInfo.getStore())){
             proInfo.setStore("0");

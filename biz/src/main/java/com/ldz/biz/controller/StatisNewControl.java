@@ -76,6 +76,28 @@ public class StatisNewControl  {
         return service.statisXzYh();
     }
 
+    /**
+     *  商品购买 浏览  统计接口
+     */
+    @PostMapping("/spgm")
+    public ApiResponse<Object>  spgm(){
+        return service.spgm();
+    }
+
+    /**
+     * 查看某一天 开奖商品的浏览数和购买数 和 比例
+     */
+    public ApiResponse<Object> dtLlGm(String time , String id){
+        return service.dtLlGm(time, id);
+    }
+
+
+
+
+
+
+
+
 
 
 

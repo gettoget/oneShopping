@@ -71,6 +71,12 @@ public interface RechargeMapper extends Mapper<Recharge> {
     @Select(" select IFNULL(count(1),0) from user where cjsj like '${time}%' and source = '0'")
     int statisXzYh(String time);
 
+    @Select(" select IFNULL(bz1,0), IFNULL((select count(1) from order_list where yhlx = '0' and pro_id in (select id from pro_info where pro_baseid = #{id}) ),0) count   from pro_baseinfo where id = #{id}")
+    Map<String,String> getGmAndLl(String id);
+
+    @Select(" select count(1) from order_list where pro_id in ( select id from pro_info where pro_baseid = #{id} ) ")
+    double sumBfb(String time , String id);
+
 
 
 }

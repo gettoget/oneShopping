@@ -23,4 +23,8 @@ public interface StatisNewService {
     ApiResponse<Map<String, String>> statisAllQd(String day);
 
     ApiResponse<Map<String, String>> statisQdJe();
+
+    ApiResponse<Object> spgm();
+
+    ApiResponse<Object> dtLlGm(String time, String id);
 }

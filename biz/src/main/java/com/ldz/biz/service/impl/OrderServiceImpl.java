@@ -491,12 +491,14 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                 }
             }
             //从最后一个购买订单的抽取一个中间号码
-            OrderList orderList = baseMapper.getOrderByRobotZjhm(id, orderIds);
+            // 修改策略 从 购买最多的用户中 获取中奖号码
+            OrderList orderList = baseMapper.getMostRobot(id);
+//            OrderList orderList = baseMapper.getOrderByRobotZjhm(id, orderIds);
 
             if (orderList != null && StringUtils.isNotBlank(lastOrder.getId())) {
                 List<String> strings = lastFifty.stream().map(OrderList::getId).collect(Collectors.toList());
                 String hm = orderList.getNum();
-                //如果最后50个订单里面没有中间号码订单，则将中奖号码订单添加进去
+                // 如果最后五十个订单中没有机器人 则添加一个进来
                 if (!strings.contains(lastOrder.getId())) {
                     lastFifty = lastFifty.subList(0, lastFifty.size() - 1);
                     lastOrder.setCjsj(lastFifty.get(lastFifty.size() - 1).getCjsj());
