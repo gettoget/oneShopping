@@ -6,6 +6,8 @@ export default {
 
   "system":"System",
   "system-user":"System user",
+  "newstock":"newstock",
+
 
   /**********************************
    ***********************************/
