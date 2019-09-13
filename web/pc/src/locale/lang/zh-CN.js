@@ -6,6 +6,26 @@ export default {
 
   "system":"系统管理",
   "system-user":"用户管理",
+  "stock":"商品",
+  "newstock":"商品上架",
+  "reserve":"库存管理",
+  "manage":"商品浏览",
+  "user":"用户",
+  "usermanagement":"用户信息",
+  "showorder":"晒单审核",
+  "order":"订单管理",
+  "audit-order":"订单查询",
+  "direct-order":"直购订单",
+  "shipment-order":"订单发货",
+  "chargeOrder":"充值订单",
+  "appmanger":"app管理",
+  "carousel":"轮播图",
+  "statistics":"统计",
+  "topUpData":"数据统计",
+  "user-details-statistics":"用户详情统计",
+  "CommodityDetailsStatistics":"商品详情统计",
+  "message":"留言管理",
+  "imessage":"留言",
 
   /**********************************
    ***********************************/
@@ -26,6 +46,8 @@ export default {
   "SPLL":"商品浏览",
   "KC":"库存",
   "DJHF":"点击回复",
+  "SC":"删除",
+  "PJ":"评价",
   /**********************************
    ***********************************/
 
@@ -48,6 +70,8 @@ export default {
   "JRSP":"今日商品",
   "KJ":"开奖",
   "XFJE":"消费金额",
+  "LX":"类型",
+  "operation":"操作",
   /**********************************
    ***********************************/
 

@@ -3,7 +3,7 @@
     <div slot="title" class="box_row colCenter">
       <!--<Avatar :src="apis.GETFILEURL+mess.himg" />-->
       <Avatar :src="mess.himg"/>
-      <div style="margin:0 16px">{{mess.userName}}的晒单</div>
+      <div style="margin:0 16px">{{mess.userName}}</div>
 
       <Icon type="ios-thumbs-up" size="26" color="#fe5722"/>
       <div style="font-weight: 600;font-size: 22px;padding: 0 12px;color: rgba(254,87,34,0.5)">
@@ -25,12 +25,12 @@
     </div>
     <div class="box_row" style="margin-top: 16px">
       <div class="box_row_100">
-        <h3>评价：</h3>
+        <h3>{{$t('PJ')}}：</h3>
         <div style="color: #a7a0a0">
           {{mess.content}}
         </div>
       </div>
-      <Button type="error" @click="delet" size="small">删除记录</Button>
+      <Button type="error" @click="delet" size="small">{{$t("SC")}}</Button>
     </div>
   </Card>
 </template>

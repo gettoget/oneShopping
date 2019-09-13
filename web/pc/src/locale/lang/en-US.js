@@ -7,6 +7,26 @@ export default {
   "system":"System",
   "system-user":"System user",
   "newstock":"newstock",
+  "stock":"stock",
+  "reserve":"reserve",
+  "manage":"manage",
+  "user":"user",
+  "usermanagement":"usermanagement",
+  "showorder":"showorder",
+  "order":"order",
+  "audit-order":"audit-order",
+  "direct-order":"direct-order",
+  "shipment-order":"shipment-order",
+  "chargeOrder":"chargeOrder",
+  "appmanger":"appmanger",
+  "carousel":"carousel",
+  "statistics":"statistics",
+  "topUpData":"topUpData",
+  "user-details-statistics":"user-details-statistics",
+  "CommodityDetailsStatistics":"CommodityDetailsStatistics",
+  "message":"message",
+  "imessage":"imessage",
+
 
 
   /**********************************
@@ -28,6 +48,8 @@ export default {
   "SPLL":"Goods Browsing",
   "KC":"Stock",
   "DJHF":"Click reply",
+  "SC":"Delet",
+  "PJ":"evaluate",
   /**********************************
    ***********************************/
 
@@ -44,6 +66,9 @@ export default {
   "PHONE_NUMBER":"phone-number",
   "SEX":"sex",
   "STATE":"state",
+  "LX":"type",
+  "operation":"operation",
+
   /**********************************
    ***********************************/
 

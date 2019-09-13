@@ -131,6 +131,7 @@
           {
             title: '类型',
             align: 'center',
+              i18n:"LX",
             key: 'lx',
             render: (h, p) => {
               let val = this.dictUtil.getValByCode(this, this.yhlxDictCode, p.row.lx)
@@ -140,6 +141,7 @@
           {
             title: '操作',
             key: 'action',
+              i18n:"operation",
             width: 180,
             align: 'center',
             render: (h, params) => {

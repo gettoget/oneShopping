@@ -3,6 +3,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    -webkit-user-select: text;
 
     .ivu-modal{
       top: 0;
@@ -10,6 +11,13 @@
   }
   #vux-scroller-2t6n6.messagebox{
     height: 600px;
+    -webkit-user-select: text;
+  }
+  .messagebox{
+    -webkit-user-select: text;
+    .xs-container{
+      -webkit-user-select: text;
+    }
   }
 </style>
 <template>
@@ -26,7 +34,7 @@
     >
       <div style="height: 600px;overflow:auto">
         <th-message
-          style="height: 600px"
+          style="height: 600px;-webkit-user-select: text;"
           ref="messgebox"
           :useText="true"
           :usePulldown="true"
@@ -55,7 +63,8 @@
 </template>
 
 <script>
-  export default {
+    // import Clipboard from 'clipboard';
+    export default {
     props: {
       mess:{}
     },
@@ -76,6 +85,7 @@
         this.getPagerList()
     },
     methods:{
+
       senRequest(){
         this.$http.post('/api/question/update', {id:this.mess.id,content:this.value5}).then((res) => {
           if (res.code == 200) {
