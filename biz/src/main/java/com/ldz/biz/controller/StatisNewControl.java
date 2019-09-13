@@ -92,7 +92,12 @@ public class StatisNewControl  {
     }
 
 
-
+    /**
+     *  单个 已经开奖的奖品统计
+     */
+    public ApiResponse<Object> dgkj(String time , String proName){
+        return service.dgkj(time, proName);
+    }
 
 
 

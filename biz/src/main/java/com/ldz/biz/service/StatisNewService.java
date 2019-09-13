@@ -27,4 +27,6 @@ public interface StatisNewService {
     ApiResponse<Object> spgm();
 
     ApiResponse<Object> dtLlGm(String time, String id);
+
+    ApiResponse<Object> dgkj(String time, String proName);
 }

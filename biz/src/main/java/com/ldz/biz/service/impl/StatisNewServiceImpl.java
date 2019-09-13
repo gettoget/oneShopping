@@ -309,4 +309,10 @@ public class StatisNewServiceImpl implements StatisNewService {
         return null;
     }
 
+    @Override
+    public ApiResponse<Object> dgkj(String time, String proName) {
+
+        return null;
+    }
+
 }
