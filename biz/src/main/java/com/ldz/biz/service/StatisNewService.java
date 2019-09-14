@@ -28,5 +28,11 @@ public interface StatisNewService {
 
     ApiResponse<Object> dtLlGm(String time, String id);
 
-    ApiResponse<Object> dgkj(String time, String proName);
+    ApiResponse<Object> dgkj(String time, String proName, String orderBy, int pageNum, int pageSize);
+
+    ApiResponse<Object> dgyh(String time);
+
+    ApiResponse<Object> zhbh(String id, int pageNum, int pageSize);
+
+    ApiResponse<Object> kj(String time, String proName, String orderBy, int pageNum, int pageSize);
 }

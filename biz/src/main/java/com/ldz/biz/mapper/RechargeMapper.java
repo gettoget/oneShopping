@@ -1,6 +1,7 @@
 package com.ldz.biz.mapper;
 
 import com.ldz.biz.model.Exchange;
+import com.ldz.biz.model.ProInfo;
 import com.ldz.biz.model.Recharge;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -77,6 +78,36 @@ public interface RechargeMapper extends Mapper<Recharge> {
     @Select(" select count(1) from order_list where pro_id in ( select id from pro_info where pro_baseid = #{id} ) ")
     double sumBfb(String time , String id);
 
+
+    @Select("</script>" +
+            "    select p.*, o.count count , o.count/cast(p.pro_price  as unsigned )  rate from pro_info p " +
+            "INNER JOIN (select pro_id , IFNULL(count(1),0) count  from order_list where yhlx = '0' group by pro_id) o " +
+            "on o.pro_id = p.id and p.kjsj is not null  " +
+            "<if test = 'time != null'>" +
+            "  and p.kjsj like '${time}%' " +
+            "</if>" +
+            " <if test = 'proName != null '>" +
+            "  and p.pro_name like '${time}%' " +
+            "</if>" +
+            "   order by ${orderBy} " +
+            "" +
+            "</script> ")
+    List<ProInfo> dgkj(@Param("time") String time,@Param("proName") String proName,@Param("orderBy") String orderBy);
+
+    @Select(" SELECT p.*,o.count  from pro_info p INNER JOIN (SELECT pro_id, IFNULL(count(pro_id),0) count from order_list where userid =  #{id}" +
+            " <if test='time != null'>" +
+            " and time like '${time}%' " +
+            "</if>" +
+            "  group by pro_id  ) o on p.id = o.pro_id  order by o.count desc  ")
+    List<ProInfo> dqyh(@Param("id") String id , @Param("time") String time);
+
+    @Select("</script>" +
+            "   SELECT b.*,s.sm count from pro_baseinfo b inner join" +
+            "( select p.pro_baseid, sum(o.c) sm from pro_info p INNER JOIN (select pro_id , count(1) c  from " +
+            "order_list where yhlx = '0' group by pro_id) o on o.pro_id = p.id and p.kjsj is not null   group by p" +
+            ".pro_baseid )  s on s.pro_baseid = b.id   order by count DESC" +
+            "</script> ")
+    List<ProInfo> kj(@Param("time") String time,@Param("proName") String proName,@Param("orderBy") String orderBy);
 
 
 }

@@ -1,21 +1,32 @@
 package com.ldz.biz.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.ldz.biz.mapper.ExchangeMapper;
 import com.ldz.biz.mapper.RechargeMapper;
 import com.ldz.biz.model.Exchange;
 import com.ldz.biz.model.ProBaseinfo;
+import com.ldz.biz.model.ProInfo;
 import com.ldz.biz.model.Recharge;
 import com.ldz.biz.service.ProBaseinfoService;
+import com.ldz.biz.service.RechargeService;
 import com.ldz.biz.service.StatisNewService;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.SimpleCondition;
+import com.ldz.util.exception.RuntimeCheck;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.*;
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +38,8 @@ public class StatisNewServiceImpl implements StatisNewService {
     private ExchangeMapper exchangeMapper;
     @Autowired
     private ProBaseinfoService baseinfoService;
+    @Autowired
+    private RechargeService rechargeService;
 
     @Override
     public ApiResponse<Map<String, Object>> statisNewRecharge(String time) {
@@ -310,7 +323,59 @@ public class StatisNewServiceImpl implements StatisNewService {
     }
 
     @Override
-    public ApiResponse<Object> dgkj(String time, String proName) {
+    public ApiResponse<Object> dgkj(String time, String proName, String orderBy, int pageNum, int pageSize) {
+        // 查询单个商品开奖的详细情况
+        //  根据条件排序
+        if(StringUtils.isBlank(time)){
+            time  = null;
+        }
+        if(StringUtils.isBlank(proName)){
+            proName = null;
+        }
+        if(StringUtils.isBlank(orderBy)){
+            orderBy = " count desc";
+        }
+        String finalTime = time;
+        String finalProName = proName;
+        String finalOrderBy = orderBy;
+        PageInfo<ProInfo> info = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> {
+            mapper.dgkj(finalTime, finalProName, finalOrderBy);
+        });
+        ApiResponse<Object> res= new ApiResponse<>();
+        res.setPage(info);
+        return res;
+    }
+
+    @Override
+    public ApiResponse<Object> dgyh(String time) {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String userId = request.getParameter("id");
+        RuntimeCheck.ifBlank(userId, "Silahkan pilih pengguna !");
+        // 查询单个用户的最近购买情况
+        if(StringUtils.isBlank(time)){
+            time = DateTime.now().toString("yyyy-MM-dd");
+        }
+        List<ProInfo> dqyh = mapper.dqyh(userId, time);
+        return ApiResponse.success(dqyh);
+    }
+
+    @Override
+    public ApiResponse<Object> zhbh(String id, int pageNum, int pageSize) {
+        // 查询单个用户的账户变化情况 , 可以通过查询充值表来
+        SimpleCondition condition = new SimpleCondition(Recharge.class);
+        condition.eq(Recharge.InnerColumn.userId, id);
+        condition.setOrderByClause(" cjsj desc");
+        PageInfo<Recharge> info =
+                PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> rechargeService.findByCondition(condition));
+        ApiResponse<Object> res = new ApiResponse<>();
+        res.setPage(info);
+        return res;
+    }
+
+    @Override
+    public ApiResponse<Object> kj(String time, String proName, String orderBy, int pageNum, int pageSize) {
+        // 查看一类商品的真是用户购买和浏览数量
+
 
         return null;
     }

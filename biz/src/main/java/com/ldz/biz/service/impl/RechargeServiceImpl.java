@@ -102,6 +102,7 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
             user.setBalance("0");
         }
         amount = amount / ratio;
+        RuntimeCheck.ifFalse(amount >= 20, "Tolong upgrade app!");
         // 判断是否为首次充值 , 首次充值 加  50%
         SimpleCondition condition = new SimpleCondition(Recharge.class);
         condition.eq(Recharge.InnerColumn.userId, user.getId());
@@ -109,6 +110,7 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
         condition.eq(Recharge.InnerColumn.czzt, "2");
         List<Recharge> recharges = findByCondition(condition);
         int ysje =amount;
+
         if(CollectionUtils.isEmpty(recharges)){
             amount = (int) (amount * 1.5);
         }
@@ -119,15 +121,11 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
         recharge.setCzjb(amount + "");
         recharge.setCjsj(DateUtils.getNowTime());
         recharge.setCzzt("1");
-        recharge.setCzqjbs(user.getBalance());
         recharge.setCzqd("1");
         recharge.setUserId(userId);
         recharge.setBz1(paymentId);
+        recharge.setBz2("recharge");
         RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
-        String balance = Integer.parseInt(user.getBalance()) + amount + "";
-        recharge.setCzhjbs(balance);
-        recharge.setImei(imei);
-        int i = save(recharge);
 
         Map<String, String> paramsMap = new HashMap<>();
         paramsMap.put("mall_id", mallId);
@@ -137,6 +135,14 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
         String words = DigestUtils.sha1Hex(mallId + sharedKey + payAmount + recharge.getId());
         paramsMap.put("words", words);
         log.info(" 支付请求参数 : {}", JSON.toJSON(paramsMap));
+        // 存储充值时的报文
+        recharge.setCzbw(JSON.toJSONString(paramsMap));
+        // 充值前金币和充值后金币不在充值的时候写 , 写在充值回调的时候
+//        String balance = Integer.parseInt(user.getBalance()) + amount + "";
+        recharge.setImei(imei);
+        int i = save(recharge);
+
+
         String post = HttpUtil.post("https://pay.gokado.id/payment/generate-pay-code", paramsMap);
         JSONObject object = JSON.parseObject(post);
         Integer code = object.getInteger("code");
@@ -191,11 +197,11 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
         recharge.setQrsj(DateUtils.getNowTime());
         recharge.setQrbw(data);
         if (StringUtils.equals(words, hex)) {
-
+            User user = userService.findById(recharge.getUserId());
             userService.saveBalance(recharge.getUserId(), Integer.parseInt(recharge.getCzjb())  + "");
             recharge.setCzzt("2");
-
-
+            recharge.setCzqjbs(user.getBalance());
+            recharge.setCzhjbs(Integer.parseInt(user.getBalance()) +Integer.parseInt(recharge.getCzjb())  + "" );
             update(recharge);
             String channelId = (String) redis.boundValueOps(recharge.getUserId() + "_channelId").get();
             if (StringUtils.isNotBlank(channelId)) {
