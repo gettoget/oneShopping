@@ -172,6 +172,7 @@ public class ProEvalServiceImpl extends BaseServiceImpl<ProEval, String> impleme
 		RuntimeCheck.ifBlank(entity.getProId(), MessageUtils.get("pro.idBlank"));
 		RuntimeCheck.ifBlank(entity.getImg(), MessageUtils.get("img.urlBlank"));
 		ProInfo info = infoService.findById(entity.getProId());
+		RuntimeCheck.ifFalse(StringUtils.equals(info.getProZt(), "4"), "Hadiah ini belum dibuka!");
 		RuntimeCheck.ifFalse(StringUtils.equals(info.getBz2(), "0"), "Pesanan ini telah dijemur!");
 		RuntimeCheck.ifNull(info, MessageUtils.get("pro.isNull"));
 		User user = userService.findById(info.getUserId());
