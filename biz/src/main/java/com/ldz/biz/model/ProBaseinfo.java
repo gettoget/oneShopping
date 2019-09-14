@@ -1,8 +1,11 @@
 package com.ldz.biz.model;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.List;
-import javax.persistence.*;
 
 @Table(name = "pro_baseinfo")
 public class ProBaseinfo implements Serializable {
@@ -93,6 +96,17 @@ public class ProBaseinfo implements Serializable {
      */
     @Transient
     private int kjs;
+
+    @Transient
+    private String count;
+
+    public String getCount() {
+        return count;
+    }
+
+    public void setCount(String count) {
+        this.count = count;
+    }
 
     public int getKjs() {
         return kjs;

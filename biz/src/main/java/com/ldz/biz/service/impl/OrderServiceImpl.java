@@ -25,6 +25,7 @@ import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.exception.RuntimeCheckException;
 import com.ldz.util.redis.RedisTemplateUtil;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -484,7 +485,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             List<String> orderIds = null;
             if (Integer.parseInt(info.getProPrice()) >= 2000) {
                 SimpleCondition simpleCondition = new SimpleCondition(Order.class);
-                simpleCondition.and().andCondition(" gmfs >= '5' or gmfs >= 10 ");
+//                simpleCondition.and().andCondition(" gmfs >= '5' or gmfs >= 10 ");
                 List<Order> orders = findByCondition(simpleCondition);
                 if (CollectionUtils.isNotEmpty(orders)) {
                     orderIds = orders.stream().map(Order::getId).collect(Collectors.toList());
@@ -492,8 +493,15 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             }
             //从最后一个购买订单的抽取一个中间号码
             // 修改策略 从 购买最多的用户中 获取中奖号码
-            OrderList orderList = baseMapper.getMostRobot(id);
-//            OrderList orderList = baseMapper.getOrderByRobotZjhm(id, orderIds);
+             // 随机 1 - 10 的数字  1-8  找多的 , 其余随机
+            int nextInt = RandomUtils.nextInt(0, 10);
+            OrderList orderList;
+            if(nextInt<= 8){
+                orderList = baseMapper.getMostRobot(id);
+            }else{
+                orderList = baseMapper.getOrderByRobotZjhm(id, orderIds);
+            }
+//
 
             if (orderList != null && StringUtils.isNotBlank(lastOrder.getId())) {
                 List<String> strings = lastFifty.stream().map(OrderList::getId).collect(Collectors.toList());
@@ -544,6 +552,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             OrderList list = lists.get(0);
             info.setUserId(list.getUserid());
             info.setUserName(list.getUserName());
+            info.setBz2("0"); // 设置为未晒单
             proInfoService.update(info);
             // 将此单的状态改为已中奖
             Order order = findById(list.getOrderId());

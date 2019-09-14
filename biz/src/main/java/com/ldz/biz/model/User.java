@@ -134,6 +134,17 @@ public class User implements Serializable {
     @Transient
     private String cy;
 
+    @Transient
+    private String count;
+
+    public String getCount() {
+        return count;
+    }
+
+    public void setCount(String count) {
+        this.count = count;
+    }
+
     public Integer getInviteNum() {
         return inviteNum;
     }

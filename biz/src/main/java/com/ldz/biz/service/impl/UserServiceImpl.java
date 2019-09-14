@@ -5,6 +5,7 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.ldz.biz.mapper.OrderMapper;
 import com.ldz.biz.mapper.UserMapper;
 import com.ldz.biz.model.*;
 import com.ldz.biz.service.*;
@@ -59,6 +60,8 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 
     @Autowired
     private RechargeService rechargeService;
+    @Autowired
+    private OrderMapper orderMapper;
 
     @Override
     protected Mapper<User> getBaseMapper() {
@@ -155,6 +158,10 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         user.setUserName(username);
         user.setLastImei(imei);
         user.setLastTime(DateUtils.getNowTime());
+        // 随机一个头像
+        List<User> ranUsers = orderMapper.ranUsers(1);
+        User user2 = ranUsers.get(0);
+        user.sethImg(user2.gethImg());
         save(user);
         // 新注册用户赠送 5个币
         Recharge recharge = new Recharge();

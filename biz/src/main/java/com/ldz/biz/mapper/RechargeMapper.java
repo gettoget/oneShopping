@@ -1,8 +1,6 @@
 package com.ldz.biz.mapper;
 
-import com.ldz.biz.model.Exchange;
-import com.ldz.biz.model.ProInfo;
-import com.ldz.biz.model.Recharge;
+import com.ldz.biz.model.*;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import tk.mybatis.mapper.common.Mapper;
@@ -81,18 +79,18 @@ public interface RechargeMapper extends Mapper<Recharge> {
 
     @Select("</script>" +
             "    select p.*, o.count count , o.count/cast(p.pro_price  as unsigned )  rate from pro_info p " +
-            "INNER JOIN (select pro_id , IFNULL(count(1),0) count  from order_list where yhlx = '0' group by pro_id) o " +
+            "INNER JOIN (select pro_id , IFNULL(count(1),0) count  from order_list where yhlx = '0' and pro_id in (select id from pro_info where pro_baseid = #{id}) group by pro_id) o " +
             "on o.pro_id = p.id and p.kjsj is not null  " +
             "<if test = 'time != null'>" +
             "  and p.kjsj like '${time}%' " +
             "</if>" +
             " <if test = 'proName != null '>" +
-            "  and p.pro_name like '${time}%' " +
+            "  and p.pro_name like '${proName}%' " +
             "</if>" +
             "   order by ${orderBy} " +
             "" +
             "</script> ")
-    List<ProInfo> dgkj(@Param("time") String time,@Param("proName") String proName,@Param("orderBy") String orderBy);
+    List<ProInfo> dgkj(@Param("id") String id, @Param("time") String time,@Param("proName") String proName,@Param("orderBy") String orderBy);
 
     @Select(" SELECT p.*,o.count  from pro_info p INNER JOIN (SELECT pro_id, IFNULL(count(pro_id),0) count from order_list where userid =  #{id}" +
             " <if test='time != null'>" +
@@ -104,10 +102,22 @@ public interface RechargeMapper extends Mapper<Recharge> {
     @Select("</script>" +
             "   SELECT b.*,s.sm count from pro_baseinfo b inner join" +
             "( select p.pro_baseid, sum(o.c) sm from pro_info p INNER JOIN (select pro_id , count(1) c  from " +
-            "order_list where yhlx = '0' group by pro_id) o on o.pro_id = p.id and p.kjsj is not null   group by p" +
-            ".pro_baseid )  s on s.pro_baseid = b.id   order by count DESC" +
+            "order_list where yhlx = '0' and cjsj like '${time}%' group by pro_id) o on o.pro_id = p.id and p.kjsj is not null    group by p" +
+            ".pro_baseid )  s on s.pro_baseid = b.id  " +
+            " <if test='proName != null '>" +
+            " and b.name = '${proName}%'" +
+            "</if>" +
+            "  order by ${orderBy}" +
             "</script> ")
-    List<ProInfo> kj(@Param("time") String time,@Param("proName") String proName,@Param("orderBy") String orderBy);
+    List<ProBaseinfo> kj(@Param("time") String time, @Param("proName") String proName, @Param("orderBy") String orderBy);
 
-
+    @Select("<script> " +
+            " select u.*, o.count from user u inner join " +
+            "(select count(userid) count, userid from order_list where cjsj like '${time}%'  and yhlx  = '0' " +
+            " <if test='name = null'>" +
+            " and userid in (select id from user where user_name like '%${name}%' and source = '0' ) " +
+            "</if>" +
+            "  group by userid) o  on u.id = p.userid   order by o.count" +
+            "</script> ")
+    List<User> yhgm(String time, String name, String orderBy);
 }
