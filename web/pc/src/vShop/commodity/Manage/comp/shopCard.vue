@@ -4,6 +4,11 @@
       <div class="bqBox">
         {{mess.proZt | proZt}}
       </div>
+      <div class="eavBox"
+           v-if="mess.proZt == 4 && mess.bz2 == '0'"
+           @click.stop="eavEvent">
+        晒
+      </div>
       <div class="shopCardSty-selImg">
         <img v-if='mess.coverUrls[0].substring(0,4)==="http"'
              :src="mess.coverUrls" alt="">
@@ -53,6 +58,8 @@
       <!--{{it | TagVal}}-->
       <!--</Tag>-->
     </div>
+    <component :is="compName" :proId="mess.id"
+               @close="close"></component>
   </Card>
 </template>
 
@@ -60,8 +67,10 @@
   import iphone from '../img/iphone.jpg'
   import i18nTabTit from '@/mixins/i18nTabTit'
 
+  import eav from './eavModal'
   export default {
     name: "shopCard",
+    components:{eav},
     mixins: [i18nTabTit],
     props: {
       inVal: {
@@ -112,6 +121,7 @@
     },
     data() {
       return {
+        compName:"",
         iphone,
         tagVal: 1,
         tegList: [
@@ -159,6 +169,10 @@
     mounted() {
     },
     methods: {
+      eavEvent(){
+        console.log('晒单');
+        this.compName = 'eav'
+      },
       getMess() {
         this.$emit("getMess")
       },
@@ -181,6 +195,10 @@
           }
         }).catch(err => {
         })
+      },
+      close(){
+        this.compName = '';
+        this.$emit('eavClose')
       }
     }
   }
@@ -205,6 +223,18 @@
         line-height: 30px;
         color: #fff;
         text-align: center;
+      }
+      .eavBox{
+        width: 30px;
+        height: 30px;
+        background-color: #fe5722;
+        position: absolute;
+        top:4px;
+        right: 4px;
+        text-align: center;
+        line-height: 30px;
+        color: #fff;
+        cursor: pointer;
       }
     }
     &-selImg {

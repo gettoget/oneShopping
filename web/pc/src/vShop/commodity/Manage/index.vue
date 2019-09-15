@@ -13,7 +13,12 @@
         <Radio label="1">{{$t('SMZ')}}</Radio>
         <Radio label="3">{{$t('DKJ')}}</Radio>
         <Radio label="4">{{$t('YKJ')}}</Radio>
+        <Radio label="5">
+          未晒单
+          <!--{{$t('YKJ')}}-->
+        </Radio>
       </RadioGroup>
+
       <div style="margin-right: 20px">
         <Button :type="it.bol?'primary':'default'"
                 v-for="(it,index) in tegList"
@@ -48,7 +53,10 @@
           <!--:mess="JSON.parse(JSON.stringify(it))"-->
           <shop-card v-if="datamess" :inVal="index+((param.pageNum-1)*param.pageSize)" :mess="it"
                      v-for="(it,index) in shopList" :key="index+((param.pageNum-1)*param.pageSize)"
-                     @labSave="getDataList" @getMess="getMess(it)"></shop-card>
+                     @labSave="getDataList"
+                     @getMess="getMess(it)"
+                     @eavClose="getDataList"
+          ></shop-card>
         </div>
       </div>
       <div class="pagerBoxSty boxMar_T box_row rowRight">
@@ -57,7 +65,8 @@
                   @chPager="chPager"></one-page>
       </div>
     </div>
-    <component :is="compName" :mess="itmess" @close="compName=''"></component>
+    <component :is="compName"
+               :mess="itmess" @close="compName=''"></component>
   </Card>
 </template>
 
@@ -65,6 +74,7 @@
   import shopCard from './comp/shopCard'
   import dr from './comp/DrawerMod'
   import i18nTabTit from '@/mixins/i18nTabTit'
+
   export default {
     name: "index",
     components: {
@@ -74,13 +84,13 @@
     data() {
       return {
         compName: "",
-        datamess:true,
+        datamess: true,
         itmess: {},
         tegList: [
           {
             bol: false,
             text: "推荐",
-            i18n:'TJ',
+            i18n: 'TJ',
             key: "1"
           },
           {
@@ -102,7 +112,7 @@
           proZt: "0",
           proLx: "",
           pageNum: 1,
-          pageSize:8
+          pageSize: 8
         }
 
       }
@@ -144,6 +154,9 @@
         let a = JSON.parse(JSON.stringify(this.param))
         if (a.proZt == "0") {
           a.proZt = ""
+        } else if (a.proZt == "5") {
+          a.proZt = 4
+          a.bz2 = 0
         }
         this.datamess = false
         this.$http.post("/api/proinfo/pager", a).then(res => {
