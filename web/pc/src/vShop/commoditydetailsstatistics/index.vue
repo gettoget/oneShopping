@@ -70,7 +70,7 @@
           {
             title:"当日用户购买总数量",
             key:"bz1",
-            width:100,
+            minWidth:100,
             i18n:'当日用户购买数量',
             render:(h,p)=>{
               let a = 0
@@ -83,7 +83,7 @@
           {
             title:"总浏览数量",
             key:"bz1",
-            width:100,
+            minWidth:100,
             i18n:'总浏览数量',
             render:(h,p)=>{
               let a = 0
