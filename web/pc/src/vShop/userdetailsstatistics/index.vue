@@ -9,7 +9,7 @@
           :placeholder="$t('YHM')" style="width: 160px;margin-right: 18px"/>
       </div>
       <div>
-        <DatePicker v-model="param.time"
+        <DatePicker v-model="tableDatatime"
                     format='yyyy-MM-dd' @on-change="changTime" type="date"
                     split-panels style="width: 160px;margin-right: 18px"
                     placement="bottom-end" :placeholder="$t('GMRQ')"></DatePicker>
@@ -26,6 +26,7 @@
           :height="tab_H"
           v-if="tab_H>0"
           :columns="tableTiT"
+          @on-row-click="clickrow"
           :data="tableData"></Table>
       </div>
       <div class="pagerBoxSty boxMar_T box_row rowRight">
@@ -51,6 +52,7 @@
     },
     data(){
       return {
+          tableDatatime:'',
         compName:"",
         itMess:{},
         tab_H: 0,
@@ -65,16 +67,18 @@
             }
           },
           {
-            title:"用户名称",
-            key:"username",
+            title:"用户名",
+            key:"userName",
             minWidth:100,
-            i18n:'YHM'
+            i18n:'YHM',
+              align:'center'
           },
           {
             title:"充值时间",
             minWidth:180,
             key:"cjsj",
             i18n:'CZSJ',
+              align:'center',
             render:(h,p)=>{
               return h('div',this.moment(p.row.cjsj).format("YYYY-MM-DD HH:mm:ss"))
             }
@@ -84,68 +88,18 @@
             minWidth:180,
             key:"cjsj",
             i18n:'ZFSJ',
+              align:'center',
             render:(h,p)=>{
               return h('div',this.moment(p.row.qrsj).format("YYYY-MM-DD HH:mm:ss"))
             }
           },
           {
-            title:"充值金额",
+            title:"购买次数",
             minWidth:120,
-            i18n:'CZJE',
-            key:"amonut"
+            i18n:'GM',
+            key:"count",
+              align:'center'
           },
-          {
-            title:"充值渠道",
-            minWidth:120,
-            i18n:'CZQD',
-            key:"czqd",
-            render:(h,p)=>{
-              let a={
-                "1":{
-                  typ:"primary",
-                  val:" 支付"
-                },
-                "2":{
-                  typ:"success",
-                  val:" 活动"
-                }
-              }
-              return h("div",p.row.czqd)
-            }
-          },
-          {
-            title:"充值状态",
-            minWidth:120,
-            i18n:'CZZT',
-            key:"czzt",
-            render:(h,p)=>{
-              let a={
-                "1":{
-                  typ:"primary",
-                  i18n:"DQR",
-                  val:this.$t('DQR')
-                },
-                "2":{
-                  typ:"success",
-                  val:this.$t('CZCG')
-                },
-                "3":{
-                  typ:"error",
-                  val:this.$t('CZSB')
-                },
-                "4":{
-                  typ:"warning",
-                  val:this.$t('CZQX')
-                }
-              }
-
-              return h("Tag",{
-                props:{
-                  color:a[p.row.czzt].typ
-                }
-              },a[p.row.czzt].val)
-            }
-          }
         ],
         tableData: [],
         param: {
@@ -160,7 +114,9 @@
     created(){
       console.log(this.moment().format('YYYY-MM-DD'));
       this.param.time = this.moment().format('YYYY-MM-DD')
-      this.getPagerList()
+      this.tableDatatime = this.moment().format('YYYY-MM-DD')
+        console.log(this.param.time);
+        this.getPagerList()
     },
     mounted(){
       this.$nextTick(() => {
@@ -171,6 +127,13 @@
       })
     },
     methods:{
+        closeMod(){
+          this.compName = ''
+        },
+        clickrow(a,b){
+            this.itMess = a
+            this.compName = 'messMod'
+        },
       chPager(p) {
         this.param.pageNum = p.pageNum
         this.param.pageSize = p.pageSize
@@ -178,7 +141,7 @@
       },
       changTime(value) {
         console.log(value);
-        // this.param.time = value
+        this.param.time = value
         this.getPagerList()
       },
       getPagerList(){
