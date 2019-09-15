@@ -34,7 +34,7 @@ public interface OrderMapper extends Mapper<Order> , InsertListMapper<Order> {
     /**
      * 从待开奖商品中获取数量最多的购买人中获取中奖号码
      */
-    @Select(" SELECT o.*, RAND() r from order_list o , (select count(userid) c , userid from order_list where yhlx='1' and pro_id = #{id} group by userid order by c  desc limit 1) a WHERE o.userid = a.userid ORDER BY r desc limit 1  ")
+    @Select(" SELECT o.*,Rand() r from order_list o , (select count(userid) c , userid from order_list where yhlx='1' and pro_id = #{id} group by userid order by c  desc limit 1) a WHERE o.userid = a.userid and o.pro_id =#{id} ORDER BY r desc limit 1  ")
     OrderList getMostRobot(String id);
 
 
