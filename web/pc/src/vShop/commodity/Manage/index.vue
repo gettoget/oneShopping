@@ -24,7 +24,7 @@
         <Button :type="it.bol?'primary':'default'"
                 v-for="(it,index) in tegList"
                 @click.native="tagEvent(it,index)">
-          {{it.text}}
+          {{$t(it.text)}}
         </Button>
       </div>
       <Input v-model="param.proNameLike" :placeholder="$t('SPMC')"
@@ -90,18 +90,17 @@
         tegList: [
           {
             bol: false,
-            text: "推荐",
-            i18n: 'TJ',
+            text: "TJ",
             key: "1"
           },
           {
             bol: false,
-            text: "上新",
+            text: "SX",
             key: "2"
           },
           {
             bol: false,
-            text: "热门",
+            text: "RM",
             key: "3"
           },
         ],
