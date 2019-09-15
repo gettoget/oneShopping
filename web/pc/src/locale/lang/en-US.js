@@ -48,6 +48,7 @@ export default {
   "SPLL":"Goods Browsing",
   "KC":"Stock",
   "DJHF":"Click reply",
+  "FS":"Send out",
   "SC":"Delet",
   "PJ":"evaluate",
   /**********************************
@@ -137,6 +138,7 @@ export default {
    "JG":"Price",
    "SMZ":"On sale",
    "YKJ":"Award has been awarded",
+   "UNS":"Unsold single",
    "TJ":"Recommend",
    "SX":"Up to date",
    "RM":"Popular",
@@ -193,6 +195,10 @@ export default {
   "LJCZQDTJ":"Cumulative recharge channel statistics",
   "JRCZTJ":"Today's recharge statistics",
   "LJCZTJ":"Cumulative recharge statistics",
+  "GMCS":"Purchase times",
+  "PH":"Ranking",
+  "JRYHGML":'Total amount purchased by users on the same day',
+  "ZLLL":'Total number of views',
   /**********************************
    ***********************************/
 }

@@ -22,8 +22,8 @@ export default {
   "carousel":"轮播图",
   "statistics":"统计",
   "topUpData":"数据统计",
-  "user-details-statistics":"用户详情统计",
-  "CommodityDetailsStatistics":"商品详情统计",
+  "user-details-statistics":"用户购买排行",
+  "CommodityDetailsStatistics":"商品售卖排行",
   "message":"留言管理",
   "imessage":"留言",
 
@@ -46,6 +46,7 @@ export default {
   "SPLL":"商品浏览",
   "KC":"库存",
   "DJHF":"点击回复",
+  "FS":"发送",
   "SC":"删除",
   "PJ":"评价",
   /**********************************
@@ -140,6 +141,7 @@ export default {
   "JG":"价格",
   "SMZ":"售卖中",
   "YKJ":"已开奖",
+  "UNS":"未晒单",
   "TJ":"推荐",
   "SX":"上新",
   "RM":"热门",
@@ -198,6 +200,10 @@ export default {
   "LJCZQDTJ":"累计充值渠道统计",
   "JRCZTJ":"今日充值统计",
   "LJCZTJ":"累计充值统计",
+  "GMCS":"购买次数",
+  "PH":"排行",
+  "JRYHGML":'当日用户购买总数量',
+  "ZLLL":'总浏览数量',
   /**********************************
    ***********************************/
 

@@ -311,7 +311,19 @@
           {
             title:"金币余额",
             key:"czhjbs"
-          }
+          },
+            {
+                title:"充值渠道",
+                key:"czqd",
+                render:(h,p)=>{
+                    if(p.row.czqd == '1'){
+                        return h("div","充值")
+                    }else {
+                        return h("div","奖励")
+                    }
+
+                }
+            }
         ],
         tableData2: [],
         param2: {

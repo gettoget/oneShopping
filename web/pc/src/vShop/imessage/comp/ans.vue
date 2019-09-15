@@ -54,7 +54,7 @@
        <div style="padding: 10px">
          <Row>
            <Col span="20"> <Input v-model="value5" type="textarea" placeholder="Enter something..." /></Col>
-           <Col span="4"><Button type="primary" style="padding: 15px;margin-left: 8px" @click="senRequest">发送</Button></Col>
+           <Col span="4"><Button type="primary" style="padding: 15px;margin-left: 8px" @click="senRequest">{{$t("FS")}}</Button></Col>
          </Row>
 
        </div>

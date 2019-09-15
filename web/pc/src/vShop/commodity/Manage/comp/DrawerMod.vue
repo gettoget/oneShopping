@@ -16,7 +16,8 @@
         <Icon type="md-close" size="26" @click.native="close"/>
       </div>
       <div class="proZtBoxSty">
-        {{mess.proZt | proZt}}
+        <!--{{$t(mess.proZt | proZt)}}-->
+        {{$t(getProZt(mess.proZt))}}
       </div>
 
       <div class="shopTitBox">
@@ -28,7 +29,7 @@
             <Tag :color="'red'"
                  v-for="(it,index) in mess.proLx.split(',')"
                  @click.native="tagVal = index">
-              {{it | TagVal}}
+              {{$t(TagVal(it))}}
             </Tag>
           </div>
           <div class="box_row_100" style="text-align: right;font-size: 18px;font-weight: 500;color: orangered">
@@ -214,7 +215,8 @@
       proZt: (val) => {
         switch (val) {
           case "1":
-            return "售卖中"
+            return 'SMZ'
+            // "售卖中"
             break;
           case "2":
             return "----"
@@ -259,6 +261,42 @@
       this.getBuyUserList()
     },
     methods: {
+      getProZt(val){
+        switch (val) {
+          case "1":
+            return 'SMZ'
+            // "售卖中"
+            break;
+          case "2":
+            return "----"
+            break;
+          case "3":
+            return 'DKJ'
+            break;
+          case "4":
+            return 'YKJ'
+            break;
+          default:
+            return 'SMZ'
+            break;
+        }
+      },
+      TagVal: (val) => {
+        switch (val) {
+          case "1":
+            return 'TJ'
+            break;
+          case "2":
+            return 'newstock'
+            break;
+          case "3":
+            return 'RM'
+            break;
+          default:
+            return 'newstock'
+            break;
+        }
+      },
       close() {
         this.$emit("close")
       },
