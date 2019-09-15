@@ -308,7 +308,7 @@ export default [
         name: 'user-details-statistics',
         meta: {
           icon: 'md-images',
-          title: "用户详情统计"
+          title: "用户购买排行"
         },
         component: () => import('@/vShop/userdetailsstatistics')
       },
