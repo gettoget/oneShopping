@@ -15,8 +15,6 @@
         <Radio label="4">{{$t('YKJ')}}</Radio>
         <Radio label="5">
           {{$t('UNS')}}
-          Unsold single
-          <!--{{$t('YKJ')}}-->
         </Radio>
       </RadioGroup>
 
@@ -24,7 +22,9 @@
         <Button :type="it.bol?'primary':'default'"
                 v-for="(it,index) in tegList"
                 @click.native="tagEvent(it,index)">
-          {{it.text}}
+          <!--{{it.text}}-->
+
+          {{$t(it.i18n)}}
         </Button>
       </div>
       <Input v-model="param.proNameLike" :placeholder="$t('SPMC')"
@@ -97,11 +97,13 @@
           {
             bol: false,
             text: "上新",
+            i18n: 'SX',
             key: "2"
           },
           {
             bol: false,
             text: "热门",
+            i18n: 'RM',
             key: "3"
           },
         ],
