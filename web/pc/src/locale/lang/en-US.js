@@ -48,6 +48,7 @@ export default {
   "SPLL":"Goods Browsing",
   "KC":"Stock",
   "DJHF":"Click reply",
+  "FS":"Send out",
   "SC":"Delet",
   "PJ":"evaluate",
   /**********************************
