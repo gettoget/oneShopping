@@ -137,6 +137,7 @@ export default {
    "JG":"Price",
    "SMZ":"On sale",
    "YKJ":"Award has been awarded",
+   "UNS":"Unsold single",
    "TJ":"Recommend",
    "SX":"Up to date",
    "RM":"Popular",

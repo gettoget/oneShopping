@@ -14,7 +14,8 @@
         <Radio label="3">{{$t('DKJ')}}</Radio>
         <Radio label="4">{{$t('YKJ')}}</Radio>
         <Radio label="5">
-          未晒单
+          {{$t('UNS')}}
+          Unsold single
           <!--{{$t('YKJ')}}-->
         </Radio>
       </RadioGroup>
