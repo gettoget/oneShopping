@@ -85,24 +85,41 @@
             key:"amonut"
           },
           {
-            title:"充值渠道",
+            title:"充值类型",
             minWidth:120,
-            i18n:'CZQD',
+            i18n:'LX',
             key:"czqd",
             render:(h,p)=>{
-              let a={
-                "1":{
-                  typ:"primary",
-                  val:" 支付"
-                },
-                "2":{
-                  typ:"success",
-                  val:" 活动"
-                }
+              if(p.row.czqd == '1'){
+                  return h("div","充值")
+              }else {
+                  return h("div","奖励")
               }
-              return h("div",p.row.czqd)
+
             }
           },
+            {
+                title:"充值渠道",
+                minWidth:120,
+                i18n:'CZQD',
+                key:"bz1",
+                render:(h,p)=>{
+                    if (p.row.bz1 == "51491197"){
+                        return h("div","CIMB")
+                    }else if (p.row.bz1 == "89220177"){
+                        return h("div","Danamon")
+                    }else if (p.row.bz1 == "11111029"){
+                        return h("div","Alfa")
+                    }else if (p.row.bz1 == "88561113"){
+                        return h("div","Permata")
+                    }else if (p.row.bz1 == "82910053"){
+                        return h("div","BNI")
+                    }else if (p.row.bz1 == "89022179"){
+                        return h("div","Mandiri")
+                    }
+
+                }
+            },
           {
             title:"充值状态",
             minWidth:120,
