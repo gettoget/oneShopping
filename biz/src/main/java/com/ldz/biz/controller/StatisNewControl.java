@@ -5,6 +5,7 @@ import com.ldz.util.bean.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -95,9 +96,49 @@ public class StatisNewControl  {
     /**
      *  单个 已经开奖的奖品统计
      */
-    public ApiResponse<Object> dgkj(String time , String proName){
-        return service.dgkj(time, proName);
+    @PostMapping("/dgkj")
+    public ApiResponse<Object> dgkj(String time , String proName, String orderBy, @RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "3") int pageSize){
+        return service.dgkj(time, proName, orderBy, pageNum, pageSize);
     }
+
+    /**
+     * 单个用户的购买情况
+     */
+    @PostMapping("/dgyh")
+    public ApiResponse<Object> dgyh(String time){
+        return service.dgyh(time);
+    }
+
+    /**
+     * 单个用户的账户变化情况
+     */
+    @PostMapping("/zhbh")
+    public ApiResponse<Object> zhbh(String id ,@RequestParam(defaultValue = "1") int pageNum,@RequestParam(defaultValue = "8") int pageSize){
+        return service.zhbh(id, pageNum, pageSize);
+    }
+
+    /**
+     *   一类商品购买的情况和浏览情况
+     */
+    @PostMapping("/kj")
+    public ApiResponse<Object> kj(String time , String proName, String orderBy, @RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "3") int pageSize){
+        return service.kj(time,proName,orderBy,pageNum,pageSize);
+    }
+
+    /**
+     * 用户每天购买的数量 排名
+     */
+    @PostMapping("/yhgm")
+    public ApiResponse<Object> yhgm(String time, String name, String orderBy, @RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "8") int pageSize){
+        return service.yhgm(time,name,orderBy,pageNum,pageSize);
+    }
+
+
+
+
+
+
+
 
 
 

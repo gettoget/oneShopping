@@ -2,12 +2,9 @@ package com.ldz.biz.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
-import com.ldz.biz.model.EvalCom;
-import com.ldz.biz.model.Order;
-import com.ldz.biz.model.User;
-import com.ldz.biz.service.EvalComService;
-import com.ldz.biz.service.OrderService;
-import com.ldz.biz.service.UserService;
+import com.ldz.biz.mapper.ProEvalMapper;
+import com.ldz.biz.model.*;
+import com.ldz.biz.service.*;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.sys.base.LimitedCondition;
 import com.ldz.util.bean.ApiResponse;
@@ -17,14 +14,10 @@ import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import tk.mybatis.mapper.common.Mapper;
-
-import com.ldz.biz.service.ProEvalService;
-import com.ldz.biz.mapper.ProEvalMapper;
-import com.ldz.biz.model.ProEval;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +39,9 @@ public class ProEvalServiceImpl extends BaseServiceImpl<ProEval, String> impleme
 
 	@Autowired
 	private EvalComService evalComService;
+
+	@Autowired
+	private ProInfoService infoService;
 
 	@Override
 	protected Mapper<ProEval> getBaseMapper() {
@@ -170,8 +166,29 @@ public class ProEvalServiceImpl extends BaseServiceImpl<ProEval, String> impleme
 		return res;
     }
 
+	@Override
+	public ApiResponse<String> saveEval(ProEval entity) {
+		RuntimeCheck.ifBlank(entity.getContent(), "Tolong isi dari formulir ini");
+		RuntimeCheck.ifBlank(entity.getProId(), MessageUtils.get("pro.idBlank"));
+		RuntimeCheck.ifBlank(entity.getImg(), MessageUtils.get("img.urlBlank"));
+		ProInfo info = infoService.findById(entity.getProId());
+		RuntimeCheck.ifFalse(StringUtils.equals(info.getProZt(), "4"), "Hadiah ini belum dibuka!");
+		RuntimeCheck.ifFalse(StringUtils.equals(info.getBz2(), "0"), "Pesanan ini telah dijemur!");
+		RuntimeCheck.ifNull(info, MessageUtils.get("pro.isNull"));
+		User user = userService.findById(info.getUserId());
+		entity.setUserId(user.getId());
+		entity.setUserName(user.getUserName());
+		entity.setHimg(user.gethImg());
+		entity.setId(genId());
+		save(entity);
+		// 将商品标记为已晒单
+		info.setBz2("1");
+		infoService.update(info);
+		return ApiResponse.success();
+	}
 
-    @Override
+
+	@Override
 	public void afterPager(PageInfo<ProEval> result){
 		List<ProEval> list = result.getList();
 		if (CollectionUtils.isEmpty(list)) {

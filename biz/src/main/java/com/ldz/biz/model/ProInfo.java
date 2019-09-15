@@ -1,8 +1,5 @@
 package com.ldz.biz.model;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -182,6 +179,29 @@ public class ProInfo implements Serializable {
      */
     @Transient
     private String tip;
+
+    @Transient
+    private String rate;
+
+    @Transient
+    private String count;
+
+
+    public String getRate() {
+        return rate;
+    }
+
+    public void setRate(String rate) {
+        this.rate = rate;
+    }
+
+    public String getCount() {
+        return count;
+    }
+
+    public void setCount(String count) {
+        this.count = count;
+    }
 
     public String getId() {
         return id;

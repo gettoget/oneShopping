@@ -5,6 +5,7 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.ldz.biz.mapper.OrderMapper;
 import com.ldz.biz.mapper.UserMapper;
 import com.ldz.biz.model.*;
 import com.ldz.biz.service.*;
@@ -59,6 +60,8 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 
     @Autowired
     private RechargeService rechargeService;
+    @Autowired
+    private OrderMapper orderMapper;
 
     @Override
     protected Mapper<User> getBaseMapper() {
@@ -76,12 +79,12 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 
         Map<String, UserInModel> modelMap = map.stream().collect(Collectors.toMap(UserInModel::getUserId, p -> p));
         list.forEach(user -> {
-            if(modelMap.containsKey(user.getId())){
+            if (modelMap.containsKey(user.getId())) {
                 UserInModel inModel = modelMap.get(user.getId());
                 user.setCy(inModel.getCys());
                 user.setCz(inModel.getCz());
                 user.setXf(inModel.getXf());
-            }else{
+            } else {
                 user.setXf("0");
                 user.setCy("0");
                 user.setCz("0");
@@ -94,7 +97,14 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 
 
     @Override
-    public ApiResponse<Map<String, Object>> register(String phone, String password, String password1, String code, String username) {
+    public ApiResponse<Map<String, Object>> register(String phone, String password, String password1, String code,
+                                                     String username) {
+        String inviteNumber = getRequestParamterAsString("inviteNumber");
+        if (StringUtils.isNotBlank(inviteNumber)) {
+            // 邀请码不为空 需要验证是否存在
+            List<User> users = findEq(User.InnerColumn.inviteNumber, inviteNumber);
+            RuntimeCheck.ifEmpty(users, "Pengecualian kode undangan!");
+        }
         RuntimeCheck.ifBlank(password, MessageUtils.get("user.pwdblank"));
         RuntimeCheck.ifBlank(password1, MessageUtils.get("user.pwdBlank"));
         password = checkPer(password);
@@ -113,6 +123,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         // 判断用户是否注册
         RuntimeCheck.ifTrue(CollectionUtils.isNotEmpty(users), MessageUtils.get("user.registered"));
 
+
         String regCode = (String) redis.boundValueOps(phone + "_register_code").get();
         RuntimeCheck.ifBlank(regCode, MessageUtils.get("user.regCodeBlank"));
         RuntimeCheck.ifFalse(StringUtils.equals(regCode, code), MessageUtils.get("user.regCodeError"));
@@ -123,6 +134,17 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         // 保存用户
         String encryptUserPwd = EncryptUtil.encryptUserPwd(password);
         User user = new User();
+        // 新用户注册生成邀请码
+        boolean flag = true;
+        while (flag ){
+            String shareCode = ShareCodeUtil.createShareCode();
+            List<User> userList = findEq(User.InnerColumn.inviteNumber, shareCode);
+            if(CollectionUtils.isEmpty(userList)){
+                user.setInviteNumber(shareCode);
+                user.setInvitedNumber(inviteNumber);
+                flag = false;
+            }
+        }
         user.setId(genId());
         user.setBalance("5");
         user.setCjsj(DateUtils.getNowTime());
@@ -136,6 +158,10 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         user.setUserName(username);
         user.setLastImei(imei);
         user.setLastTime(DateUtils.getNowTime());
+        // 随机一个头像
+        List<User> ranUsers = orderMapper.ranUsers(1);
+        User user2 = ranUsers.get(0);
+        user.sethImg(user2.gethImg());
         save(user);
         // 新注册用户赠送 5个币
         Recharge recharge = new Recharge();
@@ -145,11 +171,51 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         recharge.setCzjb("5");
         recharge.setCzqd("2");
         recharge.setUserId(user.getId());
-        recharge.setQrsj(DateUtils.getNowTime());
         recharge.setCzqjbs("0");
         recharge.setCzhjbs("5");
         recharge.setId(genId());
+        recharge.setBz2("register");
         rechargeService.save(recharge);
+        // 用户注册成功 查看用户是否有邀请码 , 根据邀请码奖励邀请用户 2 金币
+        if (StringUtils.isNotBlank(inviteNumber)) {
+            List<User> list = findEq(User.InnerColumn.inviteNumber, inviteNumber);
+
+            User user1 = list.get(0);
+            // 邀请人数 加一
+            user1.setInviteNum( user1.getInviteNum()+1);
+            update(user1);
+            if(user1.getInviteNum() <200){
+                baseMapper.saveBalance(user1.getId(), "2");
+                recharge = new Recharge();
+                recharge.setAmonut("2");
+                recharge.setCzzt("2");
+                recharge.setCjsj(DateUtils.getNowTime());
+                recharge.setCzjb("2");
+                recharge.setCzqd("2");
+                recharge.setUserId(user1.getId());
+                recharge.setCzqjbs(user1.getBalance());
+                recharge.setCzhjbs(Integer.parseInt(user1.getBalance()) + 2 + "");
+                recharge.setBz2("invite");
+                recharge.setId(genId());
+                rechargeService.save(recharge);
+            }
+            // 新注册用户获得一个金币
+            recharge = new Recharge();
+            recharge.setId(genId());
+            recharge.setAmonut("1");
+            recharge.setCzzt("1");
+            recharge.setCjsj(DateUtils.getNowTime());
+            recharge.setCzjb("1");
+            recharge.setCzqd("2");
+            recharge.setUserId(user.getId());
+            recharge.setCzqjbs(user.getBalance());
+            recharge.setCzhjbs(Integer.parseInt(user.getBalance()) + 1 + "");
+            recharge.setBz2("invited");
+            recharge.setId(genId());
+            user.setBalance(Integer.parseInt(user.getBalance()) + 1 +"");
+            update(user);
+        }
+
         String token = JwtUtil.createToken(user.getId(), System.currentTimeMillis() + "");
         redisDao.boundValueOps(user.getId()).set(token, 30, TimeUnit.DAYS);
         ApiResponse<Map<String, Object>> response = new ApiResponse<>();
@@ -228,12 +294,15 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
 
     @Override
     public ApiResponse<UserModel> editUserInfo(User user) {
-        log.info(" user ->  {} " , JSON.toJSON(user));
+        log.info(" user ->  {} ", JSON.toJSON(user));
         ApiResponse<UserModel> res = new ApiResponse<>();
         String userId = getAttributeAsString("userId");
         User u = findById(userId);
         RuntimeCheck.ifNull(user, MessageUtils.get("user.null"));
-        BeanUtil.copyProperties(user, u, CopyOptions.create().setIgnoreNullValue(true).setIgnoreError(true).setIgnoreProperties("id", "phone", "pwd", "source", "lastTime", "lastImei", "regImei", "balance", "cjsj", "refCode", "score", "zjcs"));
+        BeanUtil.copyProperties(user, u,
+                CopyOptions.create().setIgnoreNullValue(true).setIgnoreError(true).setIgnoreProperties("id", "phone",
+                        "pwd", "source", "lastTime", "lastImei", "regImei", "balance", "cjsj", "refCode", "score",
+                        "zjcs"));
         update(u);
         UserModel model = new UserModel(u);
 //        redis.boundValueOps(u.getId() + "_userInfo").set(JSON.toJSON(model), 30, TimeUnit.DAYS);
@@ -299,7 +368,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
             List<User> users = findByCondition(condition);
             RuntimeCheck.ifTrue(CollectionUtils.isNotEmpty(users), MessageUtils.get("user.registered"));
             String code = SendSmsUtil.sendOtp(phone);
-            if(StringUtils.equals(code, "error")){
+            if (StringUtils.equals(code, "error")) {
                 RuntimeCheck.ifTrue(true, MessageUtils.get("sms.isError"));
             }
             redis.boundValueOps(phone + "_register_code").set(code, 5, TimeUnit.MINUTES);
@@ -314,7 +383,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
             RuntimeCheck.ifTrue(CollectionUtils.isEmpty(users), MessageUtils.get("user.notregister"));
 
             String code = SendSmsUtil.sendOtp(phone);
-            if(StringUtils.equals(code, "error")){
+            if (StringUtils.equals(code, "error")) {
                 RuntimeCheck.ifTrue(true, MessageUtils.get("sms.isError"));
             }
             redis.boundValueOps(phone + "_find_pwd").set(code, 5, TimeUnit.MINUTES);
@@ -324,7 +393,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
             RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
             User user = findById(userId);
             String code = SendSmsUtil.sendOtp(user.getPhone());
-            if(StringUtils.equals(code, "error")){
+            if (StringUtils.equals(code, "error")) {
                 RuntimeCheck.ifTrue(true, MessageUtils.get("sms.isError"));
             }
             // 存储验证码
@@ -335,7 +404,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
             RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
             User user = findById(userId);
             String code = SendSmsUtil.sendOtp(user.getPhone());
-            if(StringUtils.equals(code, "error")){
+            if (StringUtils.equals(code, "error")) {
                 RuntimeCheck.ifTrue(true, MessageUtils.get("sms.isError"));
             }
             // 存储验证码
@@ -360,7 +429,8 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
             condition.eq(OrderList.InnerColumn.proId, id);
             List<OrderList> orderLists = orderListService.findByCondition(condition);
             if (CollectionUtils.isNotEmpty(orderLists)) {
-                List<String> collect = orderLists.stream().map(OrderList::getNum).sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+                List<String> collect =
+                        orderLists.stream().map(OrderList::getNum).sorted(Comparator.reverseOrder()).collect(Collectors.toList());
                 return ApiResponse.success(collect);
             }
         }
@@ -438,7 +508,8 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         RuntimeCheck.ifBlank(entity.getId(), MessageUtils.get("user.idIsnull"));
         User user = findById(entity.getId());
         RuntimeCheck.ifNull(user, MessageUtils.get("user.notFind"));
-        BeanUtil.copyProperties(entity, user, CopyOptions.create().setIgnoreNullValue(true).setIgnoreProperties("id", "payPwd", "pwd", "zjcs", "score", "balance"));
+        BeanUtil.copyProperties(entity, user, CopyOptions.create().setIgnoreNullValue(true).setIgnoreProperties("id",
+                "payPwd", "pwd", "zjcs", "score", "balance"));
         update(user);
         return ApiResponse.success();
     }
@@ -452,8 +523,8 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     }
 
     @Override
-    public void saveBalance(String userId,String amount) {
-        baseMapper.saveBalance(userId,amount);
+    public void saveBalance(String userId, String amount) {
+        baseMapper.saveBalance(userId, amount);
     }
 
 
@@ -467,7 +538,8 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
             RuntimeCheck.ifTrue(times.length != 2, MessageUtils.get("user.timeError"));
             long time = Long.parseLong(times[1]);
             DateTime dateTime = new DateTime(time);
-            RuntimeCheck.ifTrue(dateTime.plusMinutes(10).compareTo(DateTime.now()) < 0, MessageUtils.get("user.timeError"));
+            RuntimeCheck.ifTrue(dateTime.plusMinutes(10).compareTo(DateTime.now()) < 0, MessageUtils.get("user" +
+                    ".timeError"));
             return split[0];
         } catch (Exception e) {
             RuntimeCheck.ifTrue(true, MessageUtils.get("user.timeError"));

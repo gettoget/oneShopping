@@ -13,4 +13,6 @@ public interface ProEvalService extends BaseService<ProEval, String> {
     PageResponse<ProEval> getNewPager(Page<ProEval> page);
 
     ApiResponse<String> saveThumbs(String id);
+
+    ApiResponse<String> saveEval(ProEval entity);
 }

@@ -1,9 +1,12 @@
 package com.ldz.biz.model;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import javax.persistence.*;
 
 @Table(name = "user")
 public class User implements Serializable {
@@ -107,6 +110,15 @@ public class User implements Serializable {
      */
     private String bz3;
 
+    @Column(name = "INVITE_NUMBER")
+    private String inviteNumber;
+
+    @Column(name = "INVITE_NUM")
+    private Integer inviteNum;
+
+    @Column(name = "INVITED_NUMBER")
+    private String invitedNumber;
+
     /**
      * 充值和消费记录
      */
@@ -121,6 +133,41 @@ public class User implements Serializable {
 
     @Transient
     private String cy;
+
+    @Transient
+    private String count;
+
+    public String getCount() {
+        return count;
+    }
+
+    public void setCount(String count) {
+        this.count = count;
+    }
+
+    public Integer getInviteNum() {
+        return inviteNum;
+    }
+
+    public void setInviteNum(Integer inviteNum) {
+        this.inviteNum = inviteNum;
+    }
+
+    public String getInvitedNumber() {
+        return invitedNumber;
+    }
+
+    public void setInvitedNumber(String invitedNumber) {
+        this.invitedNumber = invitedNumber;
+    }
+
+    public String getInviteNumber() {
+        return inviteNumber;
+    }
+
+    public void setInviteNumber(String inviteNumber) {
+        this.inviteNumber = inviteNumber;
+    }
 
     public String getCz() {
         return cz;
@@ -502,7 +549,10 @@ public class User implements Serializable {
         zjcs("zjcs"),
         bz1("bz1"),
         bz2("bz2"),
-        bz3("bz3");
+        bz3("bz3"),
+        inviteNumber("INVITE_NUMBER"),
+        inviteNum("INVITE_NUM"),
+        invitedNumber("INVITED_NUMBER");
 
         private final String column;
 

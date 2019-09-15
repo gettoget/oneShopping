@@ -58,6 +58,10 @@ public class Recharge implements Serializable {
     private String qrbw;
 
     /**
+     * 充值报文
+     */
+    private String czbw;
+    /**
      * 充值终端IMEI
      */
     private String imei;
@@ -92,6 +96,14 @@ public class Recharge implements Serializable {
 
     @Transient
     private String himg;
+
+    public String getCzbw() {
+        return czbw;
+    }
+
+    public void setCzbw(String czbw) {
+        this.czbw = czbw;
+    }
 
     public String getHimg() {
         return himg;

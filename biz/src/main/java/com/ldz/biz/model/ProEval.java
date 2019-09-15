@@ -1,7 +1,10 @@
 package com.ldz.biz.model;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
-import javax.persistence.*;
 
 @Table(name = "pro_eval")
 public class ProEval implements Serializable {
