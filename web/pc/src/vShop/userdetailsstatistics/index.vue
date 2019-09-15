@@ -33,16 +33,26 @@
                   :opts="[4,8,12,16]" @chPager="chPager"></one-page>
       </div>
     </div>
+
+    <component :is="compName"
+               :itMess="itMess"
+               @closeMod="closeMod"></component>
   </Card>
 </template>
 
 <script>
   import i18nTabTit from '@/mixins/i18nTabTit'
+  import messMod from '../user/usermanagement/comp/messMod'
   export default {
     name: "index",
     mixins: [i18nTabTit],
+    components:{
+      messMod
+    },
     data(){
       return {
+        compName:"",
+        itMess:{},
         tab_H: 0,
         tabBox: "tabBox",
         tableTiT:[
@@ -148,6 +158,7 @@
       }
     },
     created(){
+      console.log(this.moment().format('YYYY-MM-DD'));
       this.param.time = this.moment().format('YYYY-MM-DD')
       this.getPagerList()
     },
