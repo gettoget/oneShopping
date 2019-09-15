@@ -241,7 +241,7 @@ public class SendSmsUtil {
 
 
     public static void main(String[] args) {
-        sendOtp("6282121224879");
+        sendOtp("81988098945");
     }
 
 

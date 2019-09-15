@@ -46,6 +46,10 @@ public class UserModel implements Serializable {
      */
     private List<Map<String,String>> record;
 
+    private String  inviteNumber;
+
+    private String inviteNum;
+
     public UserModel(User user) {
         this.id = user.getId();
         this.phone = user.getPhone();
@@ -54,6 +58,8 @@ public class UserModel implements Serializable {
         this.balance = user.getBalance();
         this.refCode = user.getRefCode();
         this.score = user.getScore();
+        this.inviteNum = user.getInviteNum()+"";
+        this.inviteNumber = user.getInviteNumber();
     }
 
     public UserModel() {
