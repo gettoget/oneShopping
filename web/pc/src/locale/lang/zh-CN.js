@@ -22,8 +22,8 @@ export default {
   "carousel":"轮播图",
   "statistics":"统计",
   "topUpData":"数据统计",
-  "user-details-statistics":"用户详情统计",
-  "CommodityDetailsStatistics":"商品详情统计",
+  "user-details-statistics":"用户购买排行",
+  "CommodityDetailsStatistics":"商品售卖排行",
   "message":"留言管理",
   "imessage":"留言",
 
