@@ -6,11 +6,11 @@
       <div>
         <Input
           v-model="param.proName" @on-change="getPagerList" clearable
-          :placeholder="$t('YHM')" style="width: 160px;margin-right: 18px"/>
+          :placeholder="$t('SPMC')" style="width: 160px;margin-right: 18px"/>
       </div>
       <div>
         <DatePicker v-model="pickTime" format='yyyy-MM-dd' @on-change="changTime" type="date"
-                    split-panels style="width: 160px;margin-right: 18px"
+                    split-panels style="width: 160px;margin-right: 18px" :clearable="false"
                     placement="bottom-end" :placeholder="$t('GMRQ')"></DatePicker>
       </div>
       <Button type="primary" @click="getPagerList">
@@ -72,6 +72,19 @@
             key:"bz1",
             width:100,
             i18n:'当日用户购买数量',
+            render:(h,p)=>{
+              let a = 0
+              if(p.row.count){
+                a = p.row.count
+              }
+              return h('div',a)
+            }
+          },
+          {
+            title:"总浏览数量",
+            key:"bz1",
+            width:100,
+            i18n:'总浏览数量',
             render:(h,p)=>{
               let a = 0
               if(p.row.bz1){
