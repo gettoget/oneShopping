@@ -34,6 +34,11 @@ public class Awardtrl extends BaseController<Award, String> {
     public ApiResponse<String> save(Award entity){
         return service.validAndSave(entity);
     }
+    @GetMapping("/lotty")
+    public ApiResponse<String> saveLotty(String userId){
+        return service.saveLotty(userId);
+    }
+
 
 
 }

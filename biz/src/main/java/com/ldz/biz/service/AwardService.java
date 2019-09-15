@@ -7,4 +7,6 @@ import com.ldz.util.bean.ApiResponse;
 public interface AwardService extends BaseService<Award,String> {
 
     ApiResponse<String> getAwardRecord();
+
+    ApiResponse<String> saveLotty(String userId);
 }
