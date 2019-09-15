@@ -195,6 +195,10 @@ export default {
   "LJCZQDTJ":"Cumulative recharge channel statistics",
   "JRCZTJ":"Today's recharge statistics",
   "LJCZTJ":"Cumulative recharge statistics",
+  "GMCS":"Purchase times",
+  "PH":"Ranking",
+  "JRYHGML":'Total amount purchased by users on the same day',
+  "ZLLL":'Total number of views',
   /**********************************
    ***********************************/
 }

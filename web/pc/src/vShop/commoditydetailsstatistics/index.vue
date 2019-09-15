@@ -56,6 +56,7 @@
           {
             title:"排行",
             minWidth:80,
+              i18n:"PH",
             render:(h,p)=>{
               let a = p.index+1+(this.param.pageNum-1)*this.param.pageSize
               return h('div',a)
@@ -71,7 +72,7 @@
             title:"当日用户购买总数量",
             key:"bz1",
             minWidth:100,
-            i18n:'当日用户购买数量',
+            i18n:'JRYHGML',
             render:(h,p)=>{
               let a = 0
               if(p.row.count){
@@ -84,7 +85,7 @@
             title:"总浏览数量",
             key:"bz1",
             minWidth:100,
-            i18n:'总浏览数量',
+            i18n:'ZLLL',
             render:(h,p)=>{
               let a = 0
               if(p.row.bz1){
