@@ -180,6 +180,9 @@ public class ProEvalServiceImpl extends BaseServiceImpl<ProEval, String> impleme
 		entity.setUserName(user.getUserName());
 		entity.setHimg(user.gethImg());
 		entity.setId(genId());
+		if(StringUtils.isBlank(entity.getCjsj())){
+			entity.setCjsj(DateUtils.getNowTime());
+		}
 		save(entity);
 		// 将商品标记为已晒单
 		info.setBz2("1");

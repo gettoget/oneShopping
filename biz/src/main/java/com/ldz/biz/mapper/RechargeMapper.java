@@ -77,7 +77,7 @@ public interface RechargeMapper extends Mapper<Recharge> {
     double sumBfb(String time , String id);
 
 
-    @Select("</script>" +
+    @Select("<script>" +
             "    select p.*, o.count count , o.count/cast(p.pro_price  as unsigned )  rate from pro_info p " +
             "INNER JOIN (select pro_id , IFNULL(count(1),0) count  from order_list where yhlx = '0' and pro_id in (select id from pro_info where pro_baseid = #{id}) group by pro_id) o " +
             "on o.pro_id = p.id and p.kjsj is not null  " +
@@ -99,7 +99,7 @@ public interface RechargeMapper extends Mapper<Recharge> {
             "  group by pro_id  ) o on p.id = o.pro_id  order by o.count desc  ")
     List<ProInfo> dqyh(@Param("id") String id , @Param("time") String time);
 
-    @Select("</script>" +
+    @Select("<script>" +
             "   SELECT b.*,s.sm count from pro_baseinfo b inner join" +
             "( select p.pro_baseid, sum(o.c) sm from pro_info p INNER JOIN (select pro_id , count(1) c  from " +
             "order_list where yhlx = '0' and cjsj like '${time}%' group by pro_id) o on o.pro_id = p.id and p.kjsj is not null    group by p" +
@@ -117,7 +117,7 @@ public interface RechargeMapper extends Mapper<Recharge> {
             " <if test='name = null'>" +
             " and userid in (select id from user where user_name like '%${name}%' and source = '0' ) " +
             "</if>" +
-            "  group by userid) o  on u.id = p.userid   order by o.count" +
+            "  group by userid) o  on u.id = o.userid   order by o.count" +
             "</script> ")
-    List<User> yhgm(String time, String name, String orderBy);
+    List<User> yhgm(@Param("time") String time,@Param("name") String name,@Param("orderBy") String orderBy);
 }

@@ -35,8 +35,8 @@
           </FormItem>
           <FormItem :label="$t('QGLX')" prop="rType">
             <Select v-model="formValidate.rType" :placeholder="$t('XZQGLX')">
-              <Option value="1">1</Option>
-              <Option value="2">2</Option>
+              <Option value="1">{{$t('SJKJ')}}</Option>
+              <Option value="2">{{ $t('JQZJ')}}</Option>
             </Select>
           </FormItem>
           <FormItem>

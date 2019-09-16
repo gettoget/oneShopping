@@ -59,7 +59,8 @@
         tabBox: "tabBox",
         tableTiT:[
           {
-            title:"#",
+            title:"排行",
+              i18n:'PH',
             minWidth:80,
             render:(h,p)=>{
               let a = p.index+1+(this.param.pageNum-1)*this.param.pageSize
@@ -96,7 +97,7 @@
           {
             title:"购买次数",
             minWidth:120,
-            i18n:'GM',
+            i18n:'GMCS',
             key:"count",
               align:'center'
           },

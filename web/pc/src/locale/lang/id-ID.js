@@ -49,4 +49,9 @@ export default {
 
   /**********************************
    ***********************************/
+
+
+
+  "SJKJ":"Yang menang secara acak",
+  "JQZJ":"Mesin jackpot.",
 }

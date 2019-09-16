@@ -164,6 +164,8 @@ export default {
   "SPBQ":"Commodity label",
   "SRSPBQ":"Input commodity label",
   "QGLX":"Types of snap-up",
+  "SJKJ":"Random lottery",
+  "JQZJ":"The winning machine",
   "XZQGLX":"Choose the type of snap-up",
   "FMT":"Cover Chart",
   "TJT":"Recommendation chart",
@@ -195,6 +197,10 @@ export default {
   "LJCZQDTJ":"Cumulative recharge channel statistics",
   "JRCZTJ":"Today's recharge statistics",
   "LJCZTJ":"Cumulative recharge statistics",
+  "GMCS":"Purchase times",
+  "PH":"Ranking",
+  "JRYHGML":'Total amount purchased by users on the same day',
+  "ZLLL":'Total number of views',
   /**********************************
    ***********************************/
 }

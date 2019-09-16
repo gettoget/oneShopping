@@ -33,10 +33,10 @@ public interface ProInfoMapper extends Mapper<ProInfo> {
 
     @Select(" SELECT count(DISTINCT(user_id))  from order_form where cjsj like '${today}%'")
     int countCyyhToday(@Param("today") String today);
-
-    @Update(" update pro_baseinfo set bz1 = (cast(bz1 as unsigned ) + 1)  where id = ( select pro_baseid from pro_info where id = #{id})")
-    void plusRead(@Param("id") String id);
-
-    @Update(" update pro_info set bz1 (cast(bz1 as unsigned ) + 1)  where id = #{id}")
-    void plusRead2(@Param("id")String id);
+    // 商品信息表 浏览数 加一
+    @Update(" update pro_baseinfo set bz1 = cast(IFNULL(bz1,'0') as unsigned ) + 1  where id = ( select pro_baseid from pro_info where id = #{id} )")
+    int plusRead(@Param("id") String id);
+    //  上架商品浏览数加一
+    @Update(" update pro_info set bz1 =  cast(IFNULL(bz1,'0') as unsigned ) + 1  where id = #{id}")
+    int plusRead2(@Param("id")String id);
 }
