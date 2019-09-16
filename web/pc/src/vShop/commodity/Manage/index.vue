@@ -7,16 +7,28 @@
       <div class="box_row_100">
         <pager-tit :title="$t('SPLL')"></pager-tit>
       </div>
-      <RadioGroup v-model="param.proZt" type="button"
-                  @on-change="getDataList()" style="margin-right: 20px">
-        <Radio label="0">{{$t('QB')}}</Radio>
-        <Radio label="1">{{$t('SMZ')}}</Radio>
-        <Radio label="3">{{$t('DKJ')}}</Radio>
-        <Radio label="4">{{$t('YKJ')}}</Radio>
-        <Radio label="5">
-          {{$t('UNS')}}
-        </Radio>
-      </RadioGroup>
+      <Select v-model="param.proZt" @on-change="proZtChange" style="width:200px;margin-right: 20px">
+        <Option value="0">{{$t('QB')}}</Option>
+        <Option value="1">{{$t('SMZ')}}</Option>
+        <Option value="3">{{$t('DKJ')}}</Option>
+        <Option value="4">{{$t('YKJ')}}</Option>
+        <Option value="5">{{$t('UNS')}}</Option>
+      </Select>
+
+      <DatePicker v-if="param.proZt==4 || param.proZt==5" v-model="timeVal" type="daterange" placement="bottom-end"
+                  placeholder="Waktu lotere"
+                  @on-change="getDate"
+                  style="width: 200px;margin-right: 20px"></DatePicker>
+      <!--<RadioGroup v-model="param.proZt" type="button"-->
+                  <!--@on-change="getDataList()" style="margin-right: 20px">-->
+        <!--<Radio label="0">{{$t('QB')}}</Radio>-->
+        <!--<Radio label="1">{{$t('SMZ')}}</Radio>-->
+        <!--<Radio label="3">{{$t('DKJ')}}</Radio>-->
+        <!--<Radio label="4">{{$t('YKJ')}}</Radio>-->
+        <!--<Radio label="5">-->
+          <!--{{$t('UNS')}}-->
+        <!--</Radio>-->
+      <!--</RadioGroup>-->
 
       <div style="margin-right: 20px">
         <Button :type="it.bol?'primary':'default'"
@@ -109,9 +121,12 @@
         ],
         shopList: [],
         total: 0,
+        timeVal:[],
         param: {
           proPriceGte: null,
           proPriceLte: null,
+          kjsjGte:"",
+          kjsjLte:"",
           proZt: "0",
           proLx: "",
           pageNum: 1,
@@ -124,6 +139,24 @@
       this.getDataList()
     },
     methods: {
+      proZtChange(val){
+        if(val==0 ||val==1 ||val==3){
+          this.param.kjsjGte = ""
+          this.param.kjsjLte = ""
+        }
+        this.getDataList()
+      },
+      getDate(t){
+        console.log(t);
+        if(t[0]&&t[1]){
+          this.param.kjsjGte = t[0]+" 00:00:00"
+          this.param.kjsjLte = t[0]+" 23:59:59"
+        }else{
+          this.param.kjsjGte = ""
+          this.param.kjsjLte = ""
+        }
+        this.getDataList()
+      },
       reset() {
         this.param = {
           proPriceGte: null,
