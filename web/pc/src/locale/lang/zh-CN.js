@@ -167,6 +167,8 @@ export default {
   "SPBQ":"商品标签",
   "SRSPBQ":"输入商品标签",
   "QGLX":"抢购类型",
+  "SJKJ":"随机开奖",
+  "JQZJ":"机器中奖",
   "XZQGLX":"选择抢购类型",
   "FMT":"封面图",
   "TJT":"推荐图",

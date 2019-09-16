@@ -164,6 +164,8 @@ export default {
   "SPBQ":"Commodity label",
   "SRSPBQ":"Input commodity label",
   "QGLX":"Types of snap-up",
+  "SJKJ":"Random lottery",
+  "JQZJ":"The winning machine",
   "XZQGLX":"Choose the type of snap-up",
   "FMT":"Cover Chart",
   "TJT":"Recommendation chart",
