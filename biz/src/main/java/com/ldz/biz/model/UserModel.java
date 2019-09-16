@@ -50,6 +50,8 @@ public class UserModel implements Serializable {
 
     private String inviteNum;
 
+    private String inviteCoin;
+
     public UserModel(User user) {
         this.id = user.getId();
         this.phone = user.getPhone();

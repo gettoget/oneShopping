@@ -14,8 +14,12 @@ import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.SimpleCondition;
 import com.ldz.util.commonUtil.BaiduPushUtils;
 import com.ldz.util.commonUtil.JsonUtil;
+import com.ldz.util.commonUtil.ShareCodeUtil;
 import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.redis.RedisTemplateUtil;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +27,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -111,6 +119,45 @@ public class PayCtrl {
         for (String s : list) {
             if(!strings.contains(s)){
                 template.execute(" update  user set balance = cast(balance as unsigned) + 5  where id = '"+s+"' and source = '0'");
+            }
+        }
+        return ApiResponse.success();
+    }
+
+    /**
+     * 给用户类型为 0 的用户生成邀请码
+     */
+    @GetMapping("/genCode")
+    public ApiResponse<String> genCode(){
+        SimpleCondition condition = new SimpleCondition(User.class);
+        condition.eq(User.InnerColumn.source, "0");
+        condition.and().andIsNull(User.InnerColumn.invitedNumber.name());
+        List<User> users = userService.findByCondition(condition);
+        if(CollectionUtils.isNotEmpty(users)){
+            users.stream().forEach(user -> {
+                boolean flag = true;
+                while (flag ){
+                    String shareCode = ShareCodeUtil.createShareCode();
+                    List<User> userList = userService.findEq(User.InnerColumn.inviteNumber, shareCode);
+                    if(CollectionUtils.isEmpty(userList)){
+                        user.setInviteNumber(shareCode);
+                        flag = false;
+                    }
+                }
+                userService.update(user);
+            });
+        }
+        return ApiResponse.success();
+    }
+
+    @GetMapping("/down")
+    public ApiResponse<String> down() throws IOException {
+        List<User> users = userService.findEq(User.InnerColumn.source, "1");
+        for (int i = 0; i < users.size(); i++) {
+            User user = users.get(i);
+            if (StringUtils.isNotBlank(user.gethImg())) {
+                URL u = new URL(user.gethImg());
+                FileUtils.copyURLToFile(u, new File("D:/static/common/" + i + ".png"));
             }
         }
         return ApiResponse.success();

@@ -18,6 +18,7 @@ import com.ldz.util.exception.RuntimeCheck;
 import com.ldz.util.redis.RedisTemplateUtil;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     private RechargeService rechargeService;
     @Autowired
     private OrderMapper orderMapper;
+
 
     @Override
     protected Mapper<User> getBaseMapper() {
@@ -159,9 +161,9 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         user.setLastImei(imei);
         user.setLastTime(DateUtils.getNowTime());
         // 随机一个头像
-        List<User> ranUsers = orderMapper.ranUsers(1);
-        User user2 = ranUsers.get(0);
-        user.sethImg(user2.gethImg());
+        Random r = new Random();
+        int anInt = r.nextInt(27);
+        user.sethImg("https://www.go-saku.com/api/img/"+anInt+".png");
         save(user);
         // 新注册用户赠送 5个币
         Recharge recharge = new Recharge();
@@ -258,6 +260,18 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         update(user);
         UserModel model = new UserModel(user);
         model.setToken(token);
+        condition = new SimpleCondition(Recharge.class);
+        condition.eq(Recharge.InnerColumn.czzt,"2");
+        condition.eq(Recharge.InnerColumn.czqd,"2");
+        condition.eq(Recharge.InnerColumn.bz2, "invite");
+        condition.eq(Recharge.InnerColumn.userId,user.getId());
+        List<Recharge> recharges = rechargeService.findByCondition(condition);
+        if(CollectionUtils.isEmpty(recharges)){
+            model.setInviteCoin("0");
+        }else{
+            int sum = recharges.stream().map(Recharge::getAmonut).mapToInt(Integer::parseInt).sum();
+            model.setInviteCoin(sum+"");
+        }
         redis.boundValueOps(user.getId() + "_userInfo").set(JSON.toJSON(model), 30, TimeUnit.DAYS);
         Map<String, Object> tokenMap = new HashMap<>();
         tokenMap.put("token", token);
@@ -490,6 +504,18 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
         User user = findById(userId);
         UserModel userModel = new UserModel(user);
+        SimpleCondition condition = new SimpleCondition(Recharge.class);
+        condition.eq(Recharge.InnerColumn.czzt,"2");
+        condition.eq(Recharge.InnerColumn.czqd,"2");
+        condition.eq(Recharge.InnerColumn.bz2, "invite");
+        condition.eq(Recharge.InnerColumn.userId,user.getId());
+        List<Recharge> recharges = rechargeService.findByCondition(condition);
+        if(CollectionUtils.isEmpty(recharges)){
+            userModel.setInviteCoin("0");
+        }else{
+            int sum = recharges.stream().map(Recharge::getAmonut).mapToInt(Integer::parseInt).sum();
+            userModel.setInviteCoin(sum+"");
+        }
         return ApiResponse.success(userModel);
     }
 
