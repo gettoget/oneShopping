@@ -16,14 +16,12 @@ import com.ldz.util.exception.RuntimeCheck;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.DateUtil;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
 import java.util.List;
-import java.util.Random;
 
 @Service
 public class AwardServiceImpl extends BaseServiceImpl<Award, String> implements AwardService {
@@ -80,10 +78,10 @@ public class AwardServiceImpl extends BaseServiceImpl<Award, String> implements 
         condition.startWith(Award.InnerColumn.cjsj, DateTime.now().toString("yyyy-MM-dd"));
         List<Award> awards = findByCondition(condition);
         RuntimeCheck.ifFalse(CollectionUtils.isEmpty(awards), "Hello, hari ini jumlah undian sudah habis");
-        int[] arr = {0, 0, 0, 0, 0, 0, 2, 10};
-        int anInt = RandomUtils.nextInt(0, 8);
+        int[] arr = {0, 0, 2, 2, 10, 0, 0, 2, 2, 2};
+        int anInt = RandomUtils.nextInt(0, 10);
         int i = 0;
-        if (anInt <= 7) {
+        if (anInt <= 9) {
             i = arr[anInt];
         } else {
             i = 0;
