@@ -43,6 +43,10 @@ public class AwardServiceImpl extends BaseServiceImpl<Award, String> implements 
     public ApiResponse<String> getAwardRecord() {
 
         String userId = getHeader("userId");
+        if(StringUtils.isBlank(userId)){
+            userId = getRequestParamterAsString("userId");
+        }
+        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.idIsnull"));
         SimpleCondition condition = new SimpleCondition(Award.class);
         condition.startWith(Award.InnerColumn.cjsj, DateTime.now().toString("yyyy-MM-dd"));
         condition.eq(Award.InnerColumn.userId, userId);
