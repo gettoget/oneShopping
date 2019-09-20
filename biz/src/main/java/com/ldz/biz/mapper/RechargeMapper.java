@@ -102,12 +102,12 @@ public interface RechargeMapper extends Mapper<Recharge> {
     @Select("<script>" +
             "   SELECT b.*,s.sm count from pro_baseinfo b inner join" +
             "( select p.pro_baseid, sum(o.c) sm from pro_info p INNER JOIN (select pro_id , count(1) c  from " +
-            "order_list where yhlx = '0' and cjsj like '${time}%' group by pro_id) o on o.pro_id = p.id and p.kjsj is not null    group by p" +
+            "order_list where yhlx = '0' and cjsj like '${time}%' group by pro_id) o on o.pro_id = p.id     group by p" +
             ".pro_baseid )  s on s.pro_baseid = b.id  " +
             " <if test='proName != null '>" +
             " and b.name = '${proName}%'" +
             "</if>" +
-            "  order by ${orderBy}" +
+            "  order by ${orderBy} " +
             "</script> ")
     List<ProBaseinfo> kj(@Param("time") String time, @Param("proName") String proName, @Param("orderBy") String orderBy);
 
@@ -117,7 +117,7 @@ public interface RechargeMapper extends Mapper<Recharge> {
             " <if test='name = null'>" +
             " and userid in (select id from user where user_name like '%${name}%' and source = '0' ) " +
             "</if>" +
-            "  group by userid) o  on u.id = o.userid   order by o.count" +
+            "  group by userid) o  on u.id = o.userid   order by o.count desc " +
             "</script> ")
     List<User> yhgm(@Param("time") String time,@Param("name") String name,@Param("orderBy") String orderBy);
 }

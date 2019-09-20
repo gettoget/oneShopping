@@ -117,7 +117,6 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         List<String> list = orders.stream().map(Order::getId).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(list)) {
             Set<String> receIds = orders.stream().filter(order -> StringUtils.isNotBlank(order.getReceId())).map(Order::getReceId).collect(Collectors.toSet());
-            long count = orders.stream().map(Order::getUserId).distinct().count();
             Map<String, ReceiveAddr> addrMap = new HashMap<>();
             if (CollectionUtils.isNotEmpty(receIds)) {
                 List<ReceiveAddr> addrs = addrService.findByIds(receIds);
@@ -160,6 +159,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
                     order.setOrderLists(lists);
                     List<String> nums = lists.stream().map(OrderList::getNum).collect(Collectors.toList());
                     order.setNums(nums);
+                    order.setBz3(nums.size()+"");
                 }
                 if (finalMap.containsKey(order.getProId())) {
                     ProInfo info = finalMap.get(order.getProId());

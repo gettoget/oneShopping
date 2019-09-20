@@ -799,6 +799,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         List<Order> orders = orderService.findByCondition(condition);
         Map<String, String> map = orders.stream().filter(order -> userIds.contains(order.getUserId()) && StringUtils.equals(order.getDdzt(),"1")).collect(Collectors.toMap(Order::getProId, p -> p.getGmfs()));
 
+
         for (ProInfo proBaseinfo : list) {
             long count = orders.stream().filter(order -> StringUtils.equals(proBaseinfo.getId(),order.getProId())).map(Order::getUserId).distinct().count();
             proBaseinfo.setCyyhs(count+ "");

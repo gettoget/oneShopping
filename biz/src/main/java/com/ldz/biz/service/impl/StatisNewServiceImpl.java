@@ -385,7 +385,7 @@ public class StatisNewServiceImpl implements StatisNewService {
             proName = null;
         }
         if (StringUtils.isBlank(orderBy)) {
-            orderBy = "count desc";
+            orderBy = "s.sm desc";
         }
 
         String finalTime = time;

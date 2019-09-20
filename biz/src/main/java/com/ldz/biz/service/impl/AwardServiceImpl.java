@@ -64,7 +64,6 @@ public class AwardServiceImpl extends BaseServiceImpl<Award, String> implements 
         SimpleCondition condition = new SimpleCondition(Award.class);
         condition.eq(Award.InnerColumn.userId, entity.getUserId());
         condition.startWith(Award.InnerColumn.cjsj, DateTime.now().toString("yyyy-MM-dd"));
-        List<Award> awards = findByCondition(condition);
         entity.setId(genId());
         entity.setCjsj(DateUtils.getNowTime());
         entity.setStatus("0");

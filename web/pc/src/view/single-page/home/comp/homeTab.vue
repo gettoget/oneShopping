@@ -91,17 +91,23 @@
             align:'left',
             key: 'userName',
           },
-          {
-            title: '手机号码',
-            align:'left',
-            minWidth:120,
-            key: 'phone',
-            render:(h,p)=>{
-              return h('div',[
-                h('div',p.row.phone.substring(0,3)+'****'+p.row.phone.substring(7)),
-              ])
+            {
+                title:'购买份数',
+                minWidth: 120,
+                align:'left',
+                key:'bz3'
             }
-          }
+          // {
+          //   title: '手机号码',
+          //   align:'left',
+          //   minWidth:120,
+          //   key: 'phone',
+          //   render:(h,p)=>{
+          //     return h('div',[
+          //       h('div',p.row.phone.substring(0,3)+'****'+p.row.phone.substring(7)),
+          //     ])
+          //   }
+          // }
         ],
         tableData: [
         ],

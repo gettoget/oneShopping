@@ -31,7 +31,7 @@ public interface ProInfoMapper extends Mapper<ProInfo> {
     @Select(" select id from pro_info where pro_baseid = ( select pro_baseid from pro_info where id = #{id} ) and pro_zt = '1' order by cjsj desc limit 1")
     String getLatestPro(String id);
 
-    @Select(" SELECT count(DISTINCT(user_id))  from order_form where cjsj like '${today}%'")
+    @Select("  select count(1) from order_list where yhlx = '0' and cjsj like '%${today}%'  ")
     int countCyyhToday(@Param("today") String today);
     // 商品信息表 浏览数 加一
     @Update(" update pro_baseinfo set bz1 = cast(IFNULL(bz1,'0') as unsigned ) + 1  where id = ( select pro_baseid from pro_info where id = #{id} )")
