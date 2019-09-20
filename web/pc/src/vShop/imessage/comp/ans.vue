@@ -39,7 +39,7 @@
           :useText="true"
           :usePulldown="true"
           :pulldownConfig="pulldownconfig"
-          :topPadding="20"
+          :topPadding="377"
           :messageData="messageData"
           :funcList="funclist"
           :showInput="false"
