@@ -16,7 +16,6 @@
         <Icon type="md-close" size="26" @click.native="close"/>
       </div>
       <div class="proZtBoxSty">
-        <!--{{$t(mess.proZt | proZt)}}-->
         {{$t(getProZt(mess.proZt))}}
       </div>
 
@@ -42,21 +41,20 @@
         </div>
       </div>
       <div class="">
-
         <div class="lineBox">
           <div class="lineVal box_row colCenter">
             <div class="box_row_100" style="cursor: pointer">
-              <Poptip placement="left" :transfer="false">
+              <!--<Poptip placement="left" :transfer="false">-->
                 <Icon type="md-menu" size="24"/>
                 {{$t('CYRS')}}：{{mess.cyyhs}}
-                <div slot="content" class="purchaserListBox">
-                  <Table
-                    size='small' stripe
-                    :height="500"
-                    :columns="tableTiT"
-                    :data="tableData"></Table>
-                </div>
-              </Poptip>
+                <!--<div slot="content" class="purchaserListBox">-->
+                  <!--<Table-->
+                    <!--size='small' stripe-->
+                    <!--:height="500"-->
+                    <!--:columns="tableTiT"-->
+                    <!--:data="tableData"></Table>-->
+                <!--</div>-->
+              <!--</Poptip>-->
             </div>
             <div>
               {{$t('YS')}}:{{(parseInt(mess.proPrice)-parseInt(mess.rePrice))}}{{$t('F')}} / {{$t('SY')}}
@@ -65,11 +63,10 @@
           </div>
           <div class="lineback box_row">
             <div class="line"
-                 :style="{width:((parseInt(mess.proPrice)-parseInt(mess.rePrice))/parseInt(mess.rePrice))*100+'%'}">
+                 :style="{width:((parseInt(mess.proPrice)-parseInt(mess.rePrice))/parseInt(mess.proPrice))*100+'%'}">
             </div>
           </div>
         </div>
-
       </div>
       <Card style="width:100%;margin-top: 12px">
         <div slot="title" class="box_row">
@@ -211,47 +208,11 @@
         tableData: [],
       }
     },
-    filters: {
-      proZt: (val) => {
-        switch (val) {
-          case "1":
-            return 'SMZ'
-            // "售卖中"
-            break;
-          case "2":
-            return "----"
-            break;
-          case "3":
-            return "待开奖"
-            break;
-          case "4":
-            return "已开奖"
-            break;
-          default:
-            return "售卖中"
-            break;
-        }
-      },
-      TagVal: (val) => {
-        switch (val) {
-          case "1":
-            return "推荐"
-            break;
-          case "2":
-            return "新品"
-            break;
-          case "3":
-            return "热门"
-            break;
-          default:
-            return "新品"
-            break;
-        }
-      }
-    },
     mounted() {
       this.getUserList()
-      this.getWinList()
+      if(this.mess.proZt=='4'){
+        this.getWinList()
+      }
       this.$nextTick(() => {
         try {
           this.tab_H = this.AF.getDom_H(this.tabBox)
@@ -306,9 +267,10 @@
         }, 200)
       },
       getWinList() {
-        this.$http.post("/api/proinfo/getWinRecord", {id: this.mess.id, pageNum: 1, pageSize: 1}).then(res => {
-          if (res.success) {
-            this.winList = res.page.list[0]
+        // /api/proinfo/getWinRecord
+        this.$http.post("/api/proinfo/winrecord", {id: this.mess.id}).then(res => {
+          if (res.success && res.result) {
+            this.winList = res.result
           }
         }).catch(err => {
         })
