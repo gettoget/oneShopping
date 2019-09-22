@@ -122,7 +122,7 @@
                     //   }
                     // },
                     {
-                        title: "购买次数",
+                        title: "充值金额",
                         minWidth: 120,
                         i18n: 'GMCS',
                         key: "count",

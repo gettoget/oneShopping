@@ -203,7 +203,7 @@ export default {
   "LJCZQDTJ":"累计充值渠道统计",
   "JRCZTJ":"今日充值统计",
   "LJCZTJ":"累计充值统计",
-  "GMCS":"购买次数",
+  "GMCS":"充值金额",
   "PH":"排行",
   "JRYHGML":'当日用户购买总数量',
   "ZLLL":'总浏览数量',
