@@ -101,16 +101,16 @@
                             ])
                         }
                     },
-                    {
-                        title: "充值时间",
-                        minWidth: 180,
-                        key: "cjsj",
-                        i18n: 'CZSJ',
-                        align: 'center',
-                        render: (h, p) => {
-                            return h('div', this.moment(p.row.cjsj).format("YYYY-MM-DD HH:mm:ss"))
-                        }
-                    },
+                    // {
+                    //     title: "充值时间",
+                    //     minWidth: 180,
+                    //     key: "cjsj",
+                    //     i18n: 'CZSJ',
+                    //     align: 'center',
+                    //     render: (h, p) => {
+                    //         return h('div', this.moment(p.row.cjsj).format("YYYY-MM-DD HH:mm:ss"))
+                    //     }
+                    // },
                     // {
                     //   title:"支付时间",
                     //   minWidth:180,
