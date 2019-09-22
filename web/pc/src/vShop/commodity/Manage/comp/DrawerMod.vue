@@ -44,17 +44,17 @@
         <div class="lineBox">
           <div class="lineVal box_row colCenter">
             <div class="box_row_100" style="cursor: pointer">
-              <Poptip placement="left" :transfer="false">
+              <!--<Poptip placement="left" :transfer="false">-->
                 <Icon type="md-menu" size="24"/>
                 {{$t('CYRS')}}：{{mess.cyyhs}}
-                <div slot="content" class="purchaserListBox">
+                <!--<div slot="content" class="purchaserListBox">-->
                   <!--<Table-->
                     <!--size='small' stripe-->
                     <!--:height="500"-->
                     <!--:columns="tableTiT"-->
                     <!--:data="tableData"></Table>-->
-                </div>
-              </Poptip>
+                <!--</div>-->
+              <!--</Poptip>-->
             </div>
             <div>
               {{$t('YS')}}:{{(parseInt(mess.proPrice)-parseInt(mess.rePrice))}}{{$t('F')}} / {{$t('SY')}}
