@@ -147,7 +147,7 @@ export default {
    "SY":"Surplus",
   "SJSJ":"Shelf time",
   "CYRS":"Number of participants",
-  "SQHJZ":"Last winner",
+  "SQHJZ":"Present winner",
   "ZJHM":"Winning numbers",
   "HJZ":"Prize winner",
   "CYSL":"Number of participants",

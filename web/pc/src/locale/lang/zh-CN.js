@@ -150,7 +150,7 @@ export default {
   "SY":"剩余",
   "SJSJ":"上架时间",
   "CYRS":"参与人数",
-  "SQHJZ":"上期获奖者",
+  "SQHJZ":"本期获奖者",
   "ZJHM":"中奖号码",
   "HJZ":"获奖者",
   "CYSL":"参与数量",
