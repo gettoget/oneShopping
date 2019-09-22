@@ -186,6 +186,17 @@ public class ProInfo implements Serializable {
     @Transient
     private String count;
 
+    @Transient
+    private long gmrs;
+
+
+    public long getGmrs() {
+        return gmrs;
+    }
+
+    public void setGmrs(long gmrs) {
+        this.gmrs = gmrs;
+    }
 
     public String getRate() {
         return rate;

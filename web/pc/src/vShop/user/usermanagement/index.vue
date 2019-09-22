@@ -5,6 +5,13 @@
       <div class="box_row_100">
         <div class="box_row colCenter rowRight pageFindSty" style="border: none">
           <div>
+            <Select v-model="param.reNum" style="width: 200px;margin-right: 20px" @on-change="param.pageNum = 1 , getDataList()">
+              <Option v-for="item in reList" :value="item.val" :key="item.val">
+                {{item.key}}
+              </Option>
+            </Select>
+          </div>
+          <div>
             <Input v-model="param.userNameLike" @on-change="param.pageNum = 1,getDataList()"
                    clearable :placeholder="$t('YHM')" style="width: 200px"/>
           </div>
@@ -32,6 +39,7 @@
     </div>
     <div class="pagerBoxSty boxMar_T box_row rowRight">
       <one-page :total="total" :size="param.pageSize"
+
                 :opts="[12,24]"
                 @chPager="chPager"></one-page>
     </div>
@@ -52,6 +60,20 @@
     },
     data() {
       return {
+          reList:[
+              {
+                key: '一次',
+                val: '1'
+              },
+              {
+                  key:'两次',
+                  val: '2'
+              },
+              {
+                  key: '两次以上',
+                  val: '3'
+              }
+          ],
         compName: "",
         tableData: [],
         itMess: {},
@@ -61,7 +83,8 @@
           phoneLike: "",
           source:"0",
           pageNum: 1,
-          pageSize: 12
+          pageSize: 12,
+          reNum: ''
         }
       }
     },

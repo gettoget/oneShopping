@@ -1,6 +1,6 @@
 <template>
   <Card class="userdetailsstatistics box_col">
-    <div slot="title"  class="box_row colCenter">
+    <div slot="title" class="box_row colCenter">
       <div class="box_row_100">
       </div>
       <div>
@@ -42,123 +42,151 @@
 </template>
 
 <script>
-  import i18nTabTit from '@/mixins/i18nTabTit'
-  import messMod from '../user/usermanagement/comp/messMod'
-  export default {
-    name: "index",
-    mixins: [i18nTabTit],
-    components:{
-      messMod
-    },
-    data(){
-      return {
-          tableDatatime:'',
-        compName:"",
-        itMess:{},
-        tab_H: 0,
-        tabBox: "tabBox",
-        tableTiT:[
-          {
-            title:"排行",
-              i18n:'PH',
-            minWidth:80,
-            render:(h,p)=>{
-              let a = p.index+1+(this.param.pageNum-1)*this.param.pageSize
-              return h('div',a)
-            }
-          },
-          {
-            title:"用户名",
-            key:"userName",
-            minWidth:100,
-            i18n:'YHM',
-              align:'center'
-          },
-          {
-            title:"充值时间",
-            minWidth:180,
-            key:"cjsj",
-            i18n:'CZSJ',
-              align:'center',
-            render:(h,p)=>{
-              return h('div',this.moment(p.row.cjsj).format("YYYY-MM-DD HH:mm:ss"))
-            }
-          },
-          {
-            title:"支付时间",
-            minWidth:180,
-            key:"cjsj",
-            i18n:'ZFSJ',
-              align:'center',
-            render:(h,p)=>{
-              return h('div',this.moment(p.row.qrsj).format("YYYY-MM-DD HH:mm:ss"))
-            }
-          },
-          {
-            title:"购买次数",
-            minWidth:120,
-            i18n:'GMCS',
-            key:"count",
-              align:'center'
-          },
-        ],
-        tableData: [],
-        param: {
-          time:"",
-          name:"",
-          pageNum: 1,
-          pageSize: 12
+    import i18nTabTit from '@/mixins/i18nTabTit'
+    import messMod from '../user/usermanagement/comp/messMod'
+
+    export default {
+        name: "index",
+        mixins: [i18nTabTit],
+        components: {
+            messMod
         },
-        total: 0,
-      }
-    },
-    created(){
-      console.log(this.moment().format('YYYY-MM-DD'));
-      this.param.time = this.moment().format('YYYY-MM-DD')
-      this.tableDatatime = this.moment().format('YYYY-MM-DD')
-        console.log(this.param.time);
-        this.getPagerList()
-    },
-    mounted(){
-      this.$nextTick(() => {
-        try {
-          this.tab_H = this.AF.getDom_H(this.tabBox)
-        } catch (e) {
+        data() {
+            return {
+                tableDatatime: '',
+                compName: "",
+                itMess: {},
+                tab_H: 0,
+                tabBox: "tabBox",
+                tableTiT: [
+                    {
+                        title: "排行",
+                        i18n: 'PH',
+                        minWidth: 80,
+                        render: (h, p) => {
+                            let a = p.index + 1 + (this.param.pageNum - 1) * this.param.pageSize
+                            return h('div', a)
+                        }
+                    },
+                    {
+                        title: "用户名",
+                        // key: "userName",
+                        minWidth: 100,
+                        i18n: 'YHM',
+                        align: 'center',
+                        render: (h,p) => {
+                            var v = this
+                            return h('div', [
+                                h('Button',{
+                                    props:{
+                                        type:'success',
+                                        shape: 'circle',
+                                        size: 'small'
+                                    },
+                                    on: {
+                                        click: function () {
+                                            v.$http.post("/api/user/pager", {id:p.row.id}).then(res => {
+                                                if (res.code == 200) {
+                                                    console.log(res.page.list);
+                                                    v.itMess = res.page.list[0]
+                                                    console.log(v.itMess);
+                                                    v.compName = "messMod"
+                                                }
+                                            }).catch(err => {
+                                            })
+
+                                        }
+                                    }
+                                },p.row.userName)
+                            ])
+                        }
+                    },
+                    {
+                        title: "充值时间",
+                        minWidth: 180,
+                        key: "cjsj",
+                        i18n: 'CZSJ',
+                        align: 'center',
+                        render: (h, p) => {
+                            return h('div', this.moment(p.row.cjsj).format("YYYY-MM-DD HH:mm:ss"))
+                        }
+                    },
+                    // {
+                    //   title:"支付时间",
+                    //   minWidth:180,
+                    //   key:"cjsj",
+                    //   i18n:'ZFSJ',
+                    //     align:'center',
+                    //   render:(h,p)=>{
+                    //     return h('div',this.moment(p.row.qrsj).format("YYYY-MM-DD HH:mm:ss"))
+                    //   }
+                    // },
+                    {
+                        title: "购买次数",
+                        minWidth: 120,
+                        i18n: 'GMCS',
+                        key: "count",
+                        align: 'center'
+                    },
+                ],
+                tableData: [],
+                param: {
+                    time: "",
+                    name: "",
+                    pageNum: 1,
+                    pageSize: 12
+                },
+                total: 0,
+            }
+        },
+        created() {
+            console.log(this.moment().format('YYYY-MM-DD'));
+            this.param.time = this.moment().format('YYYY-MM-DD')
+            this.tableDatatime = this.moment().format('YYYY-MM-DD')
+            console.log(this.param.time);
+            this.getPagerList()
+        },
+        mounted() {
+            this.$nextTick(() => {
+                try {
+                    this.tab_H = this.AF.getDom_H(this.tabBox)
+                } catch (e) {
+                }
+            })
+        },
+        methods: {
+            closeMod() {
+                this.compName = ''
+            },
+            clickrow(a, b) {
+                this.itMess = a
+                this.compName = 'messMod'
+            },
+            chPager(p) {
+                this.param.pageNum = p.pageNum
+                this.param.pageSize = p.pageSize
+                this.getPagerList()
+            },
+            changTime(value) {
+                console.log(value);
+                this.param.time = value
+                this.getPagerList()
+            },
+            getPagerList() {
+                this.$http.post("/api/statisnew/yhgm", this.param).then(res => {
+                    if (res.code == 200) {
+                        this.tableData = res.page.list
+                        this.total = res.page.total
+                    }
+                }).catch(err => {
+                })
+            }
         }
-      })
-    },
-    methods:{
-        closeMod(){
-          this.compName = ''
-        },
-        clickrow(a,b){
-            this.itMess = a
-            this.compName = 'messMod'
-        },
-      chPager(p) {
-        this.param.pageNum = p.pageNum
-        this.param.pageSize = p.pageSize
-        this.getPagerList()
-      },
-      changTime(value) {
-        console.log(value);
-        this.param.time = value
-        this.getPagerList()
-      },
-      getPagerList(){
-        this.$http.post("/api/statisnew/yhgm",this.param).then(res=>{
-          if (res.code == 200) {
-            this.tableData = res.page.list
-            this.total = res.page.total
-          }
-        }).catch(err=>{})
-      }
     }
-  }
 </script>
 
 <style lang="less">
-  .userdetailsstatistics{
+  .userdetailsstatistics {
     .ivu-card-body {
       flex: 1;
       overflow: auto;

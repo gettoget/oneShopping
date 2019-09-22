@@ -54,7 +54,7 @@
       </Input>
 
       <Button type="primary" icon="ios-search" style=";margin-right: 20px"
-              @click="getDataList()"></Button>
+              @click="proId = '' ,getDataList()"></Button>
       <Button type="primary" icon="md-refresh"
               @click="reset"></Button>
 
@@ -131,12 +131,16 @@
           proLx: "",
           pageNum: 1,
           pageSize: 8
-        }
-
+        },
+        proId:''
       }
     },
     created() {
-      this.getDataList()
+        let id = this.$route.params.id;
+        if(id){
+            this.proId = id
+        }
+        this.getDataList()
     },
     methods: {
       proZtChange(val){
@@ -144,6 +148,7 @@
           this.param.kjsjGte = ""
           this.param.kjsjLte = ""
         }
+        this.proId = ''
         this.getDataList()
       },
       getDate(t){
@@ -155,6 +160,7 @@
           this.param.kjsjGte = ""
           this.param.kjsjLte = ""
         }
+        this.proId = ''
         this.getDataList()
       },
       reset() {
@@ -166,6 +172,7 @@
           pageNum: 1,
           pageSize: 8
         }
+        this.proId = ''
         this.getDataList()
       },
       tagEvent(it, index) {
@@ -177,6 +184,7 @@
           }
           if (index == this.tegList.length - 1) {
             this.param.proLx = b.join(',')
+              this.proId = ''
             this.getDataList()
           }
         })
@@ -184,6 +192,7 @@
       chPager(p) {
         this.param.pageNum = p.pageNum
         this.param.pageSize = p.pageSize
+          this.proId = ''
         this.getDataList()
       },
       getDataList() {
@@ -193,6 +202,9 @@
         } else if (a.proZt == "5") {
           a.proZt = 4
           a.bz2 = 0
+        }
+        if(this.proId){
+            a.id = this.proId
         }
         this.datamess = false
         this.$http.post("/api/proinfo/pager", a).then(res => {

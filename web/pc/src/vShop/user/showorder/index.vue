@@ -45,7 +45,7 @@
         this.getDataList()
       },
       getDataList(){
-        this.$http.post("/api/proeval/pager").then(res=>{
+        this.$http.post("/api/proeval/pager",this.param).then(res=>{
           if(res.code == 200){
             this.dataList = res.page.list
             this.total = res.page.total

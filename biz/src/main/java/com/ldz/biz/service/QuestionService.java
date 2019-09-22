@@ -18,4 +18,6 @@ public interface QuestionService  extends BaseService<Question,String> {
     ApiResponse<String> getProGroup(int pageNum, int pageSize, String name);
 
     ApiResponse<String> getOneMess(int pageNum, int pageSize, String userId);
+
+    ApiResponse<String> ck();
 }

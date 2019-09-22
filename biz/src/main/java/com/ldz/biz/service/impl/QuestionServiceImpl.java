@@ -99,6 +99,8 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
         }
         res.setList(info.getList());
         res.setTotal(info.getTotal());
+        // 更新所有信息为已查看
+        baseMapper.updateCk(userId);
         return res;
     }
 
@@ -212,6 +214,18 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
         }
         res.setPage(info);
         return res;
+    }
+
+    @Override
+    public ApiResponse<String> ck() {
+        String id = getHeader("userId");
+        RuntimeCheck.ifNull(id, MessageUtils.get("user.notLogin"));
+        Question ck = baseMapper.ck(id);
+        if((StringUtils.equals(ck.getType(), "2") && StringUtils.equals(ck.getCk(), "1")) || StringUtils.equals(ck.getType(), "1")){
+            return ApiResponse.success("0");
+        }else{
+            return ApiResponse.success("1");
+        }
     }
 
     @Override

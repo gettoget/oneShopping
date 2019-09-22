@@ -81,4 +81,6 @@ public interface ProInfoService extends BaseService<ProInfo, String> {
     ApiResponse<String> getWinRecordById(String id, int pageNum, int pageSize);
 
     ApiResponse<List<Order>> getUsers(String id);
+
+    ApiResponse<WinRecord> getWinRecord(String id);
 }

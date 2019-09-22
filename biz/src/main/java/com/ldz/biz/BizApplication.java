@@ -12,8 +12,8 @@ public class BizApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(BizApplication.class, args);
-        UserService userService = SpringContextUtil.getBean(UserService.class);
-        userService.initRobot();
+//        UserService userService = SpringContextUtil.getBean(UserService.class);
+//        userService.initRobot();
 //        System.out.println("initUsers");
     }
 

@@ -10,4 +10,5 @@ public class UserInModel implements Serializable {
     private String cys;
     private String cz;
     private String xf;
+    private String czcg;
 }

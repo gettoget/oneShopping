@@ -261,7 +261,12 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             if (StringUtils.isBlank(payType)) {
                 int balance = Integer.parseInt(user1.getBalance());
                 int ye = balance - dzf;
-                RuntimeCheck.ifTrue(ye < 0, MessageUtils.get("order.balanceNotEnough"));
+                if(ye < 0){
+                    ApiResponse<String> res = new ApiResponse<>();
+                    res.setCode(555);
+                    res.setMessage(MessageUtils.get("order.balanceNotEnough"));
+                    return res;
+                }
                 exchange.setXfqjbs(balance + "");
                 exchange.setXfsj(DateUtils.getNowTime());
                 exchange.setXfhjbs(ye + "");
@@ -277,7 +282,12 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             order.setDdzt("0");
             int balance = Integer.parseInt(user1.getBalance());
             int ye = balance - dzf;
-            RuntimeCheck.ifTrue(ye < 0, MessageUtils.get("order.balanceNotEnough"));
+            if(ye < 0){
+                ApiResponse<String> res = new ApiResponse<>();
+                res.setCode(555);
+                res.setMessage(MessageUtils.get("order.balanceNotEnough"));
+                return res;
+            }
             exchange.setXfqjbs(balance + "");
             exchange.setXfsj(DateUtils.getNowTime());
             exchange.setXfhjbs(ye + "");

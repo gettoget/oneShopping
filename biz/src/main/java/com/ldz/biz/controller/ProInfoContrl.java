@@ -2,6 +2,7 @@ package com.ldz.biz.controller;
 
 import com.ldz.biz.model.Order;
 import com.ldz.biz.model.ProInfo;
+import com.ldz.biz.model.WinRecord;
 import com.ldz.biz.service.ProInfoService;
 import com.ldz.sys.base.BaseController;
 import com.ldz.sys.base.BaseService;
@@ -75,6 +76,15 @@ public class ProInfoContrl extends BaseController<ProInfo, String> {
     @PostMapping("/getWinRecord")
     public ApiResponse<String> getWinRecordById(String id,@RequestParam(defaultValue = "1") int pageNum ,@RequestParam(defaultValue = "8") int pageSize){
         return service.getWinRecordById(id,pageNum,pageSize);
+    }
+
+    /**
+     * 获取中奖纪录
+     * @return
+     */
+    @PostMapping("/winrecord")
+    public ApiResponse<WinRecord> getWinRecord(String id ){
+        return service.getWinRecord(id);
     }
 
     /**

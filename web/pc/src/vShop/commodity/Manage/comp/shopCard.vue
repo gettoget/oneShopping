@@ -33,6 +33,7 @@
       <div class="lineVal">
         {{$t('YS')}}:{{(parseInt(mess.proPrice)-parseInt(mess.rePrice))}}
         {{$t('F')}}/{{$t('SY')}}{{mess.rePrice}}{{$t('F')}}
+        {{$t('YHGM')}}:{{mess.gmrs}}
       </div>
       <Progress :percent="100-parseInt(parseInt(mess.rePrice)/parseInt(mess.proPrice)*100)" status="active">
         <span v-if="mess.rePrice == 0">售罄</span>

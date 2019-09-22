@@ -46,6 +46,7 @@ export default {
   "CY":" rak",
   "CZJE":"top-up jumlah",
   "XFJE":"konsumsi jumlah",
+  "YHGM":"Pengguna membeli",
 
   /**********************************
    ***********************************/

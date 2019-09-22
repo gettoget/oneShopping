@@ -10,6 +10,7 @@ import com.ldz.biz.mapper.UserMapper;
 import com.ldz.biz.model.*;
 import com.ldz.biz.service.*;
 import com.ldz.sys.base.BaseServiceImpl;
+import com.ldz.sys.base.LimitedCondition;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
 import com.ldz.util.bean.SimpleCondition;
@@ -86,10 +87,12 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
                 user.setCy(inModel.getCys());
                 user.setCz(inModel.getCz());
                 user.setXf(inModel.getXf());
+                user.setCzcg(inModel.getCzcg());
             } else {
                 user.setXf("0");
                 user.setCy("0");
                 user.setCz("0");
+                user.setCzcg("0");
             }
             user.setPayPwd("");
             user.setPwd("");
@@ -97,6 +100,16 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         });
     }
 
+    @Override
+    public boolean fillPagerCondition(LimitedCondition condition){
+        String reNum = getRequestParamterAsString("reNum");
+        if(StringUtils.isNotBlank(reNum)){
+            int re = Integer.parseInt(reNum);
+            List<String> list = baseMapper.getUserIds(re);
+            condition.in(User.InnerColumn.id, list);
+        }
+        return true;
+    }
 
     @Override
     public ApiResponse<Map<String, Object>> register(String phone, String password, String password1, String code,

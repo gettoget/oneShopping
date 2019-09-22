@@ -3,6 +3,7 @@ package com.ldz.biz.mapper;
 import com.ldz.biz.model.Question;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import tk.mybatis.mapper.common.Mapper;
 
 import java.util.List;
@@ -18,4 +19,10 @@ public interface QuestionMapper extends Mapper<Question> {
             " u where u.id = q.id  " +
             "</script>")
     List<Question> getPeoGroup(@Param("name") String name);
+
+    @Update(" update question set ck = '1' where user_id = #{userId}")
+    void updateCk(@Param("userId") String userId);
+
+    @Select(" select * from question where user_id = #{id} order by id limit 1")
+    Question ck(String id);
 }

@@ -778,6 +778,26 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         return ApiResponse.success(orderList);
     }
 
+    @Override
+    public ApiResponse<WinRecord> getWinRecord(String id) {
+        RuntimeCheck.ifBlank(id, MessageUtils.get("pro.idBlank"));
+        SimpleCondition wincon = new SimpleCondition(WinRecord.class);
+        wincon.eq(WinRecord.InnerColumn.proId, id);
+        wincon.setOrderByClause(" cjsj desc ");
+        List<WinRecord> records = winRecordService.findByCondition(wincon);
+        if(CollectionUtils.isNotEmpty(records)){
+            WinRecord winRecord = records.get(0);
+            ProInfo info1 = proInfoService.findById(winRecord.getProId());
+            winRecord.setProName(info1.getProName());
+            User user = userService.findById(winRecord.getUserId());
+            winRecord.setHimg(user.gethImg());
+            return ApiResponse.success(winRecord);
+        }else{
+            WinRecord winRecord =null;
+            return ApiResponse.success(winRecord);
+        }
+    }
+
 
     @Override
     public void afterPager(PageInfo<ProInfo> result) {
@@ -799,8 +819,19 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         List<Order> orders = orderService.findByCondition(condition);
         Map<String, String> map = orders.stream().filter(order -> userIds.contains(order.getUserId()) && StringUtils.equals(order.getDdzt(),"1")).collect(Collectors.toMap(Order::getProId, p -> p.getGmfs()));
 
+        condition = new SimpleCondition(OrderList.class);
+        condition.eq(OrderList.InnerColumn.yhlx, "0");
+        condition.in(OrderList.InnerColumn.proId, proIds);
+        List<OrderList> lists = orderListService.findByCondition(condition);
+        Map<String, List<OrderList>> listMap = lists.stream().collect(Collectors.groupingBy(OrderList::getProId));
 
         for (ProInfo proBaseinfo : list) {
+            List<OrderList> listList = listMap.get(proBaseinfo.getId());
+            long gmrs = 0;
+            if(listList != null){
+                gmrs = listList.stream().map(OrderList::getUserid).count();
+            }
+            proBaseinfo.setGmrs(gmrs);
             long count = orders.stream().filter(order -> StringUtils.equals(proBaseinfo.getId(),order.getProId())).map(Order::getUserId).distinct().count();
             proBaseinfo.setCyyhs(count+ "");
             if (userMap.containsKey(proBaseinfo.getUserId())) {
@@ -808,7 +839,6 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 proBaseinfo.setUserName(user.getUserName());
             }
             if(map.containsKey(proBaseinfo.getId())){
-
                 proBaseinfo.setZjfs(map.get(proBaseinfo.getId()));
 
             }

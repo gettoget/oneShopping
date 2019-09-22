@@ -52,6 +52,7 @@
                 v.buildEchart_line()
               }
             })
+              console.log(this.dataV);
           }
 
         })
@@ -117,6 +118,12 @@
             // },
             {
               type: 'bar',
+                label: {
+                  normal: {
+                      show: true,
+                      position: 'top'
+                  }
+                },
               itemStyle: {
                 normal: {
                   color: new echarts.graphic.LinearGradient(
@@ -198,7 +205,10 @@
             { // For shadow
               type: 'line',
               itemStyle: {
-                normal: {color: '#188df0'}
+                normal: {
+                    show: true ,
+                    color: '#188df0'
+                }
               },
               data: v.dataV,
                 // [220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 125, 220],

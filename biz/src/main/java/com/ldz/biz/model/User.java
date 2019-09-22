@@ -137,6 +137,17 @@ public class User implements Serializable {
     @Transient
     private String count;
 
+    @Transient
+    private String czcg;
+
+    public String getCzcg() {
+        return czcg;
+    }
+
+    public void setCzcg(String czcg) {
+        this.czcg = czcg;
+    }
+
     public String getCount() {
         return count;
     }

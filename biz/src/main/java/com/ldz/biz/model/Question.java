@@ -37,6 +37,11 @@ public class Question {
      */
     private String hf;
 
+    /**
+     * 是否查看
+     */
+    private String ck;
+
 
     @Transient
     private String himg;
@@ -44,6 +49,14 @@ public class Question {
     private String username;
     @Transient
     private List<Question> replyList;
+
+    public String getCk() {
+        return ck;
+    }
+
+    public void setCk(String ck) {
+        this.ck = ck;
+    }
 
     public String getHf() {
         return hf;

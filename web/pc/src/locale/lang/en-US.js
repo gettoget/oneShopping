@@ -172,6 +172,7 @@ export default {
   "NRT":"Content Map",
   "TIJAO":"Submission",
   "CHONGZHI":"Reset",
+  "YHGM":"Users to buy",
   /**********************************
    ***********************************/
 

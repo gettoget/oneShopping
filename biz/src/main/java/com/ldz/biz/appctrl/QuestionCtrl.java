@@ -6,10 +6,7 @@ import com.ldz.biz.service.QuestionService;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/app/user/question")
@@ -42,6 +39,11 @@ public class QuestionCtrl {
     @PostMapping("/remove/{pkid}")
     public ApiResponse<String> delete(@PathVariable("pkid") String id){
         return service.delete(id);
+    }
+
+    @GetMapping("/ck")
+    public ApiResponse<String> ck(){
+        return service.ck();
     }
 
 
