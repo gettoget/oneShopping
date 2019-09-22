@@ -136,7 +136,8 @@
       }
     },
     created() {
-        let id = this.$route.params.id;
+        let id = this.$route.query.id;
+        console.log(' id ---------' , id);
         if(id){
             this.proId = id
         }

@@ -401,9 +401,12 @@ public class StatisNewServiceImpl implements StatisNewService {
     }
 
     @Override
-    public ApiResponse<Object> yhgm(String time, String name, String orderBy, int pageNum, int pageSize) {
+    public ApiResponse<Object> yhgm(String time, String end, String name, String orderBy, int pageNum, int pageSize) {
         if (StringUtils.isBlank(time)) {
-            time = DateTime.now().toString("yyyy-MM-dd");
+            time = DateTime.now().toString("yyyy-MM-dd") + " 00:00:00.000";
+        }
+        if(StringUtils.isBlank(end)){
+            end = DateTime.now().toString("yyyy-MM-dd" + " 23:59:59.999");
         }
         if (StringUtils.isBlank(name)) {
             name = "";
@@ -414,8 +417,9 @@ public class StatisNewServiceImpl implements StatisNewService {
         String finalTime = time;
         String finalName = name;
         String finalOrderBy = orderBy;
+        String finalEnd = end;
         PageInfo<User> info =
-                PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> mapper.yhgm(finalTime, finalName,
+                PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> mapper.yhgm(finalTime, finalEnd, finalName,
                         finalOrderBy));
 
         ApiResponse<Object> res = new ApiResponse<>();

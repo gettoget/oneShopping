@@ -212,7 +212,7 @@
                                     on: {
                                         click: function () {
                                             console.log(p.row.proId)
-                                            v.$router.push('/manage/' + p.row.proId)
+                                            v.$router.push({name: 'manage',query: {id:p.row.proId}})
                                         }
                                     }
                                 },p.row.proName)

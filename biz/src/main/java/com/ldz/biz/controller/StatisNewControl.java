@@ -129,8 +129,8 @@ public class StatisNewControl  {
      * 用户每天购买的数量 排名
      */
     @PostMapping("/yhgm")
-    public ApiResponse<Object> yhgm(String time, String name, String orderBy, @RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "8") int pageSize){
-        return service.yhgm(time,name,orderBy,pageNum,pageSize);
+    public ApiResponse<Object> yhgm(String time,String end , String name, String orderBy, @RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "8") int pageSize){
+        return service.yhgm(time,end,name,orderBy,pageNum,pageSize);
     }
 
 

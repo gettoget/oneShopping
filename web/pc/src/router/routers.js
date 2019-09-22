@@ -152,7 +152,7 @@ export default [
         component: () => import('@/vShop/commodity/reserve')
       },
       {
-        path: '/manage/:id',
+        path: '/manage',
         name: 'manage',
         meta: {
           icon: 'ios-eye',
