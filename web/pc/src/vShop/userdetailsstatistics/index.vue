@@ -119,7 +119,6 @@
                     // {
                     //   title:"支付时间",
                     //   minWidth:180,
-                    //   key:"cjsj",
                     //   i18n:'ZFSJ',
                     //     align:'center',
                     //   render:(h,p)=>{
