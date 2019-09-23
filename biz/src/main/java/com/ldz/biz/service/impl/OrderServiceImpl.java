@@ -212,9 +212,9 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
         RuntimeCheck.ifBlank(entity.getPayPwd(), MessageUtils.get("user.paypwdblank"));
 
         int gmfs = Integer.parseInt(entity.getGmfs());
-        RuntimeCheck.ifTrue(gmfs < 0, MessageUtils.get("order.gmLteZero"));
+        RuntimeCheck.ifTrue(gmfs <= 0, MessageUtils.get("order.gmLteZero"));
         int dzf = Integer.parseInt(entity.getZfje());
-        RuntimeCheck.ifTrue(dzf < 0, MessageUtils.get("order.jeLteZero"));
+        RuntimeCheck.ifTrue(dzf <= 0, MessageUtils.get("order.jeLteZero"));
         ProBaseinfo baseinfo = null;
         ProInfo proInfo = null;
 
@@ -615,8 +615,10 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, String> implements 
             }
             // 商品已中奖  自动上架 下个商品  如果还有库存的话
             ProBaseinfo baseinfo = proBaseinfoService.findById(info.getProBaseid());
+            redis.convertAndSend("sendMsg", info.getId());
             if (Integer.parseInt(baseinfo.getProStore()) > 0) {
                 redis.convertAndSend("grounding", baseinfo.getId());
+
             }
         }
 

@@ -47,6 +47,14 @@ export default {
   "CZJE":"top-up jumlah",
   "XFJE":"konsumsi jumlah",
   "YHGM":"Pengguna membeli",
+  "BYBUY":"Membeli diurutkan",
+  "BYWATCH":"Urutkan tampilan",
+  "ALL":"SEMUA",
+  "SUCCESS":"Uangnya berhasil",
+  "FAIL":"Uangnya gagal",
+  "REWARD":"Sistem penghargaan",
+  "CONFIRM":"dianggap",
+  "PX":"urutan",
 
   /**********************************
    ***********************************/

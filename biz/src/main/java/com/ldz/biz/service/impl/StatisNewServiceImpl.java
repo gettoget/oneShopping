@@ -376,10 +376,17 @@ public class StatisNewServiceImpl implements StatisNewService {
     }
 
     @Override
-    public ApiResponse<Object> kj(String time, String proName, String orderBy, int pageNum, int pageSize) {
+    public ApiResponse<Object> kj(String time, String end, String proName, String orderBy, int pageNum, int pageSize) {
         // 查看一类商品的真是用户购买和浏览数量
         if (StringUtils.isBlank(time)) {
-            time = DateTime.now().toString("yyyy-MM-dd");
+            time = DateTime.now().toString("yyyy-MM-dd") + " 00:00:00.000";
+        }else{
+            time = time + " 00:00:00.000";
+        }
+        if(StringUtils.isBlank(end)){
+            end = DateTime.now().toString("yyyy-MM-dd") + " 23:59:59.999";
+        }else{
+            end = end + " 23:59:59.999";
         }
         if (StringUtils.isBlank(proName)) {
             proName = null;
@@ -391,8 +398,9 @@ public class StatisNewServiceImpl implements StatisNewService {
         String finalTime = time;
         String finalOrderBy = orderBy;
         String finalProName = proName;
+        String finalEnd = end;
         PageInfo<ProBaseinfo> info = PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> {
-            mapper.kj(finalTime, finalProName, finalOrderBy);
+            mapper.kj(finalTime, finalEnd, finalProName, finalOrderBy);
         });
         ApiResponse<Object> res = new ApiResponse<>();
         res.setPage(info);
@@ -404,9 +412,13 @@ public class StatisNewServiceImpl implements StatisNewService {
     public ApiResponse<Object> yhgm(String time, String end, String name, String orderBy, int pageNum, int pageSize) {
         if (StringUtils.isBlank(time)) {
             time = DateTime.now().toString("yyyy-MM-dd") + " 00:00:00.000";
+        }else{
+            time = time + " 00:00:00.000";
         }
         if(StringUtils.isBlank(end)){
             end = DateTime.now().toString("yyyy-MM-dd" + " 23:59:59.999");
+        }else{
+            end = end + " 23:59:59.999";
         }
         if (StringUtils.isBlank(name)) {
             name = "";

@@ -13,6 +13,10 @@
                     format='yyyy-MM-dd' @on-change="changTime" type="date"
                     split-panels style="width: 160px;margin-right: 18px"
                     placement="bottom-end" :placeholder="$t('GMRQ')"></DatePicker>
+        <DatePicker v-model="tableDatatime1"
+                    format='yyyy-MM-dd' @on-change="changEndTime" type="date"
+                    split-panels style="width: 160px;margin-right: 18px"
+                    placement="bottom-end" :placeholder="$t('GMRQ')"></DatePicker>
       </div>
       <Button type="primary" @click="getPagerList">
         <Icon type="md-search"></Icon>
@@ -54,6 +58,7 @@
         data() {
             return {
                 tableDatatime: '',
+                tableDatatime1:'',
                 compName: "",
                 itMess: {},
                 tab_H: 0,
@@ -122,7 +127,7 @@
                     //   }
                     // },
                     {
-                        title: "充值金额",
+                        title: "购买号码数",
                         minWidth: 120,
                         i18n: 'GMCS',
                         key: "count",
@@ -132,6 +137,7 @@
                 tableData: [],
                 param: {
                     time: "",
+                    end:"",
                     name: "",
                     pageNum: 1,
                     pageSize: 12
@@ -142,7 +148,9 @@
         created() {
             console.log(this.moment().format('YYYY-MM-DD'));
             this.param.time = this.moment().format('YYYY-MM-DD')
+            this.param.end = this.moment().format('YYYY-MM-DD')
             this.tableDatatime = this.moment().format('YYYY-MM-DD')
+            this.tableDatatime1 = this.moment().format('YYYY-MM-DD')
             console.log(this.param.time);
             this.getPagerList()
         },
@@ -170,6 +178,10 @@
             changTime(value) {
                 console.log(value);
                 this.param.time = value
+                this.getPagerList()
+            },
+            changEndTime(value){
+                this.param.end = value
                 this.getPagerList()
             },
             getPagerList() {

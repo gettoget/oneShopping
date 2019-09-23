@@ -14,7 +14,7 @@ spring:
     maxIdle: 200
     maxActive: 1024
     maxWait: 1000
-    database: 10
+    database: 8
   datasource:
     url: jdbc:mysql://147.139.134.167:5890/yyg?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
 #    url: jdbc:mysql://127.0.0.1:3306/yyg?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8

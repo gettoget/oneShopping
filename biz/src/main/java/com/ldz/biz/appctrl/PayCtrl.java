@@ -3,9 +3,12 @@ package com.ldz.biz.appctrl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ldz.biz.bean.PaySuc;
+import com.ldz.biz.bean.ProInfoLuckNumBean;
+import com.ldz.biz.model.OrderList;
 import com.ldz.biz.model.ProInfo;
 import com.ldz.biz.model.Recharge;
 import com.ldz.biz.model.User;
+import com.ldz.biz.service.OrderListService;
 import com.ldz.biz.service.ProInfoService;
 import com.ldz.biz.service.RechargeService;
 import com.ldz.biz.service.UserService;
@@ -29,8 +32,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,6 +47,8 @@ public class PayCtrl {
     private ProInfoService infoService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private OrderListService listService;
 
     @Autowired
     private RedisTemplateUtil redis;
@@ -159,6 +164,29 @@ public class PayCtrl {
                 URL u = new URL(user.gethImg());
                 FileUtils.copyURLToFile(u, new File("D:/static/common/" + i + ".png"));
             }
+        }
+        return ApiResponse.success();
+    }
+
+    @GetMapping("/updateGmfs")
+    public ApiResponse<String> updateGmfs(){
+        SimpleCondition condition = new SimpleCondition(OrderList.class);
+        condition.eq(OrderList.InnerColumn.proId, "622214058992467968");
+        condition.eq(OrderList.InnerColumn.userid, "622355579720957952");
+        condition.and().andNotEqualTo(OrderList.InnerColumn.num.name(), "10001568");
+        List<OrderList> lists = listService.findByCondition(condition);
+        List<String> collect = lists.stream().map(OrderList::getNum).collect(Collectors.toList());
+        redis.delete("622214058992467968_nums");
+        Collections.shuffle(collect);
+        for (String num : collect) {
+            ProInfoLuckNumBean numBean = new ProInfoLuckNumBean();
+            numBean.setProId("622214058992467968");
+            numBean.setProName("OPPO A5s 3GB RAM 32GB ROM");
+            numBean.setLuckNum(num);
+            redis.boundSetOps("622214058992467968" + "_nums").add(numBean);
+        }
+        for (OrderList list : lists) {
+            listService.remove(list.getId());
         }
         return ApiResponse.success();
     }

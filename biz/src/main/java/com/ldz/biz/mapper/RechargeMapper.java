@@ -7,6 +7,7 @@ import tk.mybatis.mapper.common.Mapper;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface RechargeMapper extends Mapper<Recharge> {
 
@@ -102,14 +103,14 @@ public interface RechargeMapper extends Mapper<Recharge> {
     @Select("<script>" +
             "   SELECT b.*,s.sm count from pro_baseinfo b inner join" +
             "( select p.pro_baseid, sum(o.c) sm from pro_info p INNER JOIN (select pro_id , count(1) c  from " +
-            "order_list where yhlx = '0' and cjsj like '${time}%' group by pro_id) o on o.pro_id = p.id     group by p" +
+            "order_list where yhlx = '0' and cjsj &gt;= #{time} and cjsj &lt;= #{end} group by pro_id) o on o.pro_id = p.id     group by p" +
             ".pro_baseid )  s on s.pro_baseid = b.id  " +
             " <if test='proName != null '>" +
             " and b.name = '${proName}%'" +
             "</if>" +
             "  order by ${orderBy} " +
             "</script> ")
-    List<ProBaseinfo> kj(@Param("time") String time, @Param("proName") String proName, @Param("orderBy") String orderBy);
+    List<ProBaseinfo> kj(@Param("time") String time, @Param("end") String end, @Param("proName") String proName, @Param("orderBy") String orderBy);
 
     @Select("<script> " +
             " select u.*, o.count from user u inner join " +
@@ -120,4 +121,12 @@ public interface RechargeMapper extends Mapper<Recharge> {
             "  group by userid) o  on u.id = o.userid   order by o.count desc " +
             "</script> ")
     List<User> yhgm(@Param("time") String time,@Param("end") String end ,@Param("name") String name,@Param("orderBy") String orderBy);
+
+    @Select("<script> " +
+            " select * from user u inner join  ( select count(user_id) c , user_id  from recharge r where r.czqd = '1' and r.user_id in " +
+            " <foreach collection='ids' item='item' index='index' open='(' separator=',' close=')' >" +
+            " #{item} " +
+            " </foreach> group by r.usesr_id having c &gt;= 2 ) re on re.user_id = u.id  " +
+            "</script>")
+    List<User> getTwo(@Param("ids") Set<String> ids);
 }

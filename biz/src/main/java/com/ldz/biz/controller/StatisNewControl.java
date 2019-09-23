@@ -121,8 +121,8 @@ public class StatisNewControl  {
      *   一类商品购买的情况和浏览情况
      */
     @PostMapping("/kj")
-    public ApiResponse<Object> kj(String time , String proName, String orderBy, @RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "3") int pageSize){
-        return service.kj(time,proName,orderBy,pageNum,pageSize);
+    public ApiResponse<Object> kj(String time, String end , String proName, String orderBy, @RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "3") int pageSize){
+        return service.kj(time, end,proName,orderBy,pageNum,pageSize);
     }
 
     /**

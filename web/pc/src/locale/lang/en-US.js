@@ -173,6 +173,14 @@ export default {
   "TIJAO":"Submission",
   "CHONGZHI":"Reset",
   "YHGM":"Users to buy",
+  "BYBUY":"By Buy",
+  "BYWATCH":"By Watch",
+  "ALL":"ALL",
+  "SUCCESS":"SUCCESS",
+  "FAIL":"FAIL",
+  "REWARD":"REWARD",
+  "CONFIRM":"CONFIRM",
+  "PX":"Order by",
   /**********************************
    ***********************************/
 
