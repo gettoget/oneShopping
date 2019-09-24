@@ -123,10 +123,15 @@ public interface RechargeMapper extends Mapper<Recharge> {
     List<User> yhgm(@Param("time") String time,@Param("end") String end ,@Param("name") String name,@Param("orderBy") String orderBy);
 
     @Select("<script> " +
-            " select * from user u inner join  ( select count(user_id) c , user_id  from recharge r where r.czqd = '1' and r.user_id in " +
+            " select u.* from user u inner join  ( select count(user_id) c , user_id  from recharge r where r.czqd = '1' and r.user_id in " +
             " <foreach collection='ids' item='item' index='index' open='(' separator=',' close=')' >" +
             " #{item} " +
             " </foreach> group by r.usesr_id having c &gt;= 2 ) re on re.user_id = u.id  " +
             "</script>")
     List<User> getTwo(@Param("ids") Set<String> ids);
+
+
+    @Select(" select u.*,o.c xf from user u left join  (select count(user_id) c , user_id from order_list where pro_id = #{id} group by user_id having c >= 5) o on o.user_id = u.id")
+    List<User> getMoreThanFive(String id);
+
 }

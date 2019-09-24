@@ -3,8 +3,14 @@ package com.ldz.biz.config;
 
 import com.ldz.biz.listener.ExpiredListener;
 import com.ldz.biz.listener.GroundingListener;
+import com.ldz.biz.listener.SendMsgListener;
+import com.ldz.biz.mapper.RechargeMapper;
+import com.ldz.biz.mapper.UserMapper;
+import com.ldz.biz.service.OrderListService;
 import com.ldz.biz.service.OrderService;
 import com.ldz.biz.service.ProInfoService;
+import com.ldz.biz.service.RechargeService;
+import com.ldz.util.commonUtil.SnowflakeIdWorker;
 import com.ldz.util.redis.RedisTemplateUtil;
 import com.ldz.util.spring.SpringContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,14 +98,26 @@ public class RedisConfig {
 		OrderService orderService = SpringContextUtil.getBean(OrderService.class);
 		ExpiredListener expiredListener = new ExpiredListener(redisTemplateUtil,orderService);
 
+		// 上架通知
 		List<PatternTopic> topicList = new ArrayList<>();
 		topicList.add(new PatternTopic("grounding"));
 		ProInfoService proInfoService = SpringContextUtil.getBean(ProInfoService.class);
 		GroundingListener groundingListener = new GroundingListener(redisTemplateUtil, proInfoService);
 
+		List<PatternTopic> msgList = new ArrayList<>();
+		msgList.add(new PatternTopic("sendMsg"));
+		OrderListService listService = SpringContextUtil.getBean(OrderListService.class);
+		RechargeMapper mapper = SpringContextUtil.getBean(RechargeMapper.class);
+		UserMapper baseMapper = SpringContextUtil.getBean(UserMapper.class);
+		SnowflakeIdWorker idWorker = SpringContextUtil.getBean(SnowflakeIdWorker.class);
+		RechargeService rechargeService = SpringContextUtil.getBean(RechargeService.class);
+		SendMsgListener msgListener = new SendMsgListener(redisTemplateUtil,listService,mapper,baseMapper,idWorker,rechargeService);
+
+
 
 		container.addMessageListener(expiredListener,topic);
 		container.addMessageListener(groundingListener, topicList);
+		container.addMessageListener(msgListener,msgList);
 		//这个container 可以添加多个 messageListener
 		return container;
 	}
