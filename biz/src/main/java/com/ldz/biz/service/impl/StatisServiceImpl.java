@@ -401,6 +401,33 @@ public class StatisServiceImpl implements StatisService {
     }
 
     @Override
+    public ApiResponse<List<String>> statisCzsb(String day) {
+        if(StringUtils.isBlank(day)){
+            day = "30";
+        }
+        List<String> result = new ArrayList<>();
+        DateTime now = DateTime.now();
+        int anInt = Integer.parseInt(day);
+        DateTime minusDays = now.minusDays(anInt - 1);
+        String start = minusDays.toString("yyyy-MM-dd");
+        String end = now.toString("yyyy-MM-dd");
+
+        List<Recharge> recharges = rechargeMapper.getCzsb(start, end);
+        Map<String, String> map = recharges.stream().collect(Collectors.toMap(Recharge::getCjsj, p -> p.getCzjb()));
+        for (int i = 0; i < anInt ; i++){
+            String key = minusDays.plusDays(i).toString("yyyy-MM-dd");
+            String value = key;
+            if(map.containsKey(key)){
+                value += "," + map.get(key);
+            }else{
+                value += ",0";
+            }
+            result.add(value);
+        }
+        return ApiResponse.success(result);
+    }
+
+    @Override
     public ApiResponse<List<String>> statisNewUser(String day) {
         if(StringUtils.isBlank(day)){
             day = "30";

@@ -56,8 +56,11 @@ public interface RechargeMapper extends Mapper<Recharge> {
     @Select(" SELECT SUBSTR(cjsj,1,10) cjsj,convert(sum(czjb),signed) czjb  from recharge WHERE  czqd = #{czqd} and SUBSTR(cjsj,1,10) >= #{start} and SUBSTR(cjsj,1,10) <= #{end}  GROUP BY SUBSTR(cjsj,1,10)  ")
     List<Recharge> getQdRecord(@Param("czqd") String czqd ,@Param("start") String start,@Param("end") String end);
 
-    @Select("select SUBSTR(cjsj , 1 , 10) cjsj ,convert(sum(czjb),signed) czjb from recharge where SUBSTR(cjsj , 1 , 10) >= #{start} and SUBSTR(cjsj , 1 , 10) <=#{end} GROUP BY SUBSTR(cjsj , 1 , 10)  ")
+    @Select("select SUBSTR(cjsj , 1 , 10) cjsj ,convert(sum(czjb),signed) czjb from recharge where SUBSTR(cjsj , 1 , 10) >= #{start}  and SUBSTR(cjsj , 1 , 10) <=#{end} and czzt = '2' and czqd = '1' GROUP BY SUBSTR(cjsj , 1 , 10)  ")
     List<Recharge> getCz(@Param("start") String start, @Param("end") String end);
+
+    @Select("select SUBSTR(cjsj , 1 , 10) cjsj ,convert(sum(czjb),signed) czjb from recharge where SUBSTR(cjsj , 1 , 10) >= #{start}  and SUBSTR(cjsj , 1 , 10) <=#{end} and czzt != '2' and czqd = '1' GROUP BY SUBSTR(cjsj , 1 , 10)  ")
+    List<Recharge> getCzsb(@Param("start") String start, @Param("end") String end);
 
     @Select(" select * from recharge r where cjsj like '${time}%' ")
     List<Recharge> getDtCz(@Param("time") String time);

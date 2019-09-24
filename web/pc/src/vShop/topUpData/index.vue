@@ -12,6 +12,10 @@
       </div>
 
       <div style="height: 600px">
+        <fail-money-analysis></fail-money-analysis>
+      </div>
+
+      <div style="height: 600px">
         <exp-money-analysis></exp-money-analysis>
       </div>
 
@@ -39,6 +43,7 @@
 
   import userAnalysis from './comp/userAnalysis'
   import moneyAnalysis from './comp/moneyAnalysis'
+  import failMoneyAnalysis from './comp/failMoneyAnalysis'
   import expMoneyAnalysis from './comp/expMoneyAnalysis'
 
 
@@ -46,7 +51,7 @@
   export default {
     name: "index",
     components:{
-      chartNumber,chartTopup,allData,userAnalysis,moneyAnalysis,expMoneyAnalysis
+      chartNumber,chartTopup,allData,userAnalysis,moneyAnalysis,expMoneyAnalysis,failMoneyAnalysis
     }
   }
 </script>

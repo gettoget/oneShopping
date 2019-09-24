@@ -146,11 +146,19 @@ public class StatisContrl {
     }
 
     /**
-     *  充值金额走势
+     *  充值成功金额走势
      */
     @PostMapping("/statisCz")
     public ApiResponse<List<String>> statisCz(String day){
         return  service.statisCz(day);
+    }
+
+    /**
+     *  充值失败金额走势
+     */
+    @PostMapping("/statisCzsb")
+    public ApiResponse<List<String>> statisCzsb(String day){
+        return  service.statisCzsb(day);
     }
 
     /**

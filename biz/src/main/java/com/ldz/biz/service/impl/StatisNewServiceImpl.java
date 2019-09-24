@@ -248,7 +248,7 @@ public class StatisNewServiceImpl implements StatisNewService {
 
         SimpleCondition condition = new SimpleCondition(Recharge.class);
         condition.eq(Recharge.InnerColumn.czqd, "1");
-        condition.eq(Recharge.InnerColumn.czzt, "2");
+//        condition.eq(Recharge.InnerColumn.czzt, "2");
         String string = DateTime.now().toString("yyyy-MM-dd");
         condition.startWith(Recharge.InnerColumn.cjsj, string);
         condition.and().andIsNotNull(Recharge.InnerColumn.bz1.name());

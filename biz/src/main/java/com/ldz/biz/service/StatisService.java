@@ -38,5 +38,7 @@ public interface StatisService {
 
     ApiResponse<List<String>> statisCz(String day);
 
+    ApiResponse<List<String>> statisCzsb(String day);
+
     ApiResponse<List<String>> statisNewUser(String day);
 }

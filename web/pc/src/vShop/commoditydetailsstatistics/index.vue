@@ -78,23 +78,24 @@
                         key: "proName",
                         minWidth: 100,
                         i18n: 'SPMC',
-                        render: (h,p) => {
-                            var v = this
-                            return h('div',[
-                                h('Button',{
-                                    props:{
-                                        type:'success',
-                                        size:'small',
-                                        shape:'circle'
-                                    },
-                                    on:{
-                                        click: function () {
-                                            v.$router.push({name:'manage',query:{id:p.row.id}})
-                                        }
-                                    }
-                                },p.row.proName)
-                            ])
-                        }
+                        // render: (h,p) => {
+                        //     var v = this
+                        //     return h('div',[
+                        //         h('Button',{
+                        //             props:{
+                        //                 type:'success',
+                        //                 size:'small',
+                        //                 shape:'circle'
+                        //             },
+                        //             on:{
+                        //                 click: function () {
+                        //                     v.$http.get('/api/')
+                        //                     v.$router.push({name:'manage',query:{id:p.row.id}})
+                        //                 }
+                        //             }
+                        //         },p.row.proName)
+                        //     ])
+                        // }
                     },
                     {
                         title: "用户购买总数量",
