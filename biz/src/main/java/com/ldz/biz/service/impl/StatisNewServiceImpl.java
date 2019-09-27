@@ -213,7 +213,13 @@ public class StatisNewServiceImpl implements StatisNewService {
 
         SimpleCondition condition = new SimpleCondition(Recharge.class);
         condition.eq(Recharge.InnerColumn.czqd, "1");
-        condition.eq(Recharge.InnerColumn.czzt, "2");
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String cz = request.getParameter("cz");
+        if(StringUtils.equals(cz, "2")){
+            condition.and().andNotEqualTo(Recharge.InnerColumn.czzt.name(), "2");
+        }else{
+            condition.eq(Recharge.InnerColumn.czzt, "2");
+        }
         if (StringUtils.isNotBlank(day)) {
             String string = DateTime.now().toString("yyyy-MM-dd");
             condition.startWith(Recharge.InnerColumn.cjsj, string);

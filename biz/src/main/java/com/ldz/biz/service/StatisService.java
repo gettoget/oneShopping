@@ -41,4 +41,6 @@ public interface StatisService {
     ApiResponse<List<String>> statisCzsb(String day);
 
     ApiResponse<List<String>> statisNewUser(String day);
+
+    ApiResponse<Map<String, Long>> rechargeNumFail();
 }

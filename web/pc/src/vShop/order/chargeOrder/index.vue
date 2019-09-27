@@ -4,6 +4,9 @@
       <div class="box_row_100">
         <!--        <pager-tit title="充值记录"></pager-tit>-->
       </div>
+      <div style="float: left;margin-right: 200px" >
+        {{$t('MORE') }}  :  {{count}}   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  {{$t('SUM') }}  :  {{amount}}
+      </div>
       <div>
         <Input
           v-model="param.username" @on-change="getPagerList" clearable
@@ -65,6 +68,8 @@
         },
         data() {
             return {
+                count:0,
+                amount:0,
                 czqd:'ALL',
                 itMess: {},
                 compName:'',
@@ -236,6 +241,7 @@
         },
         created() {
             this.getPagerList()
+            this.getMoreThanTwo()
         },
         mounted() {
             this.$nextTick(() => {
@@ -246,6 +252,14 @@
             })
         },
         methods: {
+            getMoreThanTwo(){
+               this.$http.get("/api/recharge/getTwo").then(res => {
+                   if(res.code === 200){
+                       this.amount = res.result.amount
+                       this.count = res.result.count
+                   }
+               })
+            },
             closeMod() {
                 this.compName = ''
             },

@@ -55,7 +55,8 @@ export default {
   "REWARD":"Sistem penghargaan",
   "CONFIRM":"dianggap",
   "PX":"urutan",
-
+  "MORE":"Lebih dari dua kali",
+  "SUM":"Total isi ulang akhir",
   /**********************************
    ***********************************/
 

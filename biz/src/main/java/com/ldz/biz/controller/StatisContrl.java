@@ -78,12 +78,20 @@ public class StatisContrl {
 
 
     /**
-     * 充值统计
+     * 充值成功统计
      * @return
      */
     @PostMapping("/rechargeNum")
     public ApiResponse<Map<String, Long>> rechargeNum(){
         return service.rechargeNum();
+    }
+
+    /**
+     * 充值失败统计
+     */
+    @PostMapping("/rechargeNumFail")
+    public ApiResponse<Map<String,Long>> rechargeNumFail(){
+        return service.rechargeNumFail();
     }
 
     /**

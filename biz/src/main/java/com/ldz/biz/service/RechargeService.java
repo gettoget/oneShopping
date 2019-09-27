@@ -28,4 +28,6 @@ public interface RechargeService extends BaseService<Recharge, String> {
     ApiResponse<String> paySucTest(String id);
 
     ApiResponse<String> getRechargeNum();
+
+    ApiResponse<Map<String, String>> getMoreThanTwo();
 }

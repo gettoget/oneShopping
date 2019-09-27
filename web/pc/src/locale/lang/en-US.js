@@ -181,6 +181,8 @@ export default {
   "REWARD":"REWARD",
   "CONFIRM":"CONFIRM",
   "PX":"Order by",
+  "MORE":"over two times",
+  "SUM":"last recharge amount",
   /**********************************
    ***********************************/
 

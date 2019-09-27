@@ -172,6 +172,36 @@ public class StatisServiceImpl implements StatisService {
     }
 
     @Override
+    public ApiResponse<Map<String, Long>> rechargeNumFail() {
+// 查询今日充值次数统计
+        String today = DateTime.now().toString("yyyy-MM-dd");
+        // 今日累计充值一次用户
+        long one = rechargeMapper.sumreoneFail(today);
+        // 今日累计充值俩次的用户
+        long two = rechargeMapper.sumretwoFail(today);
+        // 今日累计充值三次的用户
+        long more = rechargeMapper.sumremoreFail(today);
+
+        // 全部统计
+        // 充值一次的统计
+        long allone = rechargeMapper.sumAlloneFail();
+        // 充值俩次的用户数
+        long alltwo = rechargeMapper.sumAlltwoFail();
+        // 充值三次的用户数
+        long allmore = rechargeMapper.sumAllmoreFail();
+        Map<String,Long> map = new HashMap<>();
+        map.put("one",one);
+        map.put("two", two);
+        map.put("more", more);
+        map.put("allone", allone);
+        map.put("alltwo",alltwo);
+        map.put("allmore",allmore);
+
+        return ApiResponse.success(map);
+    }
+
+
+    @Override
     public ApiResponse<Map<String, Object>> rechargeChannel() {
         // 当天充值渠道统计
         String today = DateTime.now().toString("yyyy-MM-dd");
@@ -453,4 +483,6 @@ public class StatisServiceImpl implements StatisService {
 
         return ApiResponse.success(result);
     }
+
+
 }

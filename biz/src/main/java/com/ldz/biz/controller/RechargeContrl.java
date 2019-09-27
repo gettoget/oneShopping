@@ -6,10 +6,9 @@ import com.ldz.sys.base.BaseController;
 import com.ldz.sys.base.BaseService;
 import com.ldz.util.bean.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/recharge")
@@ -38,5 +37,11 @@ public class RechargeContrl extends BaseController<Recharge,String> {
         return ApiResponse.success();
     }
 
-
+    /**
+     * 获取充值两次以上的用户人数 和最后一次累计充值的金额
+     */
+    @GetMapping("/getTwo")
+    public ApiResponse<Map<String,String>>  getMoreThanTwo(){
+        return service.getMoreThanTwo();
+    }
 }

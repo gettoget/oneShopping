@@ -284,6 +284,15 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
         return ApiResponse.success(size+ "");
     }
 
+    @Override
+    public ApiResponse<Map<String, String>> getMoreThanTwo() {
+
+        Map<String, String> two = baseMapper.getMoreThanTwo();
+
+
+        return ApiResponse.success(two);
+    }
+
 
     @Override
     public void afterPager(PageInfo<Recharge> info) {
