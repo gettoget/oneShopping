@@ -22,16 +22,12 @@ public class Watch {
     @Column(name = "pro_baseid")
     private String proBaseid;
 
-    @Column(name = "user_id")
-    private String userId;
-
     public enum InnerColumn{
 
         id("ID"),
         cjsj("CJSJ"),
         proId("PRO_ID"),
-        proBaseid("PRO_BASEID"),
-        userId("USER_ID");
+        proBaseid("PRO_BASEID");
 
         private final String column;
 
