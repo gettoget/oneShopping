@@ -384,7 +384,7 @@ public class StatisServiceImpl implements StatisService {
         Map<String, String> collect = qdRecord.stream().collect(Collectors.toMap(Recharge::getCjsj, p -> p.getCzjb()));
         // 积分通道
         List<Recharge> record = rechargeMapper.getQdRecord("2", start, end);
-        Map<String, String> stringMap = record.stream().collect(Collectors.toMap(Recharge::getCjsj, p -> p.getCzjb()));
+        Map<String, String> stringMap = record.stream().collect(Collectors.toMap(Recharge::getCjsj, Recharge::getCzjb));
         for (int i = 0; i < anInt; i++) {
             String key = minusDays.plusDays(i).toString("yyyy-MM-dd");
             String value = key;
@@ -416,7 +416,7 @@ public class StatisServiceImpl implements StatisService {
         String end = now.toString("yyyy-MM-dd");
 
         List<Recharge> recharges = rechargeMapper.getCz(start, end);
-        Map<String, String> map = recharges.stream().collect(Collectors.toMap(Recharge::getCjsj, p -> p.getCzjb()));
+        Map<String, String> map = recharges.stream().collect(Collectors.toMap(Recharge::getCjsj, Recharge::getCzjb));
         for (int i = 0; i < anInt ; i++){
             String key = minusDays.plusDays(i).toString("yyyy-MM-dd");
             String value = key;

@@ -5,6 +5,7 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.ldz.biz.mapper.LoginMapper;
 import com.ldz.biz.mapper.OrderMapper;
 import com.ldz.biz.mapper.UserMapper;
 import com.ldz.biz.model.*;
@@ -28,6 +29,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -64,6 +66,9 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     private RechargeService rechargeService;
     @Autowired
     private OrderMapper orderMapper;
+
+    @Autowired
+    private LoginMapper loginMapper;
 
 
     @Override
@@ -290,6 +295,15 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         tokenMap.put("token", token);
         tokenMap.put("userInfo", model);
         res.setResult(tokenMap);
+        // 登录纪录
+        Login login = new Login();
+        HttpServletRequest requset = getRequset();
+        String host = requset.getRemoteHost();
+        login.setCjsj(DateUtils.getNowTime());
+        login.setId(genId());
+        login.setIP(host);
+        login.setUserId(user.getId());
+        loginMapper.insert(login);
         return res;
     }
 

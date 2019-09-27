@@ -9,6 +9,7 @@ import com.ldz.biz.bean.ProInfoLuckNumBean;
 import com.ldz.biz.mapper.OrderListMapper;
 import com.ldz.biz.mapper.OrderMapper;
 import com.ldz.biz.mapper.ProInfoMapper;
+import com.ldz.biz.mapper.WatchMapper;
 import com.ldz.biz.model.*;
 import com.ldz.biz.service.*;
 import com.ldz.sys.base.BaseServiceImpl;
@@ -80,6 +81,9 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
 
     @Value("${filePath}")
     private String filePath;
+
+    @Autowired
+    private WatchMapper watchMapper;
 
 
     @Autowired
@@ -153,9 +157,18 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         // 浏览数 +1
         baseMapper.plusRead(id);
         baseMapper.plusRead2(id);
+
         RuntimeCheck.ifBlank(id, MessageUtils.get("pro.idBlank"));
         ProInfo proInfo = findById(id);
         RuntimeCheck.ifNull(proInfo, MessageUtils.get("pro.isNull"));
+        // 记录浏览
+        Watch watch = new Watch();
+        watch.setId(genId());
+        watch.setCjsj(DateUtils.getNowTime());
+        watch.setProBaseid(proInfo.getProBaseid());
+        watch.setProId(proInfo.getId());
+        watchMapper.insert(watch);
+
         String userId = getHeader("userId");
         List<String> nums = new ArrayList<>();
         if (StringUtils.isNotBlank(userId)) {
