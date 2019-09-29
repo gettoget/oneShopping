@@ -200,4 +200,7 @@ public interface RechargeMapper extends Mapper<Recharge> {
             "  r on r.user_id = recharge.user_id where  czqd = '1' GROUP BY recharge.user_id  ) " +
             "   re on re.id = recharge.id")
     Map<String, String> getMoreThanTwo();
+
+    @Select(" select * from order_list o where o.cjsj >= #{start} and o.cjsj <= #{end} and yh_lx = '1'   ")
+    List<OrderList> countCyl(String start, String end);
 }
