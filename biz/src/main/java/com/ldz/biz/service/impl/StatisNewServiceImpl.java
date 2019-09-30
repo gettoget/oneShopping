@@ -10,6 +10,7 @@ import com.ldz.biz.service.RechargeService;
 import com.ldz.biz.service.StatisNewService;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.SimpleCondition;
+import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.MessageUtils;
 import com.ldz.util.exception.RuntimeCheck;
 import org.apache.commons.collections4.CollectionUtils;
@@ -443,6 +444,35 @@ public class StatisNewServiceImpl implements StatisNewService {
         ApiResponse<Object> res = new ApiResponse<>();
         res.setPage(info);
         return res;
+    }
+
+    /**
+     * 时间段内 新注册用户参与人数 / 新增用户人数
+     * @param day
+     * @return
+     */
+    @Override
+    public ApiResponse<String> getCyl(String day){
+        if(StringUtils.isBlank(day)){
+            day = "30";
+        }
+        int d = Integer.parseInt(day);
+        String end = DateTime.now().toString("yyyy-MM-dd") +  " 00:00:00.000";
+        String start = DateTime.now().minusDays(d).toString("yyyy-MM-dd") + " 23:59:59.999";
+        List<OrderList> list = mapper.countCyl(start, end);
+        // 根据 时间分组 , 拿到每一天的用户参与记录, 莫得办法 , 还要筛选注册人, 再根据每一天的参与记录去重找到每天的新注册用户的参与人数
+        Map<String, List<OrderList>> map =
+                list.stream().collect(Collectors.groupingBy(orderList -> orderList.getCjsj().substring(0, 10)));
+        List<String> dayBetween = DateUtils.getDayBetween(start, end);
+        for (String time : dayBetween) {
+            // 根据时间拿到当天的订单数据 , 筛选出 今日注册的用户
+            List<OrderList> lists = map.get(time);
+            // 根据当前订单的筛选出user_id  然后根据userid  筛选当天注册并且参与过的用户人数
+
+
+        }
+
+        return null;
     }
 
 }

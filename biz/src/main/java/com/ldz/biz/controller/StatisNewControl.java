@@ -134,6 +134,16 @@ public class StatisNewControl  {
     }
 
 
+    /**
+     * 新注册用户当日参与率
+     */
+    public ApiResponse<String> getCyl(String day){
+
+        return service.getCyl(day);
+
+    }
+
+
 
 
 

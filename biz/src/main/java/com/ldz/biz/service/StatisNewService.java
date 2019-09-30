@@ -37,4 +37,6 @@ public interface StatisNewService {
     ApiResponse<Object> kj(String time, String end, String proName, String orderBy, int pageNum, int pageSize);
 
     ApiResponse<Object> yhgm(String time, String end , String name, String orderBy, int pageNum, int pageSize);
+
+    ApiResponse<String> getCyl(String day);
 }
