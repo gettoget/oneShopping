@@ -260,9 +260,10 @@ public class DateUtils {
 		DateTime startTime = DateTime.parse(start, pattern);
 		List<String> timeList = new ArrayList<>();
 		String now = "";
-		while(now.compareTo(end) > 0){
+		while(now.compareTo(end) < 0){
 			now = startTime.toString("yyyy-MM-dd");
 			timeList.add(now);
+			startTime = startTime.plusDays(1);
 		}
 		return timeList;
 	}

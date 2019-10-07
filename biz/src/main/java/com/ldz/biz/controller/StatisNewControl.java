@@ -133,30 +133,52 @@ public class StatisNewControl  {
         return service.yhgm(time,end,name,orderBy,pageNum,pageSize);
     }
 
-
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------------------  10-07
     /**
      * 新注册用户当日参与率
+     * @return
      */
-    public ApiResponse<String> getCyl(String day){
-
+    @PostMapping("/getCyl")
+    public ApiResponse<List<String>> getCyl(String day){
         return service.getCyl(day);
-
     }
 
 
+    /**
+     *  当日充值订单分布  及 今天 充值中 注册一天的人数比例 , 充值二天的人数比例  充值大于等于三天的人数比例
+     * @return
+     */
+    @PostMapping("/getCzfb")
+    public ApiResponse<List<Integer>> getCzfb(){
+        return service.getCzfb();
+    }
 
+    /**
+     * 当日新注册用户当日的充值率  (默认三十天)
+     * @return
+     */
+    @PostMapping("/getCzl")
+    public ApiResponse<List<String>> getCzl(@RequestParam(defaultValue = "30") String day){
+        return service.getCzl(day);
+    }
 
+    /**
+     *  非新注册用户日活跃度=当日打开APP的非新注册用户/非新总注册用户 （分子、分母均不含当日新注册用户）(日期轴曲线)
+     * @return
+     */
+    @PostMapping("/getHyd")
+    public ApiResponse<List<String>> getHyd(@RequestParam(defaultValue = "30") String day){
+        return service.getHyd(day);
+    }
 
-
-
-
-
-
-
-
-
-
-
+    /**
+     * 非新用户活跃强度=非新注册用户的打开次数/非新注册用户的打开APP的用户数量（分子、分母均不含当日新注册用户）（日期轴曲线）
+     *  活跃强度 可能会大于一
+     */
+    @PostMapping("/getHyqd")
+    public ApiResponse<List<String>> getHyqd(@RequestParam(defaultValue =  "30")String day){
+        return service.getHyqd(day);
+    }
 
 
 

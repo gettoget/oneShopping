@@ -26,6 +26,7 @@ export default {
   "CommodityDetailsStatistics":"商品售卖排行",
   "message":"留言管理",
   "imessage":"留言",
+  "statis":"数据分析",
 
   /**********************************
    ***********************************/

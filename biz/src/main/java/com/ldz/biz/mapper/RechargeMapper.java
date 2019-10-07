@@ -104,7 +104,8 @@ public interface RechargeMapper extends Mapper<Recharge> {
             " 1 , 10)  ")
     List<Recharge> getCz(@Param("start") String start, @Param("end") String end);
 
-    @Select("select SUBSTR(cjsj , 1 , 10) cjsj ,convert(sum(amonut),signed) czjb from recharge where SUBSTR(cjsj , 1 , " +
+    @Select("select SUBSTR(cjsj , 1 , 10) cjsj ,convert(sum(amonut),signed) czjb from recharge where SUBSTR(cjsj , 1 " +
+            ", " +
             "10) >= #{start}  and SUBSTR(cjsj , 1 , 10) <=#{end} and czzt != '2' and czqd = '1' GROUP BY SUBSTR(cjsj " +
             ", 1 , 10)  ")
     List<Recharge> getCzsb(@Param("start") String start, @Param("end") String end);
@@ -201,6 +202,38 @@ public interface RechargeMapper extends Mapper<Recharge> {
             "   re on re.id = recharge.id")
     Map<String, String> getMoreThanTwo();
 
-    @Select(" select * from order_list o where o.cjsj >= #{start} and o.cjsj <= #{end} and yh_lx = '1'   ")
+    @Select(" select * from order_list o left join user u on u.cjsj >= #{start} and u.cjsj <= #{end} and u.id = o" +
+            ".userid and u.source='0'  where o.cjsj >= #{start} and o.cjsj <= #{end} and yhlx = '0'   ")
     List<OrderList> countCyl(String start, String end);
+
+    @Select(" select * from user where cjsj <= #{end} and cjsj >= #{start}")
+    List<User> getZcy(@Param("start") String s, @Param("end") String time);
+
+    @Select(" <script>" +
+            " select  * from exchange o where o.xfsj &gt;=#{start} and o.xfsj &lt;= #{end} and userid in " +
+            " <foreach collection='zzc' index='index' item = 'item' open='(' separator=',' close=')'>" +
+            " #{item} " +
+            "</foreach> " +
+            " </script>")
+    List<Exchange> getcys(@Param("start") String time, @Param("end") String end, @Param("zzc") List<String> zzc);
+
+    @Select("  select ifnull(count(id),0) from user u inner join  ( select distinct user_id from  recharge where cjsj " +
+            "like '${today}' )  o  on o.user_id = u.id  and u.cjsj >= #{start} and u.cjsj <= #{end}  and u.source ='0'  ")
+    int getCzfb(@Param("start") String start, @Param("end") String end,@Param("today") String today);
+
+    @Select("<script> select * from recharge where cjsj  &gt;= #{start} and cjsj &lt;= #{end} and  user_id in " +
+            "<foreach collection='zcy' index='index' item='item' open='(' separator=',' close=')'> " +
+            " #{item} " +
+            "  </foreach> " +
+            "  </script>")
+    List<Recharge> getCzs(@Param("start") String s,@Param("end") String end, @Param("zcy") List<String> zcy);
+
+    @Select(" select ifnull(count(distinct(user_id)),0) from biz_login  where cjsj like '${time}%'  and user_id in ( select id from user where cjsj < #{time} and source = '0' ) ")
+    int getLogin(@Param("time") String time);
+
+    @Select(" select ifnull(count(id),0) from user where cjsj < #{time} and source ='0' ")
+    int getLoginBefore(@Param("time") String time);
+
+    @Select(" select ifnull(count(*),0) from biz_login where cjsj like '${time}%' and user_id in ( select id from user where cjsj < #{time} and source ='0'  )")
+    int getLogins(@Param("time") String time);
 }

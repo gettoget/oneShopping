@@ -36,7 +36,7 @@ spring:
     filters: stat,wall,log4j
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
     cachePrepStmts: true
-    
+#    password: "123456"
 #mybatis配置信息
 mybatis:
   configLocation: classpath:mybatis/MapperConfig.xml

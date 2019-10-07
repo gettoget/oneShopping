@@ -11,10 +11,10 @@
 // ' http://119.23.242.234:8088'
 // ' http://192.168.123.69:8088'
 const ajaxUrl = process.env.NODE_ENV === 'development'//development开发环境
-  ? 'http://127.0.0.1:8088/'
-  : 'http://127.0.0.1:8088/'
+  ? 'https://www.go-saku.com/api/'
+  : 'https://www.go-saku.com/api/'
 // const fileUrl = "http://119.23.242.234:9092/"
-const fileUrl = " https://www.go-saku.com/api/"
+const fileUrl = "https://www.go-saku.com/api/"
 export default {
   NETWORK_ERR_STR: "网络加载异常!",
   url:ajaxUrl,

@@ -22,10 +22,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -214,11 +211,12 @@ public class StatisNewServiceImpl implements StatisNewService {
 
         SimpleCondition condition = new SimpleCondition(Recharge.class);
         condition.eq(Recharge.InnerColumn.czqd, "1");
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpServletRequest request =
+                ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String cz = request.getParameter("cz");
-        if(StringUtils.equals(cz, "2")){
+        if (StringUtils.equals(cz, "2")) {
             condition.and().andNotEqualTo(Recharge.InnerColumn.czzt.name(), "2");
-        }else{
+        } else {
             condition.eq(Recharge.InnerColumn.czzt, "2");
         }
         if (StringUtils.isNotBlank(day)) {
@@ -387,12 +385,12 @@ public class StatisNewServiceImpl implements StatisNewService {
         // 查看一类商品的真是用户购买和浏览数量
         if (StringUtils.isBlank(time)) {
             time = DateTime.now().toString("yyyy-MM-dd") + " 00:00:00.000";
-        }else{
+        } else {
             time = time + " 00:00:00.000";
         }
-        if(StringUtils.isBlank(end)){
+        if (StringUtils.isBlank(end)) {
             end = DateTime.now().toString("yyyy-MM-dd") + " 23:59:59.999";
-        }else{
+        } else {
             end = end + " 23:59:59.999";
         }
         if (StringUtils.isBlank(proName)) {
@@ -419,12 +417,12 @@ public class StatisNewServiceImpl implements StatisNewService {
     public ApiResponse<Object> yhgm(String time, String end, String name, String orderBy, int pageNum, int pageSize) {
         if (StringUtils.isBlank(time)) {
             time = DateTime.now().toString("yyyy-MM-dd") + " 00:00:00.000";
-        }else{
+        } else {
             time = time + " 00:00:00.000";
         }
-        if(StringUtils.isBlank(end)){
+        if (StringUtils.isBlank(end)) {
             end = DateTime.now().toString("yyyy-MM-dd" + " 23:59:59.999");
-        }else{
+        } else {
             end = end + " 23:59:59.999";
         }
         if (StringUtils.isBlank(name)) {
@@ -438,7 +436,8 @@ public class StatisNewServiceImpl implements StatisNewService {
         String finalOrderBy = orderBy;
         String finalEnd = end;
         PageInfo<User> info =
-                PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> mapper.yhgm(finalTime, finalEnd, finalName,
+                PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(() -> mapper.yhgm(finalTime, finalEnd,
+                        finalName,
                         finalOrderBy));
 
         ApiResponse<Object> res = new ApiResponse<>();
@@ -448,31 +447,161 @@ public class StatisNewServiceImpl implements StatisNewService {
 
     /**
      * 时间段内 新注册用户参与人数 / 新增用户人数
+     *
      * @param day
      * @return
      */
     @Override
-    public ApiResponse<String> getCyl(String day){
-        if(StringUtils.isBlank(day)){
+    public ApiResponse<List<String>> getCyl(String day) {
+        if (StringUtils.isBlank(day)) {
             day = "30";
         }
+        List<String> result = new ArrayList<>();
         int d = Integer.parseInt(day);
-        String end = DateTime.now().toString("yyyy-MM-dd") +  " 00:00:00.000";
-        String start = DateTime.now().minusDays(d).toString("yyyy-MM-dd") + " 23:59:59.999";
-        List<OrderList> list = mapper.countCyl(start, end);
-        // 根据 时间分组 , 拿到每一天的用户参与记录, 莫得办法 , 还要筛选注册人, 再根据每一天的参与记录去重找到每天的新注册用户的参与人数
-        Map<String, List<OrderList>> map =
-                list.stream().collect(Collectors.groupingBy(orderList -> orderList.getCjsj().substring(0, 10)));
+        String end = DateTime.now().toString("yyyy-MM-dd");
+        String start = DateTime.now().minusDays(d).toString("yyyy-MM-dd");
         List<String> dayBetween = DateUtils.getDayBetween(start, end);
-        for (String time : dayBetween) {
-            // 根据时间拿到当天的订单数据 , 筛选出 今日注册的用户
-            List<OrderList> lists = map.get(time);
-            // 根据当前订单的筛选出user_id  然后根据userid  筛选当天注册并且参与过的用户人数
-
-
+        // 总注册id
+        List<User> zzc = mapper.getZcy(start + " 00:00:00.000", end + " 23:59:59.999");
+        HashMap<String, List<String>> collect =
+                zzc.stream().collect(Collectors.groupingBy(user -> user.getCjsj().substring(0, 10), HashMap::new,
+                        Collectors.mapping(User::getId, Collectors.toList())));
+        List<String> strings = zzc.stream().map(User::getId).collect(Collectors.toList());
+        HashMap<String, List<String>> map = new HashMap<>();
+        if(CollectionUtils.isNotEmpty(strings)){
+            List<Exchange> getcys = mapper.getcys(start + " 00:00:00.000", end + " 23:59:59.999", strings);
+             map =
+                    getcys.stream().collect(Collectors.groupingBy(orderList -> orderList.getXfsj().substring(0, 10),
+                            HashMap::new, Collectors.mapping(Exchange::getUserid, Collectors.toList())));
         }
 
-        return null;
+        for (String time : dayBetween) {
+            List<String> list = collect.get(time);
+            List<String> list1 = map.get(time);
+            // 根据总注册的id人数查询出所有的当天注册用户的累计参与量
+            if (CollectionUtils.isNotEmpty(list1) && CollectionUtils.isNotEmpty(list)) {
+                Set<String> set = list1.stream().filter(list::contains).collect(Collectors.toSet());
+                int cys = set.size();
+                double v = (cys * 1.0 / (list.size() * 1.0));
+                result.add(time + "," + v);
+            } else {
+                result.add(time + "," + 0);
+            }
+        }
+        return ApiResponse.success(result);
+    }
+
+    @Override
+    public ApiResponse<List<Integer>> getCzfb() {
+        // 时间为空 则查询当天数据
+        String time = DateTime.now().toString("yyyy-MM-dd") + " 00:00:00.000";
+        String end = DateTime.now().toString("yyyy-MM-dd") + " 23:59:59.999";
+        String today = DateTime.now().toString("yyyy-MM-dd");
+        // 查询当天充值订单人数
+        // 首先查询今天充值 且注册时间为今天的用户数量
+        int czfb = mapper.getCzfb(time, end, today);
+        // 查询今天充值且注册时间为1天的用户数量
+        time = DateTime.now().minusDays(1).toString("yyyy-MM-dd") + " 00:00:00.000";
+        end = DateTime.now().minusDays(1).toString("yyyy-MM-dd") + " 23:59:59.999";
+        int czfb2 = mapper.getCzfb(time, end, today);
+        // 查询今天充值且注册时间2天的用户数量
+        time = DateTime.now().minusDays(2).toString("yyyy-MM-dd") + " 00:00:00.000";
+        end = DateTime.now().minusDays(2).toString("yyyy-MM-dd") + " 23:59:59.999";
+        int czfb3 = mapper.getCzfb(time, end, today);
+        // 查询今天充值 且大于等于三天的用户数量
+        time = "0";
+        end = DateTime.now().minusDays(3).toString("yyyy-MM-dd") + " 23:59:59.999";
+        int czfb4 = mapper.getCzfb(time, end, today);
+
+        List<Integer> list = new ArrayList<>();
+        list.add(czfb);
+        list.add(czfb2);
+        list.add(czfb3);
+        list.add(czfb4);
+        return ApiResponse.success(list);
+    }
+
+    @Override
+    public ApiResponse<List<String>> getCzl(String day) {
+        int d = Integer.parseInt(day);
+        List<String> list = new ArrayList<>();
+        String start = DateTime.now().minusDays(d).toString("yyyy-MM-dd");
+        String end = DateTime.now().toString("yyyy-MM-dd");
+        List<String> between = DateUtils.getDayBetween(start, end);
+
+        // 总注册id
+        List<User> zzc = mapper.getZcy(start + " 00:00:00.000", end + " 23:59:59.999");
+        HashMap<String, List<String>> collect =
+                zzc.stream().collect(Collectors.groupingBy(user -> user.getCjsj().substring(0, 10), HashMap::new,
+                        Collectors.mapping(User::getId, Collectors.toList())));
+        List<String> strings = zzc.stream().map(User::getId).collect(Collectors.toList());
+        HashMap<String, List<String>> map = new HashMap<>();
+        if(CollectionUtils.isNotEmpty(strings)){
+            List<Recharge> mapperCzs = mapper.getCzs(start + " 00:00:00.000", end + " 23:59:59.999", strings);
+          map =
+                    mapperCzs.stream().collect(Collectors.groupingBy(orderList -> orderList.getCjsj().substring(0, 10),
+                            HashMap::new, Collectors.mapping(Recharge::getUserId, Collectors.toList())));
+        }
+
+        for (String s : between) {
+            // 获取当天注册用户的id  (得到当天注册用户的数量)
+            List<String> zcy = collect.get(s);
+            List<String> list1 = map.get(s);
+            if (CollectionUtils.isNotEmpty(zcy) && CollectionUtils.isNotEmpty(list1)) {
+                Set<String> set = list1.stream().filter(zcy::contains).collect(Collectors.toSet());
+                int czs = set.size();
+                list.add(s + "," + (double) czs / (double) (zcy.size()));
+            } else {
+                list.add(s + "," + 0.0);
+
+            }
+        }
+        return ApiResponse.success(list);
+    }
+
+    @Override
+    public ApiResponse<List<String>> getHyd(String day) {
+
+        int d = Integer.parseInt(day);
+
+        List<String> list = new ArrayList<>();
+        String start = DateTime.now().minusDays(d).toString("yyyy-MM-dd");
+        String end = DateTime.now().toString("yyyy-MM-dd");
+        List<String> between = DateUtils.getDayBetween(start, end);
+        for (String time : between) {
+            // 获取当天登录的用户人数(非当天注册用户)
+            int login = mapper.getLogin(time);
+            // 获取当天之前注册的人数
+            int loginBefore = mapper.getLoginBefore(time);
+            if(loginBefore == 0){
+                list.add(time + "," + 0);
+            }else{
+                list.add(time + "," + (double) login / (double) loginBefore);
+            }
+        }
+        return ApiResponse.success(list);
+    }
+
+    @Override
+    public ApiResponse<List<String>> getHyqd(String day) {
+        int d = Integer.parseInt(day);
+        // 今日用户活跃强度 , 与活跃度相同
+        List<String> list = new ArrayList<>();
+        String start = DateTime.now().minusDays(d).toString("yyyy-MM-dd");
+        String end = DateTime.now().toString("yyyy-MM-dd");
+        List<String> between = DateUtils.getDayBetween(start, end);
+        for (String time : between) {
+            // 查询当天总共的登录的次数
+            int logins = mapper.getLogins(time);
+            // 查询当天总的登录用户数
+            int login = mapper.getLogin(time);
+            if(login == 0){
+                list.add(time + "," + 0);
+            }else {
+                list.add(time + "," + (double) logins / (double) login);
+            }
+        }
+        return ApiResponse.success(list);
     }
 
 }
