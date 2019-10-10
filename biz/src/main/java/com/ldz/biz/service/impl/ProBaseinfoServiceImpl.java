@@ -48,6 +48,21 @@ public class ProBaseinfoServiceImpl extends BaseServiceImpl<ProBaseinfo, String>
 		return baseMapper;
 	}
 
+	@Override
+	public ApiResponse<String> validAndUpdate(ProBaseinfo entity){
+		if(StringUtils.isNotBlank(entity.getUrls()) && StringUtils.startsWith(entity.getUrls(), "http")){
+			entity.setUrls(entity.getUrls().replaceAll("https://www.go-saku.com/api/", ""));
+		}
+		if(StringUtils.isNotBlank(entity.getCoverUrl()) && StringUtils.startsWith(entity.getCoverUrl(), "http")){
+			entity.setUrls(entity.getCoverUrl().replaceAll("https://www.go-saku.com/api/", ""));
+		}
+		if(StringUtils.isNotBlank(entity.getRefUrl()) && StringUtils.startsWith(entity.getRefUrl(), "http")){
+			entity.setUrls(entity.getRefUrl().replaceAll("https://www.go-saku.com/api/", ""));
+		}
+		update(entity);
+		return ApiResponse.success();
+	}
+
     @Override
     public ApiResponse<String> saveEntity(ProBaseinfo entity) {
 		RuntimeCheck.ifBlank(entity.getProName(), MessageUtils.get("pro.nameBlank"));

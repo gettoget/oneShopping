@@ -46,7 +46,19 @@ public class AwardServiceImpl extends BaseServiceImpl<Award, String> implements 
         if(StringUtils.isBlank(userId)){
             userId = getRequestParamterAsString("userId");
         }
-        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.idIsnull"));
+        if(StringUtils.isBlank(userId)){
+            ApiResponse<String> res=  new ApiResponse<>();
+            res.setCode(999);
+            res.setMessage(MessageUtils.get("user.null"));
+            return res;
+        }
+        User user = userService.findById(userId);
+        if(user == null){
+            ApiResponse<String> res=  new ApiResponse<>();
+            res.setCode(999);
+            res.setMessage(MessageUtils.get("user.null"));
+            return res;
+        }
         SimpleCondition condition = new SimpleCondition(Award.class);
         condition.startWith(Award.InnerColumn.cjsj, DateTime.now().toString("yyyy-MM-dd"));
         condition.eq(Award.InnerColumn.userId, userId);
