@@ -123,7 +123,6 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
             numBean.setLuckNum(num);
             redis.boundSetOps(proInfo.getId() + "_nums").add(numBean);
         }
-
         baseinfo.setProStore(storeNum - 1 + "");
         proBaseinfoService.update(baseinfo);
         AndroidMsgBean androidMsgBean = new AndroidMsgBean();
