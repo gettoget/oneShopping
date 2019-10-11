@@ -32,26 +32,35 @@
             <Select v-model="formData.imgLx" style="width:200px">
               <Option value="1">{{$t('SPTJ')}}</Option>
               <Option value="2">{{$t('HDYM')}}</Option>
+              <Option value="3">{{$t('ADDNQD')}}
+                <!--{{$t('HDYM')}}-->
+              </Option>
             </Select>
           </div>
         </div>
         <div class="box_row_100">
           <div class="box_col" style="max-height: 600px;">
-            <div>
-              <Input v-model="param.proNameLike" clearable
-                     :placeholder="$t('SRBDSP')"/>
+            <div v-if="formData.imgLx === '3'">
+              <Input v-model="formData.bz1" type="textarea"
+                     :autosize="{minRows: 3,maxRows: 3}" :placeholder="$t('LBBZ1')" />
             </div>
+            <div v-else>
+              <div>
+                <Input v-model="param.proNameLike" clearable
+                       :placeholder="$t('SRBDSP')"/>
+              </div>
 
-            <div class="box_col_auto shopListRadio">
-              <RadioGroup v-model="formData.proId" vertical>
-                <Radio :label="it.id" v-for="(it,index) in ShopList">
-                  <Avatar shape="square"
-                          :src="it.coverUrl.substring(0,4)==='http'?it.coverUrl:apis.GETFILEURL+it.coverUrl"/>
-                  <div class="radioMess">
-                    {{it.proName}}
-                  </div>
-                </Radio>
-              </RadioGroup>
+              <div class="box_col_auto shopListRadio">
+                <RadioGroup v-model="formData.proId" vertical>
+                  <Radio :label="it.id" v-for="(it,index) in ShopList">
+                    <Avatar shape="square"
+                            :src="it.coverUrl.substring(0,4)==='http'?it.coverUrl:apis.GETFILEURL+it.coverUrl"/>
+                    <div class="radioMess">
+                      {{it.proName}}
+                    </div>
+                  </Radio>
+                </RadioGroup>
+              </div>
             </div>
 
           </div>

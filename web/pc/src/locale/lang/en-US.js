@@ -196,6 +196,8 @@ export default {
   "SRBDSP":"Please enter the top quality you want to bind.",
   "SPTJ":"Merchandise Recommendation",
   "HDYM":"Activity Page",
+  "LBBZ1":"APP startup address",
+  "ADDNQD":"APP Start Inside",
 
   /**********************************
    ***********************************/
