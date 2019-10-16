@@ -41,7 +41,7 @@ public class AwardServiceImpl extends BaseServiceImpl<Award, String> implements 
 
     @Override
     public ApiResponse<String> getAwardRecord() {
-
+//        return  ApiResponse.success("1");
         String userId = getHeader("userId");
         if(StringUtils.isBlank(userId)){
             userId = getRequestParamterAsString("userId");
