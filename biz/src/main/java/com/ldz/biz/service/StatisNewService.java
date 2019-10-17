@@ -38,5 +38,13 @@ public interface StatisNewService {
 
     ApiResponse<Object> yhgm(String time, String end , String name, String orderBy, int pageNum, int pageSize);
 
-    ApiResponse<String> getCyl(String day);
+    ApiResponse<List<String>> getCyl(String day);
+
+    ApiResponse<List<Integer>> getCzfb();
+
+    ApiResponse<List<String>> getCzl(String day);
+
+    ApiResponse<List<String>> getHyd(String day);
+
+    ApiResponse<List<String>> getHyqd(String day);
 }

@@ -57,6 +57,7 @@ export default {
   "PX":"urutan",
   "MORE":"Lebih dari dua kali",
   "SUM":"Total isi ulang akhir",
+  "statis":"analisis data",
   /**********************************
    ***********************************/
 

@@ -320,6 +320,15 @@ export default [
           title: "商品售卖排行"
         },
         component: () => import('@/vShop/commoditydetailsstatistics')
+      },
+      {
+        path: '/statis',
+        name: 'statis',
+        meta: {
+          icon: 'md-images',
+          title: "数据分析"
+        },
+        component: () => import('@/vShop/statis')
       }
     ]
   },

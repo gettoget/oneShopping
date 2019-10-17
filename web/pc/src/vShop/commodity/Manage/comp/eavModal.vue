@@ -21,7 +21,7 @@
               </div>
             </div>
           </Col>
-          <Col span="6" v-if="formInline.img.length<4">
+          <Col span="6" v-if="formInline.img.length<12">
             <div class="eavUpBox box_row colCenter">
               <up-file-img upGroup="urls" @handleSuccess="contentImg">
                 <Button type="text">
@@ -98,6 +98,7 @@
     /*background-color: orangered;*/
     height: 118px;
     position: relative;
+    margin-bottom: 12px;
     img{
       height: 100%;
       width: 100%;
