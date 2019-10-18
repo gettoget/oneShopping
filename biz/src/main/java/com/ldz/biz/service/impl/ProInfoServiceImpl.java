@@ -901,7 +901,8 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
         //1.生成本次多少个用户参与
         int randomMaxUserNum = RandomUtils.nextInt(people);
         if (randomMaxUserNum == 0) {
-            return;
+            randomMaxUserNum = 1;
+//            return;
         }
         //2.商品剩余名额。将剩余名额分配给用户
         int allocNum = 0;

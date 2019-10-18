@@ -41,29 +41,29 @@ public class AwardServiceImpl extends BaseServiceImpl<Award, String> implements 
 
     @Override
     public ApiResponse<String> getAwardRecord() {
-//        return  ApiResponse.success("1");
-        String userId = getHeader("userId");
-        if(StringUtils.isBlank(userId)){
-            userId = getRequestParamterAsString("userId");
-        }
-        if(StringUtils.isBlank(userId)){
-            ApiResponse<String> res=  new ApiResponse<>();
-            res.setCode(999);
-            res.setMessage(MessageUtils.get("user.null"));
-            return res;
-        }
-        User user = userService.findById(userId);
-        if(user == null){
-            ApiResponse<String> res=  new ApiResponse<>();
-            res.setCode(999);
-            res.setMessage(MessageUtils.get("user.null"));
-            return res;
-        }
-        SimpleCondition condition = new SimpleCondition(Award.class);
-        condition.startWith(Award.InnerColumn.cjsj, DateTime.now().toString("yyyy-MM-dd"));
-        condition.eq(Award.InnerColumn.userId, userId);
-        List<Award> awards = findByCondition(condition);
-        return ApiResponse.success(awards.size() + "");
+        return  ApiResponse.success("1");
+//        String userId = getHeader("userId");
+//        if(StringUtils.isBlank(userId)){
+//            userId = getRequestParamterAsString("userId");
+//        }
+//        if(StringUtils.isBlank(userId)){
+//            ApiResponse<String> res=  new ApiResponse<>();
+//            res.setCode(999);
+//            res.setMessage(MessageUtils.get("user.null"));
+//            return res;
+//        }
+//        User user = userService.findById(userId);
+//        if(user == null){
+//            ApiResponse<String> res=  new ApiResponse<>();
+//            res.setCode(999);
+//            res.setMessage(MessageUtils.get("user.null"));
+//            return res;
+//        }
+//        SimpleCondition condition = new SimpleCondition(Award.class);
+//        condition.startWith(Award.InnerColumn.cjsj, DateTime.now().toString("yyyy-MM-dd"));
+//        condition.eq(Award.InnerColumn.userId, userId);
+//        List<Award> awards = findByCondition(condition);
+//        return ApiResponse.success(awards.size() + "");
     }
 
     @Override
