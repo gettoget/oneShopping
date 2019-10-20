@@ -66,6 +66,13 @@ public class RechargeCtrl  {
         return service.getRechargeNum();
     }
 
+    /**
+     *    用户五星好评送 2 GCoin
+     */
+    public ApiResponse<String> saveHighPraise(){
+        return service.saveHighPraise();
+    }
+
 
 
 

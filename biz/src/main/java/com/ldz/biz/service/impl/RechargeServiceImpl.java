@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import com.ldz.biz.mapper.RechargeMapper;
+import com.ldz.biz.mapper.UserMapper;
 import com.ldz.biz.model.Recharge;
 import com.ldz.biz.model.User;
 import com.ldz.biz.service.RechargeService;
@@ -45,6 +46,8 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
     private UserService userService;
     @Autowired
     private RedisTemplateUtil redis;
+    @Autowired
+    private UserMapper userMapper;
 
     @Value("${mall_id}")
     private String mallId;
@@ -291,6 +294,30 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 
 
         return ApiResponse.success(two);
+    }
+
+    @Override
+    public ApiResponse<String> saveHighPraise() {
+        // 获取用户 id
+        String userId = getHeader("userId");
+        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
+        User user = userService.findById(userId);
+        RuntimeCheck.ifNull(user, MessageUtils.get("user.notFind"));
+        // 用户余额加奖励金币 生成充值记录
+        userMapper.saveBalance(userId,  "" + 2);
+        Recharge recharge = new Recharge();
+        recharge.setAmonut("2");
+        recharge.setCzzt("2");
+        recharge.setCjsj(DateUtils.getNowTime());
+        recharge.setCzjb("2");
+        recharge.setCzqd("2");
+        recharge.setUserId(user.getId());
+        recharge.setCzqjbs(user.getBalance());
+        recharge.setCzhjbs(Integer.parseInt(user.getBalance()) + 2 + "");
+        recharge.setBz2("praise");
+        recharge.setId(genId());
+        save(recharge);
+        return ApiResponse.success();
     }
 
 
