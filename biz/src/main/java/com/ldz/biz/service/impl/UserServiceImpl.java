@@ -580,6 +580,64 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         baseMapper.saveBalance(userId, amount);
     }
 
+    @Override
+    public ApiResponse<String> loginByCode(String phone, String code) {
+        /*RuntimeCheck.ifBlank(phone, MessageUtils.get("user.phoneblank"));
+        RuntimeCheck.ifBlank(password, MessageUtils.get("user.pwdblank"));
+        password = checkPer(password);
+        RuntimeCheck.ifBlank(password, MessageUtils.get("user.timeError"));
+        SimpleCondition condition = new SimpleCondition(User.class);
+        condition.eq(User.InnerColumn.phone, phone);
+        List<User> users = findByCondition(condition);
+        RuntimeCheck.ifTrue(CollectionUtils.isEmpty(users), MessageUtils.get("user.notregister"));
+        String imei = getAttributeAsString("imei");
+        RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
+        User user = users.get(0);
+        RuntimeCheck.ifFalse(user.getZt().equals("0"), MessageUtils.get("user.isLocked"));
+        String userPwd = EncryptUtil.encryptUserPwd(password);
+        RuntimeCheck.ifFalse(StringUtils.equals(user.getPwd(), userPwd), MessageUtils.get("user.pwderror"));
+
+        // 用户登录成功后 生成token  保存token 和 用户信息  有效一天
+        String token = JwtUtil.createToken(user.getId(), System.currentTimeMillis() + "");
+        redisDao.boundValueOps(user.getId()).set(token, 30, TimeUnit.DAYS);
+
+        ApiResponse<Map<String, Object>> res = new ApiResponse<>();
+        res.setMessage(MessageUtils.get("user.loginSuccess"));
+        user.setLastImei(imei);
+        user.setLastTime(DateUtils.getNowTime());
+        update(user);
+        UserModel model = new UserModel(user);
+        model.setToken(token);
+        condition = new SimpleCondition(Recharge.class);
+        condition.eq(Recharge.InnerColumn.czzt,"2");
+        condition.eq(Recharge.InnerColumn.czqd,"2");
+        condition.eq(Recharge.InnerColumn.bz2, "invite");
+        condition.eq(Recharge.InnerColumn.userId,user.getId());
+        List<Recharge> recharges = rechargeService.findByCondition(condition);
+        if(CollectionUtils.isEmpty(recharges)){
+            model.setInviteCoin("0");
+        }else{
+            int sum = recharges.stream().map(Recharge::getAmonut).mapToInt(Integer::parseInt).sum();
+            model.setInviteCoin(sum+"");
+        }
+        redis.boundValueOps(user.getId() + "_userInfo").set(JSON.toJSON(model), 30, TimeUnit.DAYS);
+        Map<String, Object> tokenMap = new HashMap<>();
+        tokenMap.put("token", token);
+        tokenMap.put("userInfo", model);
+        res.setResult(tokenMap);
+        // 登录纪录
+        Login login = new Login();
+        HttpServletRequest requset = getRequset();
+        String host = requset.getRemoteHost();
+        login.setCjsj(DateUtils.getNowTime());
+        login.setId(genId());
+        login.setIP(host);
+        login.setUserId(user.getId());
+        loginMapper.insert(login);
+        return res;*/
+        return null;
+    }
+
 
     private String checkPer(String secret) {
         String s;

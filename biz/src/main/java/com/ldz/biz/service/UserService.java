@@ -119,4 +119,6 @@ public interface UserService extends BaseService<User, String> {
     ApiResponse<String> saveChannelId(String channelId);
 
     void saveBalance(String userId, String amount);
+
+    ApiResponse<String> loginByCode(String phone, String code);
 }

@@ -36,14 +36,18 @@ public class RobotSyncJob implements Job {
     		//从redis队列中提取还有剩余名额的商品
     		Set<Object> proInfos = mainRedis.keys("*_nums");
         	if (CollectionUtils.isNotEmpty(proInfos)){
-        		int randomIndex = RandomUtils.nextInt(proInfos.size());
+        		/*int randomIndex = RandomUtils.nextInt(proInfos.size());
         		if (randomIndex == proInfos.size()){
         			randomIndex = proInfos.size() - 1;
-        		}
+        		}*/
         		//随机得到商品ID进行购买操作  修改为所有商品都购买
 				for (int i = 0; i < proInfos.size(); i++) {
 					Object itemKey = CollectionUtils.get(proInfos.iterator(), i);
-					infoService.saveRobot(itemKey.toString());
+					try {
+						infoService.saveRobot(itemKey.toString());
+					}catch (Exception e){
+						errorInfo.error(itemKey + "商品剩余名额分配异常", e);
+					}
 				}
 //				Object itemKey = CollectionUtils.get(proInfos.iterator(), randomIndex);
 //        		infoService.saveRobot(itemKey.toString());

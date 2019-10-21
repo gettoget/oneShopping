@@ -1,12 +1,15 @@
 package com.ldz.biz.service.impl;
 
 import com.ldz.biz.mapper.AwardMapper;
+import com.ldz.biz.mapper.LogonMapper;
 import com.ldz.biz.model.Award;
+import com.ldz.biz.model.Logon;
 import com.ldz.biz.model.Recharge;
 import com.ldz.biz.model.User;
 import com.ldz.biz.service.AwardService;
 import com.ldz.biz.service.RechargeService;
 import com.ldz.biz.service.UserService;
+import com.ldz.sys.aop.Log;
 import com.ldz.sys.base.BaseServiceImpl;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.bean.SimpleCondition;
@@ -32,6 +35,8 @@ public class AwardServiceImpl extends BaseServiceImpl<Award, String> implements 
     private UserService userService;
     @Autowired
     private RechargeService rechargeService;
+    @Autowired
+    private LogonMapper logonMapper;
 
 
     @Override
@@ -41,29 +46,41 @@ public class AwardServiceImpl extends BaseServiceImpl<Award, String> implements 
 
     @Override
     public ApiResponse<String> getAwardRecord() {
-        return  ApiResponse.success("1");
-//        String userId = getHeader("userId");
-//        if(StringUtils.isBlank(userId)){
-//            userId = getRequestParamterAsString("userId");
-//        }
-//        if(StringUtils.isBlank(userId)){
-//            ApiResponse<String> res=  new ApiResponse<>();
-//            res.setCode(999);
-//            res.setMessage(MessageUtils.get("user.null"));
-//            return res;
-//        }
-//        User user = userService.findById(userId);
-//        if(user == null){
-//            ApiResponse<String> res=  new ApiResponse<>();
-//            res.setCode(999);
-//            res.setMessage(MessageUtils.get("user.null"));
-//            return res;
-//        }
-//        SimpleCondition condition = new SimpleCondition(Award.class);
-//        condition.startWith(Award.InnerColumn.cjsj, DateTime.now().toString("yyyy-MM-dd"));
-//        condition.eq(Award.InnerColumn.userId, userId);
-//        List<Award> awards = findByCondition(condition);
-//        return ApiResponse.success(awards.size() + "");
+//        return  ApiResponse.success("1");
+        String userId = getHeader("userId");
+        if(StringUtils.isBlank(userId)){
+            userId = getRequestParamterAsString("userId");
+        }
+        if(StringUtils.isBlank(userId)){
+            ApiResponse<String> res=  new ApiResponse<>();
+            res.setCode(999);
+            res.setMessage(MessageUtils.get("user.null"));
+            return res;
+        }
+        User user = userService.findById(userId);
+        if(user == null){
+            ApiResponse<String> res=  new ApiResponse<>();
+            res.setCode(999);
+            res.setMessage(MessageUtils.get("user.null"));
+            return res;
+        }
+        SimpleCondition condition = new SimpleCondition(Award.class);
+        condition.startWith(Award.InnerColumn.cjsj, DateTime.now().toString("yyyy-MM-dd"));
+        condition.eq(Award.InnerColumn.userId, userId);
+        List<Award> awards = findByCondition(condition);
+        // 每次打开都算登录一次 , 每天只记录一次登录 , 有了就不记录了
+        condition = new SimpleCondition(Logon.class);
+        condition.eq(Logon.InnerColumn.userId, userId);
+        condition.eq(Logon.InnerColumn.cjsj, DateTime.now().toString("yyyy-MM-dd"));
+        List<Logon> logons = logonMapper.selectByExample(condition);
+        if(CollectionUtils.isEmpty(logons)){
+            Logon logon = new Logon();
+            logon.setId(genId());
+            logon.setCjsj(DateTime.now().toString("yyyy-MM-dd"));
+            logon.setUserId(userId);
+            logonMapper.insertSelective(logon);
+        }
+        return ApiResponse.success(awards.size() + "");
     }
 
     @Override

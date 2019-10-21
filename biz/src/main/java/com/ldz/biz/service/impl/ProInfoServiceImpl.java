@@ -917,9 +917,11 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
             randomMaxUserNum = 1;
 //            return;
         }
+        errorLog.info(proId + "参与用户人数 " + randomMaxUserNum + "人");
         //2.商品剩余名额。将剩余名额分配给用户
         int allocNum = 0;
         long proSyNum = redis.boundSetOps(redisProInfoKey).size();
+        errorLog.info(proId + "商品剩余份数: " + proSyNum);
         if (proSyNum == 0) {
             //商品名额已经用完
             return;
@@ -934,12 +936,14 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 allocNum = 1;
             }
         }
+        errorLog.info(proId + "随机生成的份数: " + proSyNum);
         List<Object> elements = new ArrayList<>();
         List<Object> cloneElements = new ArrayList<>();
         // 随机提取中奖号码
         Set<Object> luckNums = redis.boundSetOps(redisProInfoKey).distinctRandomMembers(allocNum);
         // 删除redis的中奖号码
         Iterator<Object> removeNum = luckNums.iterator();
+        errorLog.info(proId + "提取中奖号码 " + luckNums.size() + "个");
         while (removeNum.hasNext()) {
             Object element = removeNum.next();
             // 防止并发操作时，中奖号码被重复分。先进行删除，redis删除结果不为0，表示号码可用
@@ -1058,6 +1062,7 @@ public class ProInfoServiceImpl extends BaseServiceImpl<ProInfo, String> impleme
                 BaiduPushUtils.pushAllMsg(0, JsonUtil.toJson(msgBean), 3, 0);
             }
         } catch (Exception e) {
+            errorLog.info(proId + "异常问题: " + e.getMessage());
             if (cloneElements.size() > 0) {
                 // 执行发生异常后，需要先将中奖号码回压到redis中，防止号码丢失
                 for (int i = 0; i < cloneElements.size(); i++) {

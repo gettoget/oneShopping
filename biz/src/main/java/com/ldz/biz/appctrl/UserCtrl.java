@@ -154,5 +154,12 @@ public class UserCtrl  {
         return service.saveChannelId(channelId);
     }
 
+    /**
+     * 登录注册一体化  短信验证码登录
+     */
+    public ApiResponse<String> loginByCode(String phone, String code){
+        return service.loginByCode(phone, code);
+    }
+
 
 }
