@@ -191,8 +191,8 @@ public interface RechargeMapper extends Mapper<Recharge> {
     List<User> getTwo(@Param("ids") Set<String> ids);
 
 
-    @Select(" select u.*,o.c xf from user u left join  (select count(user_id) c , user_id from order_list where " +
-            "pro_id = #{id} group by user_id having c >= 5) o on o.user_id = u.id")
+    @Select(" select u.*,o.c xf from user u  join  (select count(userid) c , userid from order_list where " +
+            "pro_id = #{id} and yhlx= '0'  group by userid having c >= 5) o on o.userid = u.id")
     List<User> getMoreThanFive(String id);
 
     @Select(" SELECT count(1) count , sum(recharge.amonut) amount  from recharge INNER JOIN ( " +

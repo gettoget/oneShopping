@@ -581,61 +581,185 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     }
 
     @Override
-    public ApiResponse<String> loginByCode(String phone, String code) {
-        /*RuntimeCheck.ifBlank(phone, MessageUtils.get("user.phoneblank"));
-        RuntimeCheck.ifBlank(password, MessageUtils.get("user.pwdblank"));
-        password = checkPer(password);
-        RuntimeCheck.ifBlank(password, MessageUtils.get("user.timeError"));
-        SimpleCondition condition = new SimpleCondition(User.class);
-        condition.eq(User.InnerColumn.phone, phone);
-        List<User> users = findByCondition(condition);
-        RuntimeCheck.ifTrue(CollectionUtils.isEmpty(users), MessageUtils.get("user.notregister"));
-        String imei = getAttributeAsString("imei");
-        RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
-        User user = users.get(0);
-        RuntimeCheck.ifFalse(user.getZt().equals("0"), MessageUtils.get("user.isLocked"));
-        String userPwd = EncryptUtil.encryptUserPwd(password);
-        RuntimeCheck.ifFalse(StringUtils.equals(user.getPwd(), userPwd), MessageUtils.get("user.pwderror"));
-
-        // 用户登录成功后 生成token  保存token 和 用户信息  有效一天
-        String token = JwtUtil.createToken(user.getId(), System.currentTimeMillis() + "");
-        redisDao.boundValueOps(user.getId()).set(token, 30, TimeUnit.DAYS);
-
+    public ApiResponse<Map<String, Object>> loginByCode(String phone, String code) {
         ApiResponse<Map<String, Object>> res = new ApiResponse<>();
-        res.setMessage(MessageUtils.get("user.loginSuccess"));
-        user.setLastImei(imei);
-        user.setLastTime(DateUtils.getNowTime());
-        update(user);
-        UserModel model = new UserModel(user);
-        model.setToken(token);
-        condition = new SimpleCondition(Recharge.class);
-        condition.eq(Recharge.InnerColumn.czzt,"2");
-        condition.eq(Recharge.InnerColumn.czqd,"2");
-        condition.eq(Recharge.InnerColumn.bz2, "invite");
-        condition.eq(Recharge.InnerColumn.userId,user.getId());
-        List<Recharge> recharges = rechargeService.findByCondition(condition);
-        if(CollectionUtils.isEmpty(recharges)){
-            model.setInviteCoin("0");
-        }else{
-            int sum = recharges.stream().map(Recharge::getAmonut).mapToInt(Integer::parseInt).sum();
-            model.setInviteCoin(sum+"");
+        RuntimeCheck.ifBlank(phone, MessageUtils.get("user.phoneblank"));
+        // 第一次进来的时候没有code   , 此时根据code 来判断是否需要发送验证码
+        if(StringUtils.isBlank(code)){
+            // 发送验证码
+            String otp = SendSmsUtil.sendOtp(phone);
+           RuntimeCheck.ifTrue(StringUtils.equals(otp, "error"), MessageUtils.get("sms.isError"));
+           // 验证码失效时间 5分钟
+            redisDao.boundValueOps(phone + "_login_code").set(otp, 5 , TimeUnit.MINUTES);
+            return res;
+        }else {
+            String s = redisDao.boundValueOps(phone + "_login_code").get();
+            RuntimeCheck.ifFalse(StringUtils.equals(s,code), MessageUtils.get("user.regCodeError"));
+
+            // 有验证码 此时需要验证是否为已有用户 , 根据验证结果 是否需要注册
+            List<User> users = findEq(User.InnerColumn.phone, phone);
+            if(CollectionUtils.isEmpty(users)){
+                // 注册用户 , 查看是否有邀请码
+                String inviteNumber = getRequestParamterAsString("inviteNumber");
+                if (StringUtils.isNotBlank(inviteNumber)) {
+                    // 邀请码不为空 需要验证是否存在
+                    users = findEq(User.InnerColumn.inviteNumber, inviteNumber);
+                    RuntimeCheck.ifEmpty(users, "Pengecualian kode undangan!");
+                }
+                User user = new User();
+                // 新用户注册生成邀请码
+                boolean flag = true;
+                while (flag ){
+                    String shareCode = ShareCodeUtil.createShareCode();
+                    List<User> userList = findEq(User.InnerColumn.inviteNumber, shareCode);
+                    if(CollectionUtils.isEmpty(userList)){
+                        user.setInviteNumber(shareCode);
+                        user.setInvitedNumber(inviteNumber);
+                        flag = false;
+                    }
+                }
+                user.setId(genId());
+                user.setBalance("5");
+                user.setCjsj(DateUtils.getNowTime());
+                user.setPhone(phone);
+                user.setZjcs("0");
+                user.setZt("0");
+                user.setScore("0");
+                user.setSource("0");
+                // 用户名随机生成
+                int nextInt = RandomUtils.nextInt(4, 10);
+                String username = randomString(nextInt);
+                user.setUserName(username);
+                user.setLastTime(DateUtils.getNowTime());
+                // 随机一个头像
+                Random r = new Random();
+                int anInt = r.nextInt(27);
+                user.sethImg("https://www.go-saku.com/api/img/"+anInt+".png");
+                save(user);
+                // 新注册用户赠送 5个币
+                Recharge recharge = new Recharge();
+                recharge.setAmonut("5");
+                recharge.setCzzt("2");
+                recharge.setCjsj(DateUtils.getNowTime());
+                recharge.setCzjb("5");
+                recharge.setCzqd("2");
+                recharge.setUserId(user.getId());
+                recharge.setCzqjbs("0");
+                recharge.setCzhjbs("5");
+                recharge.setId(genId());
+                recharge.setBz2("register");
+                rechargeService.save(recharge);
+                // 用户注册成功 查看用户是否有邀请码 , 根据邀请码奖励邀请用户 2 金币
+                if (StringUtils.isNotBlank(inviteNumber)) {
+                    List<User> list = findEq(User.InnerColumn.inviteNumber, inviteNumber);
+                    User user1 = list.get(0);
+                    // 邀请人数 加一
+                    user1.setInviteNum( user1.getInviteNum()+1);
+                    update(user1);
+                    if(user1.getInviteNum() <200){
+                        baseMapper.saveBalance(user1.getId(), "2");
+                        recharge = new Recharge();
+                        recharge.setAmonut("2");
+                        recharge.setCzzt("2");
+                        recharge.setCjsj(DateUtils.getNowTime());
+                        recharge.setCzjb("2");
+                        recharge.setCzqd("2");
+                        recharge.setUserId(user1.getId());
+                        recharge.setCzqjbs(user1.getBalance());
+                        recharge.setCzhjbs(Integer.parseInt(user1.getBalance()) + 2 + "");
+                        recharge.setBz2("invite");
+                        recharge.setId(genId());
+                        rechargeService.save(recharge);
+                    }
+                    // 新注册用户获得一个金币
+                    recharge = new Recharge();
+                    recharge.setId(genId());
+                    recharge.setAmonut("1");
+                    recharge.setCzzt("1");
+                    recharge.setCjsj(DateUtils.getNowTime());
+                    recharge.setCzjb("1");
+                    recharge.setCzqd("2");
+                    recharge.setUserId(user.getId());
+                    recharge.setCzqjbs(user.getBalance());
+                    recharge.setCzhjbs(Integer.parseInt(user.getBalance()) + 1 + "");
+                    recharge.setBz2("invited");
+                    recharge.setId(genId());
+                    user.setBalance(Integer.parseInt(user.getBalance()) + 1 +"");
+                    update(user);
+                }
+                String token = JwtUtil.createToken(user.getId(), System.currentTimeMillis() + "");
+                redisDao.boundValueOps(user.getId()).set(token, 30, TimeUnit.DAYS);
+                res.setMessage(MessageUtils.get("user.regSuccess"));
+                UserModel model = new UserModel(user);
+                model.setToken(token);
+                model.setInviteCoin("0");
+                redis.boundValueOps(user.getId() + "_userInfo").set(JSON.toJSON(model), 30, TimeUnit.DAYS);
+                Map<String, Object> map = new HashMap<>();
+                map.put("token", token);
+                map.put("userInfo", model);
+                res.setResult(map);
+                // 登录纪录
+                Login login = new Login();
+                HttpServletRequest requset = getRequset();
+                String host = requset.getRemoteHost();
+                login.setCjsj(DateUtils.getNowTime());
+                login.setId(genId());
+                login.setIP(host);
+                login.setUserId(user.getId());
+                loginMapper.insert(login);
+                return res;
+            }else {
+                User user = users.get(0);
+                // 用户已经有了 直接登录即可
+                // 用户登录成功后 生成token  保存token 和 用户信息  有效一天
+                String token = JwtUtil.createToken(user.getId(), System.currentTimeMillis() + "");
+                redisDao.boundValueOps(user.getId()).set(token, 30, TimeUnit.DAYS);
+                res.setMessage(MessageUtils.get("user.loginSuccess"));
+                user.setLastTime(DateUtils.getNowTime());
+                update(user);
+                UserModel model = new UserModel(user);
+                model.setToken(token);
+                SimpleCondition condition = new SimpleCondition(Recharge.class);
+                condition.eq(Recharge.InnerColumn.czzt,"2");
+                condition.eq(Recharge.InnerColumn.czqd,"2");
+                condition.eq(Recharge.InnerColumn.bz2, "invite");
+                condition.eq(Recharge.InnerColumn.userId,user.getId());
+                List<Recharge> recharges = rechargeService.findByCondition(condition);
+                if(CollectionUtils.isEmpty(recharges)){
+                    model.setInviteCoin("0");
+                }else{
+                    int sum = recharges.stream().map(Recharge::getAmonut).mapToInt(Integer::parseInt).sum();
+                    model.setInviteCoin(sum+"");
+                }
+                redis.boundValueOps(user.getId() + "_userInfo").set(JSON.toJSON(model), 30, TimeUnit.DAYS);
+                Map<String, Object> tokenMap = new HashMap<>();
+                tokenMap.put("token", token);
+                tokenMap.put("userInfo", model);
+                res.setResult(tokenMap);
+                // 登录纪录
+                Login login = new Login();
+                HttpServletRequest requset = getRequset();
+                String host = requset.getRemoteHost();
+                login.setCjsj(DateUtils.getNowTime());
+                login.setId(genId());
+                login.setIP(host);
+                login.setUserId(user.getId());
+                loginMapper.insert(login);
+                return res;
+            }
         }
-        redis.boundValueOps(user.getId() + "_userInfo").set(JSON.toJSON(model), 30, TimeUnit.DAYS);
-        Map<String, Object> tokenMap = new HashMap<>();
-        tokenMap.put("token", token);
-        tokenMap.put("userInfo", model);
-        res.setResult(tokenMap);
-        // 登录纪录
-        Login login = new Login();
-        HttpServletRequest requset = getRequset();
-        String host = requset.getRemoteHost();
-        login.setCjsj(DateUtils.getNowTime());
-        login.setId(genId());
-        login.setIP(host);
-        login.setUserId(user.getId());
-        loginMapper.insert(login);
-        return res;*/
-        return null;
+
+    }
+
+    private String randomString(int length){
+        String str="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        Random random=new Random();
+        StringBuffer sb=new StringBuffer();
+        for(int i=0;i<length;i++){
+            int number=random.nextInt(52);
+            sb.append(str.charAt(number));
+        }
+        return sb.toString();
     }
 
 

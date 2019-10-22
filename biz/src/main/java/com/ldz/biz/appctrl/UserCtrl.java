@@ -156,8 +156,10 @@ public class UserCtrl  {
 
     /**
      * 登录注册一体化  短信验证码登录
+     * @return
      */
-    public ApiResponse<String> loginByCode(String phone, String code){
+    @PostMapping("/loginByCode")
+    public ApiResponse<Map<String, Object>> loginByCode(String phone, String code){
         return service.loginByCode(phone, code);
     }
 

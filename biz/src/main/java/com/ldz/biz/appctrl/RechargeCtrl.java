@@ -69,6 +69,7 @@ public class RechargeCtrl  {
     /**
      *    用户五星好评送 2 GCoin
      */
+    @PostMapping("/highPraise")
     public ApiResponse<String> saveHighPraise(){
         return service.saveHighPraise();
     }
