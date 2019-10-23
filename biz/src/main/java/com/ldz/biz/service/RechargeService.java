@@ -33,4 +33,6 @@ public interface RechargeService extends BaseService<Recharge, String> {
 
     ApiResponse<String> saveHighPraise();
 
+    ApiResponse<Integer> getPraise();
+
 }

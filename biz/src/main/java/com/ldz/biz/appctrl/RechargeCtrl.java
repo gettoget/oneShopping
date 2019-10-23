@@ -74,7 +74,10 @@ public class RechargeCtrl  {
         return service.saveHighPraise();
     }
 
-
+    @GetMapping("/getPraise")
+    public ApiResponse<Integer> getPraise(){
+        return service.getPraise();
+    }
 
 
 

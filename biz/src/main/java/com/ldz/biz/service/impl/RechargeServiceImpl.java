@@ -320,6 +320,21 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
         return ApiResponse.success();
     }
 
+    @Override
+    public ApiResponse<Integer> getPraise() {
+        // 查看用户是否有评分奖励 , 如果有 则表示没有打分
+        // 获取用户 id
+        String userId = getHeader("userId");
+        RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
+        User user = userService.findById(userId);
+        RuntimeCheck.ifNull(user, MessageUtils.get("user.notFind"));
+        SimpleCondition simpleCondition = new SimpleCondition(Recharge.class);
+        simpleCondition.eq(Recharge.InnerColumn.userId, userId);
+        simpleCondition.eq(Recharge.InnerColumn.bz2, "praise");
+        List<Recharge> recharges = findByCondition(simpleCondition);
+        return ApiResponse.success(recharges.size());
+    }
+
 
     @Override
     public void afterPager(PageInfo<Recharge> info) {
