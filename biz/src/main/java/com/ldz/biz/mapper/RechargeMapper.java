@@ -157,8 +157,8 @@ public interface RechargeMapper extends Mapper<Recharge> {
 
     @Select("<script>" +
             "   SELECT b.*,s.sm count from pro_baseinfo b inner join" +
-            "( select p.pro_baseid, sum(o.c) sm from pro_info p INNER JOIN (select pro_id , count(1) c  from " +
-            "order_list where yhlx = '0' and cjsj &gt;= #{time} and cjsj &lt;= #{end} group by pro_id) o on o.pro_id " +
+            "( select p.pro_baseid, sum(o.c) sm from pro_info p INNER JOIN (select proid , sum(xfjb) c  from " +
+            "exchange where  xfsj &gt;= #{time} and xfsj &lt;= #{end} and userid in (select id from user where source = '0' ) group by proid) o on o.proid " +
             "= p.id     group by p" +
             ".pro_baseid )  s on s.pro_baseid = b.id  " +
             " <if test='proName != null '>" +
@@ -171,15 +171,14 @@ public interface RechargeMapper extends Mapper<Recharge> {
 
     @Select("<script> " +
             " select u.*, o.count from user u inner join " +
-            "(select count(userid) count, userid from order_list where cjsj &gt;= #{time} and cjsj &lt;= #{end} and " +
-            "yhlx  = '0' " +
+            "(select count(xfjb) count, userid from exchange where xfsj &gt;= #{time} and xfsj &lt;= #{end} and " +
+            " userid in ( select id from user where source = '0')  " +
             " <if test='name = null'>" +
             " and userid in (select id from user where user_name like '%${name}%' and source = '0' ) " +
             "</if>" +
             "  group by userid) o  on u.id = o.userid   order by o.count desc " +
             "</script> ")
-    List<User> yhgm(@Param("time") String time, @Param("end") String end, @Param("name") String name, @Param("orderBy"
-    ) String orderBy);
+    List<User> yhgm(@Param("time") String time, @Param("end") String end, @Param("name") String name, @Param("orderBy") String orderBy);
 
     @Select("<script> " +
             " select u.* from user u inner join  ( select count(user_id) c , user_id  from recharge r where r.czqd = " +
