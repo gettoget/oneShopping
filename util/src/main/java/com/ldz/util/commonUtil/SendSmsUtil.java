@@ -180,7 +180,7 @@ public class SendSmsUtil {
         object.put("token",token);
         object.put("sendType",1);
         object.put("msisdn",phone);
-        object.put("message",content);
+        object.put("message","[GoSaku]" + content);
         String post = "";
         try {
              post = HttpUtil.postJson(smsUrl, postHeader,JSON.toJSONString(object));

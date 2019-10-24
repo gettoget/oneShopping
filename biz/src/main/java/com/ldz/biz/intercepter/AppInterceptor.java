@@ -22,7 +22,7 @@ public class AppInterceptor extends HandlerInterceptorAdapter {
 
 
 
-    private List<String> whiteList = Arrays.asList("/api/app/user/login","/api/app/user/register","/api/app/user/sendMsg","/api/app/user/findPwd","/api/app/user/proeval/newPager","/api/app/user/award/save","/api/app/user/award/lotty","/api/app/user/award/getAwardRecord");
+    private List<String> whiteList = Arrays.asList("/api/app/user/loginByCode","/api/app/user/login","/api/app/user/register","/api/app/user/sendMsg","/api/app/user/findPwd","/api/app/user/proeval/newPager","/api/app/user/award/save","/api/app/user/award/lotty","/api/app/user/award/getAwardRecord");
 
     public AppInterceptor() {
     }
