@@ -50,9 +50,9 @@ public class RechargeContrl extends BaseController<Recharge,String> {
      * @param id
      * @return
      */
-  /*  @GetMapping("/return")
+    @GetMapping("/return")
     public ApiResponse<String> returnGcoin(String id){
         return service.returnGcoin(id);
-    }*/
+    }
 
 }

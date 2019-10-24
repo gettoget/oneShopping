@@ -35,5 +35,5 @@ public interface RechargeService extends BaseService<Recharge, String> {
 
     ApiResponse<Integer> getPraise();
 
-//    ApiResponse<String> returnGcoin(String id);
+    ApiResponse<String> returnGcoin(String id);
 }
