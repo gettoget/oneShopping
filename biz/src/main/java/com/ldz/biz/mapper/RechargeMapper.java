@@ -185,7 +185,7 @@ public interface RechargeMapper extends Mapper<Recharge> {
             "'1' and r.user_id in " +
             " <foreach collection='ids' item='item' index='index' open='(' separator=',' close=')' >" +
             " #{item} " +
-            " </foreach> group by r.usesr_id having c &gt;= 2 ) re on re.user_id = u.id  " +
+            " </foreach> group by r.user_id having c &gt;= 2 ) re on re.user_id = u.id  " +
             "</script>")
     List<User> getTwo(@Param("ids") Set<String> ids);
 
