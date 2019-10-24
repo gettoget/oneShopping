@@ -23,6 +23,7 @@ import com.ldz.util.redis.RedisTemplateUtil;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -334,6 +335,44 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
         List<Recharge> recharges = findByCondition(simpleCondition);
         return ApiResponse.success(recharges.size());
     }
+
+   /* @Override
+    public ApiResponse<String> returnGcoin(String id) {
+        // 获取超过购买达到 5 个币的用户 , 返还金币
+        List<User> users = baseMapper.getMoreThanFive(id);
+        for (User user : users) {
+            int xf = Integer.parseInt(user.getXf());
+            // 拿到消费的金币 随机 10% - 20%
+            int persent = RandomUtils.nextInt(0, 2);
+            int jb;
+            if(persent == 1){
+                jb = xf * 20 / 100;
+            }else{
+                jb = xf*10/100;
+            }
+            if(jb == 0){
+                jb =1;
+            }
+            // 用户余额加奖励金币 生成充值记录
+            userMapper.saveBalance(user.getId(),  "" + jb);
+            Recharge recharge = new Recharge();
+            recharge.setAmonut("2");
+            recharge.setCzzt("2");
+            recharge.setCjsj(DateUtils.getNowTime());
+            recharge.setCzjb("2");
+            recharge.setCzqd("2");
+            recharge.setUserId(user.getId());
+            recharge.setCzqjbs(user.getBalance());
+            recharge.setCzhjbs(Integer.parseInt(user.getBalance()) + jb + "");
+            recharge.setBz2("return");
+            recharge.setId(genId());
+            save(recharge);
+            // 短信发送
+            String s = SendSmsUtil.sendMSG(user.getPhone(), "produk yang anda ikuti sudah berakhir, selamat, anda berhak mendapatkan bonus " + jb + " Gcoin");
+            System.out.println(s);
+        }
+        return ApiResponse.success();
+    }*/
 
 
     @Override

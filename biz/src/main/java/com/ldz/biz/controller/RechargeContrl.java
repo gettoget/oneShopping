@@ -44,4 +44,15 @@ public class RechargeContrl extends BaseController<Recharge,String> {
     public ApiResponse<Map<String,String>>  getMoreThanTwo(){
         return service.getMoreThanTwo();
     }
+
+    /**
+     * 根据商品id  补送消费金币超过 5 金币的用户返回Gcoin
+     * @param id
+     * @return
+     */
+  /*  @GetMapping("/return")
+    public ApiResponse<String> returnGcoin(String id){
+        return service.returnGcoin(id);
+    }*/
+
 }
