@@ -341,9 +341,9 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
         // 获取超过购买达到 5 个币的用户 , 返还金币
         List<User> users = baseMapper.getMoreThanFive(id);
         for (User user : users) {
-         /*   if(!StringUtils.equals(user.getId(), "611629732441620480")){
+            if(!StringUtils.equals(user.getId(), "611629732441620480")){
                 continue;
-            }*/
+            }
             int xf = Integer.parseInt(user.getXf());
             // 拿到消费的金币 随机 10% - 20%
             int persent = RandomUtils.nextInt(0, 2);
