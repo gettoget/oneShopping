@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.common.Mapper;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -221,6 +220,9 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, String> imple
         String id = getHeader("userId");
         RuntimeCheck.ifNull(id, MessageUtils.get("user.notLogin"));
         Question ck = baseMapper.ck(id);
+        if(ck == null ){
+            return ApiResponse.success("0");
+        }
         if((StringUtils.equals(ck.getType(), "2") && StringUtils.equals(ck.getCk(), "1")) || StringUtils.equals(ck.getType(), "1")){
             return ApiResponse.success("0");
         }else{

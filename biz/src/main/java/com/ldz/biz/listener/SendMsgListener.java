@@ -61,20 +61,10 @@ public class SendMsgListener implements MessageListener {
             condition.eq(OrderList.InnerColumn.proId, id);
             condition.eq(OrderList.InnerColumn.yhlx, "0");
             List<OrderList> lists = listService.findByCondition(condition);
-
-            if(CollectionUtils.isNotEmpty(lists)){
-                // 拿到所有的参与用户id  筛选出 有两次以上充值用户的id
-                Set<String> ids = lists.stream().map(OrderList::getUserid).collect(Collectors.toSet());
-                List<User> gteTwo = mapper.getTwo(ids);
-                if(CollectionUtils.isNotEmpty(gteTwo)){
-                    gteTwo.forEach(user -> {
-                        SendSmsUtil.sendMSG(user.getPhone(), "produk yang anda ikuti sudah berakhir, yuk lihat hasilnya sekarang");
-                    });
-                }
-            }
             // 对参与商品超过 某个限定值的用户 进行随机 10-20%的金币反馈
             // 获取超过购买达到 5 个币的用户 , 返还金币
             List<User> users = mapper.getMoreThanFive(id);
+            List<String> collect = users.stream().map(User::getId).collect(Collectors.toList());
             for (User user : users) {
                 int xf = Integer.parseInt(user.getXf());
                 // 拿到消费的金币 随机 10% - 20%
@@ -91,10 +81,10 @@ public class SendMsgListener implements MessageListener {
                 // 用户余额加奖励金币 生成充值记录
                 baseMapper.saveBalance(user.getId(),  "" + jb);
                 Recharge recharge = new Recharge();
-                recharge.setAmonut("2");
+                recharge.setAmonut("" + jb);
                 recharge.setCzzt("2");
                 recharge.setCjsj(DateUtils.getNowTime());
-                recharge.setCzjb("2");
+                recharge.setCzjb("" + jb);
                 recharge.setCzqd("2");
                 recharge.setUserId(user.getId());
                 recharge.setCzqjbs(user.getBalance());
@@ -104,6 +94,18 @@ public class SendMsgListener implements MessageListener {
                 rechargeService.save(recharge);
                 // 短信发送
                 SendSmsUtil.sendMSG(user.getPhone(), "produk yang anda ikuti sudah berakhir, selamat, anda berhak mendapatkan bonus "+jb + " Gcoin");
+            }
+            if(CollectionUtils.isNotEmpty(lists)){
+                // 拿到所有的参与用户id  筛选出 有两次以上充值用户的id
+                Set<String> ids = lists.stream().map(OrderList::getUserid).collect(Collectors.toSet());
+                List<User> gteTwo = mapper.getTwo(ids);
+                if(CollectionUtils.isNotEmpty(gteTwo)){
+                    gteTwo.forEach(user -> {
+                        if(!collect.contains(user.getId())){
+                            SendSmsUtil.sendMSG(user.getPhone(), "produk yang anda ikuti sudah berakhir, yuk lihat hasilnya sekarang");
+                        }
+                    });
+                }
             }
 
         }
