@@ -132,21 +132,15 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
         amount = amount / ratio;
         RuntimeCheck.ifFalse(amount >= 20, "Tolong upgrade app!");
         // 判断是否为首次充值 , 首次充值 加  50%
-        SimpleCondition condition = new SimpleCondition(Recharge.class);
-        condition.eq(Recharge.InnerColumn.userId, user.getId());
-        condition.eq(Recharge.InnerColumn.czqd, "1");
-        condition.eq(Recharge.InnerColumn.czzt, "2");
-        List<Recharge> recharges = findByCondition(condition);
+
         int ysje =amount;
 
-        if(CollectionUtils.isEmpty(recharges)){
-            amount = (int) (amount * 1.5);
-        }
+
 
         Recharge recharge = new Recharge();
         recharge.setId(genId());
         recharge.setAmonut(ysje + "");
-        recharge.setCzjb(amount + "");
+        recharge.setCzjb(ysje + "");
         recharge.setCjsj(DateUtils.getNowTime());
         recharge.setCzzt("1");
         recharge.setCzqd("1");
@@ -230,6 +224,17 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
         recharge.setQrbw(data);
         if (StringUtils.equals(words, hex)) {
             User user = userService.findById(recharge.getUserId());
+            SimpleCondition condition = new SimpleCondition(Recharge.class);
+            condition.eq(Recharge.InnerColumn.userId, user.getId());
+            condition.eq(Recharge.InnerColumn.czqd, "1");
+            condition.eq(Recharge.InnerColumn.czzt, "2");
+            List<Recharge> recharges = findByCondition(condition);
+            if(CollectionUtils.isEmpty(recharges)){
+                int czjb = (int) (Integer.parseInt(recharge.getAmonut()) * 1.5);
+                recharge.setCzjb(czjb+"");
+            }else{
+                recharge.setCzjb(recharge.getAmonut());
+            }
             userService.saveBalance(recharge.getUserId(), Integer.parseInt(recharge.getCzjb())  + "");
             recharge.setCzzt("2");
             recharge.setCzqjbs(user.getBalance());
@@ -290,6 +295,18 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
             return ApiResponse.success("SUCCESS");
         }
         User user = userService.findById(recharge.getUserId());
+        SimpleCondition condition = new SimpleCondition(Recharge.class);
+        condition.eq(Recharge.InnerColumn.userId, user.getId());
+        condition.eq(Recharge.InnerColumn.czqd, "1");
+        condition.eq(Recharge.InnerColumn.czzt, "2");
+        List<Recharge> recharges = findByCondition(condition);
+        if(CollectionUtils.isEmpty(recharges)){
+            int czjb = (int) (Integer.parseInt(recharge.getAmonut()) * 1.5);
+            recharge.setCzjb(czjb+"");
+        }else{
+            recharge.setCzjb(recharge.getAmonut());
+        }
+
         userService.saveBalance(recharge.getUserId(),
                 Integer.parseInt(recharge.getCzjb()) + "");
         recharge.setCzzt("2");
