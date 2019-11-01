@@ -39,6 +39,26 @@ public class StatisNewServiceImpl implements StatisNewService {
 
     @Override
     public ApiResponse<Map<String, Object>> statisNewRecharge(String time) {
+        // 时间格式小于10 的 补 0
+        String[] split = time.split("-");
+        String year = split[0];
+        String mon = "";
+        String day = "";
+        if(split.length ==2){
+             mon = split[1];
+            if(Integer.parseInt(mon) < 10){
+                mon = "0" + Integer.parseInt(mon);
+            }
+        }
+        if(split.length == 3){
+             day = split[2];
+            if(Integer.parseInt(day) < 10 ){
+                day = "0" + Integer.parseInt(day);
+            }
+        }
+        time = year + "-" + mon + "-" + day;
+
+
         //  先查当天的
 //        String time = DateTime.now().toString("yyyy-MM-dd");
         List<Recharge> dtCz = mapper.getDtCz(time);
