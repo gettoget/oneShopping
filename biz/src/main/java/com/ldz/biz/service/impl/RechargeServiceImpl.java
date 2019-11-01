@@ -289,10 +289,13 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
         if (StringUtils.equals(recharge.getCzzt(), "2")) {
             return ApiResponse.success("SUCCESS");
         }
+        User user = userService.findById(recharge.getUserId());
         userService.saveBalance(recharge.getUserId(),
-                Integer.parseInt(recharge.getAmonut().split("\\.")[0]) / ratio + "");
+                Integer.parseInt(recharge.getCzjb()) + "");
         recharge.setCzzt("2");
         recharge.setQrsj(DateUtils.getNowTime());
+        recharge.setCzqjbs(user.getBalance());
+        recharge.setCzhjbs(Integer.parseInt(user.getBalance()) + Integer.parseInt(recharge.getCzjb()) + "");
         // 存储银行卡号
         BankRecord bankRecord = new BankRecord();
         bankRecord.setId(genId());
