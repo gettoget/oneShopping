@@ -575,6 +575,10 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         return ApiResponse.success();
     }
 
+    public static void main(String[] args) {
+        System.out.println("0123456".startsWith("0"));
+    }
+
     @Override
     public void saveBalance(String userId, String amount) {
         baseMapper.saveBalance(userId, amount);
@@ -584,6 +588,11 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
     public ApiResponse<Map<String, Object>> loginByCode(String phone, String code) {
         ApiResponse<Map<String, Object>> res = new ApiResponse<>();
         RuntimeCheck.ifBlank(phone, MessageUtils.get("user.phoneblank"));
+        phone = phone.trim();
+        // 判断号码为 0 开头的电话 , 去掉第一个为0 的电话号码 再进行匹配
+        if(phone.startsWith("0")){
+            phone = phone.substring(1);
+        }
         // 第一次进来的时候没有code   , 此时根据code 来判断是否需要发送验证码
         if(StringUtils.isBlank(code)){
             // 发送验证码
@@ -597,7 +606,9 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
             RuntimeCheck.ifFalse(StringUtils.equals(s,code), MessageUtils.get("user.regCodeError"));
 
             // 有验证码 此时需要验证是否为已有用户 , 根据验证结果 是否需要注册
-            List<User> users = findEq(User.InnerColumn.phone, phone);
+            SimpleCondition condition = new SimpleCondition(User.class);
+            condition.and().andCondition(" phone = '" + phone + "' or phone = '0" + phone + "'");
+            List<User> users = findByCondition(condition);
             if(CollectionUtils.isEmpty(users)){
                 // 注册用户 , 查看是否有邀请码
                 String inviteNumber = getRequestParamterAsString("inviteNumber");
@@ -719,7 +730,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
                 update(user);
                 UserModel model = new UserModel(user);
                 model.setToken(token);
-                SimpleCondition condition = new SimpleCondition(Recharge.class);
+                condition = new SimpleCondition(Recharge.class);
                 condition.eq(Recharge.InnerColumn.czzt,"2");
                 condition.eq(Recharge.InnerColumn.czqd,"2");
                 condition.eq(Recharge.InnerColumn.bz2, "invite");
