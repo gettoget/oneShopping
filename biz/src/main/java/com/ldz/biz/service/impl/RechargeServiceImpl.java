@@ -358,6 +358,11 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
         RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
         User user = userService.findById(userId);
         RuntimeCheck.ifNull(user, MessageUtils.get("user.notFind"));
+        SimpleCondition simpleCondition = new SimpleCondition(Recharge.class);
+        simpleCondition.eq(Recharge.InnerColumn.userId, userId);
+        simpleCondition.eq(Recharge.InnerColumn.bz2, "praise");
+        List<Recharge> recharges = findByCondition(simpleCondition);
+        RuntimeCheck.ifTrue(CollectionUtils.isNotEmpty(recharges), "Anda telah mengevaluasi, tidak dapat mengevaluasi lagi");
         // 用户余额加奖励金币 生成充值记录
         userMapper.saveBalance(userId,  "" + 2);
         Recharge recharge = new Recharge();

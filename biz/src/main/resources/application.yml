@@ -1,5 +1,5 @@
 server:
-  port: 8088
+  port: 8080
 spring:
   profiles:
     active: test  #合并 application-test.yml 中的配置参数

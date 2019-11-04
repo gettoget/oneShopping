@@ -51,6 +51,10 @@ public class StatisNewServiceImpl implements StatisNewService {
             }
         }
         if(split.length == 3){
+            mon = split[1];
+            if(Integer.parseInt(mon) < 10){
+                mon = "0" + Integer.parseInt(mon);
+            }
              day = split[2];
             if(Integer.parseInt(day) < 10 ){
                 day = "0" + Integer.parseInt(day);

@@ -212,6 +212,7 @@
       this.getStatisPro()
       this.getStatisRecharge()
       this.getStatisRecharge1()
+      this.getSstatisCharge()
     },
     mounted() {
     },

@@ -29,16 +29,16 @@ public class ScheduleComponent {
     @PostConstruct
     public void startScheduler() {
 //        //         每5秒运行一次。机器人购买商品功能
-        jobConfigs.add(new JobConfig(RobotSyncJob.class,"0/10 * * * * ? *","RobotSyncJob"));
-//
-//        // 每10秒运行一次。商品开奖功能
-        jobConfigs.add(new JobConfig(ProInfoFinishSyncJob.class,"0/10 * * * * ? *","ProInfoFinishSyncJob"));
+//        jobConfigs.add(new JobConfig(RobotSyncJob.class,"0/10 * * * * ? *","RobotSyncJob"));
+////
+////        // 每10秒运行一次。商品开奖功能
+//        jobConfigs.add(new JobConfig(ProInfoFinishSyncJob.class,"0/10 * * * * ? *","ProInfoFinishSyncJob"));
+////
+////        // 每5分钟检查一次。商品开奖功能
+//        jobConfigs.add(new JobConfig(KjJob.class,"0 */5 * * * ?","kjJob"));
 //
 //        // 每5分钟检查一次。商品开奖功能
-        jobConfigs.add(new JobConfig(KjJob.class,"0 */5 * * * ?","kjJob"));
-
-        // 每5分钟检查一次。商品开奖功能
-        jobConfigs.add(new JobConfig(ForceKj.class,"0 */5 * * * ?","forceKjJob"));
+//        jobConfigs.add(new JobConfig(ForceKj.class,"0 */5 * * * ?","forceKjJob"));
 
         try {
             for (JobConfig jobConfig : jobConfigs) {
