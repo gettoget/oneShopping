@@ -772,7 +772,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, String> implements Us
         user.setInvitedNumber(inviteNumber);
         user.setBalance(Integer.parseInt(user.getBalance()) + 1 + "");
         update(user);
-
+        rechargeService.save(recharge);
 
         return ApiResponse.success();
     }
