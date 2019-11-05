@@ -121,4 +121,6 @@ public interface UserService extends BaseService<User, String> {
     void saveBalance(String userId, String amount);
 
     ApiResponse<Map<String, Object>> loginByCode(String phone, String code);
+
+    ApiResponse<String> saveInvited(String inviteNumber);
 }
