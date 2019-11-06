@@ -5,10 +5,15 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
+import com.ldz.biz.mapper.BankMapper;
+import com.ldz.biz.mapper.BankRecordMapper;
 import com.ldz.biz.mapper.RechargeMapper;
 import com.ldz.biz.mapper.UserMapper;
+import com.ldz.biz.model.Bank;
+import com.ldz.biz.model.BankRecord;
 import com.ldz.biz.model.Recharge;
 import com.ldz.biz.model.User;
+import com.ldz.biz.service.BankService;
 import com.ldz.biz.service.RechargeService;
 import com.ldz.biz.service.UserService;
 import com.ldz.sys.base.BaseServiceImpl;
@@ -25,6 +30,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -49,6 +55,14 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
     private RedisTemplateUtil redis;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private BankService bankService;
+    @Autowired
+    private BankMapper bankMapper;
+    @Autowired
+    private BankRecordMapper bankRecordMapper;
+    @Value("${czqr}")
+    private int czqr;
 
     @Value("${mall_id}")
     private String mallId;
@@ -76,6 +90,16 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
             }
             Set<String> userid = users.stream().map(User::getId).collect(Collectors.toSet());
             condition.in(Recharge.InnerColumn.userId, userid);
+        }
+        String type = getRequestParamterAsString("type");
+        if(StringUtils.equals("ovo", type)){
+            List<Bank> banks = bankService.findAll();
+            if(CollectionUtils.isNotEmpty(banks)){
+                List<String> collect = banks.stream().map(Bank::getBankNo).collect(Collectors.toList());
+                condition.in(Recharge.InnerColumn.bz1, collect);
+            }else{
+                return false;
+            }
         }
         return true;
     }
@@ -108,55 +132,53 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
         amount = amount / ratio;
         RuntimeCheck.ifFalse(amount >= 20, "Tolong upgrade app!");
         // 判断是否为首次充值 , 首次充值 加  50%
-        SimpleCondition condition = new SimpleCondition(Recharge.class);
-        condition.eq(Recharge.InnerColumn.userId, user.getId());
-        condition.eq(Recharge.InnerColumn.czqd, "1");
-        condition.eq(Recharge.InnerColumn.czzt, "2");
-        List<Recharge> recharges = findByCondition(condition);
+
         int ysje =amount;
 
-        if(CollectionUtils.isEmpty(recharges)){
-            amount = (int) (amount * 1.5);
-        }
+
 
         Recharge recharge = new Recharge();
         recharge.setId(genId());
         recharge.setAmonut(ysje + "");
-        recharge.setCzjb(amount + "");
+        recharge.setCzjb(ysje + "");
         recharge.setCjsj(DateUtils.getNowTime());
         recharge.setCzzt("1");
         recharge.setCzqd("1");
         recharge.setUserId(userId);
-        recharge.setBz1(paymentId);
-        recharge.setBz2("recharge");
-        RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
+        ApiResponse<String> res = new ApiResponse<>();
+        if(StringUtils.equals(paymentId, "ovo")){
+            // 获取卡号
+            Bank bank = bankMapper.getByType(paymentId, DateTime.now().toString("yyyy-MM-dd"), czqr);
+            RuntimeCheck.ifNull(bank , MessageUtils.get("defeat"));
+            recharge.setBz1(bank.getBankNo());
+            res.setResult( bank.getBankNo() + "," + recharge.getId());
+        }else{
+            recharge.setBz1(paymentId);
+            recharge.setBz2("recharge");
+            RuntimeCheck.ifBlank(imei, MessageUtils.get("user.imeiBlank"));
+            Map<String, String> paramsMap = new HashMap<>();
+            paramsMap.put("mall_id", mallId);
+            paramsMap.put("amount", payAmount + "");
+            paramsMap.put("trans_id", recharge.getId());
+            paramsMap.put("payment_id", paymentId);
+            String words = DigestUtils.sha1Hex(mallId + sharedKey + payAmount + recharge.getId());
+            paramsMap.put("words", words);
+            log.info(" 支付请求参数 : {}", JSON.toJSON(paramsMap));
+            // 存储充值时的报文
+            recharge.setCzbw(JSON.toJSONString(paramsMap));
+            String post = HttpUtil.post("https://pay.gokado.id/payment/generate-pay-code", paramsMap);
+            JSONObject object = JSON.parseObject(post);
+            Integer code = object.getInteger("code");
+            Integer status = object.getInteger("status");
+            RuntimeCheck.ifFalse(code == 0 && status == 200, MessageUtils.get("order.error"));
+            String data = object.getString("data");
+            res.setResult(data + "," + recharge.getId());
+        }
 
-        Map<String, String> paramsMap = new HashMap<>();
-        paramsMap.put("mall_id", mallId);
-        paramsMap.put("amount", payAmount + "");
-        paramsMap.put("trans_id", recharge.getId());
-        paramsMap.put("payment_id", paymentId);
-        String words = DigestUtils.sha1Hex(mallId + sharedKey + payAmount + recharge.getId());
-        paramsMap.put("words", words);
-        log.info(" 支付请求参数 : {}", JSON.toJSON(paramsMap));
-        // 存储充值时的报文
-        recharge.setCzbw(JSON.toJSONString(paramsMap));
         // 充值前金币和充值后金币不在充值的时候写 , 写在充值回调的时候
 //        String balance = Integer.parseInt(user.getBalance()) + amount + "";
         recharge.setImei(imei);
         int i = save(recharge);
-
-
-        String post = HttpUtil.post("https://pay.gokado.id/payment/generate-pay-code", paramsMap);
-        JSONObject object = JSON.parseObject(post);
-        Integer code = object.getInteger("code");
-        Integer status = object.getInteger("status");
-        RuntimeCheck.ifFalse(code == 0 && status == 200, MessageUtils.get("order.error"));
-        String data = object.getString("data");
-
-        ApiResponse<String> res = new ApiResponse<>();
-        res.setResult(data + "," + recharge.getId());
-
         res.setMessage(MessageUtils.get("recharge.orderSuc"));
         return res;
     }
@@ -202,6 +224,17 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
         recharge.setQrbw(data);
         if (StringUtils.equals(words, hex)) {
             User user = userService.findById(recharge.getUserId());
+            SimpleCondition condition = new SimpleCondition(Recharge.class);
+            condition.eq(Recharge.InnerColumn.userId, user.getId());
+            condition.eq(Recharge.InnerColumn.czqd, "1");
+            condition.eq(Recharge.InnerColumn.czzt, "2");
+            List<Recharge> recharges = findByCondition(condition);
+            if(CollectionUtils.isEmpty(recharges)){
+                int czjb = (int) (Integer.parseInt(recharge.getAmonut()) * 1.5);
+                recharge.setCzjb(czjb+"");
+            }else{
+                recharge.setCzjb(recharge.getAmonut());
+            }
             userService.saveBalance(recharge.getUserId(), Integer.parseInt(recharge.getCzjb())  + "");
             recharge.setCzzt("2");
             recharge.setCzqjbs(user.getBalance());
@@ -255,15 +288,37 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
 
     @Override
     public ApiResponse<String> paySucTest(String id) {
-        RuntimeCheck.ifBlank(id, "请上传订单id");
+        RuntimeCheck.ifBlank(id, MessageUtils.get("order.idBlank"));
         Recharge recharge = findById(id);
         RuntimeCheck.ifNull(recharge, MessageUtils.get("order.notTrue"));
         if (StringUtils.equals(recharge.getCzzt(), "2")) {
             return ApiResponse.success("SUCCESS");
         }
+        User user = userService.findById(recharge.getUserId());
+        SimpleCondition condition = new SimpleCondition(Recharge.class);
+        condition.eq(Recharge.InnerColumn.userId, user.getId());
+        condition.eq(Recharge.InnerColumn.czqd, "1");
+        condition.eq(Recharge.InnerColumn.czzt, "2");
+        List<Recharge> recharges = findByCondition(condition);
+        if(CollectionUtils.isEmpty(recharges)){
+            int czjb = (int) (Integer.parseInt(recharge.getAmonut()) * 1.5);
+            recharge.setCzjb(czjb+"");
+        }else{
+            recharge.setCzjb(recharge.getAmonut());
+        }
+
         userService.saveBalance(recharge.getUserId(),
-                Integer.parseInt(recharge.getAmonut().split("\\.")[0]) / ratio + "");
+                Integer.parseInt(recharge.getCzjb()) + "");
         recharge.setCzzt("2");
+        recharge.setQrsj(DateUtils.getNowTime());
+        recharge.setCzqjbs(user.getBalance());
+        recharge.setCzhjbs(Integer.parseInt(user.getBalance()) + Integer.parseInt(recharge.getCzjb()) + "");
+        // 存储银行卡号
+        BankRecord bankRecord = new BankRecord();
+        bankRecord.setId(genId());
+        bankRecord.setCjsj(DateUtils.getNowTime());
+        bankRecord.setBankNo(recharge.getBz1());
+        bankRecordMapper.insertSelective(bankRecord);
         update(recharge);
         String channelId = (String) redis.boundValueOps(recharge.getUserId() + "_channelId").get();
         if (StringUtils.isNotBlank(channelId)) {
@@ -272,7 +327,6 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
             msgBean.setJson(JsonUtil.toJson(recharge));
             BaiduPushUtils.pushSingleMsg(channelId, 0, JsonUtil.toJson(msgBean), 3);
         }
-
         return ApiResponse.success("SUCCESS");
     }
 
@@ -304,6 +358,11 @@ public class RechargeServiceImpl extends BaseServiceImpl<Recharge, String> imple
         RuntimeCheck.ifBlank(userId, MessageUtils.get("user.notLogin"));
         User user = userService.findById(userId);
         RuntimeCheck.ifNull(user, MessageUtils.get("user.notFind"));
+        SimpleCondition simpleCondition = new SimpleCondition(Recharge.class);
+        simpleCondition.eq(Recharge.InnerColumn.userId, userId);
+        simpleCondition.eq(Recharge.InnerColumn.bz2, "praise");
+        List<Recharge> recharges = findByCondition(simpleCondition);
+        RuntimeCheck.ifTrue(CollectionUtils.isNotEmpty(recharges), "Anda telah mengevaluasi, tidak dapat mengevaluasi lagi");
         // 用户余额加奖励金币 生成充值记录
         userMapper.saveBalance(userId,  "" + 2);
         Recharge recharge = new Recharge();

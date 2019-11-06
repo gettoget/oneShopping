@@ -1,5 +1,5 @@
 server:
-  port: 8088
+  port: 8080
 spring:
   profiles:
     active: test  #合并 application-test.yml 中的配置参数
@@ -38,6 +38,7 @@ mall_id: cabf5fdd363bbb73209a32d4ce12b65a
 shared_key: t8oO2DMFX8UY
 
 ratio: 100
+czqr: 40
 
 
 

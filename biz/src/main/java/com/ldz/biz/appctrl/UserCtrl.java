@@ -163,5 +163,10 @@ public class UserCtrl  {
         return service.loginByCode(phone, code);
     }
 
+    @PostMapping("/saveInvited")
+    public ApiResponse<String> saveInvited(String inviteNumber){
+        return service.saveInvited(inviteNumber);
+    }
+
 
 }

@@ -55,4 +55,14 @@ public class RechargeContrl extends BaseController<Recharge,String> {
         return service.returnGcoin(id);
     }
 
+    /**
+     * 充值订单确认
+     * @param id
+     * @return
+     */
+    @PostMapping("/paySucTest")
+    public ApiResponse<String> paySucTest(String id) {
+        return service.paySucTest(id);
+    }
+
 }

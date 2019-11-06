@@ -41,6 +41,10 @@ public class QuestionCtrl {
         return service.delete(id);
     }
 
+    /**
+     * 查看回复
+     * @return
+     */
     @GetMapping("/ck")
     public ApiResponse<String> ck(){
         return service.ck();
