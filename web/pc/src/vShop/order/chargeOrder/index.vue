@@ -14,7 +14,7 @@
       </div>
       <div>
         <Select v-model="czqd" @on-change="getPagerList" style="width: 160px;margin-right: 18px" :placeholder="$t('CZZT')">
-          <Option value="ALL">{{$t('QB')}}</Option>
+          <Option value="">{{$t('QB')}}</Option>
           <Option value="0">{{$t('SUCCESS')}}</Option>
           <Option value="1">{{$t('FAIL')}}</Option>
           <Option value="2">{{$t('REWARD')}}</Option>
@@ -227,7 +227,7 @@
                 ],
                 tableData: [],
                 param: {
-                    bz1:'ALL',
+                    bz1:'',
                     username: '',
                     cjsjGte: '',//开始
                     cjsjLte: '',//结束

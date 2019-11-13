@@ -262,6 +262,15 @@ export default [
           title: '充值订单'
         },
         component: () => import('@/vShop/order/chargeOrder')
+      },
+      {
+        path: '/ovo',
+        name: 'ovo',
+        meta: {
+          icon: 'ios-document-outline',
+          title: '充值订单'
+        },
+        component: () => import('@/vShop/order/ovo')
       }
     ]
   },
