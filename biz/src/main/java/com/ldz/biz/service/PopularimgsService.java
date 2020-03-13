@@ -14,4 +14,6 @@ public interface PopularimgsService extends BaseService<Popularimgs, String> {
      * @return
      */
     ApiResponse<String> saveEntity(Popularimgs entity);
+
+    void removeEntity(String id);
 }

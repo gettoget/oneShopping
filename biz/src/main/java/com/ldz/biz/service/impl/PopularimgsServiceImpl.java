@@ -5,6 +5,7 @@ import com.ldz.biz.mapper.PopularimgsMapper;
 import com.ldz.biz.model.Popularimgs;
 import com.ldz.biz.service.PopularimgsService;
 import com.ldz.sys.base.BaseServiceImpl;
+import com.ldz.sys.base.LimitedCondition;
 import com.ldz.util.bean.ApiResponse;
 import com.ldz.util.commonUtil.DateUtils;
 import com.ldz.util.commonUtil.MessageUtils;
@@ -49,8 +50,22 @@ public class PopularimgsServiceImpl extends BaseServiceImpl<Popularimgs, String>
 		return ApiResponse.saveSuccess();
     }
 
-
     @Override
+    public void removeEntity(String id) {
+		Popularimgs popularimgs = findById(id);
+		if(popularimgs != null){
+			popularimgs.setZt("1");
+			update(popularimgs);
+		}
+	}
+
+	@Override
+	public boolean fillPagerCondition(LimitedCondition condition) {
+		condition.eq(Popularimgs.InnerColumn.zt, "0");
+		return true;
+	}
+
+	@Override
     public void afterPager(PageInfo<Popularimgs> result){
 		List<Popularimgs> list = result.getList();
 		if(CollectionUtils.isEmpty(list)){
