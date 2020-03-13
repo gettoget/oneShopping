@@ -49,3 +49,6 @@ export default {
   }
 }
 </script>
+<style lang="less">
+  /*.otem:nth-child()*/
+</style>
